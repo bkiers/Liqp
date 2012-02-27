@@ -1,0 +1,193 @@
+http://wiki.shopify.com/UsingLiquid
+
+## 1. output
+
+    Hello {{name}}
+    Hello {{user.name}}
+    Hello {{ 'tobi' }}
+
+![-][1]
+
+## 2. filters
+
+    The word "tobi" in uppercase: {{ 'tobi' | upcase }}
+    The word "tobi" has {{ 'tobi' | size }} letters!
+    Change "Hello world" to "Hi world": {{ 'Hello world' | replace: 'Hello', 'Hi' }}
+    The date today is {{ 'now' | date: "%Y %b %d" }}
+
+![-][2]
+
+## 3. comment
+
+    Hello world. {% comment %} Now this is a single-line comment {% endcomment %} <br />
+    Hello world,
+    I think I'm gonna be happy today. {% comment %} Now this is a
+    multi-line comment that should be ignored too,
+    just like the single-line comment {% endcomment %}
+
+![-][3]
+
+## 4. raw
+
+    {% raw %}{{ 5 | plus: 6 }}{% endraw %} is equal to {{ 5 | plus: 6 }}.
+
+![-][4]
+
+## 5. if, else, unless
+
+    {% if user.payments == empty %}
+       you haven't paid yet! 
+    {% endif %}
+
+![-][5]
+
+    {% if user.age > 18 %}
+       Login here
+    {% else %}
+       Sorry, you are too young
+    {% endif %}
+
+![-][6]
+
+    {% unless user.age > 18 %}
+      Sorry, you are too young
+    {% else %}
+      Login here
+    {% endunless %}
+
+![-][7]
+
+## 6. case
+
+    {% case template %}
+      {% when 'index' %}
+         Welcome
+      {% when 'product' %}
+         {{ product.vendor | link_to_vendor }} / {{ product.title }}
+      {% else %}
+         {{ page_title }}
+    {% endcase %}
+
+![-][8]
+
+## 7. cycle
+
+    {% cycle 'one', 'two', 'three' %}<br /> 
+    {% cycle 'one', 'two', 'three' %}<br /> 
+    {% cycle 'one', 'two', 'three' %}<br /> 
+    {% cycle 'one', 'two', 'three' %} 
+
+![-][9]
+    
+    {% cycle 'group 1': 'one', 'two', 'three' %}<br /> 
+    {% cycle 'group 1': 'one', 'two', 'three' %}<br /> 
+    {% cycle 'group 2': 'one', 'two', 'three' %}<br /> 
+    {% cycle 'group 2': 'one', 'two', 'three' %} 
+
+![-][10]
+
+## 8. for
+
+    {% for item in array %} 
+      {{ item }}
+    {% endfor %} 
+
+![-][11]
+
+    {% for item in array limit:2 offset:2 %} 
+      {{ item }}
+    {% endfor %} 
+
+![-][12]
+
+    {% for i in (1..item.quantity) %}
+      {{ i }}
+    {% endfor %}
+
+![-][13]
+
+## 9. tables
+
+    {% tablerow item in items cols: 3 limit: 12 %}
+      {{ item.variable }}
+    {% endtablerow %}
+
+![-][14]
+    
+    {% tablerow item in items cols: 3 %}
+      {% if tablerowloop.col_first %}
+        First column: {{ item.variable }}
+      {% else %}
+        Different column: {{ item.variable }}
+      {% endif %}
+    {% endtablerow %}
+
+![-][15]
+
+## 10. assign
+
+    {% assign name = 'freestyle' %}
+    {% for t in collections.tags %}
+      {% if t == name %}
+        <p>Freestyle!</p>
+      {% endif %}
+    {% endfor %}
+
+![-][16]
+
+    {% assign freestyle = false %}
+    {% for t in collections.tags %}
+      {% if t == 'freestyle' %}
+        {% assign freestyle = true %}
+      {% endif %}
+    {% endfor %}
+    {% if freestyle %}
+      <p>Freestyle!</p>
+    {% endif %}
+
+![-][17]
+
+## 11. capture
+
+    {% capture attribute_name %}{{ item.title | handleize }}-{{ i }}-color{% endcapture %}
+
+    <label for="{{ attribute_name }}">Color:</label>
+    <select name="attributes[{{ attribute_name }}]" id="{{ attribute_name }}">
+      <option value="red">Red</option>
+      <option value="green">Green</option>
+      <option value="blue">Blue</option>
+    </select>
+
+![-][18]
+
+## 12. include
+
+    {% assign shape = 'circle' %}
+    {% include 'color' %}
+    {% include 'color' with 'red' %}
+    {% include 'color' with 'blue' %}
+    {% assign shape = 'square' %}
+    {% include 'color' with 'red' %}
+
+![-][19]
+
+
+  [1]: img/1.png
+  [2]: img/2.png
+  [3]: img/3.png
+  [4]: img/4.png
+  [5]: img/5.png
+  [6]: img/6.png
+  [7]: img/7.png
+  [8]: img/8.png
+  [9]: img/9.png
+  [10]: img/10.png
+  [11]: img/11.png
+  [12]: img/12.png
+  [13]: img/13.png
+  [14]: img/14.png
+  [15]: img/15.png
+  [16]: img/16.png
+  [17]: img/17.png
+  [18]: img/18.png
+  [19]: img/19.png

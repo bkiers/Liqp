@@ -81,6 +81,7 @@ tag
  : raw_tag
  | comment_tag
  | if_tag
+ | unless_tag
  | case_tag
  | cycle_tag
  | for_tag
@@ -115,6 +116,11 @@ if_tag
 else_tag
  : TagStart Else TagEnd block 
    -> block
+ ;
+
+unless_tag
+ : TagStart UnlessStart expr TagEnd block else_tag? TagStart UnlessEnd TagEnd 
+   -> ^(UNLESS expr block ^(ELSE else_tag?))
  ;
 
 case_tag
@@ -228,35 +234,6 @@ OutEnd   : '}}' {inTag=false;};
 TagStart : '{%' {inTag=true;};
 TagEnd   : '%}' {inTag=false;};
 
-CommentStart : {inTag}?=> 'comment';
-CommentEnd   : {inTag}?=> 'endcomment';
-RawStart     : {inTag}?=> 'raw';
-RawEnd       : {inTag}?=> 'endraw';
-IfStart      : {inTag}?=> 'if';
-IfEnd        : {inTag}?=> 'endif';
-UnlessStart  : {inTag}?=> 'unless';
-UnlessEnd    : {inTag}?=> 'endunless';
-Else         : {inTag}?=> 'else';
-CaseStart    : {inTag}?=> 'case';
-CaseEnd      : {inTag}?=> 'endcase';
-When         : {inTag}?=> 'when';
-Cycle        : {inTag}?=> 'cycle';
-ForStart     : {inTag}?=> 'for';
-ForEnd       : {inTag}?=> 'endfor';
-In           : {inTag}?=> 'in';
-And          : {inTag}?=> 'and';
-Or           : {inTag}?=> 'or';
-TableStart   : {inTag}?=> 'tablerow';
-TableEnd     : {inTag}?=> 'endtablerow';
-Assign       : {inTag}?=> 'assign';
-True         : {inTag}?=> 'true';
-False        : {inTag}?=> 'false';
-Nil          : {inTag}?=> 'nil';
-Include      : {inTag}?=> 'include';
-With         : {inTag}?=> 'with';
-CaptureStart : {inTag}?=> 'capture';
-CaptureEnd   : {inTag}?=> 'endcapture';
-
 Str : {inTag}?=> (SStr | DStr);
 
 DotDot : {inTag}?=> '..';
@@ -273,9 +250,42 @@ Col    : {inTag}?=> ':';
 Comma  : {inTag}?=> ',';
 OPar   : {inTag}?=> '(';
 CPar   : {inTag}?=> ')';
-Id     : {inTag}?=> (Letter | '_') (Letter | '_' | Digit)*;
 Num    : {inTag}?=> Digit+;
 WS     : {inTag}?=> (' ' | '\t' | '\r' | '\n')+ {skip();};
+
+Id
+ : {inTag}?=> (Letter | '_') (Letter | '_' | '-' | Digit)*
+   {
+     if($text.equals("capture"))          $type = CaptureStart;
+     else if($text.equals("endcapture"))  $type = CaptureEnd;
+     else if($text.equals("comment"))     $type = CommentStart;
+     else if($text.equals("endcomment"))  $type = CommentEnd;
+     else if($text.equals("raw"))         $type = RawStart;
+     else if($text.equals("endraw"))      $type = RawEnd;
+     else if($text.equals("if"))          $type = IfStart;
+     else if($text.equals("endif"))       $type = IfEnd;
+     else if($text.equals("unless"))      $type = UnlessStart;
+     else if($text.equals("endunless"))   $type = UnlessEnd;
+     else if($text.equals("else"))        $type = Else;
+     else if($text.equals("case"))        $type = CaseStart;
+     else if($text.equals("endcase"))     $type = CaseEnd;
+     else if($text.equals("when"))        $type = When;
+     else if($text.equals("cycle"))       $type = Cycle;
+     else if($text.equals("for"))         $type = ForStart;
+     else if($text.equals("endfor"))      $type = ForEnd;
+     else if($text.equals("in"))          $type = In;
+     else if($text.equals("and"))         $type = And;
+     else if($text.equals("or"))          $type = Or;
+     else if($text.equals("tablerow"))    $type = TableStart;
+     else if($text.equals("endtablerow")) $type = TableEnd;
+     else if($text.equals("assign"))      $type = Assign;
+     else if($text.equals("true"))        $type = True;
+     else if($text.equals("false"))       $type = False;
+     else if($text.equals("nil"))         $type = Nil;
+     else if($text.equals("include"))     $type = Include;
+     else if($text.equals("with"))        $type = With;
+   }
+ ;
 
 Other
  : ({!inTag && !openTagAhead()}?=> . )+
@@ -295,3 +305,32 @@ fragment Letter : 'a'..'z' | 'A'..'Z';
 fragment Digit  : '0'..'9';
 fragment SStr   : '\'' ~'\''* '\'';
 fragment DStr   : '"' ~'"'* '"';
+
+fragment CommentStart : ;
+fragment CommentEnd : ;
+fragment RawStart : ;
+fragment RawEnd : ;
+fragment IfStart : ;
+fragment IfEnd : ;
+fragment UnlessStart : ;
+fragment UnlessEnd : ;
+fragment Else : ;
+fragment CaseStart : ;
+fragment CaseEnd : ;
+fragment When : ;
+fragment Cycle : ;
+fragment ForStart : ;
+fragment ForEnd : ;
+fragment In : ;
+fragment And : ;
+fragment Or : ;
+fragment TableStart : ;
+fragment TableEnd : ;
+fragment Assign : ;
+fragment True : ;
+fragment False : ;
+fragment Nil : ;
+fragment Include : ;
+fragment With : ;
+fragment CaptureStart : ;
+fragment CaptureEnd : ;

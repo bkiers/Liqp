@@ -161,7 +161,7 @@ http://wiki.shopify.com/UsingLiquid
 ![-][18]
 
 ## 12. include
-
+https://github.com/bkiers/Liqp/https://github.com/bkiers/Liqp/tree/master/img
     {% assign shape = 'circle' %}
     {% include 'color' %}
     {% include 'color' with 'red' %}
@@ -172,22 +172,22 @@ http://wiki.shopify.com/UsingLiquid
 ![-][19]
 
 
-  [1]: tree/master/img/1.png
-  [2]: tree/master/img/2.png
-  [3]: tree/master/img/3.png
-  [4]: tree/master/img/4.png
-  [5]: tree/master/img/5.png
-  [6]: tree/master/img/6.png
-  [7]: tree/master/img/7.png
-  [8]: tree/master/img/8.png
-  [9]: tree/master/img/9.png
-  [10]: tree/master/img/10.png
-  [11]: tree/master/img/11.png
-  [12]: tree/master/img/12.png
-  [13]: tree/master/img/13.png
-  [14]: tree/master/img/14.png
-  [15]: tree/master/img/15.png
-  [16]: tree/master/img/16.png
-  [17]: tree/master/img/17.png
-  [18]: tree/master/img/18.png
-  [19]: tree/master/img/19.png
+  [1]: https://github.com/bkiers/Liqp/tree/master/img/1.png
+  [2]: https://github.com/bkiers/Liqp/tree/master/img/2.png
+  [3]: https://github.com/bkiers/Liqp/tree/master/img/3.png
+  [4]: https://github.com/bkiers/Liqp/tree/master/img/4.png
+  [5]: https://github.com/bkiers/Liqp/tree/master/img/5.png
+  [6]: https://github.com/bkiers/Liqp/tree/master/img/6.png
+  [7]: https://github.com/bkiers/Liqp/tree/master/img/7.png
+  [8]: https://github.com/bkiers/Liqp/tree/master/img/8.png
+  [9]: https://github.com/bkiers/Liqp/tree/master/img/9.png
+  [10]: https://github.com/bkiers/Liqp/tree/master/img/10.png
+  [11]: https://github.com/bkiers/Liqp/tree/master/img/11.png
+  [12]: https://github.com/bkiers/Liqp/tree/master/img/12.png
+  [13]: https://github.com/bkiers/Liqp/tree/master/img/13.png
+  [14]: https://github.com/bkiers/Liqp/tree/master/img/14.png
+  [15]: https://github.com/bkiers/Liqp/tree/master/img/15.png
+  [16]: https://github.com/bkiers/Liqp/tree/master/img/16.png
+  [17]: https://github.com/bkiers/Liqp/tree/master/img/17.png
+  [18]: https://github.com/bkiers/Liqp/tree/master/img/18.png
+  [19]: https://github.com/bkiers/Liqp/tree/master/img/19.png

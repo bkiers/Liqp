@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Liqp">
+
+    <property name="version"          value="0.1" />
+    <property name="project.name"     value="Liqp" />
+    <property name="main.class"       value="liqp.Main" />
+    <property name="combined.grammar" value="src/grammar/Liquid.g" />
+    <property name="package"          value="liqp" />
+    <property name="main.build.dir"   value="build/main" />
+    <property name="main.src.dir"     value="src/main" />
+    <property name="test.build.dir"   value="build/test" />
+    <property name="test.src.dir"     value="src/test" />
+
+    <path id="classpath">
+        <pathelement location="${main.build.dir}" />
+        <fileset dir="lib">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <target name="init">
+        <mkdir dir="${main.build.dir}" />
+        <mkdir dir="${test.build.dir}" />
+    </target>
+
+    <target name="main.compile" depends="init">
+        <javac srcdir="${main.src.dir}" destdir="${main.build.dir}" includeantruntime="false">
+            <classpath refid="classpath" />
+        </javac>
+    </target>
+
+    <target name="generate.parser">
+        <echo>Generating the parser and lexer</echo>
+        <java classname="org.antlr.Tool" fork="true" failonerror="true" maxmemory="128m">
+            <arg value="-fo" />
+            <arg value="${main.src.dir}/${package}" />
+            <arg value="${combined.grammar}" />
+            <classpath refid="classpath" />
+        </java>
+        <echo>Checking for syntax errors in the grammar file by compiling the lexer and parser</echo>
+        <antcall target="main.compile" />
+    </target>
+
+    <target name="run" depends="generate.parser" >
+        <java classname="${main.class}">
+            <classpath refid="classpath" />
+        </java>
+    </target>
+
+</project>

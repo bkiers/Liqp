@@ -161,7 +161,7 @@ http://wiki.shopify.com/UsingLiquid
 ![-][18]
 
 ## 12. include
-https://github.com/bkiers/Liqp/https://github.com/bkiers/Liqp/raw/master/img
+
     {% assign shape = 'circle' %}
     {% include 'color' %}
     {% include 'color' with 'red' %}

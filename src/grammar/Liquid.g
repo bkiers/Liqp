@@ -57,14 +57,15 @@ tokens {
   UNLESS;
   WHEN;
   WITH;
+  NO_SPACE;
 }
 
 @parser::header {
-  package liqp;
+  package liqp.parser;
 }
 
 @lexer::header {
-  package liqp;
+  package liqp.parser;
 }
 
 @parser::members {
@@ -85,6 +86,10 @@ tokens {
   public void reportError(RecognitionException e) {
     throw new RuntimeException(e); 
   }
+
+  private String strip(String text, boolean singleQuoted) {
+    return text.substring(1, text.length() - 1);
+  }
 }
 
 /* parser rules */
@@ -101,7 +106,7 @@ atom
  : tag
  | output
  | assignment
- | Other -> ^(PLAIN Other)
+ | Other -> PLAIN[$Other.text]
  ;
 
 tag
@@ -118,51 +123,47 @@ tag
  ;
 
 raw_tag
- : TagStart RawStart TagEnd raw_body TagStart RawEnd TagEnd 
-   -> ^(RAW raw_body)
+ : TagStart RawStart TagEnd raw_body TagStart RawEnd TagEnd -> raw_body
  ;
 
 raw_body
- : ~TagStart*
+ : other_than_tag_start -> RAW[$other_than_tag_start.text.trim()]
  ;
 
 comment_tag
- : TagStart CommentStart TagEnd comment_body TagStart CommentEnd TagEnd 
-   -> ^(COMMENT comment_body)
+ : TagStart CommentStart TagEnd comment_body TagStart CommentEnd TagEnd -> comment_body
  ;
 
 comment_body
+ : other_than_tag_start -> COMMENT[$other_than_tag_start.text.trim()]
+ ;
+
+other_than_tag_start
  : ~TagStart*
  ;
 
 if_tag
- : TagStart IfStart expr TagEnd block else_tag? TagStart IfEnd TagEnd 
-   -> ^(IF expr block ^(ELSE else_tag?))
+ : TagStart IfStart expr TagEnd block else_tag? TagStart IfEnd TagEnd -> ^(IF expr block ^(ELSE else_tag?))
  ;
 
 else_tag
- : TagStart Else TagEnd block 
-   -> block
+ : TagStart Else TagEnd block -> block
  ;
 
 unless_tag
- : TagStart UnlessStart expr TagEnd block else_tag? TagStart UnlessEnd TagEnd 
-   -> ^(UNLESS expr block ^(ELSE else_tag?))
+ : TagStart UnlessStart expr TagEnd block else_tag? TagStart UnlessEnd TagEnd -> ^(UNLESS expr block ^(ELSE else_tag?))
  ;
 
 case_tag
- : TagStart CaseStart expr TagEnd when_tag+ else_tag? TagStart CaseEnd TagEnd 
-   -> ^(CASE expr when_tag+ ^(ELSE else_tag?))
+ : TagStart CaseStart expr TagEnd when_tag+ else_tag? TagStart CaseEnd TagEnd -> ^(CASE expr when_tag+ ^(ELSE else_tag?))
  ;
 
 when_tag
- : TagStart When expr TagEnd block 
-   -> ^(WHEN expr block)
+ : TagStart When expr TagEnd block -> ^(WHEN expr block)
  ;
 
 cycle_tag
- : TagStart Cycle cycle_group? expr (Comma expr)* TagEnd 
-   -> ^(CYCLE ^(GROUP cycle_group?) expr+)
+ : TagStart Cycle cycle_group? expr (Comma expr)* TagEnd -> ^(CYCLE ^(GROUP cycle_group?) expr+)
  ;
 
 cycle_group
@@ -174,9 +175,9 @@ for_tag
  | for_range    
  ;
 
-for_array // attributes must be 'limit' or 'offset'!
- : TagStart ForStart Id In lookup attribute* TagEnd block TagStart ForEnd TagEnd
-   -> ^(FOR_ARRAY Id lookup ^(ATTRIBUTES attribute*) block)
+// attributes must be 'limit' or 'offset'!
+for_array
+ : TagStart ForStart Id In lookup attribute* TagEnd block TagStart ForEnd TagEnd -> ^(FOR_ARRAY Id lookup ^(ATTRIBUTES attribute*) block)
  ;
 
 attribute 
@@ -184,42 +185,36 @@ attribute
  ;
 
 for_range
- : TagStart ForStart Id In OPar expr DotDot expr CPar TagEnd block TagStart ForEnd TagEnd
-   -> ^(FOR_RANGE Id expr expr block)
+ : TagStart ForStart Id In OPar expr DotDot expr CPar TagEnd block TagStart ForEnd TagEnd -> ^(FOR_RANGE Id expr expr block)
  ;
 
-table_tag // attributes must be 'limit' or 'cols'!
- : TagStart TableStart Id In Id attribute* TagEnd block TagStart TableEnd TagEnd
-   -> ^(TABLE Id Id ^(ATTRIBUTES attribute*) block)
+// attributes must be 'limit' or 'cols'!
+table_tag
+ : TagStart TableStart Id In Id attribute* TagEnd block TagStart TableEnd TagEnd -> ^(TABLE Id Id ^(ATTRIBUTES attribute*) block)
  ;
 
 capture_tag
- : TagStart CaptureStart Id TagEnd block TagStart CaptureEnd TagEnd
-   -> ^(CAPTURE Id block)
+ : TagStart CaptureStart Id TagEnd block TagStart CaptureEnd TagEnd -> ^(CAPTURE Id block)
  ;
 
 include_tag
- : TagStart Include a=Str (With b=Str)? TagEnd 
-   -> ^(INCLUDE $a ^(WITH $b?))
+ : TagStart Include a=Str (With b=Str)? TagEnd -> ^(INCLUDE $a ^(WITH $b?))
  ;
 
 output
- : OutStart expr filter* OutEnd 
-   -> ^(OUTPUT expr ^(FILTERS filter*))
+ : OutStart expr filter* OutEnd -> ^(OUTPUT expr ^(FILTERS filter*))
  ;
 
 filter
- : Pipe Id params? 
-   -> ^(FILTER Id ^(PARAMS params?))
+ : Pipe Id params? -> ^(FILTER Id ^(PARAMS params?))
  ;
 
 params
- : Col expr (Comma expr)*  -> expr+
+ : Col expr (Comma expr)* -> expr+
  ;
 
 assignment
- : TagStart Assign Id EqSign expr TagEnd 
-   -> ^(ASSIGNMENT Id expr)
+ : TagStart Assign Id EqSign expr TagEnd -> ^(ASSIGNMENT Id expr)
  ;
 
 expr
@@ -248,6 +243,7 @@ term
  | True
  | False
  | Nil
+ | NoSpace+ -> NO_SPACE[$text]
  | lookup
  ;
 
@@ -278,7 +274,7 @@ Comma  : {inTag}?=> ',';
 OPar   : {inTag}?=> '(';
 CPar   : {inTag}?=> ')';
 Num    : {inTag}?=> Digit+;
-WS     : {inTag}?=> (' ' | '\t' | '\r' | '\n')+ {skip();};
+WS     : {inTag}?=> (' ' | '\t' | '\r' | '\n')+ {$channel=HIDDEN;};
 
 Id
  : {inTag}?=> (Letter | '_') (Letter | '_' | '-' | Digit)*
@@ -317,21 +313,21 @@ Id
 Other
  : ({!inTag && !openTagAhead()}?=> . )+
    {
-     String s = getText().replaceAll("\\s+", " ").trim();
-     if(s.isEmpty()) {
-       skip();
-     }
-     else {
-       setText(s);
+     if($text.matches("\\s+")) {
+       $channel=HIDDEN;
      }
    }
+ ;
+
+NoSpace
+ : ~(' ' | '\t' | '\r' | '\n')
  ;
 
 /* fragment rules */
 fragment Letter : 'a'..'z' | 'A'..'Z';
 fragment Digit  : '0'..'9';
-fragment SStr   : '\'' ~'\''* '\'';
-fragment DStr   : '"' ~'"'* '"';
+fragment SStr   : '\'' ~'\''* '\'' {setText(strip($text, true));};
+fragment DStr   : '"' ~'"'* '"'    {setText(strip($text, false));};
 
 fragment CommentStart : ;
 fragment CommentEnd : ;

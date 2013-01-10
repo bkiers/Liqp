@@ -19,6 +19,10 @@ public class Main {
 
         boolean leaf = tree.getChildCount() == 0;
 
+        if(tree.getType() == LiquidLexer.EOF) {
+            return;
+        }
+
         System.out.println(tokenNames[tree.getType()] + (leaf ? "='" + tree.getText() + "'" : ""));
 
         for(int i = 0; i < tree.getChildCount(); i++) {
@@ -27,7 +31,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        String test = "{{ 'a~!~b' | split:~!~ }}";
+        String test = "{% twice 12 %}";
         LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(test));
         LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
         CommonTree ast = (CommonTree)parser.parse().getTree();

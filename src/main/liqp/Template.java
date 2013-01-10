@@ -10,7 +10,6 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -55,7 +54,7 @@ public class Template {
             FILTERS='FILTERS'
     */
     public static void main(String[] args) throws Exception {
-        Template template = Template.parse("{{ 'aBc' | downcase | capitalize }}");
+        Template template = Template.parse("{% assign N = 42 %}{{N}}");
 
         //Map<String, Object> variables = new HashMap<String, Object>();
         //variables.put("name", "Bart");

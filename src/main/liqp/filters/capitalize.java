@@ -2,10 +2,15 @@ package liqp.filters;
 
 class capitalize extends Filter {
 
+    /*
+     * (Object) capitalize(input)
+     *
+     * capitalize words in the input sentence
+     */
     @Override
     public Object apply(Object value, Object... params) {
 
-        String original = String.valueOf(value);
+        String original = super.asString(value);
 
         if(original.isEmpty()) {
             return original;

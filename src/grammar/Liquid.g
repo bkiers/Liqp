@@ -58,6 +58,7 @@ tokens {
   WHEN;
   WITH;
   NO_SPACE;
+  CUSTOM_TAG;
 }
 
 @parser::header {
@@ -120,6 +121,11 @@ tag
  | table_tag
  | capture_tag
  | include_tag
+ | custom_tag
+ ;
+
+custom_tag
+ : TagStart Id (expr (Comma expr)*)? TagEnd -> ^(CUSTOM_TAG Id expr*)
  ;
 
 raw_tag

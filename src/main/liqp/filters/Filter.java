@@ -2,44 +2,70 @@ package liqp.filters;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class Filter {
 
-    private static Map<String, Filter> filters;
+    private static final Map<String, Filter> FILTERS = new HashMap<String, Filter>();
 
     static {
-        filters = new HashMap<String, Filter>();
-
-        addFilter(new capitalize());
-        addFilter(new downcase());
-        addFilter(new upcase());
-        addFilter(new replace());
-        addFilter(new replace_first());
-        addFilter(new remove_first());
-        addFilter(new remove());
-        addFilter(new times());
-        addFilter(new divided_by());
-        addFilter(new split());
-        addFilter(new modulo());
+        registerFilter(new append());
+        registerFilter(new date());
+        registerFilter(new capitalize());
+        registerFilter(new first());
+        registerFilter(new last());
+        registerFilter(new downcase());
+        registerFilter(new upcase());
+        registerFilter(new replace());
+        registerFilter(new replace_first());
+        registerFilter(new remove_first());
+        registerFilter(new remove());
+        registerFilter(new times());
+        registerFilter(new divided_by());
+        registerFilter(new split());
+        registerFilter(new modulo());
     }
 
-    private static void addFilter(Filter filter) {
-        addFilter(filter.getClass().getSimpleName(), filter);
+    private static void registerFilter(Filter filter) {
+        registerFilter(filter.getClass().getSimpleName(), filter);
     }
 
-    public static void addFilter(String id, Filter filter) {
+    public static void registerFilter(String id, Filter filter) {
 
-        if(filters.containsKey(id)) {
-            throw new RuntimeException("filter '" + id + "' already defined");
+        FILTERS.put(id, filter);
+    }
+
+    public Object[] asArray(Object value) {
+
+        if(value.getClass().isArray()) {
+            return (Object[])value;
         }
 
-        filters.put(id, filter);
+        if(value instanceof List) {
+            return ((List)value).toArray();
+        }
+
+        return new String[]{ "" };
+    }
+
+    public String asString(Object value) {
+
+        if(value instanceof Number) {
+
+            double number = ((Number)value).doubleValue();
+
+            if(number == (long)number) {
+                return String.valueOf((long)number);
+            }
+        }
+
+        return String.valueOf(value);
     }
 
     /*
-        date - reformat a date syntax reference
-        capitalize - capitalize words in the input sentence
+        - date - reformat a date syntax reference
+        - capitalize - capitalize words in the input sentence
         - downcase - convert an input string to lowercase
         - upcase - convert an input string to uppercase
         first - get the first element of the passed in array
@@ -69,12 +95,24 @@ public abstract class Filter {
         - modulo - remainder, e.g. {{ 3 | modulo:2 }} #=> 1
     */
 
+    public final String name;
+
+    protected Filter() {
+        this.name = this.getClass().getSimpleName();
+    }
+
+    public Filter(String name) {
+        this.name = name;
+    }
+
     public abstract Object apply(Object value, Object... params);
 
     protected Object get(int index, Object... params) {
 
         if(index >= params.length) {
-            throw new RuntimeException("cannot get param index: " + index + " from: " + Arrays.toString(params));
+            throw new RuntimeException("error in filter '" + name +
+                    "': cannot get param index: " + index +
+                    " from: " + Arrays.toString(params));
         }
 
         return params[index];
@@ -82,7 +120,7 @@ public abstract class Filter {
 
     public static Filter getFilter(String name) {
 
-        Filter filter = filters.get(name);
+        Filter filter = FILTERS.get(name);
 
         if(filter == null) {
             throw new RuntimeException("unknown filter: " + name);

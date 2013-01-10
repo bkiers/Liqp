@@ -36,6 +36,7 @@ options {
   package liqp.parser;
 
   import liqp.nodes.*;
+  import liqp.tags.*;
 }
 
 walk returns [LNode node]
@@ -48,9 +49,9 @@ block returns [BlockNode node]
  ;
 
 atom returns [LNode node]
- : tag        {if(true) throw new RuntimeException("atom.tag");}
+ : tag        {$node = $tag.node;}
  | output     {$node = $output.node;}
- | assignment {if(true) throw new RuntimeException("atom.assignment");}
+ | assignment {$node = $assignment.node;}
  | PLAIN      {$node = new PlainNode($PLAIN.text);}
  ;
 
@@ -65,6 +66,7 @@ tag returns [LNode node]
  | table_tag   {if(true) throw new RuntimeException("tag.table_tag");}
  | capture_tag {if(true) throw new RuntimeException("tag.capture_tag");}
  | include_tag {if(true) throw new RuntimeException("tag.include_tag");}
+ | custom_tag  {$node = $custom_tag.node;}
  ;
 
 if_tag returns [LNode node]
@@ -118,6 +120,11 @@ include_tag returns [LNode node]
  : ^(INCLUDE Str ^(WITH Str?)) {if(true) throw new RuntimeException("include_tag");}
  ;
 
+custom_tag returns [LNode node]
+@init{List<LNode> expressions = new ArrayList<LNode>();}
+ : ^(CUSTOM_TAG Id (expr {expressions.add($expr.node);})*) {$node = new TagNode($Id.text, expressions.toArray(new LNode[expressions.size()]));}
+ ;
+
 output returns [OutputNode node]
  : ^(OUTPUT expr {$node = new OutputNode($expr.node);} ^(FILTERS (filter {$node.addFilter($filter.node);})*))
  ;
@@ -131,7 +138,7 @@ params[FilterNode node]
  ;
 
 assignment returns [LNode node]
- : ^(ASSIGNMENT Id expr) {if(true) throw new RuntimeException("assignment");}
+ : ^(ASSIGNMENT Id expr) {$node = new TagNode("assign", new IdNode($Id.text), $expr.node);}
  ;
 
 expr returns [LNode node]

@@ -31,7 +31,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        String test = "{% twice 12 %}";
+        String test = "{% random 5 %} wanna hear a joke? {% endrandom %}";
         LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(test));
         LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
         CommonTree ast = (CommonTree)parser.parse().getTree();

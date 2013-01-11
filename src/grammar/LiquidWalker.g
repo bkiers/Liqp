@@ -56,17 +56,18 @@ atom returns [LNode node]
  ;
 
 tag returns [LNode node]
- : RAW         {if(true) throw new RuntimeException("tag.RAW");}
- | COMMENT     {if(true) throw new RuntimeException("tag.COMMENT");}
- | if_tag      {if(true) throw new RuntimeException("tag.if_tag");}
- | unless_tag  {if(true) throw new RuntimeException("tag.unless_tag");}
- | case_tag    {if(true) throw new RuntimeException("tag.case_tag");}
- | cycle_tag   {if(true) throw new RuntimeException("tag.cycle_tag");}
- | for_tag     {if(true) throw new RuntimeException("tag.for_tag");}
- | table_tag   {if(true) throw new RuntimeException("tag.table_tag");}
- | capture_tag {if(true) throw new RuntimeException("tag.capture_tag");}
- | include_tag {if(true) throw new RuntimeException("tag.include_tag");}
- | custom_tag  {$node = $custom_tag.node;}
+ : RAW              {if(true) throw new RuntimeException("tag.RAW");}
+ | COMMENT          {if(true) throw new RuntimeException("tag.COMMENT");}
+ | if_tag           {if(true) throw new RuntimeException("tag.if_tag");}
+ | unless_tag       {if(true) throw new RuntimeException("tag.unless_tag");}
+ | case_tag         {if(true) throw new RuntimeException("tag.case_tag");}
+ | cycle_tag        {if(true) throw new RuntimeException("tag.cycle_tag");}
+ | for_tag          {if(true) throw new RuntimeException("tag.for_tag");}
+ | table_tag        {if(true) throw new RuntimeException("tag.table_tag");}
+ | capture_tag      {if(true) throw new RuntimeException("tag.capture_tag");}
+ | include_tag      {if(true) throw new RuntimeException("tag.include_tag");}
+ | custom_tag       {$node = $custom_tag.node;}
+ | custom_tag_block {$node = $custom_tag_block.node;}
  ;
 
 if_tag returns [LNode node]
@@ -122,7 +123,14 @@ include_tag returns [LNode node]
 
 custom_tag returns [LNode node]
 @init{List<LNode> expressions = new ArrayList<LNode>();}
- : ^(CUSTOM_TAG Id (expr {expressions.add($expr.node);})*) {$node = new TagNode($Id.text, expressions.toArray(new LNode[expressions.size()]));}
+ : ^(CUSTOM_TAG Id (expr {expressions.add($expr.node);})*)
+    {$node = new TagNode($Id.text, expressions.toArray(new LNode[expressions.size()]));}
+ ;
+
+custom_tag_block returns [LNode node]
+@init{List<LNode> expressions = new ArrayList<LNode>();}
+ : ^(CUSTOM_TAG_BLOCK Id (expr {expressions.add($expr.node);})* block {expressions.add($block.node);})
+    {$node = new TagNode($Id.text, expressions.toArray(new LNode[expressions.size()]));}
  ;
 
 output returns [OutputNode node]

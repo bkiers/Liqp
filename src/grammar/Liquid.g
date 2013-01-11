@@ -59,6 +59,7 @@ tokens {
   WITH;
   NO_SPACE;
   CUSTOM_TAG;
+  CUSTOM_TAG_BLOCK;
 }
 
 @parser::header {
@@ -111,7 +112,8 @@ atom
  ;
 
 tag
- : raw_tag
+ : custom_tag
+ | raw_tag
  | comment_tag
  | if_tag
  | unless_tag
@@ -121,11 +123,15 @@ tag
  | table_tag
  | capture_tag
  | include_tag
- | custom_tag
  ;
 
 custom_tag
- : TagStart Id (expr (Comma expr)*)? TagEnd -> ^(CUSTOM_TAG Id expr*)
+ : (TagStart Id (expr (Comma expr)*)? TagEnd -> ^(CUSTOM_TAG Id expr*))
+   ((custom_tag_block)=> custom_tag_block    -> ^(CUSTOM_TAG_BLOCK Id expr* custom_tag_block))?
+ ;
+
+custom_tag_block
+ : (options{greedy=false;}: atom)* TagStart EndId TagEnd -> ^(BLOCK atom*)
  ;
 
 raw_tag
@@ -313,6 +319,7 @@ Id
      else if($text.equals("nil"))         $type = Nil;
      else if($text.equals("include"))     $type = Include;
      else if($text.equals("with"))        $type = With;
+     else if($text.startsWith("end"))     $type = EndId;
    }
  ;
 
@@ -363,3 +370,4 @@ fragment Include : ;
 fragment With : ;
 fragment CaptureStart : ;
 fragment CaptureEnd : ;
+fragment EndId : ;

@@ -18,7 +18,7 @@ public class TagTest {
         Tag.registerTag("twice", new Tag() {
             @Override
             public Object render(Map<String, Object> variables, LNode... tokens) {
-                Double number = new Double(String.valueOf(tokens[0].render(variables)));
+                Double number = super.asNumber(tokens[0].render(variables)).doubleValue();
                 return number * 2;
             }
         });
@@ -27,5 +27,23 @@ public class TagTest {
         String rendered = String.valueOf(template.render());
 
         assertThat(rendered, is("20.0"));
+    }
+
+    @Test
+    public void testCustomTagBlock() throws RecognitionException {
+
+        Tag.registerTag("twice", new Tag() {
+            @Override
+            public Object render(Map<String, Object> variables, LNode... tokens) {
+                LNode blockNode = tokens[tokens.length - 1];
+                String blockValue = super.asString(blockNode.render(variables));
+                return blockValue + " " + blockValue;
+            }
+        });
+
+        Template template = Template.parse("{% twice %}abc{% endtwice %}");
+        String rendered = String.valueOf(template.render());
+
+        assertThat(rendered, is("abc abc"));
     }
 }

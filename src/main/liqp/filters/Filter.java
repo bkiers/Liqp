@@ -1,11 +1,13 @@
 package liqp.filters;
 
+import liqp.LValue;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class Filter {
+public abstract class Filter extends LValue {
 
     private static final Map<String, Filter> FILTERS = new HashMap<String, Filter>();
 
@@ -34,33 +36,6 @@ public abstract class Filter {
     public static void registerFilter(String id, Filter filter) {
 
         FILTERS.put(id, filter);
-    }
-
-    public Object[] asArray(Object value) {
-
-        if(value.getClass().isArray()) {
-            return (Object[])value;
-        }
-
-        if(value instanceof List) {
-            return ((List)value).toArray();
-        }
-
-        return new String[]{ "" };
-    }
-
-    public String asString(Object value) {
-
-        if(value instanceof Number) {
-
-            double number = ((Number)value).doubleValue();
-
-            if(number == (long)number) {
-                return String.valueOf((long)number);
-            }
-        }
-
-        return String.valueOf(value);
     }
 
     /*

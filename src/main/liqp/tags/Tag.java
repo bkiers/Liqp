@@ -1,11 +1,12 @@
 package liqp.tags;
 
+import liqp.LValue;
 import liqp.nodes.LNode;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Tag {
+public abstract class Tag extends LValue {
 
     private static final Map<String, Tag> TAGS = new HashMap<String, Tag>();
 

@@ -19,12 +19,22 @@ public class LookupNode implements LNode {
     @Override
     public Object render(Map<String, Object> variables) {
 
-        String id = ids.get(0);
+        Object value = variables.get(ids.get(0));
 
-        Object value = variables.get(id);
+        for(int i = 1; i < ids.size(); i++) {
 
-        if(value == null) {
-            throw new RuntimeException("unknown variable: " + id);
+            if(value == null) {
+                return null;
+            }
+
+            try {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> map = (Map<String, Object>)value;
+                value = map.get(ids.get(i));
+            }
+            catch (Exception e) {
+                return null;
+            }
         }
 
         return value;

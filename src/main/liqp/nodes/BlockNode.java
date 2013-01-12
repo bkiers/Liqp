@@ -26,7 +26,9 @@ public class BlockNode implements LNode {
 
             Object value = node.render(variables);
 
-            builder.append(value.getClass().isArray() ? Arrays.toString((Object[])value) : value);
+            if(value != null) {
+                builder.append(value.getClass().isArray() ? Arrays.toString((Object[])value) : value);
+            }
         }
 
         return builder.toString();

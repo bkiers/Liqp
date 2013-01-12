@@ -21,6 +21,7 @@ class date extends Filter {
 
         // %b - The abbreviated month name (``Jan'')
         LIQUID_TO_JAVA_FORMAT.put('b', new SimpleDateFormat("MMM"));
+        LIQUID_TO_JAVA_FORMAT.put('h', new SimpleDateFormat("MMM"));
 
         // %B - The  full  month  name (``January'')
         LIQUID_TO_JAVA_FORMAT.put('B', new SimpleDateFormat("MMMM"));
@@ -117,7 +118,9 @@ class date extends Filter {
     public Object apply(Object value, Object... params) {
 
         try {
-            final long seconds = Long.valueOf(super.asString(value));
+            final long seconds = super.asString(value).equals("now") ?
+                    System.currentTimeMillis() / 1000L :
+                    Long.valueOf(super.asString(value));
             final Date date = new Date(seconds * 1000L);
             final String format = super.asString(super.get(0, params));
             final Calendar calendar = Calendar.getInstance();

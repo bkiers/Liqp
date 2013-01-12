@@ -12,6 +12,9 @@ public abstract class Tag extends LValue {
 
     static {
         registerTag(new assign());
+        registerTag(new comment());
+        registerTag(new _if());
+        registerTag(new raw());
     }
 
     public static Tag getTag(String name) {
@@ -26,7 +29,7 @@ public abstract class Tag extends LValue {
     }
 
     private static void registerTag(Tag tag) {
-        registerTag(tag.getClass().getSimpleName(), tag);
+        registerTag(tag.getClass().getSimpleName().toLowerCase(), tag);
     }
 
     public static void registerTag(String name, Tag tag) {

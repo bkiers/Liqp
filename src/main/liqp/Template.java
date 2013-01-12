@@ -44,23 +44,23 @@ public class Template {
         }
     }
 
-    /*
-        BLOCK
-          PLAIN
-            Other='Hello '
-          OUTPUT
-            LOOKUP
-              Id='name'
-            FILTERS='FILTERS'
-    */
     public static void main(String[] args) throws Exception {
-        Template template = Template.parse("{% assign N = 42 %}{{N}}");
+        Template template = Template.parse(
+                "{% if user.name == 'tobi' %}\n" +
+                        "  Hello tobi\n" +
+                        "{% elsif user.name == 'bob' %}\n" +
+                        "  Hello bob\n" +
+                        "{% else %}\n" +
+                        "  Hello ???\n" +
+                        "{% endif %}");
 
-        //Map<String, Object> variables = new HashMap<String, Object>();
-        //variables.put("name", "Bart");
-        //Object output = template.render(variables);
+        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> user = new HashMap<String, Object>();
+        user.put("name", "bob");
+        variables.put("user", user);
+        Object output = template.render(variables);
 
-        Object output = template.render();
+        //Object output = template.render();
 
         System.out.printf(">>>%s<<<", output);
     }

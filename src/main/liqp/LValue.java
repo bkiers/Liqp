@@ -17,6 +17,19 @@ public abstract class LValue {
         return new String[]{ "" };
     }
 
+    public boolean asBoolean(Object value) {
+
+        if(value == null) {
+            return false;
+        }
+
+        if(value instanceof Boolean) {
+            return (Boolean)value;
+        }
+
+        return true;
+    }
+
     public Number asNumber(Object value) {
 
         Number number = (Number)value;

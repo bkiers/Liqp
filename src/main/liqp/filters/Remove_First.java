@@ -2,15 +2,15 @@ package liqp.filters;
 
 import java.util.regex.Pattern;
 
-class split extends Filter {
+class Remove_First extends Filter {
 
     @Override
     public Object apply(Object value, Object... params) {
 
         String original = String.valueOf(value);
 
-        String delimiter = String.valueOf(super.get(0, params));
+        String needle = String.valueOf(super.get(0, params));
 
-        return original.split(Pattern.quote(delimiter));
+        return original.replaceFirst(Pattern.quote(needle), "");
     }
 }

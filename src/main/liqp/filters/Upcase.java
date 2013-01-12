@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class upcase extends Filter {
+class Upcase extends Filter {
 
     @Override
     public Object apply(Object value, Object... params) {

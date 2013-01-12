@@ -4,7 +4,6 @@ import liqp.LValue;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public abstract class Filter extends LValue {
@@ -12,25 +11,25 @@ public abstract class Filter extends LValue {
     private static final Map<String, Filter> FILTERS = new HashMap<String, Filter>();
 
     static {
-        registerFilter(new append());
-        registerFilter(new date());
-        registerFilter(new capitalize());
-        registerFilter(new first());
-        registerFilter(new last());
-        registerFilter(new downcase());
-        registerFilter(new upcase());
-        registerFilter(new replace());
-        registerFilter(new replace_first());
-        registerFilter(new remove_first());
-        registerFilter(new remove());
-        registerFilter(new times());
-        registerFilter(new divided_by());
-        registerFilter(new split());
-        registerFilter(new modulo());
+        registerFilter(new Append());
+        registerFilter(new Date());
+        registerFilter(new Capitalize());
+        registerFilter(new First());
+        registerFilter(new Last());
+        registerFilter(new Downcase());
+        registerFilter(new Upcase());
+        registerFilter(new Replace());
+        registerFilter(new Replace_First());
+        registerFilter(new Remove_First());
+        registerFilter(new Remove());
+        registerFilter(new Times());
+        registerFilter(new Divided_By());
+        registerFilter(new Split());
+        registerFilter(new Modulo());
     }
 
     private static void registerFilter(Filter filter) {
-        registerFilter(filter.getClass().getSimpleName(), filter);
+        registerFilter(filter.getClass().getSimpleName().toLowerCase(), filter);
     }
 
     public static void registerFilter(String id, Filter filter) {

@@ -3,7 +3,7 @@ package liqp.filters;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-class date extends Filter {
+class Date extends Filter {
 
     private final static Map<Character, SimpleDateFormat> LIQUID_TO_JAVA_FORMAT =
             new HashMap<Character, SimpleDateFormat>();
@@ -121,7 +121,7 @@ class date extends Filter {
             final long seconds = super.asString(value).equals("now") ?
                     System.currentTimeMillis() / 1000L :
                     Long.valueOf(super.asString(value));
-            final Date date = new Date(seconds * 1000L);
+            final java.util.Date date = new java.util.Date(seconds * 1000L);
             final String format = super.asString(super.get(0, params));
             final Calendar calendar = Calendar.getInstance();
             calendar.setTime(date);

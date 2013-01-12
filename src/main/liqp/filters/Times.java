@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class modulo extends Filter {
+class Times extends Filter {
 
     @Override
     public Object apply(Object value, Object... params) {
@@ -8,7 +8,7 @@ class modulo extends Filter {
         Double lhs = Double.valueOf(String.valueOf(value));
         Double rhs = Double.valueOf(String.valueOf(super.get(0, params)));
 
-        double product = lhs % rhs;
+        double product = lhs * rhs;
 
         if(product % 1 == 0) {
             return (long)product;

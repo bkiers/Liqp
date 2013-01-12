@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class capitalize extends Filter {
+class Capitalize extends Filter {
 
     /*
      * (Object) capitalize(input)

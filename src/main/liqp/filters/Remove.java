@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class remove extends Filter {
+class Remove extends Filter {
 
     @Override
     public Object apply(Object value, Object... params) {

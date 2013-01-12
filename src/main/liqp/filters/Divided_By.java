@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class divided_by extends Filter {
+class Divided_By extends Filter {
 
     @Override
     public Object apply(Object value, Object... params) {

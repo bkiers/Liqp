@@ -1,12 +1,12 @@
 package liqp.filters;
 
-class first extends Filter {
+class Last extends Filter {
 
     @Override
     public Object apply(Object value, Object... params) {
 
         Object[] array = super.asArray(value);
 
-        return array.length == 0 ? "" : String.valueOf(array[0]);
+        return array.length == 0 ? "" : String.valueOf(array[array.length - 1]);
     }
 }

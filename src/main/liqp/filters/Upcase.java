@@ -5,6 +5,6 @@ class Upcase extends Filter {
     @Override
     public Object apply(Object value, Object... params) {
 
-        return String.valueOf(value).toUpperCase();
+        return super.asString(value).toUpperCase();
     }
 }

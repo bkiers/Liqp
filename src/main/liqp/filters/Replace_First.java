@@ -8,11 +8,20 @@ class Replace_First extends Filter {
     @Override
     public Object apply(Object value, Object... params) {
 
-        String original = String.valueOf(value);
+        String original = super.asString(value);
 
-        String needle = String.valueOf(super.get(0, params));
-        String replacement = String.valueOf(super.get(1, params));
+        Object needle = super.get(0, params);
+        Object replacement = super.get(1, params);
 
-        return original.replaceFirst(Pattern.quote(needle), Matcher.quoteReplacement(replacement));
+        if(needle == null) {
+            throw new RuntimeException("invalid pattern: " + needle);
+        }
+
+        if(replacement == null) {
+            throw new RuntimeException("invalid replacement: " + needle);
+        }
+
+        return original.replaceFirst(Pattern.quote(String.valueOf(needle)),
+                Matcher.quoteReplacement(String.valueOf(replacement)));
     }
 }

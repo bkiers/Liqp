@@ -5,15 +5,12 @@ class Times extends Filter {
     @Override
     public Object apply(Object value, Object... params) {
 
-        Double lhs = Double.valueOf(String.valueOf(value));
-        Double rhs = Double.valueOf(String.valueOf(super.get(0, params)));
+        Object rhsObj = params[0];
 
-        double product = lhs * rhs;
-
-        if(product % 1 == 0) {
-            return (long)product;
+        if(value instanceof Long && rhsObj instanceof Long) {
+            return ((Number)value).longValue() * ((Number)rhsObj).longValue();
         }
 
-        return product;
+        return ((Number)value).doubleValue() * ((Number)rhsObj).doubleValue();
     }
 }

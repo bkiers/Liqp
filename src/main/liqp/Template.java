@@ -74,7 +74,7 @@ public class Template {
                         "{% endif %}");
 
 
-        String json = "{\"user\" : {\"name\" : \"tobii\"} }";
+        String json = "{\"user\" : {\"name\" : \"tobi\"} }";
 
         Object output = template.render(json);
 

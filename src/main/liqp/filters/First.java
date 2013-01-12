@@ -7,6 +7,6 @@ class First extends Filter {
 
         Object[] array = super.asArray(value);
 
-        return array.length == 0 ? "" : String.valueOf(array[0]);
+        return array.length == 0 ? "" : super.asString(array[0]);
     }
 }

@@ -4,6 +4,23 @@ import java.util.List;
 
 public abstract class LValue {
 
+    public static boolean areEqual(Object a, Object b) {
+
+        if(a == b) {
+            return true;
+        }
+
+        if(a == null || b == null) {
+            return false;
+        }
+
+        if(a instanceof Number && b instanceof Number) {
+            return ((Number)a).doubleValue() == ((Number)b).doubleValue();
+        }
+
+        return a.equals(b);
+    }
+
     public Object[] asArray(Object value) {
 
         if(value.getClass().isArray()) {
@@ -32,28 +49,11 @@ public abstract class LValue {
 
     public Number asNumber(Object value) {
 
-        Number number = (Number)value;
-
-        double d = number.doubleValue();
-
-        if(d == (long)d) {
-            return (long)d;
-        }
-
-        return d;
+        return (Number) value;
     }
 
     public String asString(Object value) {
 
-        if(value instanceof Number) {
-
-            double number = ((Number)value).doubleValue();
-
-            if(number == (long)number) {
-                return String.valueOf((long)number);
-            }
-        }
-
-        return String.valueOf(value);
+        return value == null ? "" : String.valueOf(value);
     }
 }

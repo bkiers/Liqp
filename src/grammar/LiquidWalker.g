@@ -173,7 +173,7 @@ expr returns [LNode node]
  : ^(Or expr expr)     {if(true) throw new RuntimeException("expr.Or");}
  | ^(And expr expr)    {if(true) throw new RuntimeException("expr.And");}
  | ^(Eq a=expr b=expr) {$node = new EqNode($a.node, $b.node);}
- | ^(NEq expr expr)    {if(true) throw new RuntimeException("expr.NEq");}
+ | ^(NEq expr expr)    {$node = new NEqNode($a.node, $b.node);}
  | ^(LtEq expr expr)   {if(true) throw new RuntimeException("expr.LtEq");}
  | ^(Lt expr expr)     {if(true) throw new RuntimeException("expr.Lt");}
  | ^(GtEq expr expr)   {if(true) throw new RuntimeException("expr.GtEq");}
@@ -181,9 +181,9 @@ expr returns [LNode node]
  | LongNum             {$node = new AtomNode(new Long($LongNum.text));}
  | DoubleNum           {$node = new AtomNode(new Double($DoubleNum.text));}
  | Str                 {$node = new AtomNode($Str.text);}
- | True                {if(true) throw new RuntimeException("expr.True");}
- | False               {if(true) throw new RuntimeException("expr.False");}
- | Nil                 {if(true) throw new RuntimeException("expr.Nil");}
+ | True                {$node = new AtomNode(true);}
+ | False               {$node = new AtomNode(false);}
+ | Nil                 {$node = new AtomNode(null);}
  | NO_SPACE            {$node = new AtomNode($NO_SPACE.text);}
  | lookup              {$node = $lookup.node;}
  ;

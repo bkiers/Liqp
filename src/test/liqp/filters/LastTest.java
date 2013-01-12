@@ -16,12 +16,9 @@ public class LastTest {
     public void applyTest() throws RecognitionException {
 
 
-        Template template = Template.parse("{{numbers | last}}");
+        Template template = Template.parse("{{values | last}}");
 
-        Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put("numbers", new String[]{ "Mu", "foo", "bar" });
-
-        String rendered = String.valueOf(template.render(variables));
+        String rendered = String.valueOf(template.render("{\"values\" : [\"Mu\", \"foo\", \"bar\"]}"));
 
         assertThat(rendered, is("bar"));
     }

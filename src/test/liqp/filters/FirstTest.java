@@ -15,13 +15,9 @@ public class FirstTest {
     @Test
     public void applyTest() throws RecognitionException {
 
+        Template template = Template.parse("{{values | first}}");
 
-        Template template = Template.parse("{{numbers | first}}");
-
-        Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put("numbers", new String[]{ "Mu", "foo", "bar" });
-
-        String rendered = String.valueOf(template.render(variables));
+        String rendered = String.valueOf(template.render("{\"values\" : [\"Mu\", \"foo\", \"bar\"]}"));
 
         assertThat(rendered, is("Mu"));
     }

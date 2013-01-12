@@ -7,10 +7,14 @@ class Remove_First extends Filter {
     @Override
     public Object apply(Object value, Object... params) {
 
-        String original = String.valueOf(value);
+        String original = super.asString(value);
 
-        String needle = String.valueOf(super.get(0, params));
+        Object needle = super.get(0, params);
 
-        return original.replaceFirst(Pattern.quote(needle), "");
+        if(needle == null) {
+            throw new RuntimeException("invalid pattern: " + needle);
+        }
+
+        return original.replaceFirst(Pattern.quote(String.valueOf(needle)), "");
     }
 }

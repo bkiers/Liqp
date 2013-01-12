@@ -52,7 +52,7 @@ atom returns [LNode node]
  : tag        {$node = $tag.node;}
  | output     {$node = $output.node;}
  | assignment {$node = $assignment.node;}
- | PLAIN      {$node = new PlainNode($PLAIN.text);}
+ | PLAIN      {$node = new AtomNode($PLAIN.text);}
  ;
 
 tag returns [LNode node]
@@ -166,26 +166,26 @@ params[FilterNode node]
  ;
 
 assignment returns [LNode node]
- : ^(ASSIGNMENT Id expr) {$node = new TagNode("assign", new IdNode($Id.text), $expr.node);}
+ : ^(ASSIGNMENT Id expr) {$node = new TagNode("assign", new AtomNode($Id.text), $expr.node);}
  ;
 
 expr returns [LNode node]
- : ^(Or expr expr)     {if(true) throw new RuntimeException("expr.Or");}
- | ^(And expr expr)    {if(true) throw new RuntimeException("expr.And");}
- | ^(Eq a=expr b=expr) {$node = new EqNode($a.node, $b.node);}
- | ^(NEq expr expr)    {$node = new NEqNode($a.node, $b.node);}
- | ^(LtEq expr expr)   {if(true) throw new RuntimeException("expr.LtEq");}
- | ^(Lt expr expr)     {if(true) throw new RuntimeException("expr.Lt");}
- | ^(GtEq expr expr)   {if(true) throw new RuntimeException("expr.GtEq");}
- | ^(Gt expr expr)     {if(true) throw new RuntimeException("expr.Gt");}
- | LongNum             {$node = new AtomNode(new Long($LongNum.text));}
- | DoubleNum           {$node = new AtomNode(new Double($DoubleNum.text));}
- | Str                 {$node = new AtomNode($Str.text);}
- | True                {$node = new AtomNode(true);}
- | False               {$node = new AtomNode(false);}
- | Nil                 {$node = new AtomNode(null);}
- | NO_SPACE            {$node = new AtomNode($NO_SPACE.text);}
- | lookup              {$node = $lookup.node;}
+ : ^(Or a=expr b=expr)   {$node = new OrNode($a.node, $b.node);}
+ | ^(And a=expr b=expr)  {$node = new AndNode($a.node, $b.node);}
+ | ^(Eq a=expr b=expr)   {$node = new EqNode($a.node, $b.node);}
+ | ^(NEq a=expr b=expr)  {$node = new NEqNode($a.node, $b.node);}
+ | ^(LtEq a=expr b=expr) {$node = new LtEqNode($a.node, $b.node);}
+ | ^(Lt a=expr b=expr)   {$node = new LtNode($a.node, $b.node);}
+ | ^(GtEq a=expr b=expr) {$node = new GtEqNode($a.node, $b.node);}
+ | ^(Gt a=expr b=expr)   {$node = new GtNode($a.node, $b.node);}
+ | LongNum               {$node = new AtomNode(new Long($LongNum.text));}
+ | DoubleNum             {$node = new AtomNode(new Double($DoubleNum.text));}
+ | Str                   {$node = new AtomNode($Str.text);}
+ | True                  {$node = new AtomNode(true);}
+ | False                 {$node = new AtomNode(false);}
+ | Nil                   {$node = new AtomNode(null);}
+ | NO_SPACE              {$node = new AtomNode($NO_SPACE.text);}
+ | lookup                {$node = $lookup.node;}
  ;
 
 lookup returns [LookupNode node]

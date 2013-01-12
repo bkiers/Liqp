@@ -4,12 +4,12 @@ import liqp.LValue;
 
 import java.util.Map;
 
-public class OrNode extends LValue implements LNode {
+public class LtNode extends LValue implements LNode {
 
     private LNode lhs;
     private LNode rhs;
 
-    public OrNode(LNode lhs, LNode rhs) {
+    public LtNode(LNode lhs, LNode rhs) {
         this.lhs = lhs;
         this.rhs = rhs;
     }
@@ -20,7 +20,7 @@ public class OrNode extends LValue implements LNode {
         Object a = lhs.render(variables);
         Object b = rhs.render(variables);
 
-        return super.asBoolean(a) || super.asBoolean(b);
-
+        return (a instanceof Number) && (b instanceof Number) &&
+                super.asNumber(a).doubleValue() < super.asNumber(b).doubleValue();
     }
 }

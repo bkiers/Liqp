@@ -255,7 +255,8 @@ rel_expr
  ;
 
 term
- : Num
+ : DoubleNum
+ | LongNum
  | Str
  | True
  | False
@@ -276,22 +277,23 @@ TagEnd   : '%}' {inTag=false;};
 
 Str : {inTag}?=> (SStr | DStr);
 
-DotDot : {inTag}?=> '..';
-Dot    : {inTag}?=> '.';
-NEq    : {inTag}?=> '!=';
-Eq     : {inTag}?=> '==';
-EqSign : {inTag}?=> '=';
-GtEq   : {inTag}?=> '>=';
-Gt     : {inTag}?=> '>';
-LtEq   : {inTag}?=> '<=';
-Lt     : {inTag}?=> '<';
-Pipe   : {inTag}?=> '|';
-Col    : {inTag}?=> ':';
-Comma  : {inTag}?=> ',';
-OPar   : {inTag}?=> '(';
-CPar   : {inTag}?=> ')';
-Num    : {inTag}?=> Digit+;
-WS     : {inTag}?=> (' ' | '\t' | '\r' | '\n')+ {$channel=HIDDEN;};
+DotDot    : {inTag}?=> '..';
+Dot       : {inTag}?=> '.';
+NEq       : {inTag}?=> '!=';
+Eq        : {inTag}?=> '==';
+EqSign    : {inTag}?=> '=';
+GtEq      : {inTag}?=> '>=';
+Gt        : {inTag}?=> '>';
+LtEq      : {inTag}?=> '<=';
+Lt        : {inTag}?=> '<';
+Pipe      : {inTag}?=> '|';
+Col       : {inTag}?=> ':';
+Comma     : {inTag}?=> ',';
+OPar      : {inTag}?=> '(';
+CPar      : {inTag}?=> ')';
+DoubleNum : {inTag}?=> Digit+ '.' Digit*;
+LongNum   : {inTag}?=> Digit+;
+WS        : {inTag}?=> (' ' | '\t' | '\r' | '\n')+ {$channel=HIDDEN;};
 
 Id
  : {inTag}?=> (Letter | '_') (Letter | '_' | '-' | Digit)*

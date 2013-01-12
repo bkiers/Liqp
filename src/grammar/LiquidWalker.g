@@ -59,8 +59,8 @@ tag returns [LNode node]
  : raw_tag          {$node = $raw_tag.node;}
  | comment_tag      {$node = $comment_tag.node;}
  | if_tag           {$node = $if_tag.node;}
- | unless_tag       {if(true) throw new RuntimeException("tag.unless_tag");}
- | case_tag         {if(true) throw new RuntimeException("tag.case_tag");}
+ | unless_tag       {$node = $unless_tag.node;}
+ | case_tag         {$node = $case_tag.node;}
  | cycle_tag        {if(true) throw new RuntimeException("tag.cycle_tag");}
  | for_tag          {if(true) throw new RuntimeException("tag.for_tag");}
  | table_tag        {if(true) throw new RuntimeException("tag.table_tag");}
@@ -88,15 +88,22 @@ if_tag returns [LNode node]
  ;
 
 unless_tag returns [LNode node]
- : ^(UNLESS expr block ^(ELSE block?)) {if(true) throw new RuntimeException("unless_tag");}
+@init{List<LNode> nodes = new ArrayList<LNode>();}
+ : ^(UNLESS expr b1=block {nodes.add($expr.node); nodes.add($b1.node);}
+   ^(ELSE (b2=block       {nodes.add(new AtomNode(null)); nodes.add($b2.node);})?))
+    {$node = new TagNode("unless", nodes.toArray(new LNode[nodes.size()]));}
  ;
 
 case_tag returns [LNode node]
- : ^(CASE expr when_tag+ ^(ELSE block?)) {if(true) throw new RuntimeException("case_tag");}
+@init{List<LNode> nodes = new ArrayList<LNode>();}
+ : ^(CASE expr   {nodes.add($expr.node);}
+    (when_tag    [nodes] )+
+   ^(ELSE (block {nodes.add(nodes.get(0)); nodes.add($block.node);} )?))
+    {$node = new TagNode("case", nodes.toArray(new LNode[nodes.size()]));}
  ;
 
-when_tag returns [LNode node]
- : ^(WHEN expr block) {if(true) throw new RuntimeException("when_tag");}
+when_tag[List<LNode> nodes]
+ : ^(WHEN expr block) {nodes.add($expr.node); nodes.add($block.node);}
  ;
 
 cycle_tag returns [LNode node]
@@ -104,8 +111,8 @@ cycle_tag returns [LNode node]
  ;
 
 for_tag returns [LNode node]
- : for_array {if(true) throw new RuntimeException("for_tag.for_array");}
- | for_range {if(true) throw new RuntimeException("for_tag.for_range");}
+ : for_array {$node = $for_array.node;}
+ | for_range {$node = $for_range.node;}
  ;
 
 // attributes must be 'limit' or 'offset'!
@@ -171,7 +178,8 @@ expr returns [LNode node]
  | ^(Lt expr expr)     {if(true) throw new RuntimeException("expr.Lt");}
  | ^(GtEq expr expr)   {if(true) throw new RuntimeException("expr.GtEq");}
  | ^(Gt expr expr)     {if(true) throw new RuntimeException("expr.Gt");}
- | Num                 {$node = new AtomNode(new Double($Num.text));}
+ | LongNum             {$node = new AtomNode(new Long($LongNum.text));}
+ | DoubleNum           {$node = new AtomNode(new Double($DoubleNum.text));}
  | Str                 {$node = new AtomNode($Str.text);}
  | True                {if(true) throw new RuntimeException("expr.True");}
  | False               {if(true) throw new RuntimeException("expr.False");}

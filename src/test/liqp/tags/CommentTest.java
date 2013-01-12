@@ -1,4 +1,4 @@
-package liqp.filters;
+package liqp.tags;
 
 import liqp.Template;
 import org.antlr.runtime.RecognitionException;
@@ -7,15 +7,14 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class capitalizeTest {
+public class CommentTest {
 
     @Test
-    public void applyTest() throws RecognitionException {
+    public void renderTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{{'a' | capitalize}}", "A" },
-                { "{{'' | capitalize}}", "" },
-                { "{{1 | capitalize}}", "1" },
+                { "{% comment %}ABC{% endcomment %}", "" },
+                { "A{% comment %}B{% endcomment %}C", "AC" }
         };
 
         for(String[] test : tests) {

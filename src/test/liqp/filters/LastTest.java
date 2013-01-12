@@ -10,7 +10,7 @@ import java.util.Map;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class lastTest {
+public class LastTest {
 
     @Test
     public void applyTest() throws RecognitionException {

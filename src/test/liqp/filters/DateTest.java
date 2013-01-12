@@ -10,7 +10,7 @@ import java.util.Date;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class dateTest {
+public class DateTest {
 
     @Test
     public void applyTest() throws RecognitionException {

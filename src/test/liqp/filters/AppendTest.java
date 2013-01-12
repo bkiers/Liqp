@@ -1,4 +1,4 @@
-package liqp.tags;
+package liqp.filters;
 
 import liqp.Template;
 import org.antlr.runtime.RecognitionException;
@@ -7,14 +7,15 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class rawTest {
+public class AppendTest {
 
     @Test
-    public void renderTest() throws RecognitionException {
+    public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{% raw %}{% endraw %}", "" },
-                { "{% raw %}{{a|b}}{% endraw %}", "{{a|b}}" }
+                { "{{'a' | append: 'b'}}", "ab" },
+                { "{{'' | append: ''}}", "" },
+                { "{{1 | append: 23}}", "123" },
         };
 
         for(String[] test : tests) {

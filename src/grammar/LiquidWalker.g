@@ -56,9 +56,9 @@ atom returns [LNode node]
  ;
 
 tag returns [LNode node]
- : RAW              {if(true) throw new RuntimeException("tag.RAW");}
- | COMMENT          {if(true) throw new RuntimeException("tag.COMMENT");}
- | if_tag           {if(true) throw new RuntimeException("tag.if_tag");}
+ : raw_tag          {$node = $raw_tag.node;}
+ | comment_tag      {$node = $comment_tag.node;}
+ | if_tag           {$node = $if_tag.node;}
  | unless_tag       {if(true) throw new RuntimeException("tag.unless_tag");}
  | case_tag         {if(true) throw new RuntimeException("tag.case_tag");}
  | cycle_tag        {if(true) throw new RuntimeException("tag.cycle_tag");}
@@ -70,8 +70,21 @@ tag returns [LNode node]
  | custom_tag_block {$node = $custom_tag_block.node;}
  ;
 
+raw_tag returns [LNode node]
+ : RAW {$node = new TagNode("raw", new AtomNode($RAW.text));}
+ ;
+
+comment_tag returns [LNode node]
+ : COMMENT {$node = new TagNode("comment", new AtomNode($COMMENT.text));}
+ ;
+
 if_tag returns [LNode node]
- : ^(IF expr block ^(ELSE block?)) {if(true) throw new RuntimeException("if_tag");}
+@init{List<LNode> nodes = new ArrayList<LNode>();}
+ : ^(IF        e1=expr b1=block {nodes.add($e1.node); nodes.add($b1.node);}
+      (^(ELSIF e2=expr b2=block {nodes.add($e2.node); nodes.add($b2.node);} ))*
+       ^(ELSE         (b3=block {nodes.add(new AtomNode("TRUE")); nodes.add($b3.node);} )?)
+    )
+    {$node = new TagNode("if", nodes.toArray(new LNode[nodes.size()]));}
  ;
 
 unless_tag returns [LNode node]
@@ -150,21 +163,21 @@ assignment returns [LNode node]
  ;
 
 expr returns [LNode node]
- : ^(Or expr expr)   {if(true) throw new RuntimeException("expr.Or");}
- | ^(And expr expr)  {if(true) throw new RuntimeException("expr.And");}
- | ^(Eq expr expr)   {if(true) throw new RuntimeException("expr.Eq");}
- | ^(NEq expr expr)  {if(true) throw new RuntimeException("expr.NEq");}
- | ^(LtEq expr expr) {if(true) throw new RuntimeException("expr.LtEq");}
- | ^(Lt expr expr)   {if(true) throw new RuntimeException("expr.Lt");}
- | ^(GtEq expr expr) {if(true) throw new RuntimeException("expr.GtEq");}
- | ^(Gt expr expr)   {if(true) throw new RuntimeException("expr.Gt");}
- | Num               {$node = new AtomNode(new Double($Num.text));}
- | Str               {$node = new AtomNode($Str.text);}
- | True              {if(true) throw new RuntimeException("expr.True");}
- | False             {if(true) throw new RuntimeException("expr.False");}
- | Nil               {if(true) throw new RuntimeException("expr.Nil");}
- | NO_SPACE          {$node = new AtomNode($NO_SPACE.text);}
- | lookup            {$node = $lookup.node;}
+ : ^(Or expr expr)     {if(true) throw new RuntimeException("expr.Or");}
+ | ^(And expr expr)    {if(true) throw new RuntimeException("expr.And");}
+ | ^(Eq a=expr b=expr) {$node = new EqNode($a.node, $b.node);}
+ | ^(NEq expr expr)    {if(true) throw new RuntimeException("expr.NEq");}
+ | ^(LtEq expr expr)   {if(true) throw new RuntimeException("expr.LtEq");}
+ | ^(Lt expr expr)     {if(true) throw new RuntimeException("expr.Lt");}
+ | ^(GtEq expr expr)   {if(true) throw new RuntimeException("expr.GtEq");}
+ | ^(Gt expr expr)     {if(true) throw new RuntimeException("expr.Gt");}
+ | Num                 {$node = new AtomNode(new Double($Num.text));}
+ | Str                 {$node = new AtomNode($Str.text);}
+ | True                {if(true) throw new RuntimeException("expr.True");}
+ | False               {if(true) throw new RuntimeException("expr.False");}
+ | Nil                 {if(true) throw new RuntimeException("expr.Nil");}
+ | NO_SPACE            {$node = new AtomNode($NO_SPACE.text);}
+ | lookup              {$node = $lookup.node;}
  ;
 
 lookup returns [LookupNode node]

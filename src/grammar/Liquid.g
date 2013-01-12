@@ -47,6 +47,7 @@ tokens {
   FOR_RANGE;
   GROUP;
   IF;
+  ELSIF;
   INCLUDE;
   LOOKUP;
   OUTPUT;
@@ -155,7 +156,11 @@ other_than_tag_start
  ;
 
 if_tag
- : TagStart IfStart expr TagEnd block else_tag? TagStart IfEnd TagEnd -> ^(IF expr block ^(ELSE else_tag?))
+ : TagStart IfStart expr TagEnd block elsif_tag* else_tag? TagStart IfEnd TagEnd -> ^(IF expr block elsif_tag* ^(ELSE else_tag?))
+ ;
+
+elsif_tag
+ : TagStart Elsif expr TagEnd block -> ^(ELSIF expr block)
  ;
 
 else_tag
@@ -298,6 +303,7 @@ Id
      else if($text.equals("raw"))         $type = RawStart;
      else if($text.equals("endraw"))      $type = RawEnd;
      else if($text.equals("if"))          $type = IfStart;
+     else if($text.equals("elsif"))       $type = Elsif;
      else if($text.equals("endif"))       $type = IfEnd;
      else if($text.equals("unless"))      $type = UnlessStart;
      else if($text.equals("endunless"))   $type = UnlessEnd;
@@ -348,6 +354,7 @@ fragment RawStart : ;
 fragment RawEnd : ;
 fragment IfStart : ;
 fragment IfEnd : ;
+fragment Elsif : ;
 fragment UnlessStart : ;
 fragment UnlessEnd : ;
 fragment Else : ;

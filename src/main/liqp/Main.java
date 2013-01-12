@@ -31,7 +31,11 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        String test = "{% comment %}ABC{% endcomment %}";
+        String test = "{% if user.name == 'tobi' %}\n" +
+                "  Hello tobi\n" +
+                "{% elsif user.name == 'bob' %}\n" +
+                "  Hello bob\n" +
+                "{% endif %}";
         LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(test));
         LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
         CommonTree ast = (CommonTree)parser.parse().getTree();

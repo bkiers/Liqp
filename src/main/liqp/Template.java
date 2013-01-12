@@ -1,5 +1,6 @@
 package liqp;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.nodes.LNode;
 import liqp.parser.LiquidLexer;
 import liqp.parser.LiquidParser;
@@ -17,27 +18,45 @@ public class Template {
 
     private final CommonTree root;
 
-    public Template(String input) throws RecognitionException {
+    public Template(String input) {
+
         LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(input));
         LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
-        root = (CommonTree)parser.parse().getTree();
+
+        try {
+            root = (CommonTree)parser.parse().getTree();
+        } catch (RecognitionException e) {
+            throw new RuntimeException("could not parse input: " + input, e);
+        }
     }
 
-    public static Template parse(String input) throws RecognitionException {
+    public static Template parse(String input) {
         return new Template(input);
     }
 
-    public Object render() {
+    public String render() {
         return render(new HashMap<String, Object>());
     }
 
-    public Object render(Map<String, Object> variables) {
+    public String render(String jsonMap) {
+
+        try {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> variables = new ObjectMapper().readValue(jsonMap, HashMap.class);
+            return render(variables);
+        }
+        catch (Exception e) {
+            throw new RuntimeException("invalid json map: '" + jsonMap + "'", e);
+        }
+    }
+
+    public String render(Map<String, Object> variables) {
 
         LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root));
 
         try {
             LNode node = walker.walk();
-            return node.render(variables);
+            return String.valueOf(node.render(variables)).trim();
         }
         catch (Exception e) {
             throw new RuntimeException(e);
@@ -54,13 +73,10 @@ public class Template {
                         "  Hello ???\n" +
                         "{% endif %}");
 
-        Map<String, Object> variables = new HashMap<String, Object>();
-        Map<String, Object> user = new HashMap<String, Object>();
-        user.put("name", "bob");
-        variables.put("user", user);
-        Object output = template.render(variables);
 
-        //Object output = template.render();
+        String json = "{\"user\" : {\"name\" : \"tobii\"} }";
+
+        Object output = template.render(json);
 
         System.out.printf(">>>%s<<<", output);
     }

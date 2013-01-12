@@ -11,10 +11,10 @@ public abstract class Tag extends LValue {
     private static final Map<String, Tag> TAGS = new HashMap<String, Tag>();
 
     static {
-        registerTag(new assign());
-        registerTag(new comment());
-        registerTag(new _if());
-        registerTag(new raw());
+        registerTag(new Assign());
+        registerTag(new Comment());
+        registerTag(new If());
+        registerTag(new Raw());
     }
 
     public static Tag getTag(String name) {

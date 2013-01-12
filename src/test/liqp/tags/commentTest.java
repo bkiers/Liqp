@@ -13,8 +13,8 @@ public class commentTest {
     public void renderTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{% comment %}ABC{% endcomment %}", "" },
-                { "A{% comment %}B{% endcomment %}C", "AC" }
+                { "{% Comment %}ABC{% endcomment %}", "" },
+                { "A{% Comment %}B{% endcomment %}C", "AC" }
         };
 
         for(String[] test : tests) {

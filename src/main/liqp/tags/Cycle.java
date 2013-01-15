@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class Cycle extends Tag {
+class Cycle extends Tag {
 
     private static final String PREPEND = "\"'";
 

@@ -5,7 +5,7 @@ import liqp.nodes.LNode;
 
 import java.util.Map;
 
-public class Case extends Tag {
+class Case extends Tag {
 
     @Override
     public Object render(Map<String, Object> variables, LNode... tokens) {

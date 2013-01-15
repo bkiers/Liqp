@@ -4,7 +4,7 @@ import liqp.nodes.LNode;
 
 import java.util.Map;
 
-public class Unless extends Tag {
+class Unless extends Tag {
 
     @Override
     public Object render(Map<String, Object> variables, LNode... tokens) {

@@ -4,7 +4,7 @@ import liqp.nodes.LNode;
 
 import java.util.Map;
 
-public class Assign extends Tag {
+class Assign extends Tag {
 
     @Override
     public Object render(Map<String, Object> variables, LNode... tokens) {

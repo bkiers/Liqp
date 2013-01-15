@@ -54,7 +54,23 @@ public abstract class LValue {
 
     public String asString(Object value) {
 
-        return value == null ? "" : String.valueOf(value);
+        if(value == null) {
+            return "";
+        }
+
+        if(!this.isArray(value)) {
+            return String.valueOf(value);
+        }
+
+        Object[] array = this.asArray(value);
+
+        StringBuilder builder = new StringBuilder();
+
+        for(Object obj : array) {
+            builder.append(this.asString(obj));
+        }
+
+        return builder.toString();
     }
 
     public boolean isArray(Object value) {

@@ -16,6 +16,7 @@ public abstract class Filter extends LValue {
         registerFilter(new Date());
         registerFilter(new Divided_By());
         registerFilter(new Downcase());
+        registerFilter(new Escape());
         registerFilter(new First());
         registerFilter(new Join());
         registerFilter(new Last());

@@ -27,7 +27,7 @@ public class IfTest {
         String json = "{\"user\" : {\"name\" : \"Tobi\", \"age\" : 42} }";
 
         tests = new String[][]{
-                { "{% if user %} Hello {{ user.name }}! {% endif %}", "Hello Tobi!" },
+                { "{% if user %}Hello {{ user.name }}!{% endif %}", "Hello Tobi!" },
                 { "{% if user.name == 'tobi' %}A{% elsif user.name == 'Tobi' %}B{% endif %}", "B" },
                 { "{% if user.name == 'tobi' %}A{% elsif user.name == 'TOBI' %}B{% else %}C{% endif %}", "C" },
         };

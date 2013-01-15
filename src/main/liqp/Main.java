@@ -31,11 +31,16 @@ public class Main {
     }
 
     public static void main(String[] args) throws Exception {
-        String test = "{% if user.name == 'tobi' %}\n" +
-                "  Hello tobi\n" +
-                "{% elsif user.name == 'bob' %}\n" +
-                "  Hello bob\n" +
-                "{% endif %}";
+        String test = "{% cycle 'o', 't' %}\n" +
+                "{% cycle 33: 'one', 'two', 'three' %}\n" +
+                "{% cycle 33: 'one', 'two', 'three' %}\n" +
+                "{% cycle 3: '1', '2' %}\n" +
+                "{% cycle 33: 'one', 'two' %}\n" +
+                "{% cycle 33: 'one', 'two' %}\n" +
+                "{% cycle 3: '1', '2' %}\n" +
+                "{% cycle 3: '1', '2' %}\n" +
+                "{% cycle 'o', 't' %}\n" +
+                "{% cycle 'o', 't' %}";
         LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(test));
         LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
         CommonTree ast = (CommonTree)parser.parse().getTree();

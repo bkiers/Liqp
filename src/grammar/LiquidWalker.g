@@ -39,6 +39,10 @@ options {
   import liqp.tags.*;
 }
 
+@members {
+  // ...
+}
+
 walk returns [LNode node]
  : block {$node = $block.node;}
  ;
@@ -61,11 +65,11 @@ tag returns [LNode node]
  | if_tag           {$node = $if_tag.node;}
  | unless_tag       {$node = $unless_tag.node;}
  | case_tag         {$node = $case_tag.node;}
- | cycle_tag        {if(true) throw new RuntimeException("tag.cycle_tag");}
- | for_tag          {if(true) throw new RuntimeException("tag.for_tag");}
- | table_tag        {if(true) throw new RuntimeException("tag.table_tag");}
- | capture_tag      {if(true) throw new RuntimeException("tag.capture_tag");}
- | include_tag      {if(true) throw new RuntimeException("tag.include_tag");}
+ | cycle_tag        {$node = $cycle_tag.node;}
+ | for_tag          {$node = $for_tag.node;}
+ | table_tag        {$node = $table_tag.node;}
+ | capture_tag      {$node = $capture_tag.node;}
+ | include_tag      {$node = $include_tag.node;}
  | custom_tag       {$node = $custom_tag.node;}
  | custom_tag_block {$node = $custom_tag_block.node;}
  ;
@@ -107,7 +111,13 @@ when_tag[List<LNode> nodes]
  ;
 
 cycle_tag returns [LNode node]
- : ^(CYCLE ^(GROUP expr?) expr+) {if(true) throw new RuntimeException("cycle_tag");}
+@init{List<LNode> nodes = new ArrayList<LNode>();}
+ : ^(CYCLE cycle_group {nodes.add($cycle_group.node);} (e=expr {nodes.add($e.node);})+)
+    {$node = new TagNode("cycle", nodes.toArray(new LNode[nodes.size()]));}
+ ;
+
+cycle_group returns [LNode node]
+ : ^(GROUP expr?) {$node = $expr.node;}
  ;
 
 for_tag returns [LNode node]

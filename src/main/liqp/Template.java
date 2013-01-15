@@ -38,16 +38,19 @@ public class Template {
         return render(new HashMap<String, Object>());
     }
 
+    @SuppressWarnings("unchecked")
     public String render(String jsonMap) {
 
+        Map<String, Object> variables = new HashMap<String, Object>();
+
         try {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> variables = new ObjectMapper().readValue(jsonMap, HashMap.class);
-            return render(variables);
+            variables = new ObjectMapper().readValue(jsonMap, HashMap.class);
         }
         catch (Exception e) {
             throw new RuntimeException("invalid json map: '" + jsonMap + "'", e);
         }
+
+        return render(variables);
     }
 
     public String render(Map<String, Object> variables) {
@@ -56,7 +59,7 @@ public class Template {
 
         try {
             LNode node = walker.walk();
-            return String.valueOf(node.render(variables)).trim();
+            return String.valueOf(node.render(variables));
         }
         catch (Exception e) {
             throw new RuntimeException(e);

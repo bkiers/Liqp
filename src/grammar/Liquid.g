@@ -91,6 +91,7 @@ tokens {
   }
 
   private String strip(String text, boolean singleQuoted) {
+    // TODO account for escaped chars?
     return text.substring(1, text.length() - 1);
   }
 }
@@ -140,7 +141,7 @@ raw_tag
  ;
 
 raw_body
- : other_than_tag_start -> RAW[$other_than_tag_start.text.trim()]
+ : other_than_tag_start -> RAW[$other_than_tag_start.text]
  ;
 
 comment_tag
@@ -148,7 +149,7 @@ comment_tag
  ;
 
 comment_body
- : other_than_tag_start -> COMMENT[$other_than_tag_start.text.trim()]
+ : other_than_tag_start -> COMMENT[$other_than_tag_start.text]
  ;
 
 other_than_tag_start
@@ -180,11 +181,11 @@ when_tag
  ;
 
 cycle_tag
- : TagStart Cycle cycle_group? expr (Comma expr)* TagEnd -> ^(CYCLE ^(GROUP cycle_group?) expr+)
+ : TagStart Cycle cycle_group expr (Comma expr)* TagEnd -> ^(CYCLE cycle_group expr+)
  ;
 
 cycle_group
- : expr Col -> expr
+ : (expr Col)? -> ^(GROUP expr?)
  ;
 
 for_tag
@@ -333,11 +334,6 @@ Id
 
 Other
  : ({!inTag && !openTagAhead()}?=> . )+
-   {
-     if($text.matches("\\s+")) {
-       $channel=HIDDEN;
-     }
-   }
  ;
 
 NoSpace

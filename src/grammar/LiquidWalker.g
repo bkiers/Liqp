@@ -160,7 +160,7 @@ table_tag returns [LNode node]
  ;
 
 capture_tag returns [LNode node]
- : ^(CAPTURE Id block) {if(true) throw new RuntimeException("capture");}
+ : ^(CAPTURE Id block) {$node = new TagNode("capture", new AtomNode($Id.text), $block.node);}
  ;
 
 include_tag returns [LNode node]

@@ -13,12 +13,13 @@ public abstract class Tag extends LValue {
     static {
         registerTag(new Assign());
         registerTag(new Case());
+        registerTag(new Capture());
         registerTag(new Comment());
+        registerTag(new Cycle());
+        registerTag(new For());
         registerTag(new If());
         registerTag(new Raw());
         registerTag(new Unless());
-        registerTag(new Cycle());
-        registerTag(new For());
     }
 
     public static Tag getTag(String name) {

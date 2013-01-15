@@ -127,15 +127,31 @@ for_tag returns [LNode node]
 
 // attributes must be 'limit' or 'offset'!
 for_array returns [LNode node]
- : ^(FOR_ARRAY Id lookup ^(ATTRIBUTES attribute*) block) {if(true) throw new RuntimeException("for_array");}
- ;
-
-attribute returns [LNode node]
- : ^(Id expr) {if(true) throw new RuntimeException("attribute");}
+@init{
+  List<LNode> expressions = new ArrayList<LNode>();
+  expressions.add(new AtomNode(true));
+}
+ : ^(FOR_ARRAY Id lookup      {expressions.add(new AtomNode($Id.text)); expressions.add($lookup.node);}
+      block                   {expressions.add($block.node);}
+      ^(ATTRIBUTES (attribute {expressions.add($attribute.node);})*)
+    )
+    {$node = new TagNode("for", expressions.toArray(new LNode[expressions.size()]));}
  ;
 
 for_range returns [LNode node]
- : ^(FOR_RANGE Id expr expr block) {if(true) throw new RuntimeException("for_range");}
+@init{
+  List<LNode> expressions = new ArrayList<LNode>();
+  expressions.add(new AtomNode(false));
+}
+ : ^(FOR_RANGE Id from=expr to=expr {expressions.add(new AtomNode($Id.text)); expressions.add($from.node); expressions.add($to.node);}
+      block                         {expressions.add($block.node);}
+      ^(ATTRIBUTES (attribute       {expressions.add($attribute.node);})*)
+    )
+    {$node = new TagNode("for", expressions.toArray(new LNode[expressions.size()]));}
+ ;
+
+attribute returns [LNode node]
+ : ^(Id expr) {$node = new AttributeNode(new AtomNode($Id.text), $expr.node);}
  ;
 
 // attributes must be 'limit' or 'cols'!

@@ -195,15 +195,15 @@ for_tag
 
 // attributes must be 'limit' or 'offset'!
 for_array
- : TagStart ForStart Id In lookup attribute* TagEnd block TagStart ForEnd TagEnd -> ^(FOR_ARRAY Id lookup ^(ATTRIBUTES attribute*) block)
- ;
-
-attribute 
- : Id Col expr -> ^(Id expr)
+ : TagStart ForStart Id In lookup attribute* TagEnd block TagStart ForEnd TagEnd -> ^(FOR_ARRAY Id lookup block ^(ATTRIBUTES attribute*))
  ;
 
 for_range
- : TagStart ForStart Id In OPar expr DotDot expr CPar TagEnd block TagStart ForEnd TagEnd -> ^(FOR_RANGE Id expr expr block)
+ : TagStart ForStart Id In OPar expr DotDot expr CPar attribute* TagEnd block TagStart ForEnd TagEnd -> ^(FOR_RANGE Id expr expr block ^(ATTRIBUTES attribute*))
+ ;
+
+attribute
+ : Id Col expr -> ^(Id expr)
  ;
 
 // attributes must be 'limit' or 'cols'!

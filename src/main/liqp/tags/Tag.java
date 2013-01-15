@@ -18,6 +18,7 @@ public abstract class Tag extends LValue {
         registerTag(new Raw());
         registerTag(new Unless());
         registerTag(new Cycle());
+        registerTag(new For());
     }
 
     public static Tag getTag(String name) {

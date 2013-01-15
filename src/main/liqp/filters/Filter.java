@@ -12,23 +12,24 @@ public abstract class Filter extends LValue {
 
     static {
         registerFilter(new Append());
-        registerFilter(new Date());
         registerFilter(new Capitalize());
+        registerFilter(new Date());
+        registerFilter(new Divided_By());
+        registerFilter(new Downcase());
         registerFilter(new First());
         registerFilter(new Join());
         registerFilter(new Last());
         registerFilter(new liqp.filters.Map());
-        registerFilter(new Downcase());
-        registerFilter(new Upcase());
+        registerFilter(new Modulo());
+        registerFilter(new Remove());
+        registerFilter(new Remove_First());
         registerFilter(new Replace());
         registerFilter(new Replace_First());
-        registerFilter(new Remove_First());
-        registerFilter(new Remove());
-        registerFilter(new Times());
-        registerFilter(new Divided_By());
+        registerFilter(new Size());
         registerFilter(new Sort());
         registerFilter(new Split());
-        registerFilter(new Modulo());
+        registerFilter(new Times());
+        registerFilter(new Upcase());
     }
 
     private static void registerFilter(Filter filter) {

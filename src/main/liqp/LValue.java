@@ -56,4 +56,19 @@ public abstract class LValue {
 
         return value == null ? "" : String.valueOf(value);
     }
+
+    public boolean isArray(Object value) {
+
+        return value != null && (value.getClass().isArray() || value instanceof List);
+    }
+
+    public boolean isNumber(Object value) {
+
+        return value != null && value instanceof Number;
+    }
+
+    public boolean isString(Object value) {
+
+        return value != null && value instanceof CharSequence;
+    }
 }

@@ -292,7 +292,9 @@ Col       : {inTag}?=> ':';
 Comma     : {inTag}?=> ',';
 OPar      : {inTag}?=> '(';
 CPar      : {inTag}?=> ')';
-DoubleNum : {inTag}?=> Digit+ '.' Digit*;
+DoubleNum : {inTag}?=> Digit+ ( {input.LA(1) == '.' && input.LA(2) != '.'}?=> '.' Digit*
+                              | {$type = LongNum;}
+                              );
 LongNum   : {inTag}?=> Digit+;
 WS        : {inTag}?=> (' ' | '\t' | '\r' | '\n')+ {$channel=HIDDEN;};
 

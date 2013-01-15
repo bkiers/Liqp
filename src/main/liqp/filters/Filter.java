@@ -17,6 +17,7 @@ public abstract class Filter extends LValue {
         registerFilter(new First());
         registerFilter(new Join());
         registerFilter(new Last());
+        registerFilter(new liqp.filters.Map());
         registerFilter(new Downcase());
         registerFilter(new Upcase());
         registerFilter(new Replace());

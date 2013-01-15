@@ -25,6 +25,7 @@ public abstract class Filter extends LValue {
         registerFilter(new Remove());
         registerFilter(new Times());
         registerFilter(new Divided_By());
+        registerFilter(new Sort());
         registerFilter(new Split());
         registerFilter(new Modulo());
     }

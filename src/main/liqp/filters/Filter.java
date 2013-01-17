@@ -44,6 +44,7 @@ public abstract class Filter extends LValue {
         registerFilter(new Sort());
         registerFilter(new Split());
         registerFilter(new Strip_HTML());
+        registerFilter(new Strip_Newlines());
         registerFilter(new Times());
         registerFilter(new Upcase());
     }

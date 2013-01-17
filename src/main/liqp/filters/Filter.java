@@ -10,10 +10,15 @@ public abstract class Filter extends LValue {
 
     private static final Map<String, Filter> FILTERS = new HashMap<String, Filter>();
 
-    /**
-     * Implemented the following filters:
-     * http://www.ruby-doc.org/gems/docs/l/liquid-2.2.2/Liquid/StandardFilters.html
-     */
+
+    /*
+        #strip_html
+        #strip_newlines
+
+        #truncate
+        #truncatewords
+    */
+
     static {
         registerFilter(new Append());
         registerFilter(new Capitalize());
@@ -21,6 +26,7 @@ public abstract class Filter extends LValue {
         registerFilter(new Divided_By());
         registerFilter(new Downcase());
         registerFilter(new Escape());
+        registerFilter(new Escape_Once());
         registerFilter(new First());
         registerFilter(new H());
         registerFilter(new Join());

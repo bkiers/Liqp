@@ -11,6 +11,10 @@ class Cycle extends Tag {
 
     private static final String PREPEND = "\"'";
 
+    /*
+     * Cycle is usually used within a loop to alternate
+     * between values, like colors or DOM classes.
+     */
     @Override
     public Object render(Map<String, Object> variables, LNode... tokens) {
 

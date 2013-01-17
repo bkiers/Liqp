@@ -10,6 +10,9 @@ class For extends Tag {
     private static final String OFFSET = "offset";
     private static final String LIMIT = "limit";
 
+    /*
+     * For loop
+     */
     @Override
     public Object render(Map<String, Object> variables, LNode... tokens) {
 
@@ -20,7 +23,6 @@ class For extends Tag {
         return array ? renderArray(id, variables, tokens) : renderRange(id, variables, tokens);
     }
 
-    // ^(FOR_ARRAY [boolean] Id lookup block ^(ATTRIBUTES attribute*))
     private Object renderArray(String id, Map<String, Object> variables, LNode... tokens) {
 
         StringBuilder builder = new StringBuilder();
@@ -45,7 +47,6 @@ class For extends Tag {
         return builder.toString();
     }
 
-    // ^(FOR_RANGE [boolean] Id expr expr block ^(ATTRIBUTES attribute*))
     private Object renderRange(String id, Map<String, Object> variables, LNode... tokens) {
 
         StringBuilder builder = new StringBuilder();

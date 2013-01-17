@@ -6,6 +6,9 @@ import java.util.Map;
 
 class Capture extends Tag {
 
+    /*
+     * Block tag that captures text into a variable
+     */
     @Override
     public Object render(Map<String, Object> variables, LNode... tokens) {
 

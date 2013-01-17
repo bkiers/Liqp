@@ -6,6 +6,9 @@ import java.util.Map;
 
 class Assign extends Tag {
 
+    /*
+     * Assigns some value to a variable
+     */
     @Override
     public Object render(Map<String, Object> variables, LNode... tokens) {
 

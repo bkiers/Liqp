@@ -7,6 +7,9 @@ import java.util.Map;
 
 class Case extends Tag {
 
+    /*
+     * Block tag, its the standard case...when block
+     */
     @Override
     public Object render(Map<String, Object> variables, LNode... tokens) {
 

@@ -6,6 +6,9 @@ import java.util.Map;
 
 class If extends Tag {
 
+    /*
+     * Standard if/else block
+     */
     @Override
     public Object render(Map<String, Object> variables, LNode... tokens) {
 

@@ -10,12 +10,6 @@ public abstract class Filter extends LValue {
 
     private static final Map<String, Filter> FILTERS = new HashMap<String, Filter>();
 
-
-    /*
-        #truncate
-        #truncatewords
-    */
-
     static {
         registerFilter(new Append());
         registerFilter(new Capitalize());
@@ -44,6 +38,7 @@ public abstract class Filter extends LValue {
         registerFilter(new Strip_Newlines());
         registerFilter(new Times());
         registerFilter(new Truncate());
+        registerFilter(new Truncatewords());
         registerFilter(new Upcase());
     }
 

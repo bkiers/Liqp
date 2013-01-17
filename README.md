@@ -1,8 +1,8 @@
-# Liqp
+## Liqp
 
 An ANTLR based 'Liquid Template' parser and rendering engine.
 
-## Some examples
+### Examples
 
 Below are some examples of how to use this library to render Liquid-templates.
 

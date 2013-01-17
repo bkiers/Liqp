@@ -4,6 +4,10 @@ An ANTLR based 'Liquid Template' parser and rendering engine.
 
 ## Some examples
 
+Below are some examples of how to use this library to render Liquid-templates.
+
+-----------------------------------
+
 `input`:
 
 ```java

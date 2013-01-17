@@ -3,34 +3,48 @@
 
     <property name="version"          value="0.1" />
     <property name="project.name"     value="Liqp" />
-    <property name="main.class"       value="liqp.Main" />
+    <property name="main.class"       value="liqp.Examples" />
     <property name="combined.grammar" value="src/grammar/Liquid.g" />
     <property name="tree.grammar"     value="src/grammar/LiquidWalker.g" />
     <property name="package"          value="liqp" />
+    <property name="build.dir"        value="build" />
     <property name="main.build.dir"   value="build/main" />
     <property name="main.src.dir"     value="src/main" />
     <property name="test.build.dir"   value="build/test" />
     <property name="test.src.dir"     value="src/test" />
+    <property name="report.dir"       value="build/reports" />
 
     <path id="classpath">
         <pathelement location="${main.build.dir}" />
+        <pathelement location="${test.build.dir}" />
         <fileset dir="lib">
             <include name="*.jar" />
         </fileset>
     </path>
 
-    <target name="init">
+    <target name="clean" description="Deletes build directories">
+        <mkdir dir="${build.dir}"/>
+        <delete includeemptydirs="true">
+            <fileset dir="${build.dir}" includes="**/*"/>
+        </delete>
+    </target>
+
+    <target name="init" depends="clean">
         <mkdir dir="${main.build.dir}" />
         <mkdir dir="${test.build.dir}" />
+        <mkdir dir="${report.dir}" />
     </target>
 
     <target name="compile" depends="init">
         <javac srcdir="${main.src.dir}" destdir="${main.build.dir}" includeantruntime="false">
             <classpath refid="classpath" />
         </javac>
+        <javac srcdir="${test.src.dir}" destdir="${test.build.dir}" includeantruntime="false">
+            <classpath refid="classpath" />
+        </javac>
     </target>
 
-    <target name="generate">
+    <target name="generate" depends="compile">
         <echo>Generating the parser and lexer</echo>
 
         <java classname="org.antlr.Tool" fork="true" failonerror="true" maxmemory="128m">
@@ -50,6 +64,18 @@
 
         <echo>Checking for syntax errors in the grammar file by compiling the lexer and parser</echo>
         <antcall target="compile" />
+    </target>
+
+    <target name="test" depends="compile" description="Runs all the unit tests">
+        <junit printsummary="yes" fork="yes" haltonfailure="yes">
+            <classpath refid="classpath"/>
+            <formatter type="plain"/>
+            <batchtest fork="yes" todir="${report.dir}">
+                <fileset dir="${test.src.dir}">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
     </target>
 
     <target name="run" depends="generate" >

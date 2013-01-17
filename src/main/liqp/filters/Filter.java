@@ -12,9 +12,6 @@ public abstract class Filter extends LValue {
 
 
     /*
-        #strip_html
-        #strip_newlines
-
         #truncate
         #truncatewords
     */
@@ -46,6 +43,7 @@ public abstract class Filter extends LValue {
         registerFilter(new Strip_HTML());
         registerFilter(new Strip_Newlines());
         registerFilter(new Times());
+        registerFilter(new Truncate());
         registerFilter(new Upcase());
     }
 

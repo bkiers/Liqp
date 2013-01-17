@@ -43,6 +43,7 @@ public abstract class Filter extends LValue {
         registerFilter(new Size());
         registerFilter(new Sort());
         registerFilter(new Split());
+        registerFilter(new Strip_HTML());
         registerFilter(new Times());
         registerFilter(new Upcase());
     }

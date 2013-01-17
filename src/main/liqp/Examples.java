@@ -5,7 +5,10 @@ import liqp.parser.LiquidParser;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
 
-public class Main {
+/**
+ * Used for debugging: prints the AST of some Liquid-input.
+ */
+public class Examples {
 
     private static void walk(CommonTree tree, String[] tokenNames, int indent) {
 
@@ -37,5 +40,23 @@ public class Main {
         LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
         CommonTree ast = (CommonTree)parser.parse().getTree();
         walk(ast, parser.getTokenNames(), 0);
+
+        /*
+        Template template = Template.parse(
+                "{% if user.name == 'tobi' %}\n" +
+                        "  Hello tobi\n" +
+                        "{% elsif user.name == 'bob' %}\n" +
+                        "  Hello bob\n" +
+                        "{% else %}\n" +
+                        "  Hello ???\n" +
+                        "{% endif %}");
+
+
+        String json = "{\"user\" : {\"name\" : \"tobi\"} }";
+
+        Object output = template.render(json);
+
+        System.out.printf(">>>%s<<<", output);
+        */
     }
 }

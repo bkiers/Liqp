@@ -29,6 +29,7 @@ public abstract class Filter extends LValue {
         registerFilter(new Minus());
         registerFilter(new Modulo());
         registerFilter(new Plus());
+        registerFilter(new Prepend());
         registerFilter(new Remove());
         registerFilter(new Remove_First());
         registerFilter(new Replace());

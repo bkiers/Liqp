@@ -38,7 +38,6 @@ public abstract class Filter extends LValue {
     }
 
     public static void registerFilter(String id, Filter filter) {
-
         FILTERS.put(id, filter);
     }
 

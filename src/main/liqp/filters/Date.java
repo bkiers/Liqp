@@ -1,12 +1,11 @@
 package liqp.filters;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
 
 class Date extends Filter {
 
-    private final static Map<Character, SimpleDateFormat> LIQUID_TO_JAVA_FORMAT =
-            new HashMap<Character, SimpleDateFormat>();
+    private final static java.util.Map<Character, SimpleDateFormat> LIQUID_TO_JAVA_FORMAT =
+            new java.util.HashMap<Character, SimpleDateFormat>();
 
     static {
 
@@ -123,7 +122,7 @@ class Date extends Filter {
                     Long.valueOf(super.asString(value));
             final java.util.Date date = new java.util.Date(seconds * 1000L);
             final String format = super.asString(super.get(0, params));
-            final Calendar calendar = Calendar.getInstance();
+            final java.util.Calendar calendar = java.util.Calendar.getInstance();
             calendar.setTime(date);
 
             StringBuilder builder = new StringBuilder();

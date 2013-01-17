@@ -8,7 +8,7 @@ Below are some examples of how to use this library to render Liquid-templates.
 
 -----------------------------------
 
-`input`:
+`input`
 
 ```java
 String source = "hi {{name}}";
@@ -23,7 +23,7 @@ String rendered = template.render(variables);
 System.out.println(rendered);
 ```
 
-`output`:
+`output`
 
 ```
 hi tobi
@@ -31,7 +31,7 @@ hi tobi
 
 -----------------------------------
 
-`input`:
+`input`
 
 ```java
 String source =
@@ -58,7 +58,7 @@ String rendered = template.render(variables);
 System.out.println(rendered);
 ```
 
-`output`:
+`output`
 
 ```
 <ul id="products">  

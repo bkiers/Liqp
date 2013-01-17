@@ -6,6 +6,12 @@ import java.util.List;
 
 class Sort extends Filter {
 
+    /*
+     * sort(input, property = nil)
+     *
+     * Sort elements of the array provide optional property with
+     * which to sort an array of hashes or drops
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

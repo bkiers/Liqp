@@ -2,6 +2,11 @@ package liqp.filters;
 
 class Times extends Filter {
 
+    /*
+     * times(input, operand)
+     *
+     * multiplication
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

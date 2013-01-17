@@ -2,6 +2,11 @@ package liqp.filters;
 
 class Escape extends Filter {
 
+    /*
+     * escape(input)
+     *
+     * escape a string
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

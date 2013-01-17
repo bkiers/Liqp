@@ -4,6 +4,13 @@ import java.util.regex.Pattern;
 
 class Split extends Filter {
 
+    /*
+     * split(input, delimiter = ' ')
+     *
+     * Split a string on a matching pattern
+     *
+     * E.g. {{ "a~b" | split:'~' | first }} #=> 'a'
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

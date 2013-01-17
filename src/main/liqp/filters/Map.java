@@ -5,6 +5,11 @@ import java.util.List;
 
 class Map extends Filter {
 
+    /*
+     * map(input, property)
+     *
+     * map/collect on a given property
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

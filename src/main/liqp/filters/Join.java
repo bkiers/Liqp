@@ -4,6 +4,11 @@ import java.util.Arrays;
 
 class Join extends Filter {
 
+    /*
+     * join(input, glue = ' ')
+     *
+     * Join elements of the array with certain character between them
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

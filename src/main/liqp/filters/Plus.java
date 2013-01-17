@@ -2,6 +2,11 @@ package liqp.filters;
 
 class Plus extends Filter {
 
+    /*
+     * plus(input, operand)
+     *
+     * addition
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

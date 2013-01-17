@@ -1,9 +1,12 @@
 package liqp.filters;
 
-import org.jsoup.Jsoup;
-
 class Truncate extends Filter {
 
+    /*
+     * truncate(input, length = 50, truncate_string = "...")
+     *
+     * Truncate a string down to x characters
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

@@ -2,6 +2,11 @@ package liqp.filters;
 
 class Divided_By extends Filter {
 
+    /*
+     * divided_by(input, operand)
+     *
+     * division
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

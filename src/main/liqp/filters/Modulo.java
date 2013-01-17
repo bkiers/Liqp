@@ -2,6 +2,11 @@ package liqp.filters;
 
 class Modulo extends Filter {
 
+    /*
+     * plus(input, operand)
+     *
+     * modulus
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

@@ -4,6 +4,11 @@ import java.util.regex.Pattern;
 
 class Remove_First extends Filter {
 
+    /*
+     * remove_first(input, string)
+     *
+     * remove the first occurrences of a substring
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

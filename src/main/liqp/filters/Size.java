@@ -2,6 +2,11 @@ package liqp.filters;
 
 class Size extends Filter {
 
+    /*
+     * size(input)
+     *
+     * Return the size of an array or of an string
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

@@ -1,9 +1,12 @@
 package liqp.filters;
 
-import org.jsoup.Jsoup;
-
 class Strip_Newlines extends Filter {
 
+    /*
+     * strip_newlines(input) click to toggle source
+     *
+     * Remove all newlines from the string
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

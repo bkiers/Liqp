@@ -2,6 +2,11 @@ package liqp.filters;
 
 class First extends Filter {
 
+    /*
+     * first(array)
+     *
+     * Get the first element of the passed in array
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

@@ -2,6 +2,11 @@ package liqp.filters;
 
 class Truncatewords extends Filter {
 
+    /*
+     * truncatewords(input, words = 15, truncate_string = "...")
+     *
+     * Truncate a string down to x words
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

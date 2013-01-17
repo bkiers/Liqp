@@ -2,6 +2,11 @@ package liqp.filters;
 
 class Remove extends Filter {
 
+    /*
+     * remove(input, string)
+     *
+     * remove a substring
+     */
     @Override
     public Object apply(Object value, Object... params) {
 

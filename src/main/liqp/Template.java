@@ -31,7 +31,7 @@ public class Template {
     private final CommonTree root;
 
     /**
-     * Creates a new Template instance from a given file.
+     * Creates a new Template instance from a given input.
      *
      * @param input the file holding the Liquid source.
      */

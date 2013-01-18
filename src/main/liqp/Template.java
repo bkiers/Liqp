@@ -88,15 +88,6 @@ public class Template {
     /**
      * Renders the template.
      *
-     * @return a string denoting the rendered template.
-     */
-    public String render() {
-        return render(new HashMap<String, Object>());
-    }
-
-    /**
-     * Renders the template.
-     *
      * @param jsonMap a JSON-map denoting the (possibly nested)
      *                variables that can be used in this Template.
      * @return a string denoting the rendered template.
@@ -104,33 +95,66 @@ public class Template {
     @SuppressWarnings("unchecked")
     public String render(String jsonMap) {
 
-        Map<String, Object> variables;
+        Map<String, Object> map;
 
         try {
-            variables = new ObjectMapper().readValue(jsonMap, HashMap.class);
+            map = new ObjectMapper().readValue(jsonMap, HashMap.class);
         }
         catch (Exception e) {
             throw new RuntimeException("invalid json map: '" + jsonMap + "'", e);
         }
 
-        return render(variables);
+        return render(map);
     }
 
     /**
      * Renders the template.
      *
-     * @param variables a Map denoting the (possibly nested)
-     *                  variables that can be used in this
-     *                  Template.
-     * @return a string denoting the rendered template.
+     * @param context an array denoting key-value pairs where the
+     *                uneven numbers (even indexes) should be Strings.
+     *                If the length of this array is uneven, the last
+     *                key (without the value) gets `null` attached to
+     *                it. Note that a call to this method with a single
+     *                String as parameter, will be handled by
+     *                `render(String jsonMap)` instead.
+     * @return        a string denoting the rendered template.
      */
-    public String render(Map<String, Object> variables) {
+    public String render(Object... context) {
+
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        for(int i = 0; i < context.length - 1; i++) {
+
+            Object key = context[i];
+
+            if(key.getClass() != String.class) {
+                throw new RuntimeException("illegal key: " + String.valueOf(key) +
+                        " (" + key.getClass().getName() + "). Must be a String.");
+            }
+
+            Object value = context[i + 1];
+
+            map.put((String)key, value);
+        }
+
+        return render(map);
+    }
+
+    /**
+     * Renders the template.
+     *
+     * @param context a Map denoting the (possibly nested)
+     *                variables that can be used in this
+     *                Template.
+     * @return        a string denoting the rendered template.
+     */
+    public String render(Map<String, Object> context) {
 
         LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root));
 
         try {
             LNode node = walker.walk();
-            return String.valueOf(node.render(variables));
+            return String.valueOf(node.render(context));
         }
         catch (Exception e) {
             throw new RuntimeException(e);

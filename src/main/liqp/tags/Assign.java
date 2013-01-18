@@ -10,14 +10,14 @@ class Assign extends Tag {
      * Assigns some value to a variable
      */
     @Override
-    public Object render(Map<String, Object> variables, LNode... tokens) {
+    public Object render(Map<String, Object> context, LNode... nodes) {
 
-        String id = String.valueOf(tokens[0].render(variables));
-        LNode expression = tokens[1];
+        String id = String.valueOf(nodes[0].render(context));
+        LNode expression = nodes[1];
 
-        Object value = expression.render(variables);
+        Object value = expression.render(context);
 
-        variables.put(id, value);
+        context.put(id, value);
 
         return "";
     }

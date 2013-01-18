@@ -12,7 +12,7 @@ public class FilterTest {
     @Test
     public void testCustomFilter() throws RecognitionException {
 
-        Filter.registerFilter("textilize", new Filter() {
+        Filter.registerFilter(new Filter("textilize") {
             @Override
             public Object apply(Object value, Object... params) {
                 String s = super.asString(value).trim();

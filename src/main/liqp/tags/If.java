@@ -10,15 +10,15 @@ class If extends Tag {
      * Standard if/else block
      */
     @Override
-    public Object render(Map<String, Object> variables, LNode... tokens) {
+    public Object render(Map<String, Object> context, LNode... nodes) {
 
-        for(int i = 0; i < tokens.length - 1; i += 2) {
+        for(int i = 0; i < nodes.length - 1; i += 2) {
 
-            Object exprNodeValue = tokens[i].render(variables);
-            LNode blockNode = tokens[i + 1];
+            Object exprNodeValue = nodes[i].render(context);
+            LNode blockNode = nodes[i + 1];
 
             if(super.asBoolean(exprNodeValue)) {
-                return blockNode.render(variables);
+                return blockNode.render(context);
             }
         }
 

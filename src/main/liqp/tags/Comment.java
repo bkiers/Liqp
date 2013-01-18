@@ -10,7 +10,7 @@ class Comment extends Tag {
      * Block tag, comments out the text in the block
      */
     @Override
-    public Object render(Map<String, Object> variables, LNode... tokens) {
+    public Object render(Map<String, Object> context, LNode... nodes) {
         return "";
     }
 }

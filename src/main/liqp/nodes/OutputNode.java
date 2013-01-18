@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class OutputNode implements LNode {
+class OutputNode implements LNode {
 
     private LNode expression;
     private List<FilterNode> filters;
@@ -19,12 +19,12 @@ public class OutputNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> variables) {
+    public Object render(Map<String, Object> context) {
 
-        Object value = expression.render(variables);
+        Object value = expression.render(context);
 
         for(FilterNode node : filters) {
-            value = node.apply(value, variables);
+            value = node.apply(value, context);
         }
 
         return value;

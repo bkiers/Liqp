@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class BlockNode implements LNode {
+class BlockNode implements LNode {
 
     private List<LNode> children;
 
@@ -18,13 +18,13 @@ public class BlockNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> variables) {
+    public Object render(Map<String, Object> context) {
 
         StringBuilder builder = new StringBuilder();
 
         for(LNode node : children) {
 
-            Object value = node.render(variables);
+            Object value = node.render(context);
 
             if(value != null) {
 

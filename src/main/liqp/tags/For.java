@@ -14,13 +14,16 @@ class For extends Tag {
      * For loop
      */
     @Override
-    public Object render(Map<String, Object> variables, LNode... tokens) {
+    public Object render(Map<String, Object> context, LNode... nodes) {
 
-        boolean array = super.asBoolean(tokens[0].render(variables));
+        // The first node in the array denotes whether this is a for-tag
+        // over an array, `for item in array ...`, or a for-tag over a
+        // range, `for i in (4..item.length)`.
+        boolean array = super.asBoolean(nodes[0].render(context));
 
-        String id = super.asString(tokens[1].render(variables));
+        String id = super.asString(nodes[1].render(context));
 
-        return array ? renderArray(id, variables, tokens) : renderRange(id, variables, tokens);
+        return array ? renderArray(id, context, nodes) : renderRange(id, context, nodes);
     }
 
     private Object renderArray(String id, Map<String, Object> variables, LNode... tokens) {

@@ -4,7 +4,7 @@ import liqp.LValue;
 
 import java.util.Map;
 
-public class EqNode implements LNode {
+class EqNode implements LNode {
 
     private LNode lhs;
     private LNode rhs;
@@ -15,10 +15,10 @@ public class EqNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> variables) {
+    public Object render(Map<String, Object> context) {
 
-        Object a = lhs.render(variables);
-        Object b = rhs.render(variables);
+        Object a = lhs.render(context);
+        Object b = rhs.render(context);
 
         return LValue.areEqual(a, b);
 

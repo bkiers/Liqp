@@ -10,12 +10,12 @@ class Capture extends Tag {
      * Block tag that captures text into a variable
      */
     @Override
-    public Object render(Map<String, Object> variables, LNode... tokens) {
+    public Object render(Map<String, Object> context, LNode... nodes) {
 
-        String id = super.asString(tokens[0].render(variables));
+        String id = super.asString(nodes[0].render(context));
 
-        LNode block = tokens[1];
+        LNode block = nodes[1];
 
-        return variables.put(id, block.render(variables));
+        return context.put(id, block.render(context));
     }
 }

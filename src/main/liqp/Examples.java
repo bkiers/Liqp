@@ -1,10 +1,12 @@
 package liqp;
 
+import liqp.filters.Filter;
 import liqp.parser.LiquidLexer;
 import liqp.parser.LiquidParser;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,14 +39,13 @@ public class Examples {
     }
 
     public static void main(String[] args) throws Exception {
-        /*
-        String test = "{% for item in array limittt:3 offset:2 %}{{ item }}{% endfor %}\n" +
-                "{% for i in (1..item.quantity) offset:2 %}{{ i }}{% endfor %}";
+        ///*
+        String test = "{% for item in array %}{{ item }}{% endfor %}";
         LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(test));
         LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
         CommonTree ast = (CommonTree)parser.parse().getTree();
         walk(ast, parser.getTokenNames(), 0);
-        */
+        //*/
 
         /*
         Template template = Template.parse(
@@ -66,11 +67,11 @@ public class Examples {
 
         /*
         String source =
-                "<ul id=\"products\">\n" +
+                "<ul id=\"products\">" +
                 "  {% for p in products %}\n" +
-                "    <li>\n" +
-                "      {{ p.name }} costs ${{ p.price }},-: {{ p.description | downcase }}\n" +
-                "    </li>\n" +
+                "  <li>\n" +
+                "    {{ p.name }} costs ${{ p.price }},-: {{ p.description | downcase }}\n" +
+                "  </li>" +
                 "  {% endfor %}\n" +
                 "</ul>\n";
 
@@ -87,8 +88,8 @@ public class Examples {
         String rendered = template.render(variables);
 
         System.out.println(rendered);
-        */
-
+//        */
+/*
         String source = "hi {{name}}";
 
         Template template = Template.parse(source);
@@ -99,5 +100,22 @@ public class Examples {
         String rendered = template.render(variables);
 
         System.out.println(rendered);
+*/
+/*
+        Filter.registerFilter(new Filter("b") {
+            @Override
+            public Object apply(Object value, Object... params) {
+                return "<strong>" + super.asString(value) + "</strong>";
+            }
+        });
+
+        String source = "hi {{ name | b: 1, 2, 3 }}";
+
+        Template template = Template.parse(source);
+
+        String rendered = template.render("{\"name\":\"tobi\"}");
+
+        System.out.println(rendered);
+//*/
     }
 }

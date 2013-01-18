@@ -4,7 +4,7 @@ import liqp.LValue;
 
 import java.util.Map;
 
-public class AndNode extends LValue implements LNode {
+class AndNode extends LValue implements LNode {
 
     private LNode lhs;
     private LNode rhs;
@@ -15,10 +15,10 @@ public class AndNode extends LValue implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> variables) {
+    public Object render(Map<String, Object> context) {
 
-        Object a = lhs.render(variables);
-        Object b = rhs.render(variables);
+        Object a = lhs.render(context);
+        Object b = rhs.render(context);
 
         return super.asBoolean(a) && super.asBoolean(b);
 

@@ -15,10 +15,10 @@ public class TagTest {
     @Test
     public void testCustomTag() throws RecognitionException {
 
-        Tag.registerTag("twice", new Tag() {
+        Tag.registerTag(new Tag("twice") {
             @Override
-            public Object render(Map<String, Object> variables, LNode... tokens) {
-                Double number = super.asNumber(tokens[0].render(variables)).doubleValue();
+            public Object render(Map<String, Object> context, LNode... nodes) {
+                Double number = super.asNumber(nodes[0].render(context)).doubleValue();
                 return number * 2;
             }
         });
@@ -32,11 +32,11 @@ public class TagTest {
     @Test
     public void testCustomTagBlock() throws RecognitionException {
 
-        Tag.registerTag("twice", new Tag() {
+        Tag.registerTag(new Tag("twice") {
             @Override
-            public Object render(Map<String, Object> variables, LNode... tokens) {
-                LNode blockNode = tokens[tokens.length - 1];
-                String blockValue = super.asString(blockNode.render(variables));
+            public Object render(Map<String, Object> context, LNode... nodes) {
+                LNode blockNode = nodes[nodes.length - 1];
+                String blockValue = super.asString(blockNode.render(context));
                 return blockValue + " " + blockValue;
             }
         });

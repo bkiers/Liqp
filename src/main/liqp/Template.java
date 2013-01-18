@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.nodes.LNode;
 import liqp.parser.LiquidLexer;
 import liqp.parser.LiquidParser;
-import liqp.parser.LiquidWalker;
+import liqp.nodes.LiquidWalker;
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;

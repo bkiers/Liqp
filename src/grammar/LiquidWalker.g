@@ -33,9 +33,9 @@ options {
 }
 
 @header {
-  package liqp.parser;
+  package liqp.nodes;
 
-  import liqp.nodes.*;
+  import liqp.parser.*;
   import liqp.tags.*;
 }
 

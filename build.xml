@@ -44,7 +44,7 @@
         </javac>
     </target>
 
-    <target name="generate" depends="compile">
+    <target name="generate" depends="init">
         <echo>Generating the parser and lexer</echo>
 
         <java classname="org.antlr.Tool" fork="true" failonerror="true" maxmemory="128m">
@@ -54,10 +54,13 @@
             <classpath refid="classpath" />
         </java>
 
+        <copy file="${main.src.dir}/${package}/parser/Liquid.tokens"
+              tofile="${main.src.dir}/${package}/nodes/Liquid.tokens"/>
+
         <echo>Generating the tree walker</echo>
         <java classname="org.antlr.Tool" fork="true" failonerror="true" maxmemory="128m">
             <arg value="-fo" />
-            <arg value="${main.src.dir}/${package}/parser" />
+            <arg value="${main.src.dir}/${package}/nodes" />
             <arg value="${tree.grammar}" />
             <classpath refid="classpath" />
         </java>

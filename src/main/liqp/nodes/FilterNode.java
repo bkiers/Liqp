@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class FilterNode implements LNode {
+class FilterNode implements LNode {
 
     private Filter filter;
     private List<LNode> params;
@@ -32,7 +32,7 @@ public class FilterNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> variables) {
+    public Object render(Map<String, Object> context) {
         throw new RuntimeException("cannot render a filter");
     }
 }

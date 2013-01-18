@@ -2,7 +2,7 @@ package liqp.nodes;
 
 import java.util.Map;
 
-public class AtomNode implements LNode {
+class AtomNode implements LNode {
 
     private Object value;
 
@@ -11,7 +11,7 @@ public class AtomNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> variables) {
+    public Object render(Map<String, Object> context) {
 
         return value;
     }

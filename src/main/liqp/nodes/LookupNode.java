@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class LookupNode implements LNode {
+class LookupNode implements LNode {
 
     private List<String> ids;
 
@@ -17,9 +17,9 @@ public class LookupNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> variables) {
+    public Object render(Map<String, Object> context) {
 
-        Object value = variables.get(ids.get(0));
+        Object value = context.get(ids.get(0));
 
         for(int i = 1; i < ids.size(); i++) {
 

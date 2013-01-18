@@ -16,25 +16,25 @@ class Cycle extends Tag {
      * between values, like colors or DOM classes.
      */
     @Override
-    public Object render(Map<String, Object> variables, LNode... tokens) {
+    public Object render(Map<String, Object> context, LNode... nodes) {
 
         // The group-name is either the first token-expression, or if that is
         // null (indicating there is no name), give it the name PREPEND followed
         // by the number of expressions in the cycle-group.
-        String groupName = tokens[0] == null ?
-                PREPEND + (tokens.length - 1) :
-                super.asString(tokens[0].render(variables));
+        String groupName = nodes[0] == null ?
+                PREPEND + (nodes.length - 1) :
+                super.asString(nodes[0].render(context));
 
         // Prepend a groupName with a single- and double quote as to not
         // let the groupName conflict with other variable assignments
         groupName = PREPEND + groupName;
 
-        Object obj = variables.remove(groupName);
+        Object obj = context.remove(groupName);
 
         List<Object> elements = new ArrayList<Object>();
 
-        for(int i = 1; i < tokens.length; i++) {
-            elements.add(tokens[i].render(variables));
+        for(int i = 1; i < nodes.length; i++) {
+            elements.add(nodes[i].render(context));
         }
 
         CycleGroup group;
@@ -46,7 +46,7 @@ class Cycle extends Tag {
             group = (CycleGroup)obj;
         }
 
-        variables.put(groupName, group);
+        context.put(groupName, group);
 
         return group.next(elements);
     }

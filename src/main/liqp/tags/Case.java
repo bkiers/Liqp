@@ -11,17 +11,17 @@ class Case extends Tag {
      * Block tag, its the standard case...when block
      */
     @Override
-    public Object render(Map<String, Object> variables, LNode... tokens) {
+    public Object render(Map<String, Object> context, LNode... nodes) {
 
-        Object condition = tokens[0].render(variables);
+        Object condition = nodes[0].render(context);
 
-        for(int i = 1; i < tokens.length - 1; i += 2) {
+        for(int i = 1; i < nodes.length - 1; i += 2) {
 
-            Object whenExpressionValue = tokens[i].render(variables);
-            LNode whenBlock = tokens[i + 1];
+            Object whenExpressionValue = nodes[i].render(context);
+            LNode whenBlock = nodes[i + 1];
 
             if(LValue.areEqual(condition, whenExpressionValue)) {
-                return whenBlock.render(variables);
+                return whenBlock.render(context);
             }
         }
 

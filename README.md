@@ -112,9 +112,23 @@ The following examples are equivalent to the previous Liqp example:
 #### Map example
 
 ```java
+template = Template.parse("hi {{name}}");
+Map<String, Object> map = new HashMap<String, Object>();
+map.put("name", "tobi");
+rendered = template.render(map);
+System.out.println(rendered);
+/*
+    hi tobi
+*/
 ```
 
 #### JSON example
 
 ```java
+template = Template.parse("hi {{name}}");
+rendered = template.render("{\"name\" : \"tobi\"}");
+System.out.println(rendered);
+/*
+    hi tobi
+*/
 ```

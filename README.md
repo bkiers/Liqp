@@ -133,7 +133,7 @@ System.out.println(rendered);
 */
 ```
 
-### 2.1 Creating custom filters
+### 2.1 Custom filters
 
 Let's say you watn to create a custom filters, called `b`, that changes a string like 
 `*text*` to `<strong>text</strong>`.
@@ -169,11 +169,11 @@ Filter.registerFilter(new Filter("repeat"){
     @Override
     public Object apply(Object value, Object... params) {
 
-        // check if an optional parameter is provided
-        int times = params.length == 0 ? 1 : super.asNumber(params[0]).intValue();
-
         // get the text of the value
         String text = super.asString(value);
+        
+        // check if an optional parameter is provided
+        int times = params.length == 0 ? 1 : super.asNumber(params[0]).intValue();
 
         StringBuilder builder = new StringBuilder();
 
@@ -223,3 +223,12 @@ System.out.println(rendered);
 
 where the `times` filter is a standard Liquid filter that multiplies whatever 
 `numbers | sum` returned (`15.0`, in this case). 
+
+### 2.2 Custom tags
+
+Let's say you want to create a new tag that is similar to the `while`-statement in many
+popular programming languages. You could do that as follows:
+
+```java
+
+```

@@ -16,14 +16,14 @@ public class Divided_ByTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{{ 8 | divided_by: 2 }}", "4" },
-                { "{{ 8 | divided_by: 3 }}", "2" },
-                { "{{ 8 | divided_by: 3. }}", String.valueOf(8 / 3.0) },
-                { "{{ 8 | divided_by: 3.0 }}", String.valueOf(8 / 3.0) },
-                { "{{ 8 | divided_by: 2.0 }}", "4.0" },
+                {"{{ 8 | divided_by: 2 }}", "4"},
+                {"{{ 8 | divided_by: 3 }}", "2"},
+                {"{{ 8 | divided_by: 3. }}", String.valueOf(8 / 3.0)},
+                {"{{ 8 | divided_by: 3.0 }}", String.valueOf(8 / 3.0)},
+                {"{{ 8 | divided_by: 2.0 }}", "4.0"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

@@ -13,11 +13,11 @@ public class RawTest {
     public void renderTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{% raw %}{% endraw %}", "" },
-                { "{% raw %}{{a|b}}{% endraw %}", "{{a|b}}" }
+                {"{% raw %}{% endraw %}", ""},
+                {"{% raw %}{{a|b}}{% endraw %}", "{{a|b}}"}
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

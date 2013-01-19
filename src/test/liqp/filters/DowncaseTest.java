@@ -13,13 +13,13 @@ public class DowncaseTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{{ '' | downcase }}", "" },
-                { "{{ nil | downcase }}", "" },
-                { "{{ 'Abc' | downcase }}", "abc" },
-                { "{{ 'abc' | downcase }}", "abc" },
+                {"{{ '' | downcase }}", ""},
+                {"{{ nil | downcase }}", ""},
+                {"{{ 'Abc' | downcase }}", "abc"},
+                {"{{ 'abc' | downcase }}", "abc"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

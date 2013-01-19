@@ -13,13 +13,13 @@ public class EqNodeTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{% if 1.0 == 1 %}TRUE{% else %}FALSE{% endif %}", "TRUE" },
-                { "{% if nil == nil %}TRUE{% else %}FALSE{% endif %}", "TRUE" },
-                { "{% if false == false %}TRUE{% else %}FALSE{% endif %}", "TRUE" },
-                { "{% if \"\" == '' %}TRUE{% else %}FALSE{% endif %}", "TRUE" },
+                {"{% if 1.0 == 1 %}TRUE{% else %}FALSE{% endif %}", "TRUE"},
+                {"{% if nil == nil %}TRUE{% else %}FALSE{% endif %}", "TRUE"},
+                {"{% if false == false %}TRUE{% else %}FALSE{% endif %}", "TRUE"},
+                {"{% if \"\" == '' %}TRUE{% else %}FALSE{% endif %}", "TRUE"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

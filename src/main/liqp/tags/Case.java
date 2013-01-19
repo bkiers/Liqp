@@ -15,12 +15,12 @@ class Case extends Tag {
 
         Object condition = nodes[0].render(context);
 
-        for(int i = 1; i < nodes.length - 1; i += 2) {
+        for (int i = 1; i < nodes.length - 1; i += 2) {
 
             Object whenExpressionValue = nodes[i].render(context);
             LNode whenBlock = nodes[i + 1];
 
-            if(LValue.areEqual(condition, whenExpressionValue)) {
+            if (LValue.areEqual(condition, whenExpressionValue)) {
                 return whenBlock.render(context);
             }
         }

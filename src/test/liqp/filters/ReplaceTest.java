@@ -13,13 +13,13 @@ public class ReplaceTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{{ '' | replace:'a', 'A' }}", "" },
-                { "{{ nil | replace:'a', 'A' }}", "" },
-                { "{{ 'aabb' | replace:'ab', 'A' }}", "aAb" },
-                { "{{ 'ababab' | replace:'a', 'A' }}", "AbAbAb" },
+                {"{{ '' | replace:'a', 'A' }}", ""},
+                {"{{ nil | replace:'a', 'A' }}", ""},
+                {"{{ 'aabb' | replace:'ab', 'A' }}", "aAb"},
+                {"{{ 'ababab' | replace:'a', 'A' }}", "AbAbAb"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

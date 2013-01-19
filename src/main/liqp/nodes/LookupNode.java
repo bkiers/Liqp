@@ -21,15 +21,15 @@ class LookupNode implements LNode {
 
         Object value = context.get(ids.get(0));
 
-        for(int i = 1; i < ids.size(); i++) {
+        for (int i = 1; i < ids.size(); i++) {
 
-            if(value == null) {
+            if (value == null) {
                 return null;
             }
 
             try {
                 @SuppressWarnings("unchecked")
-                Map<String, Object> map = (Map<String, Object>)value;
+                Map<String, Object> map = (Map<String, Object>) value;
                 value = map.get(ids.get(i));
             }
             catch (Exception e) {

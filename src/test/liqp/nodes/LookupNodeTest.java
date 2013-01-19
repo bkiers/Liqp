@@ -15,11 +15,11 @@ public class LookupNodeTest {
         String json = "{\"a\" : { \"b\" : { \"c\" : 42 } } }";
 
         String[][] tests = {
-                { "{{a.b.c.d}}", "" },
-                { "{{a.b.c}}", "42" },
+                {"{{a.b.c.d}}", ""},
+                {"{{a.b.c}}", "42"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render(json));

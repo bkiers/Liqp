@@ -19,14 +19,14 @@ public class MapTest {
                 "]}";
 
         String[][] tests = {
-                { "{{ mu | map:'name' }}", "" },
-                { "{{ products | map:'XYZ' }}", "" },
-                { "{{ products | map:'XYZ' | sort | join }}", "" },
-                { "{{ products | map:'name' | sort | join }}", "A B C" },
-                { "{{ products | map:'price' | sort | join:'=' }}", "1=2=3" },
+                {"{{ mu | map:'name' }}", ""},
+                {"{{ products | map:'XYZ' }}", ""},
+                {"{{ products | map:'XYZ' | sort | join }}", ""},
+                {"{{ products | map:'name' | sort | join }}", "A B C"},
+                {"{{ products | map:'price' | sort | join:'=' }}", "1=2=3"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render(json));

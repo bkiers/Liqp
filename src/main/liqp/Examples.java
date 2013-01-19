@@ -17,24 +17,24 @@ public class Examples {
 
     private static void walk(CommonTree tree, String[] tokenNames, int indent) {
 
-        if(tree == null) {
+        if (tree == null) {
             return;
         }
 
-        for(int i = 0; i < indent; i++) {
+        for (int i = 0; i < indent; i++) {
             System.out.print("  ");
         }
 
         boolean leaf = tree.getChildCount() == 0;
 
-        if(tree.getType() == LiquidLexer.EOF) {
+        if (tree.getType() == LiquidLexer.EOF) {
             return;
         }
 
         System.out.println(tokenNames[tree.getType()] + (leaf ? "='" + tree.getText() + "'" : ""));
 
-        for(int i = 0; i < tree.getChildCount(); i++) {
-            walk((CommonTree)tree.getChild(i), tokenNames, indent + 1);
+        for (int i = 0; i < tree.getChildCount(); i++) {
+            walk((CommonTree) tree.getChild(i), tokenNames, indent + 1);
         }
     }
 
@@ -43,7 +43,7 @@ public class Examples {
         String test = "{% for item in array %}{{ item }}{% endfor %}";
         LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(test));
         LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
-        CommonTree ast = (CommonTree)parser.parse().getTree();
+        CommonTree ast = (CommonTree) parser.parse().getTree();
         walk(ast, parser.getTokenNames(), 0);
         //*/
 

@@ -13,13 +13,13 @@ public class UpcaseTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{{ '' | upcase }}", "" },
-                { "{{ nil | upcase }}", "" },
-                { "{{ 'Abc' | upcase }}", "ABC" },
-                { "{{ 'abc' | upcase }}", "ABC" },
+                {"{{ '' | upcase }}", ""},
+                {"{{ nil | upcase }}", ""},
+                {"{{ 'Abc' | upcase }}", "ABC"},
+                {"{{ 'abc' | upcase }}", "ABC"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

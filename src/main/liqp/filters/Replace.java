@@ -15,15 +15,15 @@ class Replace extends Filter {
         Object needle = super.get(0, params);
         String replacement = "";
 
-        if(needle == null) {
+        if (needle == null) {
             throw new RuntimeException("invalid pattern: " + needle);
         }
 
-        if(params.length >= 2) {
+        if (params.length >= 2) {
 
             Object obj = super.get(1, params);
 
-            if(obj == null) {
+            if (obj == null) {
                 throw new RuntimeException("invalid replacement: " + needle);
             }
 

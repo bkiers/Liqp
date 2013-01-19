@@ -13,11 +13,11 @@ public class CommentTest {
     public void renderTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{% comment %}ABC{% endcomment %}", "" },
-                { "A{% comment %}B{% endcomment %}C", "AC" }
+                {"{% comment %}ABC{% endcomment %}", ""},
+                {"A{% comment %}B{% endcomment %}C", "AC"}
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

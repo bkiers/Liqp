@@ -15,12 +15,12 @@ public class UnlessTest {
         String json = "{\"user\" : {\"name\" : \"tobi\", \"age\" : 42} }";
 
         String[][] tests = {
-                { "{% unless user.name == 'tobi' %}X{% endunless %}", "" },
-                { "{% unless user.name == 'bob' %}X{% endunless %}", "X" },
-                { "{% unless user.name == 'tobi' %}X{% else %}Y{% endunless %}", "Y" },
+                {"{% unless user.name == 'tobi' %}X{% endunless %}", ""},
+                {"{% unless user.name == 'bob' %}X{% endunless %}", "X"},
+                {"{% unless user.name == 'tobi' %}X{% else %}Y{% endunless %}", "Y"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render(json));

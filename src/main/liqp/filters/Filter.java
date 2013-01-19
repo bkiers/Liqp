@@ -12,7 +12,7 @@ import java.util.Map;
  * return value of the filter will be the new left value when the next
  * filter is run. When there are no more filters, the template will
  * receive the resulting string.
- *
+ * <p/>
  * -- https://github.com/Shopify/liquid/wiki/Liquid-for-Designers
  */
 public abstract class Filter extends LValue {
@@ -71,7 +71,8 @@ public abstract class Filter extends LValue {
     /**
      * Creates a new instance of a Filter.
      *
-     * @param name the name of the filter.
+     * @param name
+     *         the name of the filter.
      */
     public Filter(String name) {
         this.name = name;
@@ -80,9 +81,12 @@ public abstract class Filter extends LValue {
     /**
      * Applies the filter on the 'value'.
      *
-     * @param value  the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
-     * @param params the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
-     * @return       the result of the filter.
+     * @param value
+     *         the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
+     * @param params
+     *         the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
+     *
+     * @return the result of the filter.
      */
     public abstract Object apply(Object value, Object... params);
 
@@ -90,14 +94,17 @@ public abstract class Filter extends LValue {
      * Returns a value at a specific index from an array of parameters.
      * If no such index exists, a RuntimeException is thrown.
      *
-     * @param index  the index of the value to be retrieved.
-     * @param params the values.
-     * @return       a value at a specific index from an array of
-     *               parameters.
+     * @param index
+     *         the index of the value to be retrieved.
+     * @param params
+     *         the values.
+     *
+     * @return a value at a specific index from an array of
+     *         parameters.
      */
     protected Object get(int index, Object... params) {
 
-        if(index >= params.length) {
+        if (index >= params.length) {
             throw new RuntimeException("error in filter '" + name +
                     "': cannot get param index: " + index +
                     " from: " + Arrays.toString(params));
@@ -109,14 +116,16 @@ public abstract class Filter extends LValue {
     /**
      * Retrieves a filter with a specific name.
      *
-     * @param name the name of the filter to retrieve.
-     * @return     a filter with a specific name.
+     * @param name
+     *         the name of the filter to retrieve.
+     *
+     * @return a filter with a specific name.
      */
     public static Filter getFilter(String name) {
 
         Filter filter = FILTERS.get(name);
 
-        if(filter == null) {
+        if (filter == null) {
             throw new RuntimeException("unknown filter: " + name);
         }
 
@@ -126,7 +135,8 @@ public abstract class Filter extends LValue {
     /**
      * Registers a new filter.
      *
-     * @param filter the filter to be registered.
+     * @param filter
+     *         the filter to be registered.
      */
     public static void registerFilter(Filter filter) {
         FILTERS.put(filter.name, filter);

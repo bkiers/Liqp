@@ -23,7 +23,7 @@ class OutputNode implements LNode {
 
         Object value = expression.render(context);
 
-        for(FilterNode node : filters) {
+        for (FilterNode node : filters) {
             value = node.apply(value, context);
         }
 

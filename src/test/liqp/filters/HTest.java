@@ -15,14 +15,14 @@ public class HTest {
         String json = "{ \"n\" : [1,2,3,4,5] }";
 
         String[][] tests = {
-                { "{{ nil | h }}", "" },
-                { "{{ 42 | h }}", "42" },
-                { "{{ n | h }}", "12345" },
-                { "{{ '<foo>&\"' | h }}", "&lt;foo&gt;&amp;&quot;" },
-                { "{{ false | h }}", "false" },
+                {"{{ nil | h }}", ""},
+                {"{{ 42 | h }}", "42"},
+                {"{{ n | h }}", "12345"},
+                {"{{ '<foo>&\"' | h }}", "&lt;foo&gt;&amp;&quot;"},
+                {"{{ false | h }}", "false"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render(json));

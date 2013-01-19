@@ -13,13 +13,13 @@ public class Remove_FirstTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{{ '' | remove_first:'a' }}", "" },
-                { "{{ nil | remove_first:'a' }}", "" },
-                { "{{ 'aabbabc' | remove_first:'ab' }}", "ababc" },
-                { "{{ 'ababab' | remove_first:'a' }}", "babab" },
+                {"{{ '' | remove_first:'a' }}", ""},
+                {"{{ nil | remove_first:'a' }}", ""},
+                {"{{ 'aabbabc' | remove_first:'ab' }}", "ababc"},
+                {"{{ 'ababab' | remove_first:'a' }}", "babab"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

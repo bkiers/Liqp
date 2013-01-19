@@ -13,11 +13,11 @@ public class CaptureTest {
     public void renderTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{% capture foo %}{% endcapture %}{{foo}}", "" },
-                { "{% capture foo %}Abc{% endcapture %}{{foo}}", "Abc" }
+                {"{% capture foo %}{% endcapture %}{{foo}}", ""},
+                {"{% capture foo %}Abc{% endcapture %}{{foo}}", "Abc"}
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

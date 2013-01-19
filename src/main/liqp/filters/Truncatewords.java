@@ -10,7 +10,7 @@ class Truncatewords extends Filter {
     @Override
     public Object apply(Object value, Object... params) {
 
-        if(value == null) {
+        if (value == null) {
             return "";
         }
 
@@ -19,15 +19,15 @@ class Truncatewords extends Filter {
         int length = 15;
         String truncateString = "...";
 
-        if(params.length >= 1) {
+        if (params.length >= 1) {
             length = super.asNumber(super.get(0, params)).intValue();
         }
 
-        if(params.length >= 2) {
+        if (params.length >= 2) {
             truncateString = super.asString(super.get(1, params));
         }
 
-        if(length > words.length) {
+        if (length > words.length) {
             return text;
         }
 
@@ -38,7 +38,7 @@ class Truncatewords extends Filter {
 
         StringBuilder builder = new StringBuilder();
 
-        for(int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++) {
             builder.append(words[i]).append(" ");
         }
 

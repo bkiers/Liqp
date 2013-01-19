@@ -24,7 +24,7 @@ class FilterNode implements LNode {
 
         List<Object> paramValues = new ArrayList<Object>();
 
-        for(LNode node : params) {
+        for (LNode node : params) {
             paramValues.add(node.render(variables));
         }
 

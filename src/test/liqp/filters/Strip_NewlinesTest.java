@@ -15,11 +15,11 @@ public class Strip_NewlinesTest {
         String json = "{ \"a\" : \"1\\r\\r\\n\\n\\r\\n2\\r3\" }";
 
         String[][] tests = {
-                { "{{ nil | strip_newlines }}", "" },
-                { "{{ a | strip_newlines }}", "123" },
+                {"{{ nil | strip_newlines }}", ""},
+                {"{{ a | strip_newlines }}", "123"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render(json));

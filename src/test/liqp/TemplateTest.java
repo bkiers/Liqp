@@ -30,7 +30,11 @@ public class TemplateTest {
         String rendered = Template.parse("{{mu}}").render("mu", expected);
         assertThat(rendered, is(expected));
 
-        rendered = Template.parse("{{a}}{{b}}{{c}}").render("a", expected, "b", expected, "c" /* nothing */);
+        rendered = Template.parse("{{a}}{{b}}{{c}}").render(
+                "a", expected,
+                "b", expected,
+                "c" /* no value */
+        );
         assertThat(rendered, is(expected + expected));
     }
 

@@ -13,7 +13,7 @@ class Map extends Filter {
     @Override
     public Object apply(Object value, Object... params) {
 
-        if(value == null) {
+        if (value == null) {
             return "";
         }
 
@@ -23,13 +23,13 @@ class Map extends Filter {
 
         String key = super.asString(super.get(0, params));
 
-        for(Object obj : array) {
+        for (Object obj : array) {
 
-            java.util.Map map = (java.util.Map)obj;
+            java.util.Map map = (java.util.Map) obj;
 
             Object val = map.get(key);
 
-            if(val != null) {
+            if (val != null) {
                 list.add(super.asString(val));
             }
         }

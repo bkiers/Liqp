@@ -10,7 +10,7 @@ class Truncate extends Filter {
     @Override
     public Object apply(Object value, Object... params) {
 
-        if(value == null) {
+        if (value == null) {
             return "";
         }
 
@@ -18,23 +18,23 @@ class Truncate extends Filter {
         int length = 50;
         String truncateString = "...";
 
-        if(params.length >= 1) {
+        if (params.length >= 1) {
             length = super.asNumber(super.get(0, params)).intValue();
         }
 
-        if(params.length >= 2) {
+        if (params.length >= 2) {
             truncateString = super.asString(super.get(1, params));
         }
 
-        if(truncateString.length() >= length) {
+        if (truncateString.length() >= length) {
             return truncateString;
         }
 
-        if(length == text.length()) {
+        if (length == text.length()) {
             return text;
         }
 
-        if(length >= (text.length() + truncateString.length())) {
+        if (length >= (text.length() + truncateString.length())) {
             return text;
         }
 

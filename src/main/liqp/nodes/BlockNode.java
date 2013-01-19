@@ -22,17 +22,17 @@ class BlockNode implements LNode {
 
         StringBuilder builder = new StringBuilder();
 
-        for(LNode node : children) {
+        for (LNode node : children) {
 
             Object value = node.render(context);
 
-            if(value != null) {
+            if (value != null) {
 
-                if(value.getClass().isArray()) {
+                if (value.getClass().isArray()) {
 
-                    Object[] array = (Object[])value;
+                    Object[] array = (Object[]) value;
 
-                    for(Object obj : array) {
+                    for (Object obj : array) {
                         builder.append(String.valueOf(obj));
                     }
                 }

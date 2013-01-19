@@ -12,10 +12,10 @@ class Times extends Filter {
 
         Object rhsObj = params[0];
 
-        if(value instanceof Long && rhsObj instanceof Long) {
-            return ((Number)value).longValue() * ((Number)rhsObj).longValue();
+        if (value instanceof Long && rhsObj instanceof Long) {
+            return ((Number) value).longValue() * ((Number) rhsObj).longValue();
         }
 
-        return ((Number)value).doubleValue() * ((Number)rhsObj).doubleValue();
+        return ((Number) value).doubleValue() * ((Number) rhsObj).doubleValue();
     }
 }

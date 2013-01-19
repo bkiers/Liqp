@@ -15,7 +15,7 @@ class Sort extends Filter {
     @Override
     public Object apply(Object value, Object... params) {
 
-        if(value == null) {
+        if (value == null) {
             return "";
         }
 
@@ -31,8 +31,8 @@ class Sort extends Filter {
 
         List<Comparable> list = new ArrayList<Comparable>();
 
-        for(Object obj : array) {
-            list.add((Comparable)obj);
+        for (Object obj : array) {
+            list.add((Comparable) obj);
         }
 
         return list;

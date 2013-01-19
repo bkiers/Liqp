@@ -11,9 +11,11 @@ public interface LNode {
     /**
      * Renders this AST.
      *
-     * @param context the context (variables) with which this
-     *                node should be rendered.
-     * @return        an Object denoting the rendered AST.
+     * @param context
+     *         the context (variables) with which this
+     *         node should be rendered.
+     *
+     * @return an Object denoting the rendered AST.
      */
     Object render(Map<String, Object> context);
 }

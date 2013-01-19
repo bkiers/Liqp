@@ -15,15 +15,15 @@ public class SizeTest {
         String json = "{ \"n\" : [1,2,3,4,5] }";
 
         String[][] tests = {
-                { "{{ nil | size }}", "0" },
-                { "{{ 999999999999999 | size }}", "8" },
-                { "{{ '1' | size }}", "1" },
-                { "{{ N | size }}", "0" },
-                { "{{ n | size }}", "5" },
-                { "{{ true | size }}", "0" },
+                {"{{ nil | size }}", "0"},
+                {"{{ 999999999999999 | size }}", "8"},
+                {"{{ '1' | size }}", "1"},
+                {"{{ N | size }}", "0"},
+                {"{{ n | size }}", "5"},
+                {"{{ true | size }}", "0"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render(json));

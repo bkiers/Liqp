@@ -127,15 +127,15 @@ class Date extends Filter {
 
             StringBuilder builder = new StringBuilder();
 
-            for(int i = 0; i < format.length(); i++) {
+            for (int i = 0; i < format.length(); i++) {
 
                 char ch = format.charAt(i);
 
-                if(ch == '%') {
+                if (ch == '%') {
 
                     i++;
 
-                    if(i == format.length()) {
+                    if (i == format.length()) {
                         // a trailing (single) '%' sign: just append it
                         builder.append("%");
                         break;
@@ -145,7 +145,7 @@ class Date extends Filter {
 
                     SimpleDateFormat javaFormat = LIQUID_TO_JAVA_FORMAT.get(next);
 
-                    if(javaFormat == null) {
+                    if (javaFormat == null) {
                         // no valid date-format: append the '%' and the 'next'-char
                         builder.append("%").append(next);
                     }

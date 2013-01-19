@@ -13,11 +13,11 @@ public class AtomNodeTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                { "mu", "mu" },
-                { "1", "1" },
+                {"mu", "mu"},
+                {"1", "1"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

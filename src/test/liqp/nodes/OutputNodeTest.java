@@ -13,11 +13,11 @@ public class OutputNodeTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{{ X }}", "mu" },
-                { "{{ 'a.b.c' | split:'.' | first | upcase }}", "A" },
+                {"{{ X }}", "mu"},
+                {"{{ 'a.b.c' | split:'.' | first | upcase }}", "A"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render("{\"X\" : \"mu\"}"));

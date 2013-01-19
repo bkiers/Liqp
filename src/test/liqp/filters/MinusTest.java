@@ -13,14 +13,14 @@ public class MinusTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{{ 8 | minus: 2 }}", "6" },
-                { "{{ 8 | minus: 3 }}", "5" },
-                { "{{ 8 | minus: 3. }}", "5.0" },
-                { "{{ 8 | minus: 3.0 }}", "5.0" },
-                { "{{ 8 | minus: 2.0 }}", "6.0" },
+                {"{{ 8 | minus: 2 }}", "6"},
+                {"{{ 8 | minus: 3 }}", "5"},
+                {"{{ 8 | minus: 3. }}", "5.0"},
+                {"{{ 8 | minus: 3.0 }}", "5.0"},
+                {"{{ 8 | minus: 2.0 }}", "6.0"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

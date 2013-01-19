@@ -16,7 +16,7 @@ class Remove_First extends Filter {
 
         Object needle = super.get(0, params);
 
-        if(needle == null) {
+        if (needle == null) {
             throw new RuntimeException("invalid pattern: " + needle);
         }
 

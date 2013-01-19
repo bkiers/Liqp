@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * The main class of this library. Use one of its static
  * <code>parse(...)</code> to get a hold of a reference.
- *
+ * <p/>
  * Also see: https://github.com/Shopify/liquid
  */
 public class Template {
@@ -33,7 +33,8 @@ public class Template {
     /**
      * Creates a new Template instance from a given input.
      *
-     * @param input the file holding the Liquid source.
+     * @param input
+     *         the file holding the Liquid source.
      */
     private Template(String input) {
 
@@ -41,7 +42,7 @@ public class Template {
         LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
 
         try {
-            root = (CommonTree)parser.parse().getTree();
+            root = (CommonTree) parser.parse().getTree();
         }
         catch (RecognitionException e) {
             throw new RuntimeException("could not parse input: " + input, e);
@@ -51,14 +52,15 @@ public class Template {
     /**
      * Creates a new Template instance from a given file.
      *
-     * @param file the file holding the Liquid source.
+     * @param file
+     *         the file holding the Liquid source.
      */
     private Template(File file) throws IOException {
 
         try {
             LiquidLexer lexer = new LiquidLexer(new ANTLRFileStream(file.getAbsolutePath()));
             LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
-            root = (CommonTree)parser.parse().getTree();
+            root = (CommonTree) parser.parse().getTree();
         }
         catch (RecognitionException e) {
             throw new RuntimeException("could not parse input from " + file, e);
@@ -68,7 +70,9 @@ public class Template {
     /**
      * Returns a new Template instance from a given input string.
      *
-     * @param input the input string holding the Liquid source.
+     * @param input
+     *         the input string holding the Liquid source.
+     *
      * @return a new Template instance from a given input string.
      */
     public static Template parse(String input) {
@@ -78,7 +82,9 @@ public class Template {
     /**
      * Returns a new Template instance from a given input file.
      *
-     * @param file the input file holding the Liquid source.
+     * @param file
+     *         the input file holding the Liquid source.
+     *
      * @return a new Template instance from a given input file.
      */
     public static Template parse(File file) throws IOException {
@@ -88,8 +94,10 @@ public class Template {
     /**
      * Renders the template.
      *
-     * @param jsonMap a JSON-map denoting the (possibly nested)
-     *                variables that can be used in this Template.
+     * @param jsonMap
+     *         a JSON-map denoting the (possibly nested)
+     *         variables that can be used in this Template.
+     *
      * @return a string denoting the rendered template.
      */
     @SuppressWarnings("unchecked")
@@ -110,31 +118,33 @@ public class Template {
     /**
      * Renders the template.
      *
-     * @param context an array denoting key-value pairs where the
-     *                uneven numbers (even indexes) should be Strings.
-     *                If the length of this array is uneven, the last
-     *                key (without the value) gets `null` attached to
-     *                it. Note that a call to this method with a single
-     *                String as parameter, will be handled by
-     *                `render(String jsonMap)` instead.
-     * @return        a string denoting the rendered template.
+     * @param context
+     *         an array denoting key-value pairs where the
+     *         uneven numbers (even indexes) should be Strings.
+     *         If the length of this array is uneven, the last
+     *         key (without the value) gets `null` attached to
+     *         it. Note that a call to this method with a single
+     *         String as parameter, will be handled by
+     *         `render(String jsonMap)` instead.
+     *
+     * @return a string denoting the rendered template.
      */
     public String render(Object... context) {
 
         Map<String, Object> map = new HashMap<String, Object>();
 
-        for(int i = 0; i < context.length - 1; i++) {
+        for (int i = 0; i < context.length - 1; i++) {
 
             Object key = context[i];
 
-            if(key.getClass() != String.class) {
+            if (key.getClass() != String.class) {
                 throw new RuntimeException("illegal key: " + String.valueOf(key) +
                         " (" + key.getClass().getName() + "). Must be a String.");
             }
 
             Object value = context[i + 1];
 
-            map.put((String)key, value);
+            map.put((String) key, value);
         }
 
         return render(map);
@@ -143,10 +153,12 @@ public class Template {
     /**
      * Renders the template.
      *
-     * @param context a Map denoting the (possibly nested)
-     *                variables that can be used in this
-     *                Template.
-     * @return        a string denoting the rendered template.
+     * @param context
+     *         a Map denoting the (possibly nested)
+     *         variables that can be used in this
+     *         Template.
+     *
+     * @return a string denoting the rendered template.
      */
     public String render(Map<String, Object> context) {
 

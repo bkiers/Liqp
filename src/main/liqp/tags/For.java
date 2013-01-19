@@ -40,7 +40,7 @@ class For extends Tag {
 
         LNode block = tokens[3];
 
-        for(int i = offset, n = 0; n < limit && i < array.length; i++, n++) {
+        for (int i = offset, n = 0; n < limit && i < array.length; i++, n++) {
 
             variables.put(id, array[i]);
 
@@ -66,7 +66,7 @@ class For extends Tag {
             int from = super.asNumber(tokens[2].render(variables)).intValue();
             int to = super.asNumber(tokens[3].render(variables)).intValue();
 
-            for(int i = from + offset, n = 0; i <= to && n < limit; i++, n++) {
+            for (int i = from + offset, n = 0; i <= to && n < limit; i++, n++) {
 
                 variables.put(id, i);
 
@@ -87,7 +87,7 @@ class For extends Tag {
         attributes.put(OFFSET, 0);
         attributes.put(LIMIT, Integer.MAX_VALUE);
 
-        for(int i = fromIndex; i < tokens.length; i++) {
+        for (int i = fromIndex; i < tokens.length; i++) {
 
             Object[] attribute = super.asArray(tokens[i].render(variables));
 

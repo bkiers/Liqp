@@ -33,17 +33,17 @@ class Cycle extends Tag {
 
         List<Object> elements = new ArrayList<Object>();
 
-        for(int i = 1; i < nodes.length; i++) {
+        for (int i = 1; i < nodes.length; i++) {
             elements.add(nodes[i].render(context));
         }
 
         CycleGroup group;
 
-        if(obj == null) {
+        if (obj == null) {
             group = new CycleGroup(elements.size());
         }
         else {
-            group = (CycleGroup)obj;
+            group = (CycleGroup) obj;
         }
 
         context.put(groupName, group);
@@ -65,7 +65,7 @@ class Cycle extends Tag {
 
             Object obj;
 
-            if(currentIndex >= elements.size()) {
+            if (currentIndex >= elements.size()) {
                 obj = "";
             }
             else {
@@ -74,7 +74,7 @@ class Cycle extends Tag {
 
             currentIndex++;
 
-            if(currentIndex == sizeFirstCycle) {
+            if (currentIndex == sizeFirstCycle) {
                 currentIndex = 0;
             }
 

@@ -13,13 +13,13 @@ public class NEqNodeTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{% if 1.0 != 1 %}TRUE{% else %}FALSE{% endif %}", "FALSE" },
-                { "{% if nil != nil %}TRUE{% else %}FALSE{% endif %}", "FALSE" },
-                { "{% if false != false %}TRUE{% else %}FALSE{% endif %}", "FALSE" },
-                { "{% if \"\" != '' %}TRUE{% else %}FALSE{% endif %}", "FALSE" },
+                {"{% if 1.0 != 1 %}TRUE{% else %}FALSE{% endif %}", "FALSE"},
+                {"{% if nil != nil %}TRUE{% else %}FALSE{% endif %}", "FALSE"},
+                {"{% if false != false %}TRUE{% else %}FALSE{% endif %}", "FALSE"},
+                {"{% if \"\" != '' %}TRUE{% else %}FALSE{% endif %}", "FALSE"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

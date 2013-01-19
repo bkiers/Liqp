@@ -13,14 +13,14 @@ public class PrependTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{{ 'a' | prepend: 'b' }}", "ba" },
-                { "{{ '' | prepend: '' }}", "" },
-                { "{{ 1 | prepend: 23 }}", "231" },
-                { "{{ nil | prepend: 'a' }}", "a" },
-                { "{{ nil | prepend: nil }}", "" },
+                {"{{ 'a' | prepend: 'b' }}", "ba"},
+                {"{{ '' | prepend: '' }}", ""},
+                {"{{ 1 | prepend: 23 }}", "231"},
+                {"{{ nil | prepend: 'a' }}", "a"},
+                {"{{ nil | prepend: nil }}", ""},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

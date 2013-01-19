@@ -45,7 +45,8 @@ public abstract class Tag extends LValue {
     /**
      * Creates a new instance of a Tag.
      *
-     * @param name the name of the tag.
+     * @param name
+     *         the name of the tag.
      */
     public Tag(String name) {
         this.name = name;
@@ -54,14 +55,16 @@ public abstract class Tag extends LValue {
     /**
      * Retrieves a filter with a specific name.
      *
-     * @param name the name of the filter to retrieve.
-     * @return     a filter with a specific name.
+     * @param name
+     *         the name of the filter to retrieve.
+     *
+     * @return a filter with a specific name.
      */
     public static Tag getTag(String name) {
 
         Tag tag = TAGS.get(name);
 
-        if(tag == null) {
+        if (tag == null) {
             throw new RuntimeException("unknown tag: " + name);
         }
 
@@ -71,7 +74,8 @@ public abstract class Tag extends LValue {
     /**
      * Registers a new tag.
      *
-     * @param tag the tag to be registered.
+     * @param tag
+     *         the tag to be registered.
      */
     public static void registerTag(Tag tag) {
         TAGS.put(tag.name, tag);
@@ -80,12 +84,15 @@ public abstract class Tag extends LValue {
     /**
      * Renders this tag.
      *
-     * @param context the context (variables) with which this
-     *                node should be rendered.
-     * @param nodes   the nodes of this tag is created with. See
-     *                the file `src/grammar/LiquidWalker.g` to see
-     *                how each of the tags is created.
-     * @return        an Object denoting the rendered AST.
+     * @param context
+     *         the context (variables) with which this
+     *         node should be rendered.
+     * @param nodes
+     *         the nodes of this tag is created with. See
+     *         the file `src/grammar/LiquidWalker.g` to see
+     *         how each of the tags is created.
+     *
+     * @return an Object denoting the rendered AST.
      */
     public abstract Object render(Map<String, Object> context, LNode... nodes);
 }

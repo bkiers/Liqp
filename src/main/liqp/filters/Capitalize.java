@@ -12,7 +12,7 @@ class Capitalize extends Filter {
 
         String original = super.asString(value);
 
-        if(original.isEmpty()) {
+        if (original.isEmpty()) {
             return original;
         }
 

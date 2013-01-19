@@ -13,13 +13,13 @@ public class RemoveTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                { "{{ '' | remove:'a' }}", "" },
-                { "{{ nil | remove:'a' }}", "" },
-                { "{{ 'aabb' | remove:'ab' }}", "ab" },
-                { "{{ 'ababab' | remove:'a' }}", "bbb" },
+                {"{{ '' | remove:'a' }}", ""},
+                {"{{ nil | remove:'a' }}", ""},
+                {"{{ 'aabb' | remove:'ab' }}", "ab"},
+                {"{{ 'ababab' | remove:'a' }}", "bbb"},
         };
 
-        for(String[] test : tests) {
+        for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());

@@ -80,4 +80,23 @@ to see what the AST looks like exactly.
 
 ### 2. Render Liquid
 
-...
+If you're not familiar with Liquid, have a look at their website: [http://liquidmarkup.org](liquidmarkup.org).
+
+In Ruby, you'd render a template like this:
+
+```ruby
+@template = Liquid::Template.parse("hi {{name}}")  # Parses and compiles the template
+@template.render( 'name' => 'tobi' )               # Renders the output => "hi tobi"
+```
+
+With Liqp, the equivalent looks likt  this:
+
+```java
+Template template = Template.parse("hi {{name}}");
+String rendered = template.render("name", "tobi");
+System.out.println(rendered);
+/*
+    hi tobi
+*/
+```
+

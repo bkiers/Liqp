@@ -11,111 +11,129 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Used for debugging: prints the AST of some Liquid-input.
+ * A class holding some examples of how to use Liqp.
  */
 public class Examples {
 
-    private static void walk(CommonTree tree, String[] tokenNames, int indent) {
+    private static void demoPrintAST() {
 
-        if (tree == null) {
-            return;
-        }
+        String input =
+                "<ul id=\"products\">                                       \n" +
+                "  {% for product in products %}                            \n" +
+                "    <li>                                                   \n" +
+                "      <h2>{{ product.name }}</h2>                          \n" +
+                "      Only {{ product.price | price }}                     \n" +
+                "                                                           \n" +
+                "      {{ product.description | prettyprint | paragraph }}  \n" +
+                "    </li>                                                  \n" +
+                "  {% endfor %}                                             \n" +
+                "</ul>                                                      \n";
+        Template template = Template.parse(input);
 
-        for (int i = 0; i < indent; i++) {
-            System.out.print("  ");
-        }
+        CommonTree root = template.getAST();
 
-        boolean leaf = tree.getChildCount() == 0;
-
-        if (tree.getType() == LiquidLexer.EOF) {
-            return;
-        }
-
-        System.out.println(tokenNames[tree.getType()] + (leaf ? "='" + tree.getText() + "'" : ""));
-
-        for (int i = 0; i < tree.getChildCount(); i++) {
-            walk((CommonTree) tree.getChild(i), tokenNames, indent + 1);
-        }
+        System.out.println(template.toStringAST());
     }
 
-    public static void main(String[] args) throws Exception {
-        ///*
-        String test = "{% for item in array %}{{ item }}{% endfor %}";
-        LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(test));
-        LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
-        CommonTree ast = (CommonTree) parser.parse().getTree();
-        walk(ast, parser.getTokenNames(), 0);
-        //*/
+    private static void demoSimple() {
 
-        /*
-        Template template = Template.parse(
-                "{% if user.name == 'tobi' %}\n" +
-                        "  Hello tobi\n" +
-                        "{% elsif user.name == 'bob' %}\n" +
-                        "  Hello bob\n" +
-                        "{% else %}\n" +
-                        "  Hello ???\n" +
-                        "{% endif %}");
-
-
-        String json = "{\"user\" : {\"name\" : \"tobi\"} }";
-
-        Object output = template.render(json);
-
-        System.out.printf(">>>%s<<<", output);
-        */
-
-        /*
-        String source =
-                "<ul id=\"products\">" +
-                "  {% for p in products %}\n" +
-                "  <li>\n" +
-                "    {{ p.name }} costs ${{ p.price }},-: {{ p.description | downcase }}\n" +
-                "  </li>" +
-                "  {% endfor %}\n" +
-                "</ul>\n";
-
-        Template template = Template.parse(source);
-
-        String variables =
-                "{\"products\":[" +
-                "    {\"name\":\"A\", \"price\":1, \"description\":\"BLA\"}," +
-                "    {\"name\":\"B\", \"price\":2, \"description\":\"some more text\"}," +
-                "    {\"name\":\"C\", \"price\":3, \"description\":\"and the LAST one\"}" +
-                "  ]" +
-                "}";
-
-        String rendered = template.render(variables);
-
+        Template template = Template.parse("hi {{name}}");
+        String rendered = template.render("name", "tobi");
         System.out.println(rendered);
-//        */
-/*
-        String source = "hi {{name}}";
 
-        Template template = Template.parse(source);
-
-        Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put("name", "tobi");
-
-        String rendered = template.render(variables);
-
+        template = Template.parse("hi {{name}}");
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("name", "tobi");
+        rendered = template.render(map);
         System.out.println(rendered);
-*/
-/*
-        Filter.registerFilter(new Filter("b") {
+
+        template = Template.parse("hi {{name}}");
+        rendered = template.render("{\"name\" : \"tobi\"}");
+        System.out.println(rendered);
+    }
+
+    private static void demoCustomStrongFilter() {
+
+        // first register your custom filter
+        Filter.registerFilter(new Filter("b"){
             @Override
             public Object apply(Object value, Object... params) {
-                return "<strong>" + super.asString(value) + "</strong>";
+                // create a string from the  value
+                String text = super.asString(value);
+
+                // replace and return *...* with <strong>...</strong>
+                return text.replaceAll("\\*(\\w(.*?\\w)?)\\*", "<strong>$1</strong>");
             }
         });
 
-        String source = "hi {{ name | b: 1, 2, 3 }}";
-
-        Template template = Template.parse(source);
-
-        String rendered = template.render("{\"name\":\"tobi\"}");
-
+        // use your filter
+        Template template = Template.parse("{{ wiki | b }}");
+        String rendered = template.render("{\"wiki\" : \"Some *bold* text *in here*.\"}");
         System.out.println(rendered);
-//*/
+    }
+
+    private static void demoCustomRepeatFilter() {
+
+        // first register your custom filter
+        Filter.registerFilter(new Filter("repeat"){
+            @Override
+            public Object apply(Object value, Object... params) {
+
+                // check if an optional parameter is provided
+                int times = params.length == 0 ? 1 : super.asNumber(params[0]).intValue();
+
+                // get the text of the value
+                String text = super.asString(value);
+
+                StringBuilder builder = new StringBuilder();
+
+                while(times-- > 0) {
+                    builder.append(text);
+                }
+
+                return builder.toString();
+            }
+        });
+
+        // use your filter
+        Template template = Template.parse("{{ 'a' | repeat }}\n{{ 'b' | repeat:5 }}");
+        String rendered = template.render();
+        System.out.println(rendered);
+    }
+
+    private static void demoCustomSumFilter() {
+
+        Filter.registerFilter(new Filter("sum"){
+            @Override
+            public Object apply(Object value, Object... params) {
+
+                Object[] numbers = super.asArray(value);
+
+                double sum = 0;
+
+                for(Object obj : numbers) {
+                    sum += super.asNumber(obj).doubleValue();
+                }
+
+                return sum;
+            }
+        });
+
+        Template template = Template.parse("{{ numbers | sum | times:2 }}");
+        String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
+        System.out.println(rendered);
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        //demoPrintAST();
+
+        //demoSimple();
+
+        //demoCustomStrongFilter();
+
+        // demoCustomRepeatFilter();
+
+        demoCustomSumFilter();
     }
 }

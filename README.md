@@ -213,11 +213,11 @@ Filter.registerFilter(new Filter("sum"){
     }
 });
 
-Template template = Template.parse("{{ numbers | sum | times:2 }}");
+Template template = Template.parse("{{ numbers | sum }}");
 String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
 System.out.println(rendered);
 /*
-    30.0
+    15.0
 */
 ```
 

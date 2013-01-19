@@ -36,43 +36,43 @@ an ASCII representation of the tree:
 ```java
 System.out.println(template.toStringAST());
 /*
-'- BLOCK
-   |- PLAIN='<ul id="products">'
-   |- FOR_ARRAY
-   |  |- Id='product'
-   |  |- LOOKUP
-   |  |  '- Id='products'
-   |  |- BLOCK
-   |  |  |- PLAIN='<li> <h2>'
-   |  |  |- OUTPUT
-   |  |  |  |- LOOKUP
-   |  |  |  |  |- Id='product'
-   |  |  |  |  '- Id='name'
-   |  |  |  '- FILTERS
-   |  |  |- PLAIN='</h2> Only'
-   |  |  |- OUTPUT
-   |  |  |  |- LOOKUP
-   |  |  |  |  |- Id='product'
-   |  |  |  |  '- Id='price'
-   |  |  |  '- FILTERS
-   |  |  |     '- FILTER
-   |  |  |        |- Id='price'
-   |  |  |        '- PARAMS
-   |  |  |- PLAIN=''
-   |  |  |- OUTPUT
-   |  |  |  |- LOOKUP
-   |  |  |  |  |- Id='product'
-   |  |  |  |  '- Id='description'
-   |  |  |  '- FILTERS
-   |  |  |     |- FILTER
-   |  |  |     |  |- Id='prettyprint'
-   |  |  |     |  '- PARAMS
-   |  |  |     '- FILTER
-   |  |  |        |- Id='paragraph'
-   |  |  |        '- PARAMS
-   |  |  '- PLAIN='</li>'
-   |  '- ATTRIBUTES
-   '- PLAIN='</ul>'
+    '- BLOCK
+       |- PLAIN='<ul id="products">'
+       |- FOR_ARRAY
+       |  |- Id='product'
+       |  |- LOOKUP
+       |  |  '- Id='products'
+       |  |- BLOCK
+       |  |  |- PLAIN='<li> <h2>'
+       |  |  |- OUTPUT
+       |  |  |  |- LOOKUP
+       |  |  |  |  |- Id='product'
+       |  |  |  |  '- Id='name'
+       |  |  |  '- FILTERS
+       |  |  |- PLAIN='</h2> Only'
+       |  |  |- OUTPUT
+       |  |  |  |- LOOKUP
+       |  |  |  |  |- Id='product'
+       |  |  |  |  '- Id='price'
+       |  |  |  '- FILTERS
+       |  |  |     '- FILTER
+       |  |  |        |- Id='price'
+       |  |  |        '- PARAMS
+       |  |  |- PLAIN=''
+       |  |  |- OUTPUT
+       |  |  |  |- LOOKUP
+       |  |  |  |  |- Id='product'
+       |  |  |  |  '- Id='description'
+       |  |  |  '- FILTERS
+       |  |  |     |- FILTER
+       |  |  |     |  |- Id='prettyprint'
+       |  |  |     |  '- PARAMS
+       |  |  |     '- FILTER
+       |  |  |        |- Id='paragraph'
+       |  |  |        '- PARAMS
+       |  |  '- PLAIN='</li>'
+       |  '- ATTRIBUTES
+       '- PLAIN='</ul>'
 */
 ```
 Checkout the [ANTLR grammar](https://github.com/bkiers/Liqp/blob/master/src/grammar/Liquid.g) 

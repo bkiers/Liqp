@@ -1,4 +1,4 @@
-## Liqp
+# Liqp
 
 A Java implmentation of the Liquid templating engine backed up by an ANTLR grammar. 
 

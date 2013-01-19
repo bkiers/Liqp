@@ -1,12 +1,13 @@
 ## Liqp
 
-A Java implmentation of the Liquid templating engine backed up by an ANTLR grammar. This library can
-be used for 2  purposes:
+A Java implmentation of the Liquid templating engine backed up by an ANTLR grammar. 
 
-1. to render Liquid input source (either files, or input strings)
-2. to construct an AST (abstract syntax tree) of some Liquid input
+This library can be used for 2  purposes:
 
-### 1. Creating an AST
+1. to construct an AST (abstract syntax tree) of some Liquid input
+2. to render Liquid input source (either files, or input strings)
+
+## 1. Creating an AST
 
 To create an AST from input source, do the following:
 

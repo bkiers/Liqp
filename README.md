@@ -99,4 +99,22 @@ System.out.println(rendered);
     hi tobi
 */
 ```
+The context provided as a parameter to `render(...)` can be:
 
+* a [varargs](http://docs.oracle.com/javase/1.5.0/docs/guide/language/varargs.html) where 
+  the 0<sup>th</sup>, 2<sup>nd</sup>, 4<sup>th</sup>, ... indexes must be `String` literals
+  denoting the keys. The values can be any `Object`.
+* a `Map<String, Object>`
+* or a JSON string
+
+The following examples are equivalent to the previous Liqp example:
+
+#### Map example
+
+```java
+```
+
+#### JSON example
+
+```java
+```

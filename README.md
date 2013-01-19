@@ -223,9 +223,4 @@ System.out.println(rendered);
 
 ### 2.2 Custom tags
 
-Let's say you want to create a new tag that is similar to the `while`-statement in many
-popular programming languages. You could do that as follows:
-
-```java
-
-```
+`TODO`

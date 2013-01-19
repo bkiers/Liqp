@@ -78,7 +78,7 @@ System.out.println(template.toStringAST());
 Checkout the [ANTLR grammar](https://github.com/bkiers/Liqp/blob/master/src/grammar/Liquid.g) 
 to see what the AST looks like exactly.
 
-### 2. Render Liquid
+## 2. Render Liquid
 
 If you're not familiar with Liquid, have a look at their website: [http://liquidmarkup.org](liquidmarkup.org).
 

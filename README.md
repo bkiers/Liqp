@@ -221,9 +221,6 @@ System.out.println(rendered);
 */
 ```
 
-where the `times` filter is a standard Liquid filter that multiplies whatever 
-`numbers | sum` returned (`15.0`, in this case). 
-
 ### 2.2 Custom tags
 
 Let's say you want to create a new tag that is similar to the `while`-statement in many

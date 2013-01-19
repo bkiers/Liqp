@@ -89,7 +89,7 @@ In Ruby, you'd render a template like this:
 @template.render( 'name' => 'tobi' )               # Renders the output => "hi tobi"
 ```
 
-With Liqp, the equivalent looks likt  this:
+With Liqp, the equivalent looks like this:
 
 ```java
 Template template = Template.parse("hi {{name}}");
@@ -112,10 +112,10 @@ The following examples are equivalent to the previous Liqp example:
 #### Map example
 
 ```java
-template = Template.parse("hi {{name}}");
+Template template = Template.parse("hi {{name}}");
 Map<String, Object> map = new HashMap<String, Object>();
 map.put("name", "tobi");
-rendered = template.render(map);
+String rendered = template.render(map);
 System.out.println(rendered);
 /*
     hi tobi
@@ -125,10 +125,39 @@ System.out.println(rendered);
 #### JSON example
 
 ```java
-template = Template.parse("hi {{name}}");
-rendered = template.render("{\"name\" : \"tobi\"}");
+Template template = Template.parse("hi {{name}}");
+String rendered = template.render("{\"name\" : \"tobi\"}");
 System.out.println(rendered);
 /*
     hi tobi
+*/
+```
+
+### 2.1 Creating custom filters
+
+Let's say you watn to create a custom filters, called `b`, that changes a string like 
+`*text*` to `<strong>text</strong>`.
+
+You can do that as follows:
+
+```java
+// first register your custom filter
+Filter.registerFilter(new Filter("b"){
+    @Override
+    public Object apply(Object value, Object... params) {
+        // create a string from the  value
+        String text = super.asString(value);
+
+        // replace and return *...* with <strong>...</strong>
+        return text.replaceAll("\\*(\\w(.*?\\w)?)\\*", "<strong>$1</strong>");
+    }
+});
+
+// use your filter
+Template template = Template.parse("{{ wiki | b }}");
+String rendered = template.render("{\"wiki\" : \"Some *bold* text *in here*.\"}");
+System.out.println(rendered);
+/*
+    Some <strong>bold</strong> text <strong>in here</strong>.
 */
 ```

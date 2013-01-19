@@ -33,6 +33,13 @@ public class TemplateTest {
         rendered = Template.parse("{{a}}{{b}}{{c}}").render(
                 "a", expected,
                 "b", expected,
+                "c", null
+        );
+        assertThat(rendered, is(expected + expected));
+
+        rendered = Template.parse("{{a}}{{b}}{{c}}").render(
+                "a", expected,
+                "b", expected,
                 "c" /* no value */
         );
         assertThat(rendered, is(expected + expected));

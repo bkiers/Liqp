@@ -91,7 +91,6 @@ tokens {
   }
 
   private String strip(String text, boolean singleQuoted) {
-    // TODO account for escaped chars?
     return text.substring(1, text.length() - 1);
   }
 }

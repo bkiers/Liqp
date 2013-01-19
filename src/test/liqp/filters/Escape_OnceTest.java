@@ -20,6 +20,7 @@ public class Escape_OnceTest {
                 {"{{ n | escape_once }}", "12345"},
                 {"{{ '<foo>&\"' | escape_once }}", "&lt;foo&gt;&amp;&quot;"},
                 {"{{ false | escape_once }}", "false"},
+                {"{{ '&&amp;' | escape_once }}", "&amp;&amp;"},
         };
 
 

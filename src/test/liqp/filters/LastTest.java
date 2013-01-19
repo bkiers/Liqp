@@ -4,9 +4,6 @@ import liqp.Template;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 

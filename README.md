@@ -161,3 +161,36 @@ System.out.println(rendered);
     Some <strong>bold</strong> text <strong>in here</strong>.
 */
 ```
+And to use an optional parameter in your filter, do something like this:
+
+```java
+// first register your custom filter
+Filter.registerFilter(new Filter("repeat"){
+    @Override
+    public Object apply(Object value, Object... params) {
+
+        // check if an optional parameter is provided
+        int times = params.length == 0 ? 1 : super.asNumber(params[0]).intValue();
+
+        // get the text of the value
+        String text = super.asString(value);
+
+        StringBuilder builder = new StringBuilder();
+
+        while(times-- > 0) {
+            builder.append(text);
+        }
+
+        return builder.toString();
+    }
+});
+
+// use your filter
+Template template = Template.parse("{{ 'a' | repeat }}\n{{ 'b' | repeat:5 }}");
+String rendered = template.render();
+System.out.println(rendered);
+/*
+    a
+    bbbbb
+*/
+```

@@ -194,3 +194,32 @@ System.out.println(rendered);
     bbbbb
 */
 ```
+You can use an array (or list) as well, and could also use a numerical value:
+
+```java
+Filter.registerFilter(new Filter("sum"){
+    @Override
+    public Object apply(Object value, Object... params) {
+
+        Object[] numbers = super.asArray(value);
+
+        double sum = 0;
+
+        for(Object obj : numbers) {
+            sum += super.asNumber(obj).doubleValue();
+        }
+
+        return sum;
+    }
+});
+
+Template template = Template.parse("{{ numbers | sum | times:2 }}");
+String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
+System.out.println(rendered);
+/*
+    30.0
+*/
+```
+
+where the `times` filter is a standard Liquid filter that multiplies whatever 
+`numbers | sum` returned (`15.0`, in this case). 

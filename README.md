@@ -1,8 +1,12 @@
 # Liqp
 
-A Java implmentation of the Liquid templating engine backed up by an ANTLR grammar. 
+A Java implmentation of the [Liquid templating engine](http://liquidmarkup.org/) backed up by 
+an ANTLR grammar. 
 
-This library can be used for 2  purposes:
+To use Liqp, checkout this project and create a JAR file through the `jar` task defined in the 
+Ant build file, or download a [prebuilt JAR file](https://github.com/bkiers/Liqp/blob/master/Liqp-0.5.jar)
+
+This library can be used in two different ways:
 
 1. to construct an AST (abstract syntax tree) of some Liquid input
 2. to render Liquid input source (either files, or input strings)
@@ -76,7 +80,7 @@ System.out.println(template.toStringAST());
 */
 ```
 Checkout the [ANTLR grammar](https://github.com/bkiers/Liqp/blob/master/src/grammar/Liquid.g) 
-to see what the AST looks like exactly.
+to see what the AST looks like for each of the parser rules.
 
 ## 2. Render Liquid
 
@@ -223,4 +227,37 @@ System.out.println(rendered);
 
 ### 2.2 Custom tags
 
-`TODO`
+Let's say you would like to create a tag that makes it easy to loop for a fixed amount of times,
+executing a block of Liquid code.
+
+Here's a way to create, and use, such a custom `loop` tag:
+
+```java
+Tag.registerTag(new Tag("loop"){
+    @Override
+    public Object render(Map<String, Object> context, LNode... nodes) {
+
+        int n = super.asNumber(nodes[0].render(context)).intValue();
+        LNode block = nodes[1];
+
+        StringBuilder builder = new StringBuilder();
+
+        while(n-- > 0) {
+            builder.append(super.asString(block.render(context)));
+        }
+
+        return builder.toString();
+    }
+});
+
+Template template = Template.parse("{% loop 5 %}looping!\n{% endloop %}");
+String rendered = template.render();
+System.out.println(rendered);
+/*
+    looping!
+    looping!
+    looping!
+    looping!
+    looping!
+*/
+```

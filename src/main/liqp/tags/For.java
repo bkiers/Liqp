@@ -10,8 +10,16 @@ class For extends Tag {
     private static final String OFFSET = "offset";
     private static final String LIMIT = "limit";
 
+    /*
+     * forloop.length      # => length of the entire for loop
+     * forloop.index       # => index of the current iteration
+     * forloop.index0      # => index of the current iteration (zero based)
+     * forloop.rindex      # => how many items are still left?
+     * forloop.rindex0     # => how many items are still left? (zero based)
+     * forloop.first       # => is this the first iteration?
+     * forloop.last        # => is this the last iteration?
+     */
     private static final String FORLOOP = "forloop";
-
     private static final String LENGTH = "length";
     private static final String INDEX = "index";
     private static final String INDEX0 = "index0";
@@ -146,30 +154,5 @@ class For extends Tag {
         }
 
         return attributes;
-    }
-
-    /*
-     * forloop.length      # => length of the entire for loop
-     * forloop.index       # => index of the current iteration
-     * forloop.index0      # => index of the current iteration (zero based)
-     * forloop.rindex      # => how many items are still left?
-     * forloop.rindex0     # => how many items are still left? (zero based)
-     * forloop.first       # => is this the first iteration?
-     * forloop.last        # => is this the last iteration?
-     */
-    private void putVariables(Map<String, Object> context, String id, Object value, int length,
-                              int index, boolean first, boolean last) {
-
-        context.put(id, value);
-
-        Map<String, Object> forLoopMap = (Map<String, Object>)context.get(FORLOOP);
-
-        forLoopMap.put(LENGTH, length);
-        forLoopMap.put(INDEX, index + 1);
-        forLoopMap.put(INDEX0, index);
-        forLoopMap.put(RINDEX, length - index);
-        forLoopMap.put(RINDEX0, length - index - 1);
-        forLoopMap.put(FIRST, first);
-        forLoopMap.put(LAST, last);
     }
 }

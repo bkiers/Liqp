@@ -1,8 +1,10 @@
 package liqp;
 
 import liqp.filters.Filter;
+import liqp.nodes.LNode;
 import liqp.parser.LiquidLexer;
 import liqp.parser.LiquidParser;
+import liqp.tags.Tag;
 import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
 
@@ -119,12 +121,33 @@ public class Examples {
             }
         });
 
-        Template template = Template.parse("{{ numbers | sum | times:2 }}");
+        Template template = Template.parse("{{ numbers | sum }}");
         String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
         System.out.println(rendered);
     }
 
+    private static void customWhileTag() {
+
+        Tag.registerTag(new Tag("while"){
+            @Override
+            public Object render(Map<String, Object> context, LNode... nodes) {
+                return null;
+            }
+        });
+
+        String source =
+                "{% while n < 5 %}  \n" +
+                "  n = {{n}}        \n" +
+                "{% endwhile %}     \n";
+
+        Template template = Template.parse(source);
+
+        String rendered = template.render("n", 1);
+    }
+
     public static void main(String[] args) throws Exception {
+
+        System.out.println("running liqp.Examples");
 
         //demoPrintAST();
 

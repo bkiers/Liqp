@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Liqp">
 
-    <property name="version"          value="0.1" />
+    <property name="version"          value="0.5" />
     <property name="project.name"     value="Liqp" />
     <property name="main.class"       value="liqp.Examples" />
     <property name="combined.grammar" value="src/grammar/Liquid.g" />
@@ -13,6 +13,7 @@
     <property name="test.build.dir"   value="build/test" />
     <property name="test.src.dir"     value="src/test" />
     <property name="report.dir"       value="build/reports" />
+    <property name="author"           value="Bart Kiers" />
 
     <path id="classpath">
         <pathelement location="${main.build.dir}" />
@@ -22,7 +23,7 @@
         </fileset>
     </path>
 
-    <target name="clean" description="Deletes build directories">
+    <target name="clean">
         <mkdir dir="${build.dir}"/>
         <delete includeemptydirs="true">
             <fileset dir="${build.dir}" includes="**/*"/>
@@ -69,7 +70,7 @@
         <antcall target="compile" />
     </target>
 
-    <target name="test" depends="compile" description="Runs all the unit tests">
+    <target name="test" depends="compile">
         <junit printsummary="yes" fork="yes" haltonfailure="yes">
             <classpath refid="classpath"/>
             <formatter type="plain"/>
@@ -79,6 +80,25 @@
                 </fileset>
             </batchtest>
         </junit>
+    </target>
+
+    <target name="jar" depends="compile">
+        <unzip src="lib/antlr-runtime-3.4.jar" dest="${main.build.dir}"/>
+        <unzip src="lib/jackson-annotations-2.1.1.jar" dest="${main.build.dir}"/>
+        <unzip src="lib/jackson-core-2.1.2.jar" dest="${main.build.dir}"/>
+        <unzip src="lib/jackson-databind-2.1.0.jar" dest="${main.build.dir}"/>
+        <unzip src="lib/jsoup-1.7.1.jar" dest="${main.build.dir}"/>
+        <tstamp/>
+        <jar destfile="${project.name}-${version}.jar" whenmanifestonly="fail">
+            <fileset dir="${main.build.dir}">
+                <exclude name="**/*.html"/>
+            </fileset>
+            <manifest>
+                <attribute name="Built-By" value="${author}"/>
+                <attribute name="Built-On" value="${TODAY}"/>
+                <attribute name="Main-Class" value="${main.class}"/>
+            </manifest>
+        </jar>
     </target>
 
     <target name="run" depends="generate" >

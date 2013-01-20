@@ -3,7 +3,7 @@
 A Java implmentation of the [Liquid templating engine](http://liquidmarkup.org/) backed up by 
 an ANTLR grammar. 
 
-Clone this project and create a JAR file through the `jar` task defined in the Ant build file, or 
+Clone, or checkout this project, and create a JAR file through the `jar` task defined in the Ant build file, or 
 download a [prebuilt JAR file](https://github.com/bkiers/Liqp/blob/master/Liqp-0.5.jar)
 
 This library can be used for 2  purposes:

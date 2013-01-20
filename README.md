@@ -80,7 +80,7 @@ System.out.println(template.toStringAST());
 */
 ```
 Checkout the [ANTLR grammar](https://github.com/bkiers/Liqp/blob/master/src/grammar/Liquid.g) 
-to see what the AST looks like exactly.
+to see what the AST looks like for each of the parser rules.
 
 ## 2. Render Liquid
 

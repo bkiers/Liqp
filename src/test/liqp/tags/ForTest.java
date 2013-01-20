@@ -28,6 +28,20 @@ public class ForTest {
                 {"{% for i in (1 ..item.quantity) limit:4 OFFSET:2 %}{{ i }}{% endfor %}", "1234"},
                 {"{% for i in (1..item.quantity) limit:4 offset:20 %}{{ i }}{% endfor %}", ""},
                 {"{% for i in (1..item.quantity) limit:0 offset:2 %}{{ i }}{% endfor %}", ""},
+                {"{% for i in (1..5) limit:4 OFFSET:2 %}{{forloop.length}}{% endfor %}", "4444"},
+                {"{% for i in array limit:4 OFFSET:2 %}{{forloop.length}}{% endfor %}", "4444"},
+                {"{% for i in (1..5) limit:4 OFFSET:2 %}{{forloop.first}}{% endfor %}", "truefalsefalsefalse"},
+                {"{% for i in array limit:4 OFFSET:2 %}{{forloop.first}}{% endfor %}", "truefalsefalsefalse"},
+                {"{% for i in (1..5) limit:4 OFFSET:2 %}{{forloop.last}}{% endfor %}", "falsefalsefalsetrue"},
+                {"{% for i in array limit:4 OFFSET:2 %}{{forloop.last}}{% endfor %}", "falsefalsefalsetrue"},
+                {"{% for i in (1..5) limit:4 OFFSET:2 %}{{forloop.index}}{% endfor %}", "1234"},
+                {"{% for i in array limit:4 OFFSET:2 %}{{forloop.index}}{% endfor %}", "1234"},
+                {"{% for i in (1..5) limit:4 OFFSET:2 %}{{forloop.index0}}{% endfor %}", "0123"},
+                {"{% for i in array limit:4 OFFSET:2 %}{{forloop.index0}}{% endfor %}", "0123"},
+                {"{% for i in (1..5) limit:4 OFFSET:2 %}{{forloop.rindex}}{% endfor %}", "4321"},
+                {"{% for i in array limit:4 OFFSET:2 %}{{forloop.rindex}}{% endfor %}", "4321"},
+                {"{% for i in (1..5) limit:4 OFFSET:2 %}{{forloop.rindex0}}{% endfor %}", "3210"},
+                {"{% for i in array limit:4 OFFSET:2 %}{{forloop.rindex0}}{% endfor %}", "3210"},
         };
 
         for (String[] test : tests) {

@@ -126,23 +126,32 @@ public class Examples {
         System.out.println(rendered);
     }
 
-    private static void customWhileTag() {
+    private static void customLoopTag() {
 
-        Tag.registerTag(new Tag("while"){
+        Tag.registerTag(new Tag("loop"){
             @Override
             public Object render(Map<String, Object> context, LNode... nodes) {
-                return null;
+
+                int n = super.asNumber(nodes[0].render(context)).intValue();
+                LNode block = nodes[1];
+
+                StringBuilder builder = new StringBuilder();
+
+                while(n-- > 0) {
+                    builder.append(super.asString(block.render(context)));
+                }
+
+                return builder.toString();
             }
         });
 
-        String source =
-                "{% while n < 5 %}  \n" +
-                "  n = {{n}}        \n" +
-                "{% endwhile %}     \n";
+        String source = "{% loop 5 %}looping!\n{% endloop %}";
 
         Template template = Template.parse(source);
 
-        String rendered = template.render("n", 1);
+        String rendered = template.render();
+
+        System.out.println(rendered);
     }
 
     public static void main(String[] args) throws Exception {
@@ -157,6 +166,8 @@ public class Examples {
 
         // demoCustomRepeatFilter();
 
-        demoCustomSumFilter();
+        //demoCustomSumFilter();
+
+        customLoopTag();
     }
 }

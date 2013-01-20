@@ -227,4 +227,37 @@ System.out.println(rendered);
 
 ### 2.2 Custom tags
 
-`TODO`
+Let's say you would like to create a tag that makes it easy to loop for a fixed amount of times,
+executing a block of Liquid code.
+
+Here's a way to create, and use, such a custom `loop` tag:
+
+```java
+Tag.registerTag(new Tag("loop"){
+    @Override
+    public Object render(Map<String, Object> context, LNode... nodes) {
+
+        int n = super.asNumber(nodes[0].render(context)).intValue();
+        LNode block = nodes[1];
+
+        StringBuilder builder = new StringBuilder();
+
+        while(n-- > 0) {
+            builder.append(super.asString(block.render(context)));
+        }
+
+        return builder.toString();
+    }
+});
+
+Template template = Template.parse("{% loop 5 %}looping!\n{% endloop %}");
+String rendered = template.render();
+System.out.println(rendered);
+/*
+    looping!
+    looping!
+    looping!
+    looping!
+    looping!
+*/
+```

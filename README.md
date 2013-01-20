@@ -2,6 +2,9 @@
 
 A Java implmentation of the Liquid templating engine backed up by an ANTLR grammar. 
 
+Clone this project and create a JAR file through the `jar` task defined in the Ant build file, or 
+download a [prebuilt JAR file](https://github.com/bkiers/Liqp/blob/master/Liqp-0.5.jar)
+
 This library can be used for 2  purposes:
 
 1. to construct an AST (abstract syntax tree) of some Liquid input

@@ -139,7 +139,7 @@ System.out.println(rendered);
 
 ### 2.1 Custom filters
 
-Let's say you watn to create a custom filters, called `b`, that changes a string like 
+Let's say you want to create a custom filters, called `b`, that changes a string like 
 `*text*` to `<strong>text</strong>`.
 
 You can do that as follows:

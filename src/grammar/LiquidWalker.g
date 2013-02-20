@@ -164,7 +164,14 @@ capture_tag returns [LNode node]
  ;
 
 include_tag returns [LNode node]
- : ^(INCLUDE Str ^(WITH Str?)) {if(true) throw new RuntimeException("include_tag");}
+ : ^(INCLUDE file=Str ^(WITH (with=Str)?))
+    {
+      if($with.text != null) {
+        $node = new TagNode("include", new AtomNode($file.text), new AtomNode($with.text));
+      } else {
+        $node = new TagNode("include", new AtomNode($file.text));
+      }
+    }
  ;
 
 custom_tag returns [LNode node]

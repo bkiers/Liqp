@@ -25,6 +25,7 @@ public abstract class Tag extends LValue {
         registerTag(new Cycle());
         registerTag(new For());
         registerTag(new If());
+        registerTag(new Include());
         registerTag(new Raw());
         registerTag(new Unless());
     }

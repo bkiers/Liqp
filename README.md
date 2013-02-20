@@ -1,6 +1,6 @@
 ## Liqp &nbsp; [![Build Status](https://travis-ci.org/bkiers/Liqp.png)](https://travis-ci.org/bkiers/Liqp)
 
-A Java implmentation of the [Liquid templating engine](http://liquidmarkup.org/) backed up by 
+A Java implementation of the [Liquid templating engine](http://liquidmarkup.org/) backed up by
 an ANTLR grammar. 
 
 To use Liqp, checkout this project and create a JAR file through the `jar` task defined in the 

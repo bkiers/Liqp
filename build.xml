@@ -99,6 +99,11 @@
                 <attribute name="Main-Class" value="${main.class}"/>
             </manifest>
         </jar>
+
+        <replaceregexp file="README.md"
+                       match="https://github\.com/bkiers/Liqp/raw/master/Liqp-.*?.jar"
+                       replace="https://github.com/bkiers/Liqp/raw/master/${project.name}-${version}.jar"
+                       byline="true"/>
     </target>
 
     <target name="run" depends="generate" >

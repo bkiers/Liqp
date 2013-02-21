@@ -4,7 +4,7 @@ A Java implementation of the [Liquid templating engine](http://liquidmarkup.org/
 an ANTLR grammar. 
 
 To use Liqp, checkout this project and create a JAR file through the `jar` task defined in the 
-Ant build file, or download a [prebuilt JAR file](https://github.com/bkiers/Liqp/raw/master/Liqp-0.5.1.jar)
+Ant build file, or download a [prebuilt JAR file](https://github.com/bkiers/Liqp/raw/master/Liqp-0.5.2.jar)
 
 This library can be used in two different ways:
 

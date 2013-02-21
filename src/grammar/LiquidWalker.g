@@ -156,7 +156,16 @@ attribute returns [LNode node]
 
 // attributes must be 'limit' or 'cols'!
 table_tag returns [LNode node]
- : ^(TABLE Id Id ^(ATTRIBUTES attribute*) block) {if(true) throw new RuntimeException("table");}
+@init{
+  List<LNode> expressions = new ArrayList<LNode>();
+}
+ : ^(TABLE
+      value=Id                {expressions.add(new AtomNode($value.text));}
+      collection=Id           {expressions.add(new AtomNode($collection.text));}
+      block                   {expressions.add($block.node);}
+      ^(ATTRIBUTES (attribute {expressions.add($attribute.node);})*)
+    )
+    {$node = new TagNode("tablerow", expressions.toArray(new LNode[expressions.size()]));}
  ;
 
 capture_tag returns [LNode node]

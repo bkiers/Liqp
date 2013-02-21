@@ -27,6 +27,7 @@ public abstract class Tag extends LValue {
         registerTag(new If());
         registerTag(new Include());
         registerTag(new Raw());
+        registerTag(new Tablerow());
         registerTag(new Unless());
     }
 

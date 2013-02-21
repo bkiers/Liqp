@@ -207,7 +207,7 @@ attribute
 
 // attributes must be 'limit' or 'cols'!
 table_tag
- : TagStart TableStart Id In Id attribute* TagEnd block TagStart TableEnd TagEnd -> ^(TABLE Id Id ^(ATTRIBUTES attribute*) block)
+ : TagStart TableStart Id In Id attribute* TagEnd block TagStart TableEnd TagEnd -> ^(TABLE Id Id block ^(ATTRIBUTES attribute*))
  ;
 
 capture_tag

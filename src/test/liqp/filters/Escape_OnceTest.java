@@ -44,5 +44,8 @@ public class Escape_OnceTest {
         final Filter filter = Filter.getFilter("escape_once");
 
         assertThat(filter.apply(Filter.getFilter("escape").apply("<strong>")), is((Object)"&lt;strong&gt;"));
+
+        // the same test:
+        assertThat(filter.apply("&lt;strong&gt;"), is((Object)"&lt;strong&gt;"));
     }
 }

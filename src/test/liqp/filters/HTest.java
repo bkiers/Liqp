@@ -30,4 +30,18 @@ public class HTest {
             assertThat(rendered, is(test[1]));
         }
     }
+
+    /*
+     * def test_escape
+     *   assert_equal '&lt;strong&gt;', @filters.escape('<strong>')
+     *   assert_equal '&lt;strong&gt;', @filters.h('<strong>')
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        Filter filter = Filter.getFilter("h");
+
+        assertThat(filter.apply("<strong>"), is((Object)"&lt;strong&gt;"));
+    }
 }

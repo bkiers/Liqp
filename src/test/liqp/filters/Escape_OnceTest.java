@@ -32,4 +32,17 @@ public class Escape_OnceTest {
             assertThat(rendered, is(test[1]));
         }
     }
+
+    /*
+     * def test_escape_once
+     *   assert_equal '&lt;strong&gt;', @filters.escape_once(@filters.escape('<strong>'))
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        final Filter filter = Filter.getFilter("escape_once");
+
+        assertThat(filter.apply(Filter.getFilter("escape").apply("<strong>")), is((Object)"&lt;strong&gt;"));
+    }
 }

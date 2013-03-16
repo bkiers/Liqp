@@ -27,4 +27,19 @@ public class DowncaseTest {
             assertThat(rendered, is(test[1]));
         }
     }
+
+    /*
+	 * def test_downcase
+     *   assert_equal 'testing', @filters.downcase("Testing")
+     *   assert_equal '', @filters.downcase(nil)
+     * end
+	 */
+    @Test
+    public void applyOriginalTest() {
+
+        final String tagName = "downcase";
+
+        assertThat(Filter.getFilter(tagName).apply("Testing"), is((Object)"testing"));
+        assertThat(Filter.getFilter(tagName).apply(null), is((Object)""));
+    }
 }

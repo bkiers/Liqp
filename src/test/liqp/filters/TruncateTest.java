@@ -32,4 +32,23 @@ public class TruncateTest {
             assertThat(rendered, is(test[1]));
         }
     }
+
+    /*
+     * def test_truncate
+     *   assert_equal '1234...', @filters.truncate('1234567890', 7)
+     *   assert_equal '1234567890', @filters.truncate('1234567890', 20)
+     *   assert_equal '...', @filters.truncate('1234567890', 0)
+     *   assert_equal '1234567890', @filters.truncate('1234567890')
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        final String name = "truncate";
+
+        assertThat(Filter.getFilter(name).apply("1234567890", 7), is((Object)"1234..."));
+        assertThat(Filter.getFilter(name).apply("1234567890", 20), is((Object)"1234567890"));
+        assertThat(Filter.getFilter(name).apply("1234567890", 0), is((Object)"..."));
+        assertThat(Filter.getFilter(name).apply("1234567890"), is((Object)"1234567890"));
+    }
 }

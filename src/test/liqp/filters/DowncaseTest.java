@@ -37,9 +37,9 @@ public class DowncaseTest {
     @Test
     public void applyOriginalTest() {
 
-        final String tagName = "downcase";
+        final String name = "downcase";
 
-        assertThat(Filter.getFilter(tagName).apply("Testing"), is((Object)"testing"));
-        assertThat(Filter.getFilter(tagName).apply(null), is((Object)""));
+        assertThat(Filter.getFilter(name).apply("Testing"), is((Object)"testing"));
+        assertThat(Filter.getFilter(name).apply(null), is((Object)""));
     }
 }

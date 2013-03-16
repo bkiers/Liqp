@@ -10,7 +10,7 @@ import static org.junit.Assert.assertThat;
 public class SizeTest {
 
     @Test
-    public void sizeTest() throws RecognitionException {
+    public void applyTest() throws RecognitionException {
 
         String json = "{ \"n\" : [1,2,3,4,5] }";
 
@@ -40,7 +40,7 @@ public class SizeTest {
      * end
 	 */
 	@Test
-	public void sizeTestLiquid() {
+	public void applyOriginalTest() {
 
         final String tagName = "size";
 

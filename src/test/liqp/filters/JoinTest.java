@@ -29,4 +29,19 @@ public class JoinTest {
             assertThat(rendered, is(test[1]));
         }
     }
+
+    /*
+     * def test_join
+     *   assert_equal '1 2 3 4', @filters.join([1,2,3,4])
+     *   assert_equal '1 - 2 - 3 - 4', @filters.join([1,2,3,4], ' - ')
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        Filter filter = Filter.getFilter("join");
+
+        assertThat(filter.apply(new Integer[]{1,2,3,4}), is((Object)"1 2 3 4"));
+        assertThat(filter.apply(new Integer[]{1,2,3,4}, " - "), is((Object)"1 - 2 - 3 - 4"));
+    }
 }

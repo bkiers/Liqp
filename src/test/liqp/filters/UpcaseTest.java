@@ -27,4 +27,19 @@ public class UpcaseTest {
             assertThat(rendered, is(test[1]));
         }
     }
+
+    /*
+     * def test_upcase
+     *   assert_equal 'TESTING', @filters.upcase("Testing")
+     *   assert_equal '', @filters.upcase(nil)
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        final String tagName = "upcase";
+
+        assertThat(Filter.getFilter(tagName).apply("Testing"), is((Object)"TESTING"));
+        assertThat(Filter.getFilter(tagName).apply(null), is((Object)""));
+    }
 }

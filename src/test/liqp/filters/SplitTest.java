@@ -1,5 +1,6 @@
 package liqp.filters;
 
+import java.util.regex.Pattern;
 import liqp.Template;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
@@ -26,5 +27,25 @@ public class SplitTest {
 
             assertThat(rendered, is(test[1]));
         }
+    }
+
+    /*
+     * def test_strip
+     *   assert_equal ['12','34'], @filters.split('12~34', '~')
+     *   assert_equal ['A? ',' ,Z'], @filters.split('A? ~ ~ ~ ,Z', '~ ~ ~')
+     *   assert_equal ['A?Z'], @filters.split('A?Z', '~')
+     *   # Regexp works although Liquid does not support.
+     *   assert_equal ['A','Z'], @filters.split('AxZ', /x/)
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        final String name = "split";
+
+        assertThat(Filter.getFilter(name).apply("12~34", "~"), is((Object)new String[]{"12", "34"}));
+        assertThat(Filter.getFilter(name).apply("A? ~ ~ ~ ,Z", "~ ~ ~"), is((Object)new String[]{"A? ", " ,Z"}));
+        assertThat(Filter.getFilter(name).apply("A?Z", "~"), is((Object)new String[]{"A?Z"}));
+        assertThat(Filter.getFilter(name).apply("AxZ", Pattern.compile("x")), is((Object)new String[]{"A", "Z"}));
     }
 }

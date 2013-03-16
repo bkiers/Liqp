@@ -27,7 +27,7 @@ class Truncatewords extends Filter {
             truncateString = super.asString(super.get(1, params));
         }
 
-        if (length > words.length) {
+        if (length >= words.length) {
             return text;
         }
 

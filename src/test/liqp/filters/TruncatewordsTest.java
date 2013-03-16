@@ -22,7 +22,7 @@ public class TruncatewordsTest {
                 {"{{ txt | truncatewords: 500, '???' }}", "a        b c d e f g h i j a b c d e f g h i j"},
                 {"{{ txt | truncatewords: 2, '===' }}", "a b==="},
                 {"{{ txt | truncatewords: 19, '===' }}", "a b c d e f g h i j a b c d e f g h i==="},
-                {"{{ txt | truncatewords: 20, '===' }}", "a b c d e f g h i j a b c d e f g h i j==="},
+                {"{{ txt | truncatewords: 20, '===' }}", "a        b c d e f g h i j a b c d e f g h i j"},
                 {"{{ txt | truncatewords: 21, '===' }}", "a        b c d e f g h i j a b c d e f g h i j"},
         };
 
@@ -33,5 +33,26 @@ public class TruncatewordsTest {
 
             assertThat(rendered, is(test[1]));
         }
+    }
+
+    /*
+     * def test_truncatewords
+     *   assert_equal 'one two three', @filters.truncatewords('one two three', 4)
+     *   assert_equal 'one two...', @filters.truncatewords('one two three', 2)
+     *   assert_equal 'one two three', @filters.truncatewords('one two three')
+     *   assert_equal 'Two small (13&#8221; x 5.5&#8221; x 10&#8221; high) baskets fit inside one large basket (13&#8221;...',
+     *                 @filters.truncatewords('Two small (13&#8221; x 5.5&#8221; x 10&#8221; high) baskets fit inside one large basket (13&#8221; x 16&#8221; x 10.5&#8221; high) with cover.', 15)
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        final Filter filter = Filter.getFilter("truncatewords");
+
+        assertThat(filter.apply("one two three", 4), is((Object)"one two three"));
+        assertThat(filter.apply("one two three", 2), is((Object)"one two..."));
+        assertThat(filter.apply("one two three", 3), is((Object)"one two three"));
+        assertThat(filter.apply("Two small (13&#8221; x 5.5&#8221; x 10&#8221; high) baskets fit inside one large basket (13&#8221; x 16&#8221; x 10.5&#8221; high) with cover.", 15),
+                is((Object)"Two small (13&#8221; x 5.5&#8221; x 10&#8221; high) baskets fit inside one large basket (13&#8221;..."));
     }
 }

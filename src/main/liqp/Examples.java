@@ -164,10 +164,22 @@ public class Examples {
 
         //demoCustomStrongFilter();
 
-        // demoCustomRepeatFilter();
+        //demoCustomRepeatFilter();
 
         //demoCustomSumFilter();
 
-        customLoopTag();
+        //customLoopTag();
+
+        /*
+            list = [{"a" => 3}, {"a" => 1}, {"a" => 2}]
+
+            text = "list={{list | sort, 'a'}}"
+
+            @template = Liquid::Template.parse(text)
+            print ">>>" + @template.render({'list' => list}) + "<<<\n"
+        */
+        String json = "{\"list\":[{\"a\":3}, {\"a\":1}, {\"a\":2}]}";
+        Template t = Template.parse("list={{list | sort: \"a\"}}");
+        System.out.println(t.render(json));
     }
 }

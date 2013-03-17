@@ -75,7 +75,13 @@ class Sort extends Filter {
 
         @Override
         public String toString() {
-            return super.toString();
+            StringBuilder builder = new StringBuilder();
+
+            for(java.util.Map.Entry entry : super.entrySet()) {
+                builder.append(entry.getKey()).append(entry.getValue());
+            }
+
+            return builder.toString();
         }
     }
 }

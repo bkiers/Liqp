@@ -91,6 +91,21 @@ public abstract class Filter extends LValue {
     public abstract Object apply(Object value, Object... params);
 
     /**
+     * Check the number of parameters and throws an exception if needed.
+     *
+     * @param params
+     *         the parameters to check.
+     * @param expected
+     *         the expected number of parameters.
+     */
+    public final void checkParams(Object[] params, int expected) {
+        if(params == null || params.length != expected) {
+            throw new RuntimeException("Liquid error: wrong number of arguments (" +
+                    (params.length + 1) + " for " + (expected + 1) + ")");
+        }
+    }
+
+    /**
      * Returns a value at a specific index from an array of parameters.
      * If no such index exists, a RuntimeException is thrown.
      *

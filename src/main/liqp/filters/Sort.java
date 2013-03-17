@@ -1,8 +1,7 @@
 package liqp.filters;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.Map;
 
 class Sort extends Filter {
 
@@ -19,22 +18,60 @@ class Sort extends Filter {
             return "";
         }
 
+        if(!super.isArray(value)) {
+            throw new RuntimeException("cannot sort: " + value);
+        }
+
         Object[] array = super.asArray(value);
-        List<Comparable> list = asComparableList(array);
+        String property = params.length == 0 ? null : super.asString(params[0]);
+
+        List<Comparable> list = asComparableList(array, property);
 
         Collections.sort(list);
 
-        return list.toArray(new Object[list.size()]);
+        return property == null ?
+                list.toArray(new Comparable[list.size()]) :
+                list.toArray(new SortableMap[list.size()]);
     }
 
-    private List<Comparable> asComparableList(Object[] array) {
+    private List<Comparable> asComparableList(Object[] array, String property) {
 
         List<Comparable> list = new ArrayList<Comparable>();
 
         for (Object obj : array) {
-            list.add((Comparable) obj);
+
+            if(obj instanceof java.util.Map && property != null) {
+                list.add(new SortableMap((java.util.Map<String, Comparable>)obj, property));
+            }
+            else {
+                list.add((Comparable) obj);
+            }
         }
 
         return list;
+    }
+
+    static class SortableMap extends HashMap<String, Comparable> implements Comparable<SortableMap> {
+
+        final String property;
+
+        SortableMap(java.util.Map<String, Comparable> map, String property) {
+            super.putAll(map);
+            this.property = property;
+        }
+
+        @Override
+        public int compareTo(SortableMap that) {
+
+            Comparable thisValue = this.get(property);
+            Comparable thatValue = that.get(property);
+
+            return thisValue.compareTo(thatValue);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString();
+        }
     }
 }

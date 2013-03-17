@@ -66,6 +66,10 @@ class Sort extends Filter {
             Comparable thisValue = this.get(property);
             Comparable thatValue = that.get(property);
 
+            if(thisValue == null || thatValue == null) {
+                throw new RuntimeException("Liquid error: comparison of Hash with Hash failed");
+            }
+
             return thisValue.compareTo(thatValue);
         }
 

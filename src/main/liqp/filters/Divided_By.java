@@ -10,7 +10,17 @@ class Divided_By extends Filter {
     @Override
     public Object apply(Object value, Object... params) {
 
+        if(value == null) {
+            value = 0L;
+        }
+
+        super.checkParams(params, 1);
+
         Object rhsObj = params[0];
+
+        if(((Number) value).doubleValue() == 0.0) {
+            throw new RuntimeException("Liquid error: divided by 0");
+        }
 
         if (value instanceof Long && rhsObj instanceof Long) {
             return ((Number) value).longValue() / ((Number) rhsObj).longValue();

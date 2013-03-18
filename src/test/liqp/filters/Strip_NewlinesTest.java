@@ -27,4 +27,15 @@ public class Strip_NewlinesTest {
             assertThat(rendered, is(test[1]));
         }
     }
+
+    /*
+     * def test_strip_newlines
+     *   assert_template_result 'abc', "{{ source | strip_newlines }}", 'source' => "a\nb\nc"
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        assertThat(Template.parse("{{ source | strip_newlines }}").render("source", "a\nb\nc"), is((Object)"abc"));
+    }
 }

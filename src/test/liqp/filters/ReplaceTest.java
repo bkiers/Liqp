@@ -38,4 +38,18 @@ public class ReplaceTest {
         Template.parse("{{ 'ababab' | replace:'a', nil }}").render();
     }
 
+    /*
+     * def test_replace
+     *   assert_equal 'b b b b', @filters.replace("a a a a", 'a', 'b')
+     *   assert_equal 'b a a a', @filters.replace_first("a a a a", 'a', 'b')
+     *   assert_template_result 'b a a a', "{{ 'a a a a' | replace_first: 'a', 'b' }}"
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        Filter filter = Filter.getFilter("replace");
+
+        assertThat(filter.apply("a a a a", "a", "b"), is((Object)"b b b b"));
+    }
 }

@@ -28,4 +28,20 @@ public class AppendTest {
             assertThat(rendered, is(test[1]));
         }
     }
+
+    /*
+     * def test_append
+     *   assigns = {'a' => 'bc', 'b' => 'd' }
+     *   assert_template_result('bcd',"{{ a | append: 'd'}}",assigns)
+     *   assert_template_result('bcd',"{{ a | append: b}}",assigns)
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        final String assigns = "{\"a\":\"bc\", \"b\":\"d\" }";
+
+        assertThat(Template.parse("{{ a | append: 'd'}}").render(assigns), is("bcd"));
+        assertThat(Template.parse("{{ a | append: b}}").render(assigns), is("bcd"));
+    }
 }

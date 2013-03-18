@@ -46,7 +46,9 @@ tokens {
   FOR_ARRAY;
   FOR_RANGE;
   GROUP;
+  HASH;
   IF;
+  INDEX;
   ELSIF;
   INCLUDE;
   LOOKUP;
@@ -184,7 +186,7 @@ cycle_tag
  ;
 
 cycle_group
- : (expr Col)? -> ^(GROUP expr?)
+ : ((expr Col)=> expr Col)? -> ^(GROUP expr?)
  ;
 
 for_tag
@@ -231,7 +233,7 @@ params
  ;
 
 assignment
- : TagStart Assign Id EqSign expr TagEnd -> ^(ASSIGNMENT Id expr)
+ : TagStart Assign Id EqSign expr filter? TagEnd -> ^(ASSIGNMENT Id filter? expr)
  ;
 
 expr
@@ -266,7 +268,12 @@ term
  ;
 
 lookup
- : Id (Dot Id)* -> ^(LOOKUP Id+)
+ : Id index* -> ^(LOOKUP Id index*)
+ ;
+
+index
+ : Dot Id       -> ^(HASH Id)
+ | OBr expr CBr -> ^(INDEX expr)
  ;
 
 /* lexer rules */
@@ -291,6 +298,9 @@ Col       : {inTag}?=> ':';
 Comma     : {inTag}?=> ',';
 OPar      : {inTag}?=> '(';
 CPar      : {inTag}?=> ')';
+OBr       : {inTag}?=> '[';
+CBr       : {inTag}?=> ']';
+
 DoubleNum : {inTag}?=> Digit+ ( {input.LA(1) == '.' && input.LA(2) != '.'}?=> '.' Digit*
                               | {$type = LongNum;}
                               );

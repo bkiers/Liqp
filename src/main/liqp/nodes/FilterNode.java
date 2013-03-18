@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-class FilterNode implements LNode {
+public class FilterNode implements LNode {
 
     private Filter filter;
     private List<LNode> params;

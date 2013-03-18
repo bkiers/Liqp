@@ -207,8 +207,8 @@ params[FilterNode node]
  : (expr {$node.add($expr.node);})+
  ;
 
-assignment returns [LNode node]
- : ^(ASSIGNMENT Id expr) {$node = new TagNode("assign", new AtomNode($Id.text), $expr.node);}
+assignment returns [TagNode node]
+ : ^(ASSIGNMENT Id filter? expr) {$node = new TagNode("assign", new AtomNode($Id.text), $filter.node, $expr.node);}
  ;
 
 expr returns [LNode node]
@@ -231,6 +231,14 @@ expr returns [LNode node]
  ;
 
 lookup returns [LookupNode node]
-@init{$node = new LookupNode();}
- : ^(LOOKUP (Id {$node.add($Id.text);})+)
+ : ^(LOOKUP
+      Id      {$node = new LookupNode($Id.text);}
+      ( index {$node.add($index.indexable);}
+      )*
+    )
+ ;
+
+index returns [LookupNode.Indexable indexable]
+ : ^(HASH Id)    {$indexable = new LookupNode.Hash($Id.text);}
+ | ^(INDEX expr) {$indexable = new LookupNode.Index($expr.node);}
  ;

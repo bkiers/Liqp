@@ -41,11 +41,11 @@ public class SplitTest {
     @Test
     public void applyOriginalTest() {
 
-        final String name = "split";
+        final Filter filter = Filter.getFilter("split");
 
-        assertThat(Filter.getFilter(name).apply("12~34", "~"), is((Object)new String[]{"12", "34"}));
-        assertThat(Filter.getFilter(name).apply("A? ~ ~ ~ ,Z", "~ ~ ~"), is((Object)new String[]{"A? ", " ,Z"}));
-        assertThat(Filter.getFilter(name).apply("A?Z", "~"), is((Object)new String[]{"A?Z"}));
-        assertThat(Filter.getFilter(name).apply("AxZ", Pattern.compile("x")), is((Object)new String[]{"A", "Z"}));
+        assertThat(filter.apply("12~34", "~"), is((Object)new String[]{"12", "34"}));
+        assertThat(filter.apply("A? ~ ~ ~ ,Z", "~ ~ ~"), is((Object)new String[]{"A? ", " ,Z"}));
+        assertThat(filter.apply("A?Z", "~"), is((Object)new String[]{"A?Z"}));
+        assertThat(filter.apply("AxZ", Pattern.compile("x")), is((Object)new String[]{"A", "Z"}));
     }
 }

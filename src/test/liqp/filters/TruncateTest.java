@@ -44,11 +44,11 @@ public class TruncateTest {
     @Test
     public void applyOriginalTest() {
 
-        final String name = "truncate";
+        final Filter filter = Filter.getFilter("truncate");
 
-        assertThat(Filter.getFilter(name).apply("1234567890", 7), is((Object)"1234..."));
-        assertThat(Filter.getFilter(name).apply("1234567890", 20), is((Object)"1234567890"));
-        assertThat(Filter.getFilter(name).apply("1234567890", 0), is((Object)"..."));
-        assertThat(Filter.getFilter(name).apply("1234567890"), is((Object)"1234567890"));
+        assertThat(filter.apply("1234567890", 7), is((Object)"1234..."));
+        assertThat(filter.apply("1234567890", 20), is((Object)"1234567890"));
+        assertThat(filter.apply("1234567890", 0), is((Object)"..."));
+        assertThat(filter.apply("1234567890"), is((Object)"1234567890"));
     }
 }

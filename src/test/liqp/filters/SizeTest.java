@@ -42,10 +42,10 @@ public class SizeTest {
 	@Test
 	public void applyOriginalTest() {
 
-        final String name = "size";
+        final Filter filter = Filter.getFilter("size");
 
-        assertThat(Filter.getFilter(name).apply(new Integer[]{1, 2, 3}), is((Object) 3));
-        assertThat(Filter.getFilter(name).apply(new Object[0]), is((Object)0));
-        assertThat(Filter.getFilter(name).apply(null), is((Object)0));
+        assertThat(filter.apply(new Integer[]{1, 2, 3}), is((Object) 3));
+        assertThat(filter.apply(new Object[0]), is((Object)0));
+        assertThat(filter.apply(null), is((Object)0));
 	}
 }

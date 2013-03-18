@@ -28,4 +28,20 @@ public class PrependTest {
             assertThat(rendered, is(test[1]));
         }
     }
+
+    /*
+     * def test_prepend
+     *   assigns = {'a' => 'bc', 'b' => 'a' }
+     *   assert_template_result('abc',"{{ a | prepend: 'a'}}",assigns)
+     *   assert_template_result('abc',"{{ a | prepend: b}}",assigns)
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        final String json = "{ \"a\":\"bc\", \"b\":\"a\" }";
+
+        assertThat(Template.parse("{{ a | prepend: 'a'}}").render(json), is("abc"));
+        assertThat(Template.parse("{{ a | prepend: b}}").render(json), is("abc"));
+    }
 }

@@ -10,12 +10,18 @@ class Modulo extends Filter {
     @Override
     public Object apply(Object value, Object... params) {
 
-        Object rhsObj = params[0];
-
-        if (value instanceof Long && rhsObj instanceof Long) {
-            return ((Number) value).longValue() % ((Number) rhsObj).longValue();
+        if(value == null) {
+            value = 0L;
         }
 
-        return ((Number) value).doubleValue() % ((Number) rhsObj).doubleValue();
+        super.checkParams(params, 1);
+
+        Object rhsObj = params[0];
+
+        if (super.isInteger(value) && super.isInteger(rhsObj)) {
+            return super.asNumber(value).longValue() % super.asNumber(rhsObj).longValue();
+        }
+
+        return super.asNumber(value).doubleValue() % super.asNumber(rhsObj).doubleValue();
     }
 }

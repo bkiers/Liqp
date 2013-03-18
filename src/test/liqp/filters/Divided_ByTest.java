@@ -68,7 +68,9 @@ public class Divided_ByTest {
         assertThat(filter.apply(12L, 3L), is((Object)4L));
         assertThat(filter.apply(14L, 3L), is((Object)4L));
         assertTrue(String.valueOf(filter.apply(14L, 3.0)).matches("4[,.]6{10,}7"));
-        // assert_template_result "Liquid error: divided by 0", "{{ 5 | divided_by:0 }}" // see: applyTestInvalid3()
+
+        // see: applyTestInvalid3()
+        // assert_template_result "Liquid error: divided by 0", "{{ 5 | divided_by:0 }}"
     }
 
 }

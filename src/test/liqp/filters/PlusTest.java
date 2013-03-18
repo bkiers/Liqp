@@ -15,9 +15,9 @@ public class PlusTest {
         String[][] tests = {
                 {"{{ 8 | plus: 2 }}", "10"},
                 {"{{ 8 | plus: 3 }}", "11"},
-                {"{{ 8 | plus: 3. }}", "11.0"},
+                {"{{ 8 | plus: '3.' }}", "11.0"},
                 {"{{ 8 | plus: 3.0 }}", "11.0"},
-                {"{{ 8 | plus: 2.0 }}", "10.0"},
+                {"{{ 8 | plus: \"2.0\" }}", "10.0"},
         };
 
         for (String[] test : tests) {
@@ -27,5 +27,28 @@ public class PlusTest {
 
             assertThat(rendered, is(test[1]));
         }
+    }
+
+    @Test(expected=RuntimeException.class)
+    public void applyTestInvalid1() {
+        Filter.getFilter("plus").apply(1);
+    }
+
+    @Test(expected=RuntimeException.class)
+    public void applyTestInvalid2() {
+        Filter.getFilter("plus").apply(1, 2, 3);
+    }
+
+    /*
+     * def test_plus
+     *   assert_template_result "2", "{{ 1 | plus:1 }}"
+     *   assert_template_result "2.0", "{{ '1' | plus:'1.0' }}"
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        assertThat(Template.parse("{{ 1 | plus:1 }}").render(), is((Object)"2"));
+        assertThat(Template.parse("{{ '1' | plus:'1.0' }}").render(), is((Object)"2.0"));
     }
 }

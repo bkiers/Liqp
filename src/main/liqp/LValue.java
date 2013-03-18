@@ -91,16 +91,26 @@ public abstract class LValue {
     }
 
     /**
-     * Returns `value` as a Number.
+     * Returns `value` as a Number. Strings will be coerced into
+     * either a Long or Double.
      *
      * @param value
      *         the value to cast to a Number.
      *
      * @return `value` as a Number.
+     *
+     * @throws NumberFormatException when `value` is a String which could
+     *                               not be parsed as a Long or Double.
      */
-    public Number asNumber(Object value) {
+    public Number asNumber(Object value) throws NumberFormatException {
 
-        return (Number) value;
+        if(value instanceof Number) {
+            return (Number) value;
+        }
+
+        String str = String.valueOf(value);
+
+        return str.matches("\\d+") ? Long.valueOf(str) : Double.valueOf(str);
     }
 
     /**
@@ -146,6 +156,18 @@ public abstract class LValue {
     }
 
     /**
+     * Returns true iff `value` is a whole number (Integer or Long).
+     *
+     * @param value
+     *         the value to check.
+     *
+     * @return true iff `value` is a whole number (Integer or Long).
+     */
+    public boolean isInteger(Object value) {
+        return value != null && (value instanceof Long || value instanceof Integer);
+    }
+
+    /**
      * Returns true iff `value` is a Number.
      *
      * @param value
@@ -155,7 +177,27 @@ public abstract class LValue {
      */
     public boolean isNumber(Object value) {
 
-        return value != null && value instanceof Number;
+        if(value == null) {
+            return false;
+        }
+
+        if(value instanceof Number) {
+            return true;
+        }
+
+        // valid Long?
+        if(String.valueOf(value).matches("\\d+")) {
+            return true;
+        }
+
+        try {
+            // valid Double?
+            Double.parseDouble(String.valueOf(value));
+        } catch(Exception e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

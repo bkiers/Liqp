@@ -15,9 +15,9 @@ public class ModuloTest {
         String[][] tests = {
                 {"{{ 8 | modulo: 2 }}", "0"},
                 {"{{ 8 | modulo: 3 }}", "2"},
-                {"{{ 8 | modulo: 3. }}", "2.0"},
+                {"{{ \"8\" | modulo: 3. }}", "2.0"},
                 {"{{ 8 | modulo: 3.0 }}", "2.0"},
-                {"{{ 8 | modulo: 2.0 }}", "0.0"},
+                {"{{ 8 | modulo: '2.0' }}", "0.0"},
         };
 
         for (String[] test : tests) {
@@ -27,5 +27,27 @@ public class ModuloTest {
 
             assertThat(rendered, is(test[1]));
         }
+    }
+
+    @Test(expected=RuntimeException.class)
+    public void applyTestInvalid1() {
+        Filter.getFilter("modulo").apply(1);
+    }
+
+    @Test(expected=RuntimeException.class)
+    public void applyTestInvalid2() {
+        Filter.getFilter("modulo").apply(1, 2, 3);
+    }
+
+
+    /*
+     * def test_modulo
+     *   assert_template_result "1", "{{ 3 | modulo:2 }}"
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        assertThat(Template.parse("{{ 3 | modulo:2 }}").render(), is((Object)"1"));
     }
 }

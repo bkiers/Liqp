@@ -1,5 +1,6 @@
 package liqp.filters;
 
+import java.util.HashMap;
 import liqp.Template;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
@@ -33,5 +34,36 @@ public class MapTest {
 
             assertThat(rendered, is(test[1]));
         }
+    }
+
+    /*
+     * def test_map
+     *   assert_equal [1,2,3,4], @filters.map([{"a" => 1}, {"a" => 2}, {"a" => 3}, {"a" => 4}], 'a')
+     *   assert_template_result 'abc', "{{ ary | map:'foo' | map:'bar' }}",
+     *     'ary' => [{'foo' => {'bar' => 'a'}}, {'foo' => {'bar' => 'b'}}, {'foo' => {'bar' => 'c'}}]
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        Filter filter = Filter.getFilter("map");
+
+        Object[] rendered = (Object[]) filter.apply(
+                new HashMap[]{
+                        new HashMap<String, Integer>(){{ put("a", 1); }},
+                        new HashMap<String, Integer>(){{ put("a", 2); }},
+                        new HashMap<String, Integer>(){{ put("a", 3); }},
+                        new HashMap<String, Integer>(){{ put("a", 4); }},
+                },
+                "a"
+        );
+
+        Object[] expected = {1, 2, 3, 4};
+
+        assertThat(rendered, is(expected));
+
+        final String json = "{\"ary\":[{\"foo\":{\"bar\":\"a\"}}, {\"foo\":{\"bar\":\"b\"}}, {\"foo\":{\"bar\":\"c\"}}]}";
+
+        assertThat(Template.parse("{{ ary | map:'foo' | map:'bar' }}").render(json), is("abc"));
     }
 }

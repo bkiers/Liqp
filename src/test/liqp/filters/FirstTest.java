@@ -21,4 +21,21 @@ public class FirstTest {
 
         assertThat(rendered, is("Mu"));
     }
+
+    /*
+     * def test_first_last
+     *   assert_equal 1, @filters.first([1,2,3])
+     *   assert_equal 3, @filters.last([1,2,3])
+     *   assert_equal nil, @filters.first([])
+     *   assert_equal nil, @filters.last([])
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        Filter filter = Filter.getFilter("first");
+
+        assertThat(filter.apply(new Integer[]{1, 2, 3}), is((Object)"1"));
+        assertThat(filter.apply(new Integer[]{}), is((Object)null));
+    }
 }

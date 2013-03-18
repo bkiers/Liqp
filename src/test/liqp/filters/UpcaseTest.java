@@ -37,9 +37,9 @@ public class UpcaseTest {
     @Test
     public void applyOriginalTest() {
 
-        final String name = "upcase";
+        final Filter filter = Filter.getFilter("upcase");
 
-        assertThat(Filter.getFilter(name).apply("Testing"), is((Object)"TESTING"));
-        assertThat(Filter.getFilter(name).apply(null), is((Object)""));
+        assertThat(filter.apply("Testing"), is((Object)"TESTING"));
+        assertThat(filter.apply(null), is((Object)""));
     }
 }

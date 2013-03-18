@@ -26,4 +26,16 @@ public class CapitalizeTest {
             assertThat(rendered, is(test[1]));
         }
     }
+
+    /*
+     *
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        Filter filter = Filter.getFilter("capitalize");
+
+        assertThat(filter.apply("testing"), is((Object)"Testing"));
+        assertThat(filter.apply(null), is((Object)""));
+    }
 }

@@ -32,4 +32,19 @@ public class RemoveTest {
     public void applyTestInvalidPattern() throws RecognitionException {
         Template.parse("{{ 'ababab' | remove:nil }}").render();
     }
+
+    /*
+     * def test_remove
+     *   assert_equal '   ', @filters.remove("a a a a", 'a')
+     *   assert_equal 'a a a', @filters.remove_first("a a a a", 'a ')
+     *   assert_template_result 'a a a', "{{ 'a a a a' | remove_first: 'a ' }}"
+     * end
+     */
+    @Test
+    public void applyOriginalTest() {
+
+        Filter filter = Filter.getFilter("remove");
+
+        assertThat(filter.apply("a a a a", "a"), is((Object)"   "));
+    }
 }

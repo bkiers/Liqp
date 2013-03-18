@@ -30,7 +30,7 @@ class Map extends Filter {
             Object val = map.get(key);
 
             if (val != null) {
-                list.add(super.asString(val));
+                list.add(val);
             }
         }
 

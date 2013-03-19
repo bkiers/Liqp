@@ -56,7 +56,8 @@ class LookupNode implements LNode {
                     return ((Collection)value).size();
                 }
                 else if(value instanceof java.util.Map) {
-                    return ((java.util.Map)value).size();
+                    java.util.Map map = (java.util.Map)value;
+                    return map.containsKey(hash) ? map.get(hash) : map.size();
                 }
                 else if(value.getClass().isArray()) {
                     return ((Object[])value).length;
@@ -64,7 +65,7 @@ class LookupNode implements LNode {
             }
 
             if(value instanceof java.util.Map) {
-                return ((java.util.Map<?,?>)value).get(hash);
+                return ((java.util.Map)value).get(hash);
             }
             else {
                 return null;

@@ -288,13 +288,14 @@ Str : {inTag}?=> (SStr | DStr);
 
 DotDot    : {inTag}?=> '..';
 Dot       : {inTag}?=> '.';
-NEq       : {inTag}?=> '!=';
+NEq       : {inTag}?=> '!=' | '<>';
 Eq        : {inTag}?=> '==';
 EqSign    : {inTag}?=> '=';
 GtEq      : {inTag}?=> '>=';
 Gt        : {inTag}?=> '>';
 LtEq      : {inTag}?=> '<=';
 Lt        : {inTag}?=> '<';
+Minus     : {inTag}?=> '-';
 Pipe      : {inTag}?=> '|';
 Col       : {inTag}?=> ':';
 Comma     : {inTag}?=> ',';
@@ -303,10 +304,10 @@ CPar      : {inTag}?=> ')';
 OBr       : {inTag}?=> '[';
 CBr       : {inTag}?=> ']';
 
-DoubleNum : {inTag}?=> Digit+ ( {input.LA(1) == '.' && input.LA(2) != '.'}?=> '.' Digit*
-                              | {$type = LongNum;}
-                              );
-LongNum   : {inTag}?=> Digit+;
+DoubleNum : {inTag}?=> '-'? Digit+ ( {input.LA(1) == '.' && input.LA(2) != '.'}?=> '.' Digit*
+                                   | {$type = LongNum;}
+                                   );
+LongNum   : {inTag}?=> '-'? Digit+;
 WS        : {inTag}?=> (' ' | '\t' | '\r' | '\n')+ {$channel=HIDDEN;};
 
 Id

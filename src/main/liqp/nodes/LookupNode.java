@@ -1,6 +1,7 @@
 package liqp.nodes;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -22,28 +23,6 @@ class LookupNode implements LNode {
     public Object render(Map<String, Object> context) {
 
         Object value = context.get(id);
-
-        /*
-        Object value = context.get(ids.get(0));
-
-        for (int i = 1; i < ids.size(); i++) {
-
-            if (value == null) {
-                return null;
-            }
-
-            try {
-                @SuppressWarnings("unchecked")
-                Map<String, Object> map = (Map<String, Object>) value;
-                value = map.get(ids.get(i));
-            }
-            catch (Exception e) {
-                return null;
-            }
-        }
-
-        return value;
-        */
 
         for(Indexable index : indexes) {
 
@@ -70,6 +49,18 @@ class LookupNode implements LNode {
 
             if(value == null) {
                 return null;
+            }
+
+            if(hash.equals("size")) {
+                if(value instanceof Collection) {
+                    return ((Collection)value).size();
+                }
+                else if(value instanceof java.util.Map) {
+                    return ((java.util.Map)value).size();
+                }
+                else if(value.getClass().isArray()) {
+                    return ((Object[])value).length;
+                }
             }
 
             if(value instanceof java.util.Map) {

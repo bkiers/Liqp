@@ -213,7 +213,9 @@ table_tag
  ;
 
 capture_tag
- : TagStart CaptureStart Id TagEnd block TagStart CaptureEnd TagEnd -> ^(CAPTURE Id block)
+ : TagStart CaptureStart ( Id TagEnd block TagStart CaptureEnd TagEnd  -> ^(CAPTURE Id block)
+                         | Str TagEnd block TagStart CaptureEnd TagEnd -> ^(CAPTURE Id[$Str.text] block)
+                         )
  ;
 
 include_tag

@@ -16,6 +16,8 @@ class Capture extends Tag {
 
         LNode block = nodes[1];
 
-        return context.put(id, block.render(context));
+        context.put(id, block.render(context));
+
+        return null;
     }
 }

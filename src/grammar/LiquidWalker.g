@@ -212,22 +212,23 @@ assignment returns [TagNode node]
  ;
 
 expr returns [LNode node]
- : ^(Or a=expr b=expr)   {$node = new OrNode($a.node, $b.node);}
- | ^(And a=expr b=expr)  {$node = new AndNode($a.node, $b.node);}
- | ^(Eq a=expr b=expr)   {$node = new EqNode($a.node, $b.node);}
- | ^(NEq a=expr b=expr)  {$node = new NEqNode($a.node, $b.node);}
- | ^(LtEq a=expr b=expr) {$node = new LtEqNode($a.node, $b.node);}
- | ^(Lt a=expr b=expr)   {$node = new LtNode($a.node, $b.node);}
- | ^(GtEq a=expr b=expr) {$node = new GtEqNode($a.node, $b.node);}
- | ^(Gt a=expr b=expr)   {$node = new GtNode($a.node, $b.node);}
- | LongNum               {$node = new AtomNode(new Long($LongNum.text));}
- | DoubleNum             {$node = new AtomNode(new Double($DoubleNum.text));}
- | Str                   {$node = new AtomNode($Str.text);}
- | True                  {$node = new AtomNode(true);}
- | False                 {$node = new AtomNode(false);}
- | Nil                   {$node = new AtomNode(null);}
- | NO_SPACE              {$node = new AtomNode($NO_SPACE.text);}
- | lookup                {$node = $lookup.node;}
+ : ^(Or a=expr b=expr)       {$node = new OrNode($a.node, $b.node);}
+ | ^(And a=expr b=expr)      {$node = new AndNode($a.node, $b.node);}
+ | ^(Eq a=expr b=expr)       {$node = new EqNode($a.node, $b.node);}
+ | ^(NEq a=expr b=expr)      {$node = new NEqNode($a.node, $b.node);}
+ | ^(LtEq a=expr b=expr)     {$node = new LtEqNode($a.node, $b.node);}
+ | ^(Lt a=expr b=expr)       {$node = new LtNode($a.node, $b.node);}
+ | ^(GtEq a=expr b=expr)     {$node = new GtEqNode($a.node, $b.node);}
+ | ^(Gt a=expr b=expr)       {$node = new GtNode($a.node, $b.node);}
+ | ^(Contains a=expr b=expr) {$node = new ContainsNode($a.node, $b.node);}
+ | LongNum                   {$node = new AtomNode(new Long($LongNum.text));}
+ | DoubleNum                 {$node = new AtomNode(new Double($DoubleNum.text));}
+ | Str                       {$node = new AtomNode($Str.text);}
+ | True                      {$node = new AtomNode(true);}
+ | False                     {$node = new AtomNode(false);}
+ | Nil                       {$node = new AtomNode(null);}
+ | NO_SPACE                  {$node = new AtomNode($NO_SPACE.text);}
+ | lookup                    {$node = $lookup.node;}
  ;
 
 lookup returns [LookupNode node]

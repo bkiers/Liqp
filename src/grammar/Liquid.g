@@ -247,7 +247,11 @@ or_expr
  ;
 
 and_expr
- : eq_expr (And^ eq_expr)*
+ : contains_expr (And^ contains_expr)*
+ ;
+
+contains_expr
+ : eq_expr (Contains^ eq_expr)?
  ;
 
 eq_expr
@@ -325,6 +329,7 @@ Id
      else if($text.equals("unless"))      $type = UnlessStart;
      else if($text.equals("endunless"))   $type = UnlessEnd;
      else if($text.equals("else"))        $type = Else;
+     else if($text.equals("contains"))    $type = Contains;
      else if($text.equals("case"))        $type = CaseStart;
      else if($text.equals("endcase"))     $type = CaseEnd;
      else if($text.equals("when"))        $type = When;
@@ -370,6 +375,7 @@ fragment Elsif : 'Elsif';
 fragment UnlessStart : 'UnlessStart';
 fragment UnlessEnd : 'UnlessEnd';
 fragment Else : 'Else';
+fragment Contains : 'contains';
 fragment CaseStart : 'CaseStart';
 fragment CaseEnd : 'CaseEnd';
 fragment When : 'When';

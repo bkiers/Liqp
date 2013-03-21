@@ -108,16 +108,24 @@ class LookupNode implements LNode {
                 return null;
             }
 
-            int index = ((Number)expression.render(context)).intValue();
+            Object key = expression.render(context);
 
-            if(value.getClass().isArray()) {
-                return ((Object[])value)[index];
-            }
-            else if(value instanceof List) {
-                return ((List<?>)value).get(index);
+            if(key instanceof Number) {
+                int index = ((Number)key).intValue();
+
+                if(value.getClass().isArray()) {
+                    return ((Object[])value)[index];
+                }
+                else if(value instanceof List) {
+                    return ((List<?>)value).get(index);
+                }
+                else {
+                    return null;
+                }
             }
             else {
-                return null;
+                String hash = String.valueOf(key);
+                return new Hash(hash).get(value, context);
             }
         }
     }

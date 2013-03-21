@@ -22,7 +22,19 @@ class LookupNode implements LNode {
     @Override
     public Object render(Map<String, Object> context) {
 
-        Object value = context.get(id);
+        Object value;
+
+        // Check if there's a [var] lookup, AST: ^(LOOKUP Id["@var"])
+        if(id.startsWith("@")) {
+            value = context.get(context.get(id.substring(1)));
+        }
+        else {
+            value = context.get(id);
+        }
+
+        if(value == null) {
+            return null;
+        }
 
         for(Indexable index : indexes) {
 

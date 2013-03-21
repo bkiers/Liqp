@@ -274,7 +274,9 @@ term
  ;
 
 lookup
- : Id index* -> ^(LOOKUP Id index*)
+ : Id index*   -> ^(LOOKUP Id index*)
+ | OBr Str CBr -> ^(LOOKUP Id[$Str.text])
+ | OBr Id CBr  -> ^(LOOKUP Id["@" + $Id.text])
  ;
 
 index

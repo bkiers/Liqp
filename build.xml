@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Liqp">
 
-    <property name="version"          value="0.5.2" />
+    <property name="version"          value="0.6" />
     <property name="project.name"     value="Liqp" />
     <property name="main.class"       value="liqp.Examples" />
     <property name="combined.grammar" value="src/grammar/Liquid.g" />

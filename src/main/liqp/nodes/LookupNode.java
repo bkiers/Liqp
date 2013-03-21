@@ -63,6 +63,26 @@ class LookupNode implements LNode {
                     return ((Object[])value).length;
                 }
             }
+            else if(hash.equals("first")) {
+                if(value instanceof java.util.List) {
+                    java.util.List list = (java.util.List)value;
+                    return list.isEmpty() ? null : list.get(0);
+                }
+                else if(value.getClass().isArray()) {
+                    Object[] array = (Object[])value;
+                    return array.length == 0 ? null : array[0];
+                }
+            }
+            else if(hash.equals("last")) {
+                if(value instanceof java.util.List) {
+                    java.util.List list = (java.util.List)value;
+                    return list.isEmpty() ? null : list.get(list.size() - 1);
+                }
+                else if(value.getClass().isArray()) {
+                    Object[] array = (Object[])value;
+                    return array.length == 0 ? null : array[array.length - 1];
+                }
+            }
 
             if(value instanceof java.util.Map) {
                 return ((java.util.Map)value).get(hash);

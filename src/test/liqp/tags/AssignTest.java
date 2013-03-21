@@ -1,9 +1,12 @@
 package liqp.tags;
 
+import java.util.HashMap;
+import java.util.Map;
 import liqp.Template;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 
+import static liqp.TestUtils.getNode;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -60,5 +63,19 @@ public class AssignTest {
         assertThat(Template.parse("{% assign foo = values %}.{{ foo[1] }}.").render("values", values), is(".bar."));
 
         assertThat(Template.parse("{% assign foo = values | split: \",\" %}.{{ foo[1] }}.").render("values", "foo,bar,baz"), is(".bar."));
+    }
+
+    /*
+     * def test_hyphenated_variable
+     *
+     *   @context['oh-my'] = 'godz'
+     *   assert_equal 'godz', @context['oh-my']
+     *
+     * end
+     */
+    @Test
+    public void hyphenatedVariableTest() throws Exception {
+
+        assertThat(Template.parse("{% assign oh-my = 'godz' %}{{ oh-my }}").render(), is("godz"));
     }
 }

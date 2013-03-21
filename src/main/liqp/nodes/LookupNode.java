@@ -137,7 +137,7 @@ class LookupNode implements LNode {
             }
             else {
 
-                // hashed only work on maps, not on arrays/lists
+                // hashes only work on maps, not on arrays/lists
                 if(value.getClass().isArray() || value instanceof List) {
                     return null;
                 }

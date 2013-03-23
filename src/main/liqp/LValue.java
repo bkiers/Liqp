@@ -57,6 +57,10 @@ public abstract class LValue {
      */
     public Object[] asArray(Object value) {
 
+        if(value == null) {
+            return null;
+        }
+
         if (value.getClass().isArray()) {
             return (Object[]) value;
         }

@@ -22,6 +22,6 @@ class If extends Tag {
             }
         }
 
-        return "";
+        return null;
     }
 }

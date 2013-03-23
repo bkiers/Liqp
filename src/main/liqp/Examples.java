@@ -1,5 +1,6 @@
 package liqp;
 
+import java.io.File;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
 import liqp.parser.LiquidLexer;
@@ -178,8 +179,8 @@ public class Examples {
             @template = Liquid::Template.parse(text)
             print ">>>" + @template.render({'list' => list}) + "<<<\n"
         */
-        String json = "{\"list\":[{\"a\":3}, {\"a\":1}, {\"a\":2}]}";
-        Template t = Template.parse("list={{list | sort: \"a\"}}");
+        String json = "{\"array\":[11, 22, 33, 44, 55]}";
+       Template t = Template.parse(new File("snippets/test.liquid"));
         System.out.println(t.render(json));
     }
 }

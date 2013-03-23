@@ -72,6 +72,8 @@ tag returns [LNode node]
  | include_tag      {$node = $include_tag.node;}
  | custom_tag       {$node = $custom_tag.node;}
  | custom_tag_block {$node = $custom_tag_block.node;}
+ | break_tag        {$node = $break_tag.node;}
+ | continue_tag     {$node = $continue_tag.node;}
  ;
 
 raw_tag returns [LNode node]
@@ -182,6 +184,15 @@ include_tag returns [LNode node]
       }
     }
  ;
+
+break_tag returns [LNode node]
+ : Break {$node = new AtomNode(Tag.Statement.BREAK);}
+ ;
+
+continue_tag returns [LNode node]
+ : Continue {$node = new AtomNode(Tag.Statement.CONTINUE);}
+ ;
+
 
 custom_tag returns [LNode node]
 @init{List<LNode> expressions = new ArrayList<LNode>();}

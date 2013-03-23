@@ -11,6 +11,16 @@ import java.util.Map;
  */
 public abstract class Tag extends LValue {
 
+    public enum Statement {
+
+        BREAK, CONTINUE;
+
+        @Override
+        public String toString() {
+            return "";
+        }
+    }
+
     /**
      * A map holding all tags.
      */

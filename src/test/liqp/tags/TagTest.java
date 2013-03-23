@@ -46,4 +46,61 @@ public class TagTest {
 
         assertThat(rendered, is("abc abc"));
     }
+
+
+    @Test
+    public void breakTest() throws RecognitionException {
+
+        final String context = "{\"array\":[11,22,33,44,55]}";
+
+        final String markup = "{% for item in array %}" +
+                "{% if item > 35 %}{% break %}{% endif %}" +
+                "{{ item }}" +
+                "{% endfor %}";
+
+        assertThat(Template.parse(markup).render(context), is("112233"));
+    }
+
+    /*
+     * def test_break_with_no_block
+     *   assigns = {'i' => 1}
+     *   markup = '{% break %}'
+     *   expected = ''
+     *
+     *   assert_template_result(expected, markup, assigns)
+     * end
+     */
+    @Test
+    public void breakWithNoBlockTest() throws RecognitionException {
+
+        assertThat(Template.parse("{% break %}").render(), is(""));
+    }
+
+    @Test
+    public void continueTest() throws RecognitionException {
+
+        final String context = "{\"array\":[11,22,33,44,55]}";
+
+        final String markup = "{% for item in array %}" +
+                "{% if item < 35 %}{% continue %}{% endif %}" +
+                "{{ item }}" +
+                "{% endfor %}";
+
+        assertThat(Template.parse(markup).render(context), is("4455"));
+    }
+
+    /*
+     * def test_break_with_no_block
+     *   assigns = {'i' => 1}
+     *   markup = '{% break %}'
+     *   expected = ''
+     *
+     *   assert_template_result(expected, markup, assigns)
+     * end
+     */
+    @Test
+    public void continueWithNoBlockTest() throws RecognitionException {
+
+        assertThat(Template.parse("{% continue %}").render(), is(""));
+    }
 }

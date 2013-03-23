@@ -126,6 +126,8 @@ tag
  | table_tag
  | capture_tag
  | include_tag
+ | break_tag
+ | continue_tag
  ;
 
 custom_tag
@@ -220,6 +222,14 @@ capture_tag
 
 include_tag
  : TagStart Include a=Str (With b=Str)? TagEnd -> ^(INCLUDE $a ^(WITH $b?))
+ ;
+
+break_tag
+ : TagStart Break TagEnd -> Break
+ ;
+
+continue_tag
+ : TagStart Continue TagEnd -> Continue
  ;
 
 output
@@ -319,37 +329,39 @@ WS        : {inTag}?=> (' ' | '\t' | '\r' | '\n')+ {$channel=HIDDEN;};
 Id
  : {inTag}?=> (Letter | '_') (Letter | '_' | '-' | Digit)*
    {
-     if($text.equals("capture"))          $type = CaptureStart;
-     else if($text.equals("endcapture"))  $type = CaptureEnd;
-     else if($text.equals("comment"))     $type = CommentStart;
-     else if($text.equals("endcomment"))  $type = CommentEnd;
-     else if($text.equals("raw"))         $type = RawStart;
-     else if($text.equals("endraw"))      $type = RawEnd;
-     else if($text.equals("if"))          $type = IfStart;
-     else if($text.equals("elsif"))       $type = Elsif;
-     else if($text.equals("endif"))       $type = IfEnd;
-     else if($text.equals("unless"))      $type = UnlessStart;
-     else if($text.equals("endunless"))   $type = UnlessEnd;
-     else if($text.equals("else"))        $type = Else;
-     else if($text.equals("contains"))    $type = Contains;
-     else if($text.equals("case"))        $type = CaseStart;
-     else if($text.equals("endcase"))     $type = CaseEnd;
-     else if($text.equals("when"))        $type = When;
-     else if($text.equals("cycle"))       $type = Cycle;
-     else if($text.equals("for"))         $type = ForStart;
-     else if($text.equals("endfor"))      $type = ForEnd;
-     else if($text.equals("in"))          $type = In;
-     else if($text.equals("and"))         $type = And;
-     else if($text.equals("or"))          $type = Or;
-     else if($text.equals("tablerow"))    $type = TableStart;
-     else if($text.equals("endtablerow")) $type = TableEnd;
-     else if($text.equals("assign"))      $type = Assign;
-     else if($text.equals("true"))        $type = True;
-     else if($text.equals("false"))       $type = False;
-     else if($text.equals("nil"))         $type = Nil;
-     else if($text.equals("include"))     $type = Include;
-     else if($text.equals("with"))        $type = With;
-     else if($text.startsWith("end"))     $type = EndId;
+     if($text.equals("capture"))           $type = CaptureStart;
+     else if($text.equals("endcapture"))   $type = CaptureEnd;
+     else if($text.equals("comment"))      $type = CommentStart;
+     else if($text.equals("endcomment"))   $type = CommentEnd;
+     else if($text.equals("raw"))          $type = RawStart;
+     else if($text.equals("endraw"))       $type = RawEnd;
+     else if($text.equals("if"))           $type = IfStart;
+     else if($text.equals("elsif"))        $type = Elsif;
+     else if($text.equals("endif"))        $type = IfEnd;
+     else if($text.equals("unless"))       $type = UnlessStart;
+     else if($text.equals("endunless"))    $type = UnlessEnd;
+     else if($text.equals("else"))         $type = Else;
+     else if($text.equals("contains"))     $type = Contains;
+     else if($text.equals("case"))         $type = CaseStart;
+     else if($text.equals("endcase"))      $type = CaseEnd;
+     else if($text.equals("when"))         $type = When;
+     else if($text.equals("cycle"))        $type = Cycle;
+     else if($text.equals("for"))          $type = ForStart;
+     else if($text.equals("endfor"))       $type = ForEnd;
+     else if($text.equals("in"))           $type = In;
+     else if($text.equals("and"))          $type = And;
+     else if($text.equals("or"))           $type = Or;
+     else if($text.equals("tablerow"))     $type = TableStart;
+     else if($text.equals("endtablerow"))  $type = TableEnd;
+     else if($text.equals("assign"))       $type = Assign;
+     else if($text.equals("true"))         $type = True;
+     else if($text.equals("false"))        $type = False;
+     else if($text.equals("nil"))          $type = Nil;
+     else if($text.equals("include"))      $type = Include;
+     else if($text.equals("with"))         $type = With;
+     else if($text.startsWith("end"))      $type = EndId;
+     else if($text.equals("break"))        $type = Break;
+     else if($text.startsWith("continue")) $type = Continue;
    }
  ;
 
@@ -398,3 +410,5 @@ fragment With : 'With';
 fragment CaptureStart : 'CaptureStart';
 fragment CaptureEnd : 'CaptureEnd';
 fragment EndId : 'EndId';
+fragment Break : 'Break';
+fragment Continue : 'Continue';

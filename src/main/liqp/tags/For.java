@@ -62,6 +62,10 @@ class For extends Tag {
 
         Object[] array = super.asArray(tokens[2].render(context));
 
+        if(array == null) {
+            return null;
+        }
+
         LNode block = tokens[3];
 
         int length = Math.min(limit, array.length);
@@ -83,7 +87,17 @@ class For extends Tag {
             forLoopMap.put(FIRST, first);
             forLoopMap.put(LAST, last);
 
-            builder.append(super.asString(block.render(context)));
+            Object renderedBlock = block.render(context);
+
+            if(renderedBlock == Statement.BREAK) {
+                break;
+            }
+
+            if(renderedBlock == Statement.CONTINUE) {
+                continue;
+            }
+
+            builder.append(super.asString(renderedBlock));
         }
 
         return builder.toString();
@@ -124,7 +138,17 @@ class For extends Tag {
                 forLoopMap.put(FIRST, first);
                 forLoopMap.put(LAST, last);
 
-                builder.append(super.asString(block.render(context)));
+                Object renderedBlock = block.render(context);
+
+                if(renderedBlock == Statement.BREAK) {
+                    break;
+                }
+
+                if(renderedBlock == Statement.CONTINUE) {
+                    continue;
+                }
+
+                builder.append(super.asString(renderedBlock));
             }
         }
         catch (Exception e) {

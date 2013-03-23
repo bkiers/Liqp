@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import liqp.tags.Tag;
 
 class BlockNode implements LNode {
 
@@ -25,6 +26,10 @@ class BlockNode implements LNode {
         for (LNode node : children) {
 
             Object value = node.render(context);
+
+            if(value == Tag.Statement.BREAK || value == Tag.Statement.CONTINUE) {
+                return value;
+            }
 
             if (value != null) {
 

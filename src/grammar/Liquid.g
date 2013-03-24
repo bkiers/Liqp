@@ -220,7 +220,7 @@ attribute
  ;
 
 table_tag
- : TagStart TableStart Id In Id attribute* TagEnd block TagStart TableEnd TagEnd -> ^(TABLE Id Id block ^(ATTRIBUTES attribute*))
+ : TagStart TableStart Id In lookup attribute* TagEnd block TagStart TableEnd TagEnd -> ^(TABLE Id lookup block ^(ATTRIBUTES attribute*))
  ;
 
 capture_tag

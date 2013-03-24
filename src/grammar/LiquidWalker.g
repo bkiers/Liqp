@@ -168,8 +168,8 @@ table_tag returns [LNode node]
   List<LNode> expressions = new ArrayList<LNode>();
 }
  : ^(TABLE
-      value=Id                {expressions.add(new AtomNode($value.text));}
-      collection=Id           {expressions.add(new AtomNode($collection.text));}
+      Id                      {expressions.add(new AtomNode($Id.text));}
+      lookup                  {expressions.add($lookup.node);}
       block                   {expressions.add($block.node);}
       ^(ATTRIBUTES (attribute {expressions.add($attribute.node);})*)
     )

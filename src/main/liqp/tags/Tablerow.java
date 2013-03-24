@@ -43,8 +43,7 @@ class Tablerow extends Tag {
     public Object render(Map<String, Object> context, LNode... nodes) {
 
         String valueName = super.asString(nodes[0].render(context));
-        String collectionName = super.asString(nodes[1].render(context));
-        Object[] collection = super.asArray(context.get(collectionName));
+        Object[] collection = super.asArray(nodes[1].render(context));
         LNode block = nodes[2];
         Map<String, Integer> attributes = getAttributes(collection, 3, context, nodes);
 
@@ -61,33 +60,40 @@ class Tablerow extends Tag {
 
         int total = Math.min(collection.length, limit);
 
-        for(int i = 0, c = 1, r = 0; i < total; i++, c++) {
+        if(total == 0) {
 
-            context.put(valueName, collection[i]);
+            builder.append("<tr class=\"row1\">\n</tr>\n");
+        }
+        else {
 
-            tablerowloopContext.put(INDEX0, i);
-            tablerowloopContext.put(INDEX, i + 1);
-            tablerowloopContext.put(RINDEX0, total - i - 1);
-            tablerowloopContext.put(RINDEX, total - i);
-            tablerowloopContext.put(FIRST, i == 0);
-            tablerowloopContext.put(LAST, i == total - 1);
-            tablerowloopContext.put(COL0, c - 1);
-            tablerowloopContext.put(COL, c);
-            tablerowloopContext.put(COL_FIRST, c == 1);
-            tablerowloopContext.put(COL_LAST, c == cols);
+            for(int i = 0, c = 1, r = 0; i < total; i++, c++) {
 
-            if(c == 1) {
-                r++;
-                builder.append("<tr class=\"row").append(r).append("\">").append(r == 1 ? "\n" : "");
-            }
+                context.put(valueName, collection[i]);
 
-            builder.append("<td class=\"col").append(c).append("\">");
-            builder.append(super.asString(block.render(context)));
-            builder.append("</td>");
+                tablerowloopContext.put(INDEX0, i);
+                tablerowloopContext.put(INDEX, i + 1);
+                tablerowloopContext.put(RINDEX0, total - i - 1);
+                tablerowloopContext.put(RINDEX, total - i);
+                tablerowloopContext.put(FIRST, i == 0);
+                tablerowloopContext.put(LAST, i == total - 1);
+                tablerowloopContext.put(COL0, c - 1);
+                tablerowloopContext.put(COL, c);
+                tablerowloopContext.put(COL_FIRST, c == 1);
+                tablerowloopContext.put(COL_LAST, c == cols);
 
-            if(c == cols || i == total - 1) {
-                builder.append("</tr>\n");
-                c = 0;
+                if(c == 1) {
+                    r++;
+                    builder.append("<tr class=\"row").append(r).append("\">").append(r == 1 ? "\n" : "");
+                }
+
+                builder.append("<td class=\"col").append(c).append("\">");
+                builder.append(super.asString(block.render(context)));
+                builder.append("</td>");
+
+                if(c == cols || i == total - 1) {
+                    builder.append("</tr>\n");
+                    c = 0;
+                }
             }
         }
 

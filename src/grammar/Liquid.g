@@ -83,7 +83,28 @@ tokens {
 
 @lexer::members {
   private boolean inTag = false;
-  
+  private boolean inRaw = false;
+
+  private boolean openRawEndTagAhead() {
+
+    if(!openTagAhead()) {
+      return false;
+    }
+
+    int indexLA = 3;
+
+    while(Character.isSpaceChar(input.LA(indexLA))) {
+      indexLA++;
+    }
+
+    return input.LA(indexLA) == 'e' &&
+           input.LA(indexLA + 1) == 'n' &&
+           input.LA(indexLA + 2) == 'd' &&
+           input.LA(indexLA + 3) == 'r' &&
+           input.LA(indexLA + 4) == 'a' &&
+           input.LA(indexLA + 5) == 'w';
+  }
+
   private boolean openTagAhead() {
     return input.LA(1) == '{' && (input.LA(2) == '{' || input.LA(2) == '\u0025');
   }
@@ -347,8 +368,8 @@ Id
      else if($text.equals("endcapture"))   $type = CaptureEnd;
      else if($text.equals("comment"))      $type = CommentStart;
      else if($text.equals("endcomment"))   $type = CommentEnd;
-     else if($text.equals("raw"))          $type = RawStart;
-     else if($text.equals("endraw"))       $type = RawEnd;
+     else if($text.equals("raw"))        { $type = RawStart; inRaw = true; }
+     else if($text.equals("endraw"))     { $type = RawEnd; inRaw = false; }
      else if($text.equals("if"))           $type = IfStart;
      else if($text.equals("elsif"))        $type = Elsif;
      else if($text.equals("endif"))        $type = IfEnd;
@@ -381,6 +402,7 @@ Id
 
 Other
  : ({!inTag && !openTagAhead()}?=> . )+
+ | ({!inTag && inRaw && !openRawEndTagAhead()}?=> . )+
  ;
 
 NoSpace

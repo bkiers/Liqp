@@ -9,6 +9,7 @@ class For extends Tag {
 
     private static final String OFFSET = "offset";
     private static final String LIMIT = "limit";
+    private static final String CONTINUE = "continue";
 
     /*
      * forloop.length      # => length of the entire for loop
@@ -86,7 +87,11 @@ class For extends Tag {
 
         Map<String, Object> forLoopMap = (Map<String, Object>)context.get(FORLOOP);
 
+        int continueIndex = offset;
+
         for (int i = offset, n = 0; n < limit && i < array.length; i++, n++) {
+
+            continueIndex = i;
 
             boolean first = (i == offset);
             boolean last = ((n == limit - 1) || (i == array.length - 1));
@@ -114,6 +119,8 @@ class For extends Tag {
             builder.append(super.asString(renderedBlock));
         }
 
+        context.put(CONTINUE, continueIndex + 1);
+
         return builder.toString();
     }
 
@@ -137,7 +144,11 @@ class For extends Tag {
 
             Map<String, Object> forLoopMap = (Map<String, Object>)context.get(FORLOOP);
 
+            int continueIndex = from + offset;
+
             for (int i = from + offset, n = 0; i <= to && n < limit; i++, n++) {
+
+                continueIndex = i;
 
                 boolean first = (i == (from + offset));
                 boolean last = ((i == to) || (n == limit - 1));
@@ -164,6 +175,8 @@ class For extends Tag {
 
                 builder.append(super.asString(renderedBlock));
             }
+
+            context.put(CONTINUE, continueIndex + 1);
         }
         catch (Exception e) {
             /* just ignore incorrect expressions */

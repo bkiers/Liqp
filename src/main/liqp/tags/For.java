@@ -1,5 +1,7 @@
 package liqp.tags;
 
+import java.util.List;
+import liqp.nodes.BlockNode;
 import liqp.nodes.LNode;
 
 import java.util.HashMap;
@@ -106,17 +108,53 @@ class For extends Tag {
             forLoopMap.put(FIRST, first);
             forLoopMap.put(LAST, last);
 
-            Object renderedBlock = block.render(context);
+//            Object renderedBlock = block.render(context);
+//
+//            if(renderedBlock == Statement.BREAK) {
+//                break;
+//            }
+//
+//            if(renderedBlock == Statement.CONTINUE) {
+//                continue;
+//            }
+//
+//            builder.append(super.asString(renderedBlock));
 
-            if(renderedBlock == Statement.BREAK) {
+            List<LNode> children = ((BlockNode)block).getChildren();
+            boolean isBreak = false;
+
+            for (LNode node : children) {
+
+                Object value = node.render(context);
+
+                if(value == Tag.Statement.CONTINUE) {
+                    // break from this inner loop: equals continue outer loop!
+                    break;
+                }
+
+                if(value == Tag.Statement.BREAK) {
+                    // break from inner loop
+                    isBreak = true;
+                    break;
+                }
+
+                if (value != null && value.getClass().isArray()) {
+
+                    Object[] arr = (Object[]) value;
+
+                    for (Object obj : arr) {
+                        builder.append(String.valueOf(obj));
+                    }
+                }
+                else {
+                    builder.append(super.asString(value));
+                }
+            }
+
+            if(isBreak) {
+                // break from outer loop
                 break;
             }
-
-            if(renderedBlock == Statement.CONTINUE) {
-                continue;
-            }
-
-            builder.append(super.asString(renderedBlock));
         }
 
         context.put(CONTINUE, continueIndex + 1);
@@ -163,17 +201,41 @@ class For extends Tag {
                 forLoopMap.put(FIRST, first);
                 forLoopMap.put(LAST, last);
 
-                Object renderedBlock = block.render(context);
+                List<LNode> children = ((BlockNode)block).getChildren();
+                boolean isBreak = false;
 
-                if(renderedBlock == Statement.BREAK) {
+                for (LNode node : children) {
+
+                    Object value = node.render(context);
+
+                    if(value == Tag.Statement.CONTINUE) {
+                        // break from this inner loop: equals continue outer loop!
+                        break;
+                    }
+
+                    if(value == Tag.Statement.BREAK) {
+                        // break from inner loop
+                        isBreak = true;
+                        break;
+                    }
+
+                    if (value != null && value.getClass().isArray()) {
+
+                        Object[] arr = (Object[]) value;
+
+                        for (Object obj : arr) {
+                            builder.append(String.valueOf(obj));
+                        }
+                    }
+                    else {
+                        builder.append(super.asString(value));
+                    }
+                }
+
+                if(isBreak) {
+                    // break from outer loop
                     break;
                 }
-
-                if(renderedBlock == Statement.CONTINUE) {
-                    continue;
-                }
-
-                builder.append(super.asString(renderedBlock));
             }
 
             context.put(CONTINUE, continueIndex + 1);

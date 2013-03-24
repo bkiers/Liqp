@@ -177,7 +177,8 @@ public class Template {
 
         try {
             LNode node = walker.walk();
-            return String.valueOf(node.render(context));
+            Object rendered = node.render(context);
+            return rendered == null ? "" : String.valueOf(rendered);
         }
         catch (Exception e) {
             throw new RuntimeException(e);

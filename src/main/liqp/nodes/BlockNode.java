@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import liqp.tags.Tag;
 
-class BlockNode implements LNode {
+public class BlockNode implements LNode {
 
     private List<LNode> children;
 
@@ -18,6 +18,10 @@ class BlockNode implements LNode {
         children.add(node);
     }
 
+    public List<LNode> getChildren() {
+        return new ArrayList<LNode>(children);
+    }
+
     @Override
     public Object render(Map<String, Object> context) {
 
@@ -27,23 +31,24 @@ class BlockNode implements LNode {
 
             Object value = node.render(context);
 
+            if(value == null) {
+                continue;
+            }
+
             if(value == Tag.Statement.BREAK || value == Tag.Statement.CONTINUE) {
                 return value;
             }
 
-            if (value != null) {
+            else if (value.getClass().isArray()) {
 
-                if (value.getClass().isArray()) {
+                Object[] array = (Object[]) value;
 
-                    Object[] array = (Object[]) value;
-
-                    for (Object obj : array) {
-                        builder.append(String.valueOf(obj));
-                    }
+                for (Object obj : array) {
+                    builder.append(String.valueOf(obj));
                 }
-                else {
-                    builder.append(String.valueOf(value));
-                }
+            }
+            else {
+                builder.append(String.valueOf(value));
             }
         }
 

@@ -50,23 +50,37 @@ class For extends Tag {
         return rendered;
     }
 
+    /*
+        for_array returns [LNode node]
+        @init{
+          List<LNode> expressions = new ArrayList<LNode>();
+          expressions.add(new AtomNode(true));
+        }
+         : ^(FOR_ARRAY Id lookup      {expressions.add(new AtomNode($Id.text)); expressions.add($lookup.node);}
+              for_block               {expressions.add($for_block.node1); expressions.add($for_block.node2);}
+              ^(ATTRIBUTES (attribute {expressions.add($attribute.node);})*)
+            )
+            {$node = new TagNode("for", expressions.toArray(new LNode[expressions.size()]));}
+         ;
+    */
     private Object renderArray(String id, Map<String, Object> context, LNode... tokens) {
 
         StringBuilder builder = new StringBuilder();
 
-        // attributes start from index 4
-        Map<String, Integer> attributes = getAttributes(4, context, tokens);
+        // attributes start from index 5
+        Map<String, Integer> attributes = getAttributes(5, context, tokens);
 
         int offset = attributes.get(OFFSET);
         int limit = attributes.get(LIMIT);
 
         Object[] array = super.asArray(tokens[2].render(context));
 
-        if(array == null) {
-            return null;
-        }
-
         LNode block = tokens[3];
+        LNode blockIfEmptyOrNull = tokens[4];
+
+        if(array == null || array.length == 0) {
+            return blockIfEmptyOrNull == null ? null : blockIfEmptyOrNull.render(context);
+        }
 
         int length = Math.min(limit, array.length);
 

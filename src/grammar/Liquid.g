@@ -44,6 +44,7 @@ tokens {
   FILTERS;
   FILTER;
   FOR_ARRAY;
+  FOR_BLOCK;
   FOR_RANGE;
   GROUP;
   HASH;
@@ -196,20 +197,28 @@ for_tag
  | for_range    
  ;
 
-// attributes must be 'limit' or 'offset'!
 for_array
- : TagStart ForStart Id In lookup attribute* TagEnd block TagStart ForEnd TagEnd -> ^(FOR_ARRAY Id lookup block ^(ATTRIBUTES attribute*))
+ : TagStart ForStart Id In lookup attribute* TagEnd
+   for_block
+   TagStart ForEnd TagEnd
+   -> ^(FOR_ARRAY Id lookup for_block ^(ATTRIBUTES attribute*))
  ;
 
 for_range
- : TagStart ForStart Id In OPar expr DotDot expr CPar attribute* TagEnd block TagStart ForEnd TagEnd -> ^(FOR_RANGE Id expr expr block ^(ATTRIBUTES attribute*))
+ : TagStart ForStart Id In OPar expr DotDot expr CPar attribute* TagEnd
+   block
+   TagStart ForEnd TagEnd
+   -> ^(FOR_RANGE Id expr expr block ^(ATTRIBUTES attribute*))
+ ;
+
+for_block
+ : a=block (TagStart Else TagEnd b=block)? -> ^(FOR_BLOCK block block?)
  ;
 
 attribute
  : Id Col expr -> ^(Id expr)
  ;
 
-// attributes must be 'limit' or 'cols'!
 table_tag
  : TagStart TableStart Id In Id attribute* TagEnd block TagStart TableEnd TagEnd -> ^(TABLE Id Id block ^(ATTRIBUTES attribute*))
  ;

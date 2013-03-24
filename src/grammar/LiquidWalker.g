@@ -127,14 +127,13 @@ for_tag returns [LNode node]
  | for_range {$node = $for_range.node;}
  ;
 
-// attributes must be 'limit' or 'offset'!
 for_array returns [LNode node]
 @init{
   List<LNode> expressions = new ArrayList<LNode>();
   expressions.add(new AtomNode(true));
 }
  : ^(FOR_ARRAY Id lookup      {expressions.add(new AtomNode($Id.text)); expressions.add($lookup.node);}
-      block                   {expressions.add($block.node);}
+      for_block               {expressions.add($for_block.node1); expressions.add($for_block.node2);}
       ^(ATTRIBUTES (attribute {expressions.add($attribute.node);})*)
     )
     {$node = new TagNode("for", expressions.toArray(new LNode[expressions.size()]));}
@@ -152,11 +151,18 @@ for_range returns [LNode node]
     {$node = new TagNode("for", expressions.toArray(new LNode[expressions.size()]));}
  ;
 
+for_block returns [LNode node1, LNode node2]
+ : ^(FOR_BLOCK n1=block n2=block?)
+    {
+      $node1 = $n1.node;
+      $node2 = $n2.node;
+    }
+ ;
+
 attribute returns [LNode node]
  : ^(Id expr) {$node = new AttributeNode(new AtomNode($Id.text), $expr.node);}
  ;
 
-// attributes must be 'limit' or 'cols'!
 table_tag returns [LNode node]
 @init{
   List<LNode> expressions = new ArrayList<LNode>();

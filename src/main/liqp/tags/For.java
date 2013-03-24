@@ -30,6 +30,7 @@ class For extends Tag {
     private static final String RINDEX0 = "rindex0";
     private static final String FIRST = "first";
     private static final String LAST = "last";
+    private static final String NAME = "name";
 
     /*
      * For loop
@@ -53,19 +54,6 @@ class For extends Tag {
         return rendered;
     }
 
-    /*
-        for_array returns [LNode node]
-        @init{
-          List<LNode> expressions = new ArrayList<LNode>();
-          expressions.add(new AtomNode(true));
-        }
-         : ^(FOR_ARRAY Id lookup      {expressions.add(new AtomNode($Id.text)); expressions.add($lookup.node);}
-              for_block               {expressions.add($for_block.node1); expressions.add($for_block.node2);}
-              ^(ATTRIBUTES (attribute {expressions.add($attribute.node);})*)
-            )
-            {$node = new TagNode("for", expressions.toArray(new LNode[expressions.size()]));}
-         ;
-    */
     private Object renderArray(String id, Map<String, Object> context, LNode... tokens) {
 
         StringBuilder builder = new StringBuilder();
@@ -89,6 +77,8 @@ class For extends Tag {
 
         Map<String, Object> forLoopMap = (Map<String, Object>)context.get(FORLOOP);
 
+        forLoopMap.put(NAME, id + "-" + tokens[2].toString());
+
         int continueIndex = offset;
 
         for (int i = offset, n = 0; n < limit && i < array.length; i++, n++) {
@@ -107,18 +97,6 @@ class For extends Tag {
             forLoopMap.put(RINDEX0, length - n - 1);
             forLoopMap.put(FIRST, first);
             forLoopMap.put(LAST, last);
-
-//            Object renderedBlock = block.render(context);
-//
-//            if(renderedBlock == Statement.BREAK) {
-//                break;
-//            }
-//
-//            if(renderedBlock == Statement.CONTINUE) {
-//                continue;
-//            }
-//
-//            builder.append(super.asString(renderedBlock));
 
             List<LNode> children = ((BlockNode)block).getChildren();
             boolean isBreak = false;
@@ -208,6 +186,10 @@ class For extends Tag {
 
                     Object value = node.render(context);
 
+                    if(value == null) {
+                        continue;
+                    }
+
                     if(value == Tag.Statement.CONTINUE) {
                         // break from this inner loop: equals continue outer loop!
                         break;
@@ -219,9 +201,9 @@ class For extends Tag {
                         break;
                     }
 
-                    if (value != null && value.getClass().isArray()) {
+                    if(super.isArray(value)) {
 
-                        Object[] arr = (Object[]) value;
+                        Object[] arr = super.asArray(value);
 
                         for (Object obj : arr) {
                             builder.append(String.valueOf(obj));

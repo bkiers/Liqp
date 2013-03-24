@@ -90,9 +90,9 @@ public class TagTest {
     }
 
     /*
-     * def test_break_with_no_block
+     * def test_continue_with_no_block
      *   assigns = {'i' => 1}
-     *   markup = '{% break %}'
+     *   markup = '{% continue %}'
      *   expected = ''
      *
      *   assert_template_result(expected, markup, assigns)

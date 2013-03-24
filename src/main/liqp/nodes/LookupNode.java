@@ -103,11 +103,18 @@ class LookupNode implements LNode {
                 return null;
             }
         }
+
+        @Override
+        public String toString() {
+
+            return String.format(".%s", hash);
+        }
     }
 
     public static class Index implements Indexable {
 
         private final LNode expression;
+        private Object key = null;
 
         public Index(LNode expression) {
             this.expression = expression;
@@ -120,7 +127,7 @@ class LookupNode implements LNode {
                 return null;
             }
 
-            Object key = expression.render(context);
+            key = expression.render(context);
 
             if(key instanceof Number) {
                 int index = ((Number)key).intValue();
@@ -146,5 +153,25 @@ class LookupNode implements LNode {
                 return new Hash(hash).get(value, context);
             }
         }
+
+        @Override
+        public String toString() {
+
+            return String.format("[%s]", key);
+        }
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(id);
+
+        for(Indexable index : this.indexes) {
+            builder.append(index.toString());
+        }
+
+        return builder.toString();
     }
 }

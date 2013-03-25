@@ -198,7 +198,7 @@ unless_tag
  ;
 
 case_tag
- : TagStart CaseStart expr TagEnd when_tag+ else_tag? TagStart CaseEnd TagEnd -> ^(CASE expr when_tag+ ^(ELSE else_tag?))
+ : TagStart CaseStart expr TagEnd Other? when_tag+ else_tag? TagStart CaseEnd TagEnd -> ^(CASE expr when_tag+ ^(ELSE else_tag?))
  ;
 
 when_tag

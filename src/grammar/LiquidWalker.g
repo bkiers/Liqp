@@ -253,6 +253,7 @@ lookup returns [LookupNode node]
       Id      {$node = new LookupNode($Id.text);}
       ( index {$node.add($index.indexable);}
       )*
+      QMark?
     )
  ;
 

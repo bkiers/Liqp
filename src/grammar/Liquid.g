@@ -314,9 +314,9 @@ term
  ;
 
 lookup
- : id index*   -> ^(LOOKUP id index*)
- | OBr Str CBr -> ^(LOOKUP Id[$Str.text])
- | OBr Id CBr  -> ^(LOOKUP Id["@" + $Id.text])
+ : id index* QMark?   -> ^(LOOKUP id index* QMark?)
+ | OBr Str CBr QMark? -> ^(LOOKUP Id[$Str.text] QMark?)
+ | OBr Id CBr QMark?  -> ^(LOOKUP Id["@" + $Id.text] QMark?)
  ;
 
 id
@@ -354,6 +354,7 @@ OPar      : {inTag}?=> '(';
 CPar      : {inTag}?=> ')';
 OBr       : {inTag}?=> '[';
 CBr       : {inTag}?=> ']';
+QMark     : {inTag}?=> '?';
 
 DoubleNum : {inTag}?=> '-'? Digit+ ( {input.LA(1) == '.' && input.LA(2) != '.'}?=> '.' Digit*
                                    | {$type = LongNum;}

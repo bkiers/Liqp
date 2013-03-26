@@ -124,4 +124,47 @@ public class AssignTest {
                         .render("{\"var\" : {\"a:b c\" : {\"paged\" : \"1\" }}}"),
                 is("var2: 1"));
     }
+
+    /*
+     * def test_assign
+     *   assert_equal 'variable', Liquid::Template.parse( '{% assign a = "variable"%}{{a}}'  ).render
+     * end
+     */
+    @Test
+    public void assign2Test() throws Exception {
+
+        assertThat(
+                Template.parse("{% assign a = \"variable\"%}{{a}}")
+                        .render(),
+                is("variable"));
+    }
+
+    /*
+     * def test_assign_an_empty_string
+     *   assert_equal '', Liquid::Template.parse( '{% assign a = ""%}{{a}}'  ).render
+     * end
+     */
+    @Test
+    public void assign_an_empty_stringTest() throws Exception {
+
+        assertThat(
+                Template.parse("{% assign a = \"\"%}{{a}}")
+                        .render(),
+                is(""));
+    }
+
+    /*
+     * def test_assign_is_global
+     *   assert_equal 'variable',
+     *                Liquid::Template.parse( '{%for i in (1..2) %}{% assign a = "variable"%}{% endfor %}{{a}}'  ).render
+     * end
+     */
+    @Test
+    public void assign_is_globalTest() throws Exception {
+
+        assertThat(
+                Template.parse("{%for i in (1..2) %}{% assign a = \"variable\"%}{% endfor %}{{a}}")
+                        .render(),
+                is("variable"));
+    }
 }

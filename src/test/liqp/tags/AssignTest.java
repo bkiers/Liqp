@@ -78,4 +78,50 @@ public class AssignTest {
 
         assertThat(Template.parse("{% assign oh-my = 'godz' %}{{ oh-my }}").render(), is("godz"));
     }
+
+    /*
+     * def test_assign
+     *   assigns = {'var' => 'content' }
+     *   assert_template_result('var2:  var2:content', 'var2:{{var2}} {%assign var2 = var%} var2:{{var2}}', assigns)
+     *
+     * end
+     */
+    @Test
+    public void assignTest() throws Exception {
+
+        assertThat(
+                Template.parse("var2:{{var2}} {%assign var2 = var%} var2:{{var2}}")
+                        .render(" { \"var\" : \"content\" } "),
+                is("var2:  var2:content"));
+    }
+
+    /* def test_hyphenated_assign
+     *   assigns = {'a-b' => '1' }
+     *   assert_template_result('a-b:1 a-b:2', 'a-b:{{a-b}} {%assign a-b = 2 %}a-b:{{a-b}}', assigns)
+     *
+     * end
+     */
+    @Test
+    public void hyphenated_assignTest() throws Exception {
+
+        assertThat(
+                Template.parse("a-b:{{a-b}} {%assign a-b = 2 %}a-b:{{a-b}}")
+                        .render(" { \"a-b\" : \"1\" } "),
+                is("a-b:1 a-b:2"));
+    }
+
+    /*
+     * def test_assign_with_colon_and_spaces
+     *   assigns = {'var' => {'a:b c' => {'paged' => '1' }}}
+     *   assert_template_result('var2: 1', '{%assign var2 = var["a:b c"].paged %}var2: {{var2}}', assigns)
+     * end
+     */
+    @Test
+    public void assign_with_colon_and_spacesTest() throws Exception {
+
+        assertThat(
+                Template.parse("{%assign var2 = var[\"a:b c\"].paged %}var2: {{var2}}")
+                        .render("{\"var\" : {\"a:b c\" : {\"paged\" : \"1\" }}}"),
+                is("var2: 1"));
+    }
 }

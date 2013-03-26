@@ -298,4 +298,26 @@ public class CaseTest {
         assertThat(Template.parse(code).render("{ \"condition\" : null }"), is(" its 1 or 2 or 3 "));
         assertThat(Template.parse(code).render("{ \"condition\" : \"something else\" }"), is(""));
     }
+
+    /*
+     * def test_case_detects_bad_syntax
+     *   assert_raise(SyntaxError) do
+     *     assert_template_result('',  '{% case false %}{% when %}true{% endcase %}', {})
+     *   end
+     *
+     *   assert_raise(SyntaxError) do
+     *     assert_template_result('',  '{% case false %}{% huh %}true{% endcase %}', {})
+     *   end
+     *
+     * end
+     */
+    @Test(expected=RuntimeException.class)
+    public void case_detects_bad_syntax1Test() throws Exception {
+        Template.parse("{% case false %}{% when %}true{% endcase %}");
+    }
+
+    @Test(expected=RuntimeException.class)
+    public void case_detects_bad_syntax2Test() throws Exception {
+        Template.parse("{% case false %}{% huh %}true{% endcase %}");
+    }
 }

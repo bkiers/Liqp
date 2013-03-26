@@ -98,4 +98,38 @@ public class CaptureTest {
 
         assertThat(Template.parse(source).render().replaceAll("\\s", ""), is("3-3"));
     }
+
+    /*
+     * def test_capture
+     *   assigns = {'var' => 'content' }
+     *   assert_template_result('content foo content foo ',
+     *                          '{{ var2 }}{% capture var2 %}{{ var }} foo {% endcapture %}{{ var2 }}{{ var2 }}',
+     *                          assigns)
+     * end
+     */
+    @Test
+    public void captureTest() throws Exception {
+
+        String assigns = "{ \"var\" : \"content\" }";
+
+        assertThat(
+                Template.parse("{{ var2 }}{% capture var2 %}{{ var }} foo {% endcapture %}{{ var2 }}{{ var2 }}")
+                        .render(assigns),
+                is("content foo content foo "));
+    }
+
+    /*
+     * def test_capture_detects_bad_syntax
+     *   assert_raise(SyntaxError) do
+     *     assert_template_result('content foo content foo ',
+     *                            '{{ var2 }}{% capture %}{{ var }} foo {% endcapture %}{{ var2 }}{{ var2 }}',
+     *                            {'var' => 'content' })
+     *   end
+     * end
+     */
+    @Test(expected=RuntimeException.class)
+    public void capture_detects_bad_syntaxTest() throws Exception {
+
+        Template.parse("{{ var2 }}{% capture %}{{ var }} foo {% endcapture %}{{ var2 }}{{ var2 }}");
+    }
 }

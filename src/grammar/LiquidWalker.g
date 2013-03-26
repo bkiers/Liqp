@@ -109,7 +109,7 @@ case_tag returns [LNode node]
  ;
 
 when_tag[List<LNode> nodes]
- : ^(WHEN expr block) {nodes.add($expr.node); nodes.add($block.node);}
+ : ^(WHEN (expr {nodes.add($expr.node);})+ block) {nodes.add($block.node);}
  ;
 
 cycle_tag returns [LNode node]

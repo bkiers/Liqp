@@ -202,7 +202,7 @@ case_tag
  ;
 
 when_tag
- : TagStart When expr TagEnd block -> ^(WHEN expr block)
+ : TagStart When term (Or term)* TagEnd block -> ^(WHEN term+ block)
  ;
 
 cycle_tag

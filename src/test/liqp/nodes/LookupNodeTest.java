@@ -261,4 +261,33 @@ public class LookupNodeTest {
         assertThat(getNode("product.variants.first.title", "expr").render(context), is((Object)"draft151cm"));
         assertThat(getNode("product.variants.last.title", "expr").render(context), is((Object)"element151cm"));
     }
+
+    /*
+     * def test_size_of_array
+     *   assigns = {"array" => [1,2,3,4]}
+     *   assert_template_result('array has 4 elements', "array has {{ array.size }} elements", assigns)
+     * end
+     */
+    @Test
+    public void size_of_arrayTest() throws Exception {
+
+        String assigns = "{ \"array\" : [1,2,3,4] }";
+
+        assertThat(Template.parse("array has {{ array.size }} elements").render(assigns), is("array has 4 elements"));
+    }
+
+    /*
+     * def test_size_of_hash
+     *   assigns = {"hash" => {:a => 1, :b => 2, :c=> 3, :d => 4}}
+     *   assert_template_result('hash has 4 elements', "hash has {{ hash.size }} elements", assigns)
+     * end
+     */
+    @Test
+    public void size_of_hashTest() throws Exception {
+
+        String assigns = "{ \"hash\" : { \"a\" : 1, \"b\" : 2, \"c\" : 3, \"d\" : 4 } }";
+
+        assertThat(Template.parse("hash has {{ hash.size }} elements").render(assigns), is("hash has 4 elements"));
+    }
 }
+

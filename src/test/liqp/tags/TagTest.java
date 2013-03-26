@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class TagTest {
@@ -102,5 +103,35 @@ public class TagTest {
     public void continueWithNoBlockTest() throws RecognitionException {
 
         assertThat(Template.parse("{% continue %}").render(), is(""));
+    }
+
+    /*
+     * def test_no_transform
+     *   assert_template_result('this text should come out of the template without change...',
+     *                          'this text should come out of the template without change...')
+     *
+     *   assert_template_result('blah','blah')
+     *   assert_template_result('<blah>','<blah>')
+     *   assert_template_result('|,.:','|,.:')
+     *   assert_template_result('','')
+     *
+     *   text = %|this shouldnt see any transformation either but has multiple lines
+     *             as you can clearly see here ...|
+     *   assert_template_result(text,text)
+     * end
+     */
+    @Test
+    public void no_transformTest() throws RecognitionException {
+
+        assertThat(Template.parse("this text should come out of the template without change...").render(),
+                is("this text should come out of the template without change..."));
+
+        assertThat(Template.parse("blah").render(), is("blah"));
+        assertThat(Template.parse("<blah>").render(), is("<blah>"));
+        assertThat(Template.parse("|,.:").render(), is("|,.:"));
+        assertThat(Template.parse("").render(), is(""));
+
+        String text = "this shouldnt see any transformation either but has multiple lines\n as you can clearly see here ...";
+        assertThat(Template.parse(text).render(), is(text));
     }
 }

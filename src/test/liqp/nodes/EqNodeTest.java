@@ -27,4 +27,21 @@ public class EqNodeTest {
             assertThat(rendered, is(test[1]));
         }
     }
+
+    /*
+     * def test_illegal_symbols
+     *   assert_template_result('', '{% if true == empty %}?{% endif %}', {})
+     *   assert_template_result('', '{% if true == null %}?{% endif %}', {})
+     *   assert_template_result('', '{% if empty == true %}?{% endif %}', {})
+     *   assert_template_result('', '{% if null == true %}?{% endif %}', {})
+     * end
+     */
+    @Test
+    public void illegal_symbolsTest() throws Exception {
+
+        assertThat(Template.parse("{% if true == empty %}?{% endif %}").render(), is(""));
+        assertThat(Template.parse("{% if true == null %}?{% endif %}").render(), is(""));
+        assertThat(Template.parse("{% if empty == true %}?{% endif %}").render(), is(""));
+        assertThat(Template.parse("{% if null == true %}?{% endif %}").render(), is(""));
+    }
 }

@@ -393,6 +393,7 @@ Id
      else if($text.equals("true"))         $type = True;
      else if($text.equals("false"))        $type = False;
      else if($text.equals("nil"))          $type = Nil;
+     else if($text.equals("null"))         $type = Nil;
      else if($text.equals("include"))      $type = Include;
      else if($text.equals("with"))         $type = With;
      else if($text.startsWith("end"))      $type = EndId;

@@ -246,6 +246,7 @@ expr returns [LNode node]
  | Nil                       {$node = new AtomNode(null);}
  | NO_SPACE                  {$node = new AtomNode($NO_SPACE.text);}
  | lookup                    {$node = $lookup.node;}
+ | Empty                     {$node = AtomNode.EMPTY;}
  ;
 
 lookup returns [LookupNode node]

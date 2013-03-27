@@ -311,6 +311,7 @@ term
  | Nil
  | NoSpace+ -> NO_SPACE[$text]
  | lookup
+ | Empty
  ;
 
 lookup
@@ -324,8 +325,13 @@ id
  | Continue -> Id[$Continue.text]
  ;
 
+id2
+ : id
+ | Empty -> Id[$Empty.text]
+ ;
+
 index
- : Dot Id       -> ^(HASH Id)
+ : Dot id2      -> ^(HASH id2)
  | OBr expr CBr -> ^(INDEX expr)
  ;
 
@@ -399,6 +405,7 @@ Id
      else if($text.startsWith("end"))      $type = EndId;
      else if($text.equals("break"))        $type = Break;
      else if($text.startsWith("continue")) $type = Continue;
+     else if($text.startsWith("empty"))    $type = Empty;
    }
  ;
 
@@ -450,3 +457,4 @@ fragment CaptureEnd : 'CaptureEnd';
 fragment EndId : 'EndId';
 fragment Break : 'Break';
 fragment Continue : 'Continue';
+fragment Empty : 'Empty';

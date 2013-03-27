@@ -2,12 +2,18 @@ package liqp.nodes;
 
 import java.util.Map;
 
-class AtomNode implements LNode {
+public class AtomNode implements LNode {
+
+    public static final AtomNode EMPTY = new AtomNode(new Object());
 
     private Object value;
 
     public AtomNode(Object value) {
         this.value = value;
+    }
+
+    public static boolean isEmpty(Object o) {
+        return o == EMPTY.value;
     }
 
     @Override

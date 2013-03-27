@@ -1,6 +1,8 @@
 package liqp;
 
+import java.util.Collection;
 import java.util.List;
+import liqp.nodes.AtomNode;
 
 /**
  * An abstract class the Filter and Tag classes extend.
@@ -32,6 +34,8 @@ public abstract class LValue {
             return false;
         }
 
+        // TODO refactor the instance-ofs below
+
         if (a instanceof Number && b instanceof Number) {
 
             double delta = ((Number) a).doubleValue() - ((Number) b).doubleValue();
@@ -39,6 +43,30 @@ public abstract class LValue {
             // To account for floating point rounding errors, return true if
             // the difference between double a and double b is very small.
             return Math.abs(delta) < 0.00000000001;
+        }
+
+        if (AtomNode.isEmpty(a) && (b instanceof CharSequence)) {
+            return ((CharSequence)b).length() == 0;
+        }
+
+        if (AtomNode.isEmpty(b) && (a instanceof CharSequence)) {
+            return ((CharSequence)a).length() == 0;
+        }
+
+        if (AtomNode.isEmpty(a) && (b instanceof Collection)) {
+            return ((Collection)b).size() == 0;
+        }
+
+        if (AtomNode.isEmpty(b) && (a instanceof Collection)) {
+            return ((Collection)a).size() == 0;
+        }
+
+        if (AtomNode.isEmpty(a) && (b.getClass().isArray())) {
+            return ((Object[])b).length == 0;
+        }
+
+        if (AtomNode.isEmpty(b) && (a.getClass().isArray())) {
+            return ((Object[])a).length == 0;
         }
 
         return a.equals(b);

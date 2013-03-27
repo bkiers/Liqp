@@ -309,9 +309,10 @@ term
  | True
  | False
  | Nil
- | NoSpace+ -> NO_SPACE[$text]
+ | NoSpace+       -> NO_SPACE[$text]
  | lookup
  | Empty
+ | OPar expr CPar -> expr
  ;
 
 lookup

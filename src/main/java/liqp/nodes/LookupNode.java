@@ -1,5 +1,7 @@
 package liqp.nodes;
 
+import liqp.Drop;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -63,7 +65,11 @@ class LookupNode implements LNode {
                 return null;
             }
 
-            if(hash.equals("size")) {
+            if(value instanceof Drop) {
+                Drop drop = (Drop)value;
+                return drop.invoke_drop(hash);
+            }
+            else if(hash.equals("size")) {
                 if(value instanceof Collection) {
                     return ((Collection)value).size();
                 }
@@ -128,6 +134,8 @@ class LookupNode implements LNode {
             }
 
             key = expression.render(context);
+
+            // TODO account for Drops here?
 
             if(key instanceof Number) {
                 int index = ((Number)key).intValue();

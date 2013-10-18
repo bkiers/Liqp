@@ -179,8 +179,5 @@ public class Examples {
             @template = Liquid::Template.parse(text)
             print ">>>" + @template.render({'list' => list}) + "<<<\n"
         */
-        String json = "{\"array\":[11, 22, 33, 44, 55]}";
-       Template t = Template.parse(new File("snippets/test.liquid"));
-        System.out.println(t.render(json));
     }
 }

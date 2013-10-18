@@ -22,7 +22,7 @@ public abstract class LValue {
      *         the second object to compare.
      *
      * @return true iff a and b are equals, where (int) 1 is
-     *         equals to (double) 1.0
+     *         equal to (double) 1.0
      */
     public static boolean areEqual(Object a, Object b) {
 
@@ -74,7 +74,7 @@ public abstract class LValue {
 
     /**
      * Returns this value as an array. If a value is already an array,
-     * it is casted to a `Object[]`, if it's a `java.util.List`, it is
+     * it is cast to a `Object[]`, if it's a `java.util.List`, it is
      * converted to an array and in all other cases, `value` is simply
      * returned as an `Object[]` with a single value in it.
      *

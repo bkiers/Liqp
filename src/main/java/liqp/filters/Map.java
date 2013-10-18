@@ -13,6 +13,8 @@ class Map extends Filter {
     @Override
     public Object apply(Object value, Object... params) {
 
+        // TODO account for Drops
+
         if (value == null) {
             return "";
         }

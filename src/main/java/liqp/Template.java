@@ -44,7 +44,7 @@ public class Template {
         LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
 
         try {
-            root = (CommonTree) parser.parse().getTree();
+            root = parser.parse().getTree();
         }
         catch (RecognitionException e) {
             throw new RuntimeException("could not parse input: " + input, e);
@@ -62,7 +62,7 @@ public class Template {
         try {
             LiquidLexer lexer = new LiquidLexer(new ANTLRFileStream(file.getAbsolutePath()));
             LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
-            root = (CommonTree) parser.parse().getTree();
+            root = parser.parse().getTree();
         }
         catch (RecognitionException e) {
             throw new RuntimeException("could not parse input from " + file, e);
@@ -142,7 +142,7 @@ public class Template {
      */
     public String render(Object... context) {
 
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
 
         for (int i = 0; i < context.length - 1; i++) {
 
@@ -216,10 +216,10 @@ public class Template {
     @SuppressWarnings("unchecked")
     private void walk(CommonTree tree, StringBuilder builder) {
 
-        List<CommonTree> firstStack = new ArrayList<CommonTree>();
+        List<CommonTree> firstStack = new ArrayList<>();
         firstStack.add(tree);
 
-        List<List<CommonTree>> childListStack = new ArrayList<List<CommonTree>>();
+        List<List<CommonTree>> childListStack = new ArrayList<>();
         childListStack.add(firstStack);
 
         while (!childListStack.isEmpty()) {
@@ -248,7 +248,7 @@ public class Template {
                         .append("\n");
 
                 if (tree.getChildCount() > 0) {
-                    childListStack.add(new ArrayList<CommonTree>((List<CommonTree>) tree.getChildren()));
+                    childListStack.add(new ArrayList<>((List<CommonTree>) tree.getChildren()));
                 }
             }
         }

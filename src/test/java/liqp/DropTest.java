@@ -91,6 +91,8 @@ public class DropTest {
      */
     @Test
     public void test_protected() {
+        String output = Template.parse(" {{ product.callmenot }} ").render("product", new ProductDrop());
+        assertThat(output, is("  "));
     }
 
     /*
@@ -103,6 +105,13 @@ public class DropTest {
      */
     @Test
     public void test_object_methods_not_allowed() {
+
+        String[] superMethods = { "hashCode", "toString" };
+
+        for (String method : superMethods) {
+            String output = Template.parse(String.format(" {{ product.%s }} ", method)).render("product", new ProductDrop());
+            assertThat(output, is("  "));
+        }
     }
 }
 

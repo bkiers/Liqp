@@ -1,6 +1,8 @@
 package liqp;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,15 +34,26 @@ public abstract class Drop {
      */
     public final Object invoke_drop(String method) {
 
-        Object beforeReturn = this.before_method(method);
+        Object beforeReturn = null;
 
         try {
+            beforeReturn = this.before_method(method);
+
+            List<Method> superMethods = Arrays.asList(Object.class.getDeclaredMethods());
+
             Method instanceMethod = this.getClass().getMethod(method);
-            return instanceMethod.invoke(this); // TODO check void
+
+            // `instanceMethod` is possibly an inherited method: check if it's not in the `superMethods`.
+            if(!superMethods.contains(instanceMethod)) {
+                return instanceMethod.invoke(this); // TODO check void?
+            }
         }
         catch(Exception e) {
-            return beforeReturn;
+            // If a method is non-public or does not exist, an exception is thrown
+            // and simply ignored (`beforeReturn` will be returned).
         }
+
+        return beforeReturn;
     }
 
     /**

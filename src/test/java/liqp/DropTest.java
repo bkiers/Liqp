@@ -40,11 +40,23 @@ public class DropTest {
     @Test
     public void test_drops_respond_to_to_liquid() {
 
-//        String output = Template.parse("{{ product.to_liquid.texts.text }}").render("product", new ProductDrop());
-//        assertThat(output, is("text1"));
-
-        String output = Template.parse("{{ product | map: \"to_liquid\" | map: \"texts\" | map: \"text\" }}").render("product", new ProductDrop());
+        String output = Template.parse("{{ product.to_liquid.texts.text }}").render("product", new ProductDrop());
         assertThat(output, is("text1"));
+
+        output = Template.parse("{{ product | map: \"to_liquid\" | map: \"texts\" | map: \"text\" }}").render("product", new ProductDrop());
+        assertThat(output, is("text1"));
+    }
+
+    /*
+     *  def test_integer_argument_drop
+     *   output = Liquid::Template.parse( ' {{ product.catchall[8] }} '  ).render('product' => ProductDrop.new)
+     *   assert_equal ' method: 8 ', output
+     * end
+     */
+    @Test
+    public void test_integer_argument_drop() {
+        String output = Template.parse(" {{ product.catchall[8] }} ").render("product", new ProductDrop());
+        assertThat(output, is(" method: 8 "));
     }
 }
 

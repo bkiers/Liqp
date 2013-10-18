@@ -135,9 +135,11 @@ class LookupNode implements LNode {
 
             key = expression.render(context);
 
-            // TODO account for Drops here?
-
-            if(key instanceof Number) {
+            if(value instanceof Drop) {
+                Drop drop = (Drop)value;
+                return drop.invoke_drop(String.valueOf(key));
+            }
+            else if(key instanceof Number) {
                 int index = ((Number)key).intValue();
 
                 if(value.getClass().isArray()) {

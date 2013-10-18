@@ -67,6 +67,7 @@ class LookupNode implements LNode {
 
             if(value instanceof Drop) {
                 Drop drop = (Drop)value;
+                drop.setContext(context);
                 return drop.invoke_drop(hash);
             }
             else if(hash.equals("size")) {
@@ -137,6 +138,7 @@ class LookupNode implements LNode {
 
             if(value instanceof Drop) {
                 Drop drop = (Drop)value;
+                drop.setContext(context);
                 return drop.invoke_drop(String.valueOf(key));
             }
             else if(key instanceof Number) {

@@ -1,11 +1,15 @@
 package liqp;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 /**
  * Drops: https://github.com/Shopify/liquid/wiki/Introduction-to-Drops
  */
 public abstract class Drop {
+
+    // The (optional) variable context this Drop lives in.
+    protected Map<String, Object> context = null;
 
     /**
      * Called once for every invocation, even if the destination
@@ -55,5 +59,14 @@ public abstract class Drop {
      */
     public final Drop to_liquid() {
         return this;
+    }
+
+    /**
+     * Set the (optional) variable context.
+     *
+     * @param context the variable context.
+     */
+    public void setContext(Map<String, Object> context) {
+        this.context = context;
     }
 }

@@ -58,6 +58,52 @@ public class DropTest {
         String output = Template.parse(" {{ product.catchall[8] }} ").render("product", new ProductDrop());
         assertThat(output, is(" method: 8 "));
     }
+
+    /*
+     * def test_text_array_drop
+     *   output = Liquid::Template.parse( '{% for text in product.texts.array %} {{text}} {% endfor %}'  ).render('product' => ProductDrop.new)
+     *   assert_equal ' text1  text2 ', output
+     * end
+     */
+    @Test
+    public void test_text_array_drop() {
+        String output = Template.parse("{% for text in product.texts.array %} {{text}} {% endfor %}").render("product", new ProductDrop());
+        assertThat(output, is(" text1  text2 "));
+    }
+
+    /*
+     * def test_nested_context_drop
+     *   output = Liquid::Template.parse( ' {{ product.context.foo }} '  ).render('product' => ProductDrop.new, 'foo' => "monkey")
+     *   assert_equal ' monkey ', output
+     * end
+     */
+    @Test
+    public void test_nested_context_drop() {
+        String output = Template.parse(" {{ product.context.foo }} ").render("product", new ProductDrop(), "foo", "monkey");
+        assertThat(output, is(" monkey "));
+    }
+
+    /*
+     * def test_protected
+     *   output = Liquid::Template.parse( ' {{ product.callmenot }} '  ).render('product' => ProductDrop.new)
+     *   assert_equal '  ', output
+     * end
+     */
+    @Test
+    public void test_protected() {
+    }
+
+    /*
+     * def test_object_methods_not_allowed
+     *   [:dup, :clone, :singleton_class, :eval, :class_eval, :inspect].each do |method|
+     *     output = Liquid::Template.parse(" {{ product.#{method} }} ").render('product' => ProductDrop.new)
+     *     assert_equal '  ', output
+     *   end
+     * end
+     */
+    @Test
+    public void test_object_methods_not_allowed() {
+    }
 }
 
 class ProductDrop extends Drop {
@@ -86,7 +132,30 @@ class ProductDrop extends Drop {
         return new CatchallDrop();
     }
 
+    public Drop context() {
+        return new ContextDrop();
+    }
+
     protected String callmenot() {
         return "protected";
+    }
+}
+
+class ContextDrop extends Drop {
+
+    public int scopes() {
+        return super.context == null ? 0 : super.context.size();
+    }
+
+    public Object[] scopes_as_array() {
+        return super.context == null ? new Object[0] : super.context.values().toArray(new Object[super.context.size()]);
+    }
+
+    public Object loop_pos() {
+        return super.context == null ? -1 : super.context.get("forloop.index");
+    }
+
+    public Object before_method(String method) {
+        return super.context == null ? null : super.context.get(method);
     }
 }

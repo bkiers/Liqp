@@ -144,7 +144,7 @@ public class Template {
 
         Map<String, Object> map = new HashMap<>();
 
-        for (int i = 0; i < context.length - 1; i++) {
+        for (int i = 0; i < context.length - 1; i += 2) {
 
             Object key = context[i];
 

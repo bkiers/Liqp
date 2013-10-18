@@ -43,8 +43,8 @@ public class DropTest {
 //        String output = Template.parse("{{ product.to_liquid.texts.text }}").render("product", new ProductDrop());
 //        assertThat(output, is("text1"));
 
-//        String output = Template.parse("{{ product | map: \"to_liquid\" | map: \"texts\" | map: \"text\" }}").render("product", new ProductDrop());
-//        assertThat(output, is("text1"));
+        String output = Template.parse("{{ product | map: \"to_liquid\" | map: \"texts\" | map: \"text\" }}").render("product", new ProductDrop());
+        assertThat(output, is("text1"));
     }
 }
 

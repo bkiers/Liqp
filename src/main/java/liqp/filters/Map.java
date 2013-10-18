@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.Drop;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +15,6 @@ class Map extends Filter {
     @Override
     public Object apply(Object value, Object... params) {
 
-        // TODO account for Drops
-
         if (value == null) {
             return "";
         }
@@ -27,9 +27,15 @@ class Map extends Filter {
 
         for (Object obj : array) {
 
-            java.util.Map map = (java.util.Map) obj;
+            Object val;
 
-            Object val = map.get(key);
+            if (obj instanceof Drop) {
+                val = ((Drop) obj).invoke_drop(key);
+            }
+            else {
+                java.util.Map map = (java.util.Map) obj;
+                val = map.get(key);
+            }
 
             if (val != null) {
                 list.add(val);

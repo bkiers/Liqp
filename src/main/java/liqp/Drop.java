@@ -35,10 +35,8 @@ public abstract class Drop {
             return instanceMethod.invoke(this); // TODO check void
         }
         catch(Exception e) {
-            // ignored
+            return beforeReturn;
         }
-
-        return beforeReturn;
     }
 
     /**

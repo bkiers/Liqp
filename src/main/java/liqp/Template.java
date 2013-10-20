@@ -123,46 +123,28 @@ public class Template {
         return render(new Context(map));
     }
 
-//    /**
-//     * Renders the template.
-//     *
-//     * @param context
-//     *         an array denoting key-value pairs where the
-//     *         uneven numbers (even indexes) should be Strings.
-//     *         If the length of this array is uneven, the last
-//     *         key (without the value) gets `null` attached to
-//     *         it. Note that a call to this method with a single
-//     *         String as parameter, will be handled by
-//     *         `render(String jsonMap)` instead.
-//     *
-//     * @return a string denoting the rendered template.
-//     */
-//    public String render(Object... context) {
-//
-//        Map<String, Object> map = new HashMap<>();
-//
-//        for (int i = 0; i < context.length - 1; i += 2) {
-//
-//            Object key = context[i];
-//
-//            if (key.getClass() != String.class) {
-//                throw new RuntimeException("illegal key: " + String.valueOf(key) +
-//                        " (" + key.getClass().getName() + "). Must be a String.");
-//            }
-//
-//            Object value = context[i + 1];
-//
-//            map.put((String) key, value);
-//        }
-//
-//        return render(new Context(map));
-//    }
-
+    /**
+     * Renders the template without a context.
+     *
+     * @return a string denoting the rendered template.
+     */
     public String render() {
         return render(new LinkedHashMap<String, Object>());
     }
 
-    public String render(String identifier, Object value) {
+    /**
+     * Renders the template with a context denoting some key-value pairs.
+     *
+     * @param identifier
+     *         An identifier pointing to a particular value.
+     * @param value
+     *         The value belonging to the identifier.
+     * @param keysValues
+     *         An optional amount of key-value pairs.
+     *
+     * @return a string denoting the rendered template.
+     */
+    public String render(String identifier, Object value, Object... keysValues) {
 
         if(identifier == null) {
             throw new NullPointerException("identifier == null");
@@ -170,24 +152,37 @@ public class Template {
 
         Map<String, Object> map = new LinkedHashMap<>();
         map.put(identifier, value);
+
+        if(keysValues != null) {
+
+            if(keysValues.length % 2 == 1) {
+                throw new RuntimeException("provided a key without a value");
+            }
+
+            for(int i = 0; i < keysValues.length - 1; i += 2) {
+
+                Object key = keysValues[i];
+                Object val = keysValues[i + 1];
+
+                if(key == null || !(key instanceof CharSequence)) {
+                    throw new RuntimeException("key does not look to be a string: " + key);
+                }
+
+                map.put(String.valueOf(key), val);
+            }
+        }
+
         return render(new Context(map));
     }
 
-    public String render(String identifier, Object value, String identifier2, Object value2) {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put(identifier, value);
-        map.put(identifier2, value2);
-        return render(new Context(map));
-    }
-
-    public String render(String identifier, Object value, String identifier2, Object value2, String identifier3, Object value3) {
-        Map<String, Object> map = new LinkedHashMap<>();
-        map.put(identifier, value);
-        map.put(identifier2, value2);
-        map.put(identifier3, value3);
-        return render(new Context(map));
-    }
-
+    /**
+     * Renders the template with a context represented as a Map.
+     *
+     * @param map
+     *         The Map denoting the context.
+     *
+     * @return a string denoting the rendered template.
+     */
     public String render(Map<String, Object> map) {
         return render(new Context(map));
     }

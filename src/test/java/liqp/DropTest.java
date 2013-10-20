@@ -169,8 +169,12 @@ public class DropTest {
     public void test_scope() {
         assertThat(Template.parse("{{ context.scopes }}").render("context", new ContextDrop()), is("1"));
 
-        // TODO model the scopes as liquid does it. At the moment, there is no separate scope for `{%for ... %}` statements.
-        //assertThat(Template.parse("{%for i in dummy%}{{ context.scopes }}{%endfor%}").render("context", new ContextDrop(), "dummy", new Integer[]{1}), is("2"));
+//        Context ctx = new Context();
+//        ctx.put("context", new ContextDrop());
+//        ctx.put("dummy", new Integer[]{1});
+//
+//        assertThat(Template.parse("{%for i in dummy%}{{ context.scopes }}{%endfor%}").render(ctx), is("2"));
+
         //assertThat(Template.parse("{%for i in dummy%}{%for i in dummy%}{{ context.scopes }}{%endfor%}{%endfor%}").render("context", new ContextDrop(), "dummy", new Integer[]{1}), is("3"));
     }
 
@@ -206,9 +210,7 @@ public class DropTest {
      */
     @Test
     public void test_access_context_from_drop() {
-//        assertThat(
-//                Template.parse("{%for a in dummy%}{{ context.loop_pos }}{% endfor %}").render("context", new ContextDrop(), "dummy", new Integer[]{1, 2, 3}),
-//                is("123"));
+        // TODO
     }
 
     /*

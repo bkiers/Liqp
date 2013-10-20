@@ -1,8 +1,7 @@
 package liqp.nodes;
 
+import liqp.Context;
 import liqp.tags.Tag;
-
-import java.util.Map;
 
 class TagNode implements LNode {
 
@@ -15,7 +14,7 @@ class TagNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> context) {
+    public Object render(Context context) {
 
         return tag.render(context, tokens);
     }

@@ -1,8 +1,7 @@
 package liqp.nodes;
 
+import liqp.Context;
 import liqp.LValue;
-
-import java.util.Map;
 
 class EqNode implements LNode {
 
@@ -15,7 +14,7 @@ class EqNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> context) {
+    public Object render(Context context) {
 
         Object a = lhs.render(context);
         Object b = rhs.render(context);

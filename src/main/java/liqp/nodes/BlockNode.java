@@ -1,9 +1,9 @@
 package liqp.nodes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+
+import liqp.Context;
 import liqp.tags.Tag;
 
 public class BlockNode implements LNode {
@@ -23,7 +23,7 @@ public class BlockNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> context) {
+    public Object render(Context context) {
 
         StringBuilder builder = new StringBuilder();
 
@@ -38,7 +38,6 @@ public class BlockNode implements LNode {
             if(value == Tag.Statement.BREAK || value == Tag.Statement.CONTINUE) {
                 return value;
             }
-
             else if (value.getClass().isArray()) {
 
                 Object[] array = (Object[]) value;

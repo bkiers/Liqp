@@ -1,5 +1,6 @@
 package liqp.nodes;
 
+import liqp.Context;
 import liqp.filters.Filter;
 
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class FilterNode implements LNode {
         params.add(param);
     }
 
-    public Object apply(Object value, Map<String, Object> variables) {
+    public Object apply(Object value, Context variables) {
 
         List<Object> paramValues = new ArrayList<Object>();
 
@@ -32,7 +33,7 @@ public class FilterNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> context) {
+    public Object render(Context context) {
         throw new RuntimeException("cannot render a filter");
     }
 }

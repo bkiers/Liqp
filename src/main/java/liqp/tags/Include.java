@@ -1,10 +1,10 @@
 package liqp.tags;
 
+import liqp.Context;
 import liqp.Template;
 import liqp.nodes.LNode;
 
 import java.io.File;
-import java.util.Map;
 
 class Include extends Tag {
 
@@ -12,7 +12,7 @@ class Include extends Tag {
     public static String extension = ".liquid";
 
     @Override
-    public Object render(Map<String, Object> context, LNode... nodes) {
+    public Object render(Context context, LNode... nodes) {
 
         try {
             String fileNameWithoutExt = super.asString(nodes[0].render(context));
@@ -26,8 +26,8 @@ class Include extends Tag {
             }
 
             return include.render(context);
-
-        } catch(Exception e) {
+        }
+        catch(Exception e) {
             return "";
         }
     }

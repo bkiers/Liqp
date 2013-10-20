@@ -1,5 +1,6 @@
 package liqp.tags;
 
+import liqp.Context;
 import liqp.LValue;
 import liqp.nodes.LNode;
 
@@ -96,6 +97,7 @@ public abstract class Tag extends LValue {
     /**
      * Renders this tag.
      *
+     *
      * @param context
      *         the context (variables) with which this
      *         node should be rendered.
@@ -106,5 +108,5 @@ public abstract class Tag extends LValue {
      *
      * @return an Object denoting the rendered AST.
      */
-    public abstract Object render(Map<String, Object> context, LNode... nodes);
+    public abstract Object render(Context context, LNode... nodes);
 }

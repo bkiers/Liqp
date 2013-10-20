@@ -36,18 +36,6 @@ public class TemplateTest {
                 "c", null
         );
         assertThat(rendered, is(expected + expected));
-
-        rendered = Template.parse("{{a}}{{b}}{{c}}").render(
-                "a", expected,
-                "b", expected,
-                "c" /* no value */
-        );
-        assertThat(rendered, is(expected + expected));
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void renderVarArgsTestInvalidKey1() throws RecognitionException {
-        Template.parse("mu").render(123, 456);
     }
 
     @Test(expected = NullPointerException.class)

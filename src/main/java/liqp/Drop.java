@@ -11,7 +11,7 @@ import java.util.Map;
 public abstract class Drop {
 
     // The (optional) variable context this Drop lives in.
-    protected Map<String, Object> context = null;
+    protected Context context = null;
 
     /**
      * Called once for every invocation, even if the destination
@@ -79,7 +79,7 @@ public abstract class Drop {
      *
      * @param context the variable context.
      */
-    public void setContext(Map<String, Object> context) {
+    public void setContext(Context context) {
         this.context = context;
     }
 }

@@ -14,10 +14,7 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The main class of this library. Use one of its static
@@ -123,55 +120,79 @@ public class Template {
             throw new RuntimeException("invalid json map: '" + jsonMap + "'", e);
         }
 
-        return render(map);
+        return render(new Context(map));
     }
 
-    /**
-     * Renders the template.
-     *
-     * @param context
-     *         an array denoting key-value pairs where the
-     *         uneven numbers (even indexes) should be Strings.
-     *         If the length of this array is uneven, the last
-     *         key (without the value) gets `null` attached to
-     *         it. Note that a call to this method with a single
-     *         String as parameter, will be handled by
-     *         `render(String jsonMap)` instead.
-     *
-     * @return a string denoting the rendered template.
-     */
-    public String render(Object... context) {
+//    /**
+//     * Renders the template.
+//     *
+//     * @param context
+//     *         an array denoting key-value pairs where the
+//     *         uneven numbers (even indexes) should be Strings.
+//     *         If the length of this array is uneven, the last
+//     *         key (without the value) gets `null` attached to
+//     *         it. Note that a call to this method with a single
+//     *         String as parameter, will be handled by
+//     *         `render(String jsonMap)` instead.
+//     *
+//     * @return a string denoting the rendered template.
+//     */
+//    public String render(Object... context) {
+//
+//        Map<String, Object> map = new HashMap<>();
+//
+//        for (int i = 0; i < context.length - 1; i += 2) {
+//
+//            Object key = context[i];
+//
+//            if (key.getClass() != String.class) {
+//                throw new RuntimeException("illegal key: " + String.valueOf(key) +
+//                        " (" + key.getClass().getName() + "). Must be a String.");
+//            }
+//
+//            Object value = context[i + 1];
+//
+//            map.put((String) key, value);
+//        }
+//
+//        return render(new Context(map));
+//    }
 
-        Map<String, Object> map = new HashMap<>();
+    public String render() {
+        return render(new LinkedHashMap<String, Object>());
+    }
 
-        for (int i = 0; i < context.length - 1; i += 2) {
+    public String render(String identifier, Object value) {
 
-            Object key = context[i];
-
-            if (key.getClass() != String.class) {
-                throw new RuntimeException("illegal key: " + String.valueOf(key) +
-                        " (" + key.getClass().getName() + "). Must be a String.");
-            }
-
-            Object value = context[i + 1];
-
-            map.put((String) key, value);
+        if(identifier == null) {
+            throw new NullPointerException("identifier == null");
         }
 
-        return render(map);
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put(identifier, value);
+        return render(new Context(map));
     }
 
-    /**
-     * Renders the template.
-     *
-     * @param context
-     *         a Map denoting the (possibly nested)
-     *         variables that can be used in this
-     *         Template.
-     *
-     * @return a string denoting the rendered template.
-     */
-    public String render(Map<String, Object> context) {
+    public String render(String identifier, Object value, String identifier2, Object value2) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put(identifier, value);
+        map.put(identifier2, value2);
+        return render(new Context(map));
+    }
+
+    public String render(String identifier, Object value, String identifier2, Object value2, String identifier3, Object value3) {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put(identifier, value);
+        map.put(identifier2, value2);
+        map.put(identifier3, value3);
+        return render(new Context(map));
+    }
+
+    public String render(Map<String, Object> map) {
+        return render(new Context(map));
+    }
+
+    public String render(Context context) {
 
         LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root));
 

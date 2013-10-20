@@ -1,11 +1,11 @@
 package liqp.nodes;
 
+import liqp.Context;
 import liqp.Drop;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 class LookupNode implements LNode {
 
@@ -22,13 +22,14 @@ class LookupNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> context) {
+    public Object render(Context context) {
 
         Object value;
 
         // Check if there's a [var] lookup, AST: ^(LOOKUP Id["@var"])
         if(id.startsWith("@")) {
-            value = context.get(context.get(id.substring(1)));
+            String identifier = String.valueOf(context.get(id.substring(1)));
+            value = context.get(identifier);
         }
         else {
             value = context.get(id);
@@ -47,7 +48,7 @@ class LookupNode implements LNode {
     }
 
     interface Indexable {
-        Object get(Object value, Map<String, Object> context);
+        Object get(Object value, Context context);
     }
 
     public static class Hash implements Indexable {
@@ -59,7 +60,7 @@ class LookupNode implements LNode {
         }
 
         @Override
-        public Object get(Object value, Map<String, Object> context) {
+        public Object get(Object value, Context context) {
 
             if(value == null) {
                 return null;
@@ -73,6 +74,10 @@ class LookupNode implements LNode {
             else if(hash.equals("size")) {
                 if(value instanceof Collection) {
                     return ((Collection)value).size();
+                }
+                else if(value instanceof Context) {
+                    Context ctx = (Context)value;
+                    return ctx.containsKey(hash) ? ctx.get(hash) : ctx.size();
                 }
                 else if(value instanceof java.util.Map) {
                     java.util.Map map = (java.util.Map)value;
@@ -103,7 +108,10 @@ class LookupNode implements LNode {
                 }
             }
 
-            if(value instanceof java.util.Map) {
+            if(value instanceof Context) {
+                return ((Context)value).get(hash);
+            }
+            else if(value instanceof java.util.Map) {
                 return ((java.util.Map)value).get(hash);
             }
             else {
@@ -128,7 +136,7 @@ class LookupNode implements LNode {
         }
 
         @Override
-        public Object get(Object value, Map<String, Object> context) {
+        public Object get(Object value, Context context) {
 
             if(value == null) {
                 return null;

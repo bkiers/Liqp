@@ -1,15 +1,10 @@
 package liqp;
 
-import java.io.File;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
-import liqp.parser.LiquidLexer;
-import liqp.parser.LiquidParser;
 import liqp.tags.Tag;
-import org.antlr.runtime.*;
 import org.antlr.runtime.tree.*;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -131,7 +126,7 @@ public class Examples {
 
         Tag.registerTag(new Tag("loop"){
             @Override
-            public Object render(Map<String, Object> context, LNode... nodes) {
+            public Object render(Context context, LNode... nodes) {
 
                 int n = super.asNumber(nodes[0].render(context)).intValue();
                 LNode block = nodes[1];

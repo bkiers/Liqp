@@ -3,8 +3,8 @@
 A Java implementation of the [Liquid templating engine](http://wiki.shopify.com/Liquid) backed 
 up by an ANTLR grammar. 
 
-To use Liqp, checkout this project and create a JAR file through the `jar` task defined in the 
-Ant build file, or download a [prebuilt JAR file](https://github.com/bkiers/Liqp/raw/master/Liqp-0.6.jar)
+To use Liqp, checkout this project and create a JAR file through the `mvn install`, or download
+a [prebuilt JAR file](https://github.com/bkiers/Liqp/raw/master/liqp-0.6.1.jar)
 
 This library can be used in two different ways:
 

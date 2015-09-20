@@ -155,6 +155,54 @@ public class Examples {
         System.out.println(rendered);
     }
 
+    public static void instanceTag() {
+
+        String source = "{% loop 5 %}looping!\n{% endloop %}";
+
+        Template template = Template.parse(source).with(new Tag("loop"){
+            @Override
+            public Object render(Map<String, Object> context, LNode... nodes) {
+
+                int n = super.asNumber(nodes[0].render(context)).intValue();
+                LNode block = nodes[1];
+
+                StringBuilder builder = new StringBuilder();
+
+                while(n-- > 0) {
+                    builder.append(super.asString(block.render(context)));
+                }
+
+                return builder.toString();
+            }
+        });
+
+        String rendered = template.render();
+
+        System.out.println(rendered);
+    }
+
+    public static void instanceFilter() {
+
+        Template template = Template.parse("{{ numbers | sum }}").with(new Filter("sum"){
+            @Override
+            public Object apply(Object value, Object... params) {
+
+                Object[] numbers = super.asArray(value);
+
+                double sum = 0;
+
+                for(Object obj : numbers) {
+                    sum += super.asNumber(obj).doubleValue();
+                }
+
+                return sum;
+            }
+        });
+
+        String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
+        System.out.println(rendered);
+    }
+
     public static void main(String[] args) throws Exception {
 
         System.out.println("running liqp.Examples");
@@ -171,6 +219,10 @@ public class Examples {
 
         //customLoopTag();
 
+        //instanceTag();
+
+        //instanceFilter();
+
         /*
             list = [{"a" => 3}, {"a" => 1}, {"a" => 2}]
 
@@ -180,7 +232,7 @@ public class Examples {
             print ">>>" + @template.render({'list' => list}) + "<<<\n"
         */
         String json = "{\"array\":[11, 22, 33, 44, 55]}";
-       Template t = Template.parse(new File("snippets/test.liquid"));
+        Template t = Template.parse(new File("snippets/test.liquid"));
         System.out.println(t.render(json));
     }
 }

@@ -148,6 +148,15 @@ public abstract class Filter extends LValue {
     }
 
     /**
+     * Returns all default filters.
+     *
+     * @return all default filters.
+     */
+    public static Map<String, Filter> getFilters() {
+        return new HashMap<String, Filter>(FILTERS);
+    }
+
+    /**
      * Registers a new filter.
      *
      * @param filter

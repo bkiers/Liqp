@@ -15,7 +15,7 @@
   <packaging>jar</packaging>
   <version>0.6.1</version>
   <name>Liqp</name>
-  <description></description>
+  <description>A Java implementation of the Liquid templating engine backed up by an ANTLR grammar.</description>
   <url>https://github.com/bkiers/Liqp</url>
   <inceptionYear>2012</inceptionYear>
   <licenses>

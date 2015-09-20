@@ -11,9 +11,12 @@ public class FilterNode implements LNode {
     private Filter filter;
     private List<LNode> params;
 
-    public FilterNode(String id) {
-        filter = Filter.getFilter(id);
-        params = new ArrayList<LNode>();
+    public FilterNode(String filterName, Filter filter) {
+        if (filter == null) {
+            throw new IllegalArgumentException("no filter available  named: " + filterName);
+        }
+        this.filter = filter;
+        this.params = new ArrayList<LNode>();
     }
 
     public void add(LNode param) {

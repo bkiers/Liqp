@@ -37,10 +37,21 @@ options {
 
   import liqp.parser.*;
   import liqp.tags.*;
+  import liqp.filters.*;
+
+  import java.util.Map;
 }
 
 @members {
-  // ...
+
+  private Map<String, Tag> tags;
+  private Map<String, Filter> filters;
+
+  public LiquidWalker(TreeNodeStream nodes, Map<String, Tag> tags, Map<String, Filter> filters) {
+    super(nodes);
+    this.tags = tags;
+    this.filters = filters;
+  }
 }
 
 walk returns [LNode node]
@@ -77,11 +88,11 @@ tag returns [LNode node]
  ;
 
 raw_tag returns [LNode node]
- : RAW {$node = new TagNode("raw", new AtomNode($RAW.text));}
+ : RAW {$node = new TagNode("raw", tags.get("raw"), new AtomNode($RAW.text));}
  ;
 
 comment_tag returns [LNode node]
- : COMMENT {$node = new TagNode("comment", new AtomNode($COMMENT.text));}
+ : COMMENT {$node = new TagNode("comment", tags.get("comment"), new AtomNode($COMMENT.text));}
  ;
 
 if_tag returns [LNode node]
@@ -90,14 +101,14 @@ if_tag returns [LNode node]
       (^(ELSIF e2=expr b2=block {nodes.add($e2.node); nodes.add($b2.node);} ))*
        ^(ELSE         (b3=block {nodes.add(new AtomNode("TRUE")); nodes.add($b3.node);} )?)
     )
-    {$node = new TagNode("if", nodes.toArray(new LNode[nodes.size()]));}
+    {$node = new TagNode("if", tags.get("if"), nodes.toArray(new LNode[nodes.size()]));}
  ;
 
 unless_tag returns [LNode node]
 @init{List<LNode> nodes = new ArrayList<LNode>();}
  : ^(UNLESS expr b1=block {nodes.add($expr.node); nodes.add($b1.node);}
    ^(ELSE (b2=block       {nodes.add(new AtomNode(null)); nodes.add($b2.node);})?))
-    {$node = new TagNode("unless", nodes.toArray(new LNode[nodes.size()]));}
+    {$node = new TagNode("unless", tags.get("unless"), nodes.toArray(new LNode[nodes.size()]));}
  ;
 
 case_tag returns [LNode node]
@@ -105,7 +116,7 @@ case_tag returns [LNode node]
  : ^(CASE expr   {nodes.add($expr.node);}
     (when_tag    [nodes] )+
    ^(ELSE (block {nodes.add(nodes.get(0)); nodes.add($block.node);} )?))
-    {$node = new TagNode("case", nodes.toArray(new LNode[nodes.size()]));}
+    {$node = new TagNode("case", tags.get("case"), nodes.toArray(new LNode[nodes.size()]));}
  ;
 
 when_tag[List<LNode> nodes]
@@ -115,7 +126,7 @@ when_tag[List<LNode> nodes]
 cycle_tag returns [LNode node]
 @init{List<LNode> nodes = new ArrayList<LNode>();}
  : ^(CYCLE cycle_group {nodes.add($cycle_group.node);} (e=expr {nodes.add($e.node);})+)
-    {$node = new TagNode("cycle", nodes.toArray(new LNode[nodes.size()]));}
+    {$node = new TagNode("cycle", tags.get("cycle"), nodes.toArray(new LNode[nodes.size()]));}
  ;
 
 cycle_group returns [LNode node]
@@ -136,7 +147,7 @@ for_array returns [LNode node]
       for_block               {expressions.add($for_block.node1); expressions.add($for_block.node2);}
       ^(ATTRIBUTES (attribute {expressions.add($attribute.node);})*)
     )
-    {$node = new TagNode("for", expressions.toArray(new LNode[expressions.size()]));}
+    {$node = new TagNode("for", tags.get("for"), expressions.toArray(new LNode[expressions.size()]));}
  ;
 
 for_range returns [LNode node]
@@ -148,7 +159,7 @@ for_range returns [LNode node]
       block                         {expressions.add($block.node);}
       ^(ATTRIBUTES (attribute       {expressions.add($attribute.node);})*)
     )
-    {$node = new TagNode("for", expressions.toArray(new LNode[expressions.size()]));}
+    {$node = new TagNode("for", tags.get("for"), expressions.toArray(new LNode[expressions.size()]));}
  ;
 
 for_block returns [LNode node1, LNode node2]
@@ -173,20 +184,20 @@ table_tag returns [LNode node]
       block                   {expressions.add($block.node);}
       ^(ATTRIBUTES (attribute {expressions.add($attribute.node);})*)
     )
-    {$node = new TagNode("tablerow", expressions.toArray(new LNode[expressions.size()]));}
+    {$node = new TagNode("tablerow", tags.get("tablerow"), expressions.toArray(new LNode[expressions.size()]));}
  ;
 
 capture_tag returns [LNode node]
- : ^(CAPTURE Id block) {$node = new TagNode("capture", new AtomNode($Id.text), $block.node);}
+ : ^(CAPTURE Id block) {$node = new TagNode("capture", tags.get("capture"), new AtomNode($Id.text), $block.node);}
  ;
 
 include_tag returns [LNode node]
  : ^(INCLUDE file=Str ^(WITH (with=Str)?))
     {
       if($with.text != null) {
-        $node = new TagNode("include", new AtomNode($file.text), new AtomNode($with.text));
+        $node = new TagNode("include", tags.get("include"), new AtomNode($file.text), new AtomNode($with.text));
       } else {
-        $node = new TagNode("include", new AtomNode($file.text));
+        $node = new TagNode("include", tags.get("include"), new AtomNode($file.text));
       }
     }
  ;
@@ -203,13 +214,13 @@ continue_tag returns [LNode node]
 custom_tag returns [LNode node]
 @init{List<LNode> expressions = new ArrayList<LNode>();}
  : ^(CUSTOM_TAG Id (expr {expressions.add($expr.node);})*)
-    {$node = new TagNode($Id.text, expressions.toArray(new LNode[expressions.size()]));}
+    {$node = new TagNode($Id.text, tags.get($Id.text), expressions.toArray(new LNode[expressions.size()]));}
  ;
 
 custom_tag_block returns [LNode node]
 @init{List<LNode> expressions = new ArrayList<LNode>();}
  : ^(CUSTOM_TAG_BLOCK Id (expr {expressions.add($expr.node);})* block {expressions.add($block.node);})
-    {$node = new TagNode($Id.text, expressions.toArray(new LNode[expressions.size()]));}
+    {$node = new TagNode($Id.text, tags.get($Id.text), expressions.toArray(new LNode[expressions.size()]));}
  ;
 
 output returns [OutputNode node]
@@ -217,7 +228,7 @@ output returns [OutputNode node]
  ;
 
 filter returns [FilterNode node]
- : ^(FILTER Id {$node = new FilterNode($Id.text);} ^(PARAMS params[$node]?))
+ : ^(FILTER Id {$node = new FilterNode($Id.text, filters.get($Id.text));} ^(PARAMS params[$node]?))
  ;
 
 params[FilterNode node]
@@ -225,7 +236,7 @@ params[FilterNode node]
  ;
 
 assignment returns [TagNode node]
- : ^(ASSIGNMENT Id filter? expr) {$node = new TagNode("assign", new AtomNode($Id.text), $filter.node, $expr.node);}
+ : ^(ASSIGNMENT Id filter? expr) {$node = new TagNode("assign", tags.get("assign"), new AtomNode($Id.text), $filter.node, $expr.node);}
  ;
 
 expr returns [LNode node]

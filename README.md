@@ -4,7 +4,7 @@ A Java implementation of the [Liquid templating engine](http://wiki.shopify.com/
 up by an ANTLR grammar. 
 
 To use Liqp, checkout this project and create a JAR file through the `mvn install`, or download
-a [prebuilt JAR file](https://github.com/bkiers/Liqp/raw/master/liqp-0.6.1.jar)
+a [prebuilt JAR file](https://github.com/bkiers/Liqp/raw/master/liqp-0.6.2.jar)
 
 This library can be used in two different ways:
 
@@ -259,5 +259,47 @@ System.out.println(rendered);
     looping!
     looping!
     looping!
+*/
+```
+
+Note that both `Tag.registerTag(Tag)` and `Filer.registerFilter(Filter)` will add
+tags and filters per JVM instance. If you want templates to use specific filters,
+create your `Template` instance as follows:
+
+```java
+Template.parse(source)
+        .with(filter);
+
+Template.parse(source)
+        .with(tag);
+
+// Or combine them:
+Template.parse(source)
+        .with(filter)
+        .with(tag);
+```
+
+For example, using the `sum` filter for just 1 template, would look like this:
+
+```java
+Template template = Template.parse("{{ numbers | sum }}").with(new Filter("sum"){
+    @Override
+    public Object apply(Object value, Object... params) {
+
+        Object[] numbers = super.asArray(value);
+        double sum = 0;
+
+        for(Object obj : numbers) {
+            sum += super.asNumber(obj).doubleValue();
+        }
+
+        return sum;
+    }
+});
+
+String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
+System.out.println(rendered);
+/*
+    15.0
 */
 ```

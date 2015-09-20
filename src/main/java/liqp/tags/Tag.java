@@ -84,6 +84,15 @@ public abstract class Tag extends LValue {
     }
 
     /**
+     * Returns all default tags.
+     *
+     * @return all default tags.
+     */
+    public static Map<String, Tag> getTags() {
+        return new HashMap<String, Tag>(TAGS);
+    }
+
+    /**
      * Registers a new tag.
      *
      * @param tag

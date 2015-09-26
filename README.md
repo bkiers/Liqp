@@ -1,4 +1,5 @@
-# Liqp &nbsp; [![Build Status](https://travis-ci.org/bkiers/Liqp.png)](https://travis-ci.org/bkiers/Liqp)
+# Liqp &nbsp; [![Build Status](https://travis-ci.org/bkiers/Liqp.png)](https://travis-ci.org/bkiers/Liqp) [![Release](https://img.shields.io/github/release/bkiers/Liqp.svg?label=maven version)](https://jitpack.io/#bkiers/Liqp)
+
 
 A Java implementation of the [Liquid templating engine](http://wiki.shopify.com/Liquid) backed 
 up by an ANTLR grammar. 

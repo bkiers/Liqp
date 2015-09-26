@@ -3,8 +3,52 @@
 A Java implementation of the [Liquid templating engine](http://wiki.shopify.com/Liquid) backed 
 up by an ANTLR grammar. 
 
-To use Liqp, checkout this project and create a JAR file through the `mvn install`, or download
-a [prebuilt JAR file](https://github.com/bkiers/Liqp/raw/master/liqp-0.6.2.jar)
+## Installation
+
+### Gradle
+
+Add the repository:
+
+```groovy
+repositories {
+  maven {
+    url "https://jitpack.io"
+  }
+}
+```
+
+and then add the dependency:
+
+```groovy
+dependencies {
+  compile 'com.github.bkiers:Liqp:0.6.3'
+}
+```
+
+### Maven
+
+Add the following to your POM's `<repositories>` tag:
+
+```xml
+<repository>
+  <id>jitpack.io</id>
+  <url>https://jitpack.io</url>
+</repository>
+```
+
+then add the following dependency:
+
+```xml
+<dependency>
+  <groupId>com.github.bkiers</groupId>
+  <artifactId>Liqp</artifactId>
+  <version>0.6.3</version>
+</dependency>
+```
+
+Or clone this repository and run: `mvn install` which will create a JAR of Liqp
+in your local Maven repository, as well as in the project's `target/` folder.
+
 
 This library can be used in two different ways:
 

@@ -22,6 +22,7 @@ public class Divided_ByTest {
                 {"{{ 8 | divided_by: 3. }}", String.valueOf(8 / 3.0)},
                 {"{{ 8 | divided_by: 3.0 }}", String.valueOf(8 / 3.0)},
                 {"{{ 8 | divided_by: 2.0 }}", "4.0"},
+                {"{{ 0 | divided_by: 2.0 }}", "0.0"},
         };
 
         for (String[] test : tests) {

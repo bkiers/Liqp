@@ -108,4 +108,18 @@ public class LiquidParserTest {
 
         //assertThat(Template.parse("{% if true || false %} YES {% endif %}").render(), is(" YES ")); // TODO isn't allowed (yet?)
     }
+
+    @Test
+    public void keywords_as_identifier() throws Exception {
+
+        assertThat(
+                Template.parse("var2:{{var2}} {%assign var2 = var.comment%} var2:{{var2}}")
+                        .render(" { \"var\": { \"comment\": \"content\" } } "),
+                is("var2:  var2:content"));
+
+        assertThat(
+                Template.parse("var2:{{var2}} {%assign var2 = var.end%} var2:{{var2}}")
+                        .render(" { \"var\": { \"end\": \"content\" } } "),
+                is("var2:  var2:content"));
+    }
 }

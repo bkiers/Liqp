@@ -22,7 +22,7 @@ and then add the dependency:
 
 ```groovy
 dependencies {
-  compile 'com.github.bkiers:Liqp:0.6.3'
+  compile 'com.github.bkiers:Liqp:0.6.4'
 }
 ```
 
@@ -43,7 +43,7 @@ then add the following dependency:
 <dependency>
   <groupId>com.github.bkiers</groupId>
   <artifactId>Liqp</artifactId>
-  <version>0.6.3</version>
+  <version>0.6.4</version>
 </dependency>
 ```
 

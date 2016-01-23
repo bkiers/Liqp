@@ -22,27 +22,27 @@ public class DateTest {
                 {"{{" + seconds + " | date: 'mu'}}", "mu"},
                 {"{{" + seconds + " | date: '%'}}", "%"},
                 {"{{" + seconds + " | date: '%? %%'}}", "%? %"},
-                {"{{" + seconds + " | date: '%a'}}", new SimpleDateFormat("EEE").format(date)},
-                {"{{" + seconds + " | date: '%A'}}", new SimpleDateFormat("EEEE").format(date)},
-                {"{{" + seconds + " | date: '%b'}}", new SimpleDateFormat("MMM").format(date)},
-                {"{{" + seconds + " | date: '%B'}}", new SimpleDateFormat("MMMM").format(date)},
-                {"{{" + seconds + " | date: '%c'}}", new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy").format(date)},
-                {"{{" + seconds + " | date: '%d'}}", new SimpleDateFormat("dd").format(date)},
-                {"{{" + seconds + " | date: '%H'}}", new SimpleDateFormat("HH").format(date)},
-                {"{{" + seconds + " | date: '%I'}}", new SimpleDateFormat("hh").format(date)},
-                {"{{" + seconds + " | date: '%j'}}", new SimpleDateFormat("DDD").format(date)},
-                {"{{" + seconds + " | date: '%m'}}", new SimpleDateFormat("MM").format(date)},
-                {"{{" + seconds + " | date: '%M'}}", new SimpleDateFormat("mm").format(date)},
-                {"{{" + seconds + " | date: '%p'}}", new SimpleDateFormat("a").format(date)},
-                {"{{" + seconds + " | date: '%S'}}", new SimpleDateFormat("ss").format(date)},
-                {"{{" + seconds + " | date: '%U'}}", new SimpleDateFormat("ww").format(date)},
-                {"{{" + seconds + " | date: '%W'}}", new SimpleDateFormat("ww").format(date)},
-                {"{{" + seconds + " | date: '%w'}}", new SimpleDateFormat("F").format(date)},
-                {"{{" + seconds + " | date: '%x'}}", new SimpleDateFormat("MM/dd/yy").format(date)},
-                {"{{" + seconds + " | date: '%X'}}", new SimpleDateFormat("HH:mm:ss").format(date)},
-                {"{{" + seconds + " | date: 'x=%y'}}", "x=" + new SimpleDateFormat("yy").format(date)},
-                {"{{" + seconds + " | date: '%Y'}}", new SimpleDateFormat("yyyy").format(date)},
-                {"{{" + seconds + " | date: '%Z'}}", new SimpleDateFormat("z").format(date)}
+                {"{{" + seconds + " | date: '%a'}}", simpleDateFormat("EEE").format(date)},
+                {"{{" + seconds + " | date: '%A'}}", simpleDateFormat("EEEE").format(date)},
+                {"{{" + seconds + " | date: '%b'}}", simpleDateFormat("MMM").format(date)},
+                {"{{" + seconds + " | date: '%B'}}", simpleDateFormat("MMMM").format(date)},
+                {"{{" + seconds + " | date: '%c'}}", simpleDateFormat("EEE MMM dd HH:mm:ss yyyy").format(date)},
+                {"{{" + seconds + " | date: '%d'}}", simpleDateFormat("dd").format(date)},
+                {"{{" + seconds + " | date: '%H'}}", simpleDateFormat("HH").format(date)},
+                {"{{" + seconds + " | date: '%I'}}", simpleDateFormat("hh").format(date)},
+                {"{{" + seconds + " | date: '%j'}}", simpleDateFormat("DDD").format(date)},
+                {"{{" + seconds + " | date: '%m'}}", simpleDateFormat("MM").format(date)},
+                {"{{" + seconds + " | date: '%M'}}", simpleDateFormat("mm").format(date)},
+                {"{{" + seconds + " | date: '%p'}}", simpleDateFormat("a").format(date)},
+                {"{{" + seconds + " | date: '%S'}}", simpleDateFormat("ss").format(date)},
+                {"{{" + seconds + " | date: '%U'}}", simpleDateFormat("ww").format(date)},
+                {"{{" + seconds + " | date: '%W'}}", simpleDateFormat("ww").format(date)},
+                {"{{" + seconds + " | date: '%w'}}", simpleDateFormat("F").format(date)},
+                {"{{" + seconds + " | date: '%x'}}", simpleDateFormat("MM/dd/yy").format(date)},
+                {"{{" + seconds + " | date: '%X'}}", simpleDateFormat("HH:mm:ss").format(date)},
+                {"{{" + seconds + " | date: 'x=%y'}}", "x=" + simpleDateFormat("yy").format(date)},
+                {"{{" + seconds + " | date: '%Y'}}", simpleDateFormat("yyyy").format(date)},
+                {"{{" + seconds + " | date: '%Z'}}", simpleDateFormat("z").format(date)}
         };
 
         for (String[] test : tests) {
@@ -108,5 +108,9 @@ public class DateTest {
     private static long seconds(String str) throws Exception {
         long milliSeconds =  formatter.parse(str).getTime();
         return milliSeconds / 1000L;
+    }
+
+    public static SimpleDateFormat simpleDateFormat(String pattern) {
+        return new SimpleDateFormat(pattern, Locale.ENGLISH);
     }
 }

@@ -1,9 +1,11 @@
 package liqp.tags;
 
 import liqp.Template;
+import liqp.parser.Flavor;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 
+import java.awt.datatransfer.FlavorEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +59,7 @@ public class IncludeTest {
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_without_quotes.html");
         File includes = new File(jekyll, "_includes");
-        Template template = Template.parse(index);
+        Template template = Template.parse(index, Flavor.JEKYLL);
         Map<String, Object> context = new HashMap<String,Object>();
         context.put(Include.INCLUDES_DIRECTORY_KEY, includes);
         String result = template.render(context);

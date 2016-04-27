@@ -45,6 +45,8 @@ public class Template {
      */
     private final Map<String, Filter> filters;
 
+    private final Flavor flavor;
+
     /**
      * Creates a new Template instance from a given input.
      *  @param input
@@ -62,6 +64,7 @@ public class Template {
 
         this.tags = tags;
         this.filters = filters;
+        this.flavor = flavor;
 
         LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(input));
         LiquidParser parser = new LiquidParser(flavor, new CommonTokenStream(lexer));
@@ -88,6 +91,7 @@ public class Template {
 
         this.tags = tags;
         this.filters = filters;
+        this.flavor = flavor;
 
         try {
             LiquidLexer lexer = new LiquidLexer(new ANTLRFileStream(file.getAbsolutePath()));
@@ -217,7 +221,7 @@ public class Template {
      */
     public String render(Map<String, Object> context) {
 
-        LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root), this.tags, this.filters);
+        LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root), this.tags, this.filters, this.flavor);
 
         try {
             LNode node = walker.walk();

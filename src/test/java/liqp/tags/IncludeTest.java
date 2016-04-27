@@ -65,4 +65,20 @@ public class IncludeTest {
         String result = template.render(context);
         assertTrue(result.contains("HEADER"));
     }
+
+    @Test
+    public void renderTestWithIncludeDirectorySpecifiedInJekyllFlavor() throws Exception {
+        File index = new File("src/test/jekyll/index_without_quotes.html");
+        Template template = Template.parse(index, Flavor.JEKYLL);
+        String result = template.render();
+        assertTrue(result.contains("HEADER"));
+    }
+
+    @Test
+    public void renderTestWithIncludeDirectorySpecifiedInLiquidFlavor() throws Exception {
+        File index = new File("src/test/jekyll/index_with_quotes.html");
+        Template template = Template.parse(index, Flavor.LIQUID);
+        String result = template.render();
+        assertTrue(result.contains("HEADER"));
+    }
 }

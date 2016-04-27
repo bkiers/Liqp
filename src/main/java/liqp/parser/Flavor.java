@@ -1,5 +1,13 @@
 package liqp.parser;
 
 public enum Flavor {
-    LIQUID, JEKYLL
+
+    LIQUID("snippets"),
+    JEKYLL("_includes");
+
+    public final String snippetsFolderName;
+
+    Flavor(String snippetsFolderName) {
+        this.snippetsFolderName = snippetsFolderName;
+    }
 }

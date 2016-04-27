@@ -5,7 +5,6 @@ import liqp.parser.Flavor;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 
-import java.awt.datatransfer.FlavorEvent;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;

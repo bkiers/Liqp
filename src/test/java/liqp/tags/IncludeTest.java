@@ -1,6 +1,7 @@
 package liqp.tags;
 
 import liqp.Template;
+import liqp.parser.Flavor;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -41,14 +42,42 @@ public class IncludeTest {
     }
     
     @Test
-    public void renderTestWithIncludeDirectorySpecifiedInContext() throws Exception {
+    public void renderTestWithIncludeDirectorySpecifiedInContextLiquidFlavor() throws Exception {
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
-        File index = new File(jekyll, "index.html");
+        File index = new File(jekyll, "index_with_quotes.html");
         File includes = new File(jekyll, "_includes");
         Template template = Template.parse(index);
         Map<String, Object> context = new HashMap<String,Object>();
         context.put(Include.INCLUDES_DIRECTORY_KEY, includes);
         String result = template.render(context);
+        assertTrue(result.contains("HEADER"));
+    }
+
+    @Test
+    public void renderTestWithIncludeDirectorySpecifiedInContextJekyllFlavor() throws Exception {
+        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
+        File index = new File(jekyll, "index_without_quotes.html");
+        File includes = new File(jekyll, "_includes");
+        Template template = Template.parse(index, Flavor.JEKYLL);
+        Map<String, Object> context = new HashMap<String,Object>();
+        context.put(Include.INCLUDES_DIRECTORY_KEY, includes);
+        String result = template.render(context);
+        assertTrue(result.contains("HEADER"));
+    }
+
+    @Test
+    public void renderTestWithIncludeDirectorySpecifiedInJekyllFlavor() throws Exception {
+        File index = new File("src/test/jekyll/index_without_quotes.html");
+        Template template = Template.parse(index, Flavor.JEKYLL);
+        String result = template.render();
+        assertTrue(result.contains("HEADER"));
+    }
+
+    @Test
+    public void renderTestWithIncludeDirectorySpecifiedInLiquidFlavor() throws Exception {
+        File index = new File("src/test/jekyll/index_with_quotes.html");
+        Template template = Template.parse(index, Flavor.LIQUID);
+        String result = template.render();
         assertTrue(result.contains("HEADER"));
     }
 }

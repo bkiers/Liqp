@@ -75,6 +75,14 @@ tokens {
 }
 
 @parser::members {
+
+  private Flavor flavor = Flavor.LIQUID;
+
+  public LiquidParser(Flavor flavor, TokenStream input) {
+    this(input, new RecognizerSharedState());
+    this.flavor = flavor;
+  }
+
   @Override
   public void reportError(RecognitionException e) {
     throw new RuntimeException(e); 
@@ -251,7 +259,10 @@ capture_tag
  ;
 
 include_tag
- : TagStart Include a=Str (With b=Str)? TagEnd -> ^(INCLUDE $a ^(WITH $b?))
+ : TagStart Include ( {this.flavor == Flavor.JEKYLL}?=>
+                      file_name_as_str TagEnd    -> ^(INCLUDE file_name_as_str ^(WITH    ))
+                    | a=Str (With b=Str)? TagEnd -> ^(INCLUDE $a               ^(WITH $b?))
+                    )
  ;
 
 break_tag
@@ -366,6 +377,14 @@ id2
 index
  : Dot id2      -> ^(HASH id2)
  | OBr expr CBr -> ^(INDEX expr)
+ ;
+
+file_name_as_str
+ : other_than_tag_end -> Str[$text]
+ ;
+
+other_than_tag_end
+ : ~TagEnd+
  ;
 
 /* lexer rules */

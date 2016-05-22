@@ -6,18 +6,18 @@ import liqp.nodes.LNode;
 import java.io.File;
 import java.util.Map;
 
-class Include extends Tag {
+public class Include extends Tag {
 
-    public static String INCLUDES_DIRECTORY_KEY = "liqp@includes_directory";
-    public static File DEFAULT_INCLUDES_DIRECTORY = new File("snippets");
+    public static final String INCLUDES_DIRECTORY_KEY = "liqp@includes_directory";
     public static String DEFAULT_EXTENSION = ".liquid";
 
     @Override
     public Object render(Map<String, Object> context, LNode... nodes) {
+
+        // This value will always be defined: either a custom file set by the
+        // user, or else inside TagNode.
         File includesDirectory = (File)context.get(INCLUDES_DIRECTORY_KEY);
-        if(includesDirectory == null) {
-            includesDirectory = DEFAULT_INCLUDES_DIRECTORY;
-        }
+
         try {
             String includeResource = super.asString(nodes[0].render(context));
             String extension = DEFAULT_EXTENSION;

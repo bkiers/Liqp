@@ -3,6 +3,7 @@ package liqp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
+import liqp.parser.Flavor;
 import liqp.parser.LiquidLexer;
 import liqp.parser.LiquidParser;
 import liqp.nodes.LiquidWalker;
@@ -44,6 +45,8 @@ public class Template {
      */
     private final Map<String, Filter> filters;
 
+    private final Flavor flavor;
+
     /**
      * Creates a new Template instance from a given input.
      *  @param input
@@ -54,12 +57,17 @@ public class Template {
      *         the filters this instance will make use of.
      */
     private Template(String input, Map<String, Tag> tags, Map<String, Filter> filters) {
+        this(input, tags, filters, Flavor.LIQUID);
+    }
+
+    private Template(String input, Map<String, Tag> tags, Map<String, Filter> filters, Flavor flavor) {
 
         this.tags = tags;
         this.filters = filters;
+        this.flavor = flavor;
 
         LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(input));
-        LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
+        LiquidParser parser = new LiquidParser(flavor, new CommonTokenStream(lexer));
 
         try {
             root = (CommonTree) parser.parse().getTree();
@@ -76,13 +84,18 @@ public class Template {
      *         the file holding the Liquid source.
      */
     private Template(File file, Map<String, Tag> tags, Map<String, Filter> filters) throws IOException {
+        this(file, tags, filters, Flavor.LIQUID);
+    }
+
+    private Template(File file, Map<String, Tag> tags, Map<String, Filter> filters, Flavor flavor) throws IOException {
 
         this.tags = tags;
         this.filters = filters;
+        this.flavor = flavor;
 
         try {
             LiquidLexer lexer = new LiquidLexer(new ANTLRFileStream(file.getAbsolutePath()));
-            LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
+            LiquidParser parser = new LiquidParser(flavor, new CommonTokenStream(lexer));
             root = (CommonTree) parser.parse().getTree();
         }
         catch (RecognitionException e) {
@@ -120,7 +133,11 @@ public class Template {
      * @return a new Template instance from a given input file.
      */
     public static Template parse(File file) throws IOException {
-        return new Template(file, Tag.getTags(), Filter.getFilters());
+        return parse(file, Flavor.LIQUID);
+    }
+
+    public static Template parse(File file, Flavor flavor) throws IOException {
+        return new Template(file, Tag.getTags(), Filter.getFilters(), flavor);
     }
 
     public Template with(Tag tag) {
@@ -204,7 +221,7 @@ public class Template {
      */
     public String render(Map<String, Object> context) {
 
-        LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root), this.tags, this.filters);
+        LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root), this.tags, this.filters, this.flavor);
 
         try {
             LNode node = walker.walk();

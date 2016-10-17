@@ -221,6 +221,7 @@ public class Template {
      */
     public String render(Map<String, Object> context) {
 
+        context.put(Flavor.KEY, this.flavor);
         LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root), this.tags, this.filters, this.flavor);
 
         try {

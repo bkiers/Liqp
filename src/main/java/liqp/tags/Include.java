@@ -2,6 +2,7 @@ package liqp.tags;
 
 import liqp.Template;
 import liqp.nodes.LNode;
+import liqp.parser.Flavor;
 
 import java.io.File;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class Include extends Tag {
                 extension = "";
             }
             File includeResourceFile = new File(includesDirectory, includeResource + extension);
-            Template include = Template.parse(includeResourceFile);
+            Template include = Template.parse(includeResourceFile, (Flavor) context.get(Flavor.KEY));
 
             // check if there's a optional "with expression"
             if(nodes.length > 1) {

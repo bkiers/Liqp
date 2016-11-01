@@ -46,11 +46,17 @@ options {
 
   private Map<String, Tag> tags;
   private Map<String, Filter> filters;
+  private Flavor flavor;
 
   public LiquidWalker(TreeNodeStream nodes, Map<String, Tag> tags, Map<String, Filter> filters) {
+    this(nodes, tags, filters, Flavor.LIQUID);
+  }
+
+  public LiquidWalker(TreeNodeStream nodes, Map<String, Tag> tags, Map<String, Filter> filters, Flavor flavor) {
     super(nodes);
     this.tags = tags;
     this.filters = filters;
+    this.flavor = flavor;
   }
 }
 
@@ -195,9 +201,9 @@ include_tag returns [LNode node]
  : ^(INCLUDE file=Str ^(WITH (with=Str)?))
     {
       if($with.text != null) {
-        $node = new TagNode("include", tags.get("include"), new AtomNode($file.text), new AtomNode($with.text));
+        $node = new TagNode("include", tags.get("include"), flavor, new AtomNode($file.text), new AtomNode($with.text));
       } else {
-        $node = new TagNode("include", tags.get("include"), new AtomNode($file.text));
+        $node = new TagNode("include", tags.get("include"), flavor, new AtomNode($file.text));
       }
     }
  ;

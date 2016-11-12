@@ -13,7 +13,7 @@
   <groupId>nl.big-o</groupId>
   <artifactId>liqp</artifactId>
   <packaging>jar</packaging>
-  <version>0.6.4</version>
+  <version>0.6.5-SNAPSHOT</version>
   <name>Liqp</name>
   <description>A Java implementation of the Liquid templating engine backed up by an ANTLR grammar.</description>
   <url>https://github.com/bkiers/Liqp</url>
@@ -29,7 +29,6 @@
     <url>https://github.com/bkiers/Liqp</url>
     <connection>scm:git:git://github.com/bkiers/Liqp.git</connection>
     <developerConnection>scm:git:git@github.com:bkiers/Liqp.git</developerConnection>
-    <tag>1.0.0</tag>
   </scm>
 
   <developers>

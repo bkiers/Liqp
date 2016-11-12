@@ -140,6 +140,10 @@ public class Template {
         return new Template(file, Tag.getTags(), Filter.getFilters(), flavor);
     }
 
+    public static Template parse(String input, Flavor flavor) throws IOException {
+      return new Template(input, Tag.getTags(), Filter.getFilters(), flavor);
+  }
+
     public Template with(Tag tag) {
         this.tags.put(tag.name, tag);
         return this;

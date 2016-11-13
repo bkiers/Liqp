@@ -157,7 +157,7 @@ public class Template {
         return this;
     }
 
-    public Template withProtectionContext(ProtectionSettings protectionSettings) {
+    public Template withProtectionSettings(ProtectionSettings protectionSettings) {
         this.protectionSettings = protectionSettings;
         return this;
     }
@@ -256,8 +256,9 @@ public class Template {
         try {
             return future.get(this.protectionSettings.maxRenderTimeMillis, TimeUnit.MILLISECONDS);
         }
-        catch (Exception e) {
-            throw new RuntimeException(e);
+        catch (Throwable t) {
+            throw new RuntimeException("exceeded the max amount of time (" +
+                    this.protectionSettings.maxRenderTimeMillis + " ms.)");
         }
     }
 

@@ -1,5 +1,6 @@
 package liqp;
 
+import liqp.exceptions.ExceededMaxIterationsException;
 import liqp.parser.Flavor;
 
 import java.util.LinkedHashMap;
@@ -11,6 +12,8 @@ public class TemplateContext {
     public final Flavor flavor;
     private final Map<String, Object> variables;
 
+    public int iterations;
+
     public TemplateContext() {
         this(new ProtectionSettings.Builder().build(), Flavor.LIQUID, new LinkedHashMap<String, Object>());
     }
@@ -19,6 +22,16 @@ public class TemplateContext {
         this.protectionSettings = protectionSettings;
         this.flavor = flavor;
         this.variables = variables;
+        this.iterations = 0;
+    }
+
+    public void incrementIterations() {
+
+        this.iterations++;
+
+        if (this.iterations > this.protectionSettings.maxIterations) {
+            throw new ExceededMaxIterationsException(this.protectionSettings.maxIterations);
+        }
     }
 
     public boolean containsKey(String key) {

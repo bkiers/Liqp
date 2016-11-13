@@ -5,6 +5,7 @@ public class ProtectionSettings {
     public final int maxIterations;
     public final int maxSizeRenderedString;
     public final long maxRenderTimeMillis;
+    // TODO max template size
 
     public static class Builder {
 
@@ -42,14 +43,5 @@ public class ProtectionSettings {
         this.maxIterations = maxIterations;
         this.maxSizeRenderedString = maxSizeRenderedString;
         this.maxRenderTimeMillis = maxRenderTimeMillis;
-    }
-
-    @Override
-    public String toString() {
-        return "ProtectionSettings{" +
-                "maxIterations=" + maxIterations +
-                ", maxSizeRenderedString=" + maxSizeRenderedString +
-                ", maxRenderTimeMillis=" + maxRenderTimeMillis +
-                '}';
     }
 }

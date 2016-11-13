@@ -69,6 +69,8 @@ class Tablerow extends Tag {
 
             for(int i = 0, c = 1, r = 0; i < total; i++, c++) {
 
+                context.incrementIterations();
+
                 context.put(valueName, collection[i]);
 
                 tablerowloopContext.put(INDEX0, i);

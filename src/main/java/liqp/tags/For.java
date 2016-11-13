@@ -3,6 +3,7 @@ package liqp.tags;
 import java.util.List;
 
 import liqp.TemplateContext;
+import liqp.exceptions.ExceededMaxIterationsException;
 import liqp.nodes.BlockNode;
 import liqp.nodes.LNode;
 
@@ -85,6 +86,8 @@ class For extends Tag {
 
         for (int i = offset, n = 0; n < limit && i < array.length; i++, n++) {
 
+            context.incrementIterations();
+
             continueIndex = i;
 
             boolean first = (i == offset);
@@ -166,6 +169,8 @@ class For extends Tag {
 
             for (int i = from + offset, n = 0; i <= to && n < limit; i++, n++) {
 
+                context.incrementIterations();
+
                 continueIndex = i;
 
                 boolean first = (i == (from + offset));
@@ -223,6 +228,9 @@ class For extends Tag {
             }
 
             context.put(CONTINUE, continueIndex + 1);
+        }
+        catch (ExceededMaxIterationsException e) {
+            throw e;
         }
         catch (Exception e) {
             /* just ignore incorrect expressions */

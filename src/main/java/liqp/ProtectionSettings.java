@@ -5,18 +5,20 @@ public class ProtectionSettings {
     public final int maxIterations;
     public final int maxSizeRenderedString;
     public final long maxRenderTimeMillis;
-    // TODO max template size
+    public final long maxTemplateSizeBytes;
 
     public static class Builder {
 
         private int maxIterations;
         private int maxSizeRenderedString;
         private long maxRenderTimeMillis;
+        private long maxTemplateSizeBytes;
 
         public Builder() {
             this.maxIterations = Integer.MAX_VALUE;
             this.maxSizeRenderedString = Integer.MAX_VALUE;
             this.maxRenderTimeMillis = Long.MAX_VALUE;
+            this.maxTemplateSizeBytes = Long.MAX_VALUE;
         }
 
         public Builder withMaxIterations(int maxIterations) {
@@ -34,14 +36,20 @@ public class ProtectionSettings {
             return this;
         }
 
+        public Builder withMaxTemplateSizeBytes(long maxTemplateSizeBytes) {
+            this.maxTemplateSizeBytes = maxTemplateSizeBytes;
+            return this;
+        }
+
         public ProtectionSettings build() {
-            return new ProtectionSettings(this.maxIterations, this.maxSizeRenderedString, this.maxRenderTimeMillis);
+            return new ProtectionSettings(this.maxIterations, this.maxSizeRenderedString, this.maxRenderTimeMillis, this.maxTemplateSizeBytes);
         }
     }
 
-    private ProtectionSettings(int maxIterations, int maxSizeRenderedString, long maxRenderTimeMillis) {
+    private ProtectionSettings(int maxIterations, int maxSizeRenderedString, long maxRenderTimeMillis, long maxTemplateSizeBytes) {
         this.maxIterations = maxIterations;
         this.maxSizeRenderedString = maxSizeRenderedString;
         this.maxRenderTimeMillis = maxRenderTimeMillis;
+        this.maxTemplateSizeBytes = maxTemplateSizeBytes;
     }
 }

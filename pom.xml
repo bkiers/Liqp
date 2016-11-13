@@ -13,7 +13,7 @@
   <groupId>nl.big-o</groupId>
   <artifactId>liqp</artifactId>
   <packaging>jar</packaging>
-  <version>0.6.4</version>
+  <version>0.6.5-SNAPSHOT</version>
   <name>Liqp</name>
   <description>A Java implementation of the Liquid templating engine backed up by an ANTLR grammar.</description>
   <url>https://github.com/bkiers/Liqp</url>
@@ -29,7 +29,6 @@
     <url>https://github.com/bkiers/Liqp</url>
     <connection>scm:git:git://github.com/bkiers/Liqp.git</connection>
     <developerConnection>scm:git:git@github.com:bkiers/Liqp.git</developerConnection>
-    <tag>1.0.0</tag>
   </scm>
 
   <developers>
@@ -54,6 +53,12 @@
     <junit.version>4.6</junit.version>
 
     <main.class></main.class>
+    <!-- Properties for releasing to Maven Central via Takari -->
+    <repoHost>https://otto.takari.io</repoHost>
+    <releaseName>Takari Releases</releaseName>
+    <releaseUrl>${repoHost}/service/local/staging/deploy/maven2</releaseUrl>
+    <snapshotName>Takari Snapshots</snapshotName>
+    <snapshotUrl>${repoHost}/content/repositories/snapshots</snapshotUrl>        
   </properties>
 
   <dependencies>
@@ -149,4 +154,17 @@
     </plugins>
   </build>
 
+  <distributionManagement>
+    <repository>
+      <id>takari.releases</id>
+      <name>${releaseName}</name>
+      <url>${releaseUrl}</url>
+    </repository>
+    <snapshotRepository>
+      <id>takari.snapshots</id>
+      <name>${snapshotName}</name>
+      <url>${snapshotUrl}</url>
+    </snapshotRepository>
+  </distributionManagement>
+  
 </project>

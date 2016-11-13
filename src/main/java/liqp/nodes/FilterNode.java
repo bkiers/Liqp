@@ -1,10 +1,10 @@
 package liqp.nodes;
 
+import liqp.TemplateContext;
 import liqp.filters.Filter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class FilterNode implements LNode {
 
@@ -23,19 +23,19 @@ public class FilterNode implements LNode {
         params.add(param);
     }
 
-    public Object apply(Object value, Map<String, Object> variables) {
+    public Object apply(Object value, TemplateContext context) {
 
         List<Object> paramValues = new ArrayList<Object>();
 
         for (LNode node : params) {
-            paramValues.add(node.render(variables));
+            paramValues.add(node.render(context));
         }
 
         return filter.apply(value, paramValues.toArray(new Object[paramValues.size()]));
     }
 
     @Override
-    public Object render(Map<String, Object> context) {
+    public Object render(TemplateContext context) {
         throw new RuntimeException("cannot render a filter");
     }
 }

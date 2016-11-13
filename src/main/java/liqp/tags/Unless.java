@@ -1,8 +1,7 @@
 package liqp.tags;
 
+import liqp.TemplateContext;
 import liqp.nodes.LNode;
-
-import java.util.Map;
 
 class Unless extends Tag {
 
@@ -10,7 +9,7 @@ class Unless extends Tag {
      * Mirror of if statement
      */
     @Override
-    public Object render(Map<String, Object> context, LNode... nodes) {
+    public Object render(TemplateContext context, LNode... nodes) {
 
         for (int i = 0; i < nodes.length - 1; i += 2) {
 

@@ -1,6 +1,6 @@
 package liqp.nodes;
 
-import java.util.Map;
+import liqp.TemplateContext;
 
 /**
  * Denotes a node in the AST the parse creates from the
@@ -17,5 +17,5 @@ public interface LNode {
      *
      * @return an Object denoting the rendered AST.
      */
-    Object render(Map<String, Object> context);
+    Object render(TemplateContext context);
 }

@@ -1,6 +1,7 @@
 package liqp.tags;
 
 import liqp.LValue;
+import liqp.TemplateContext;
 import liqp.nodes.LNode;
 
 import java.util.HashMap;
@@ -115,5 +116,5 @@ public abstract class Tag extends LValue {
      *
      * @return an Object denoting the rendered AST.
      */
-    public abstract Object render(Map<String, Object> context, LNode... nodes);
+    public abstract Object render(TemplateContext context, LNode... nodes);
 }

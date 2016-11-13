@@ -1,11 +1,10 @@
 package liqp.tags;
 
+import liqp.TemplateContext;
 import liqp.nodes.LNode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 class Cycle extends Tag {
 
@@ -16,7 +15,7 @@ class Cycle extends Tag {
      * between values, like colors or DOM classes.
      */
     @Override
-    public Object render(Map<String, Object> context, LNode... nodes) {
+    public Object render(TemplateContext context, LNode... nodes) {
 
         // The group-name is either the first token-expression, or if that is
         // null (indicating there is no name), give it the name PREPEND followed

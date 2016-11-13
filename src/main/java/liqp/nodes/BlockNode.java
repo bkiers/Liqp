@@ -1,9 +1,9 @@
 package liqp.nodes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+
+import liqp.TemplateContext;
 import liqp.tags.Tag;
 
 public class BlockNode implements LNode {
@@ -23,7 +23,7 @@ public class BlockNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> context) {
+    public Object render(TemplateContext context) {
 
         StringBuilder builder = new StringBuilder();
 

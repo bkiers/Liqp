@@ -1,6 +1,8 @@
 package liqp.tags;
 
 import java.util.List;
+
+import liqp.TemplateContext;
 import liqp.nodes.BlockNode;
 import liqp.nodes.LNode;
 
@@ -36,7 +38,7 @@ class For extends Tag {
      * For loop
      */
     @Override
-    public Object render(Map<String, Object> context, LNode... nodes) {
+    public Object render(TemplateContext context, LNode... nodes) {
 
         // The first node in the array denotes whether this is a for-tag
         // over an array, `for item in array ...`, or a for-tag over a
@@ -54,7 +56,7 @@ class For extends Tag {
         return rendered;
     }
 
-    private Object renderArray(String id, Map<String, Object> context, LNode... tokens) {
+    private Object renderArray(String id, TemplateContext context, LNode... tokens) {
 
         StringBuilder builder = new StringBuilder();
 
@@ -140,7 +142,7 @@ class For extends Tag {
         return builder.toString();
     }
 
-    private Object renderRange(String id, Map<String, Object> context, LNode... tokens) {
+    private Object renderRange(String id, TemplateContext context, LNode... tokens) {
 
         StringBuilder builder = new StringBuilder();
 
@@ -229,7 +231,7 @@ class For extends Tag {
         return builder.toString();
     }
 
-    private Map<String, Integer> getAttributes(int fromIndex, Map<String, Object> context, LNode... tokens) {
+    private Map<String, Integer> getAttributes(int fromIndex, TemplateContext context, LNode... tokens) {
 
         Map<String, Integer> attributes = new HashMap<String, Integer>();
 

@@ -131,7 +131,7 @@ public class Examples {
 
         Tag.registerTag(new Tag("loop"){
             @Override
-            public Object render(Map<String, Object> context, LNode... nodes) {
+            public Object render(TemplateContext context, LNode... nodes) {
 
                 int n = super.asNumber(nodes[0].render(context)).intValue();
                 LNode block = nodes[1];
@@ -161,7 +161,7 @@ public class Examples {
 
         Template template = Template.parse(source).with(new Tag("loop"){
             @Override
-            public Object render(Map<String, Object> context, LNode... nodes) {
+            public Object render(TemplateContext context, LNode... nodes) {
 
                 int n = super.asNumber(nodes[0].render(context)).intValue();
                 LNode block = nodes[1];

@@ -43,6 +43,13 @@ public class TemplateTest {
                 "c" /* no value */
         );
         assertThat(rendered, is(expected + expected));
+
+        rendered = Template.parse("{{a}}{{b}}{{c}}").render(
+                "a", "A",
+                "b", "B",
+                "c", "C"
+        );
+        assertThat(rendered, is("ABC"));
     }
 
     @Test(expected = RuntimeException.class)

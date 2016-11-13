@@ -74,4 +74,21 @@ public class ProtectionSettingsTest {
                 .withProtectionSettings(new ProtectionSettings.Builder().withMaxIterations(5).build())
                 .render("{ \"collections\" : { \"frontpage\" : [1,2,3,4,5,6] } }");
     }
+
+    @Test
+    public void testWithinMaxTemplateSizeBytes() {
+        Template.parse("{% tablerow n in collections.frontpage cols:3%} {{n}} {% endtablerow %}")
+                .render("{ \"collections\" : { \"frontpage\" : [1,2,3,4,5,6] } }");
+
+        Template.parse("{% tablerow n in collections.frontpage cols:3%} {{n}} {% endtablerow %}")
+                .withProtectionSettings(new ProtectionSettings.Builder().withMaxTemplateSizeBytes(3000).build())
+                .render("{ \"collections\" : { \"frontpage\" : [1,2,3,4,5,6] } }");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testExceedMaxTemplateSizeBytes() {
+        Template.parse("{% tablerow n in collections.frontpage cols:3%} {{n}} {% endtablerow %}")
+                .withProtectionSettings(new ProtectionSettings.Builder().withMaxTemplateSizeBytes(30).build())
+                .render("{ \"collections\" : { \"frontpage\" : [1,2,3,4,5,6] } }");
+    }
 }

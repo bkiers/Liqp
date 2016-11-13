@@ -48,6 +48,8 @@ public class Template {
 
     private final Flavor flavor;
 
+    private final long templateSize;
+
     private ProtectionSettings protectionSettings = new ProtectionSettings.Builder().build();
 
     /**
@@ -69,11 +71,13 @@ public class Template {
         this.filters = filters;
         this.flavor = flavor;
 
-        LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(input));
+        ANTLRStringStream stream = new ANTLRStringStream(input);
+        this.templateSize = stream.size();
+        LiquidLexer lexer = new LiquidLexer(stream);
         LiquidParser parser = new LiquidParser(flavor, new CommonTokenStream(lexer));
 
         try {
-            root = (CommonTree) parser.parse().getTree();
+            root = parser.parse().getTree();
         }
         catch (RecognitionException e) {
             throw new RuntimeException("could not parse input: " + input, e);
@@ -97,9 +101,11 @@ public class Template {
         this.flavor = flavor;
 
         try {
-            LiquidLexer lexer = new LiquidLexer(new ANTLRFileStream(file.getAbsolutePath()));
+            ANTLRFileStream stream = new ANTLRFileStream(file.getAbsolutePath());
+            this.templateSize = stream.size();
+            LiquidLexer lexer = new LiquidLexer();
             LiquidParser parser = new LiquidParser(flavor, new CommonTokenStream(lexer));
-            root = (CommonTree) parser.parse().getTree();
+            root = parser.parse().getTree();
         }
         catch (RecognitionException e) {
             throw new RuntimeException("could not parse input from " + file, e);
@@ -233,6 +239,10 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String render(final Map<String, Object> variables) {
+
+        if (this.templateSize > this.protectionSettings.maxTemplateSizeBytes) {
+            throw new RuntimeException("template exceeds " + this.protectionSettings.maxTemplateSizeBytes + " bytes");
+        }
 
         final LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root), this.tags, this.filters, this.flavor);
 

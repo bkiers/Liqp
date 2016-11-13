@@ -103,7 +103,7 @@ public class Template {
         try {
             ANTLRFileStream stream = new ANTLRFileStream(file.getAbsolutePath());
             this.templateSize = stream.size();
-            LiquidLexer lexer = new LiquidLexer();
+            LiquidLexer lexer = new LiquidLexer(stream);
             LiquidParser parser = new LiquidParser(flavor, new CommonTokenStream(lexer));
             root = parser.parse().getTree();
         }

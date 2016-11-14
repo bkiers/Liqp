@@ -1,9 +1,10 @@
 package liqp.nodes;
 
+import liqp.TemplateContext;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 class LookupNode implements LNode {
 
@@ -20,13 +21,13 @@ class LookupNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> context) {
+    public Object render(TemplateContext context) {
 
         Object value;
 
         // Check if there's a [var] lookup, AST: ^(LOOKUP Id["@var"])
         if(id.startsWith("@")) {
-            value = context.get(context.get(id.substring(1)));
+            value = context.get(String.valueOf(context.get(id.substring(1))));
         }
         else {
             value = context.get(id);
@@ -45,7 +46,7 @@ class LookupNode implements LNode {
     }
 
     interface Indexable {
-        Object get(Object value, Map<String, Object> context);
+        Object get(Object value, TemplateContext context);
     }
 
     public static class Hash implements Indexable {
@@ -57,7 +58,7 @@ class LookupNode implements LNode {
         }
 
         @Override
-        public Object get(Object value, Map<String, Object> context) {
+        public Object get(Object value, TemplateContext context) {
 
             if(value == null) {
                 return null;
@@ -99,6 +100,9 @@ class LookupNode implements LNode {
             if(value instanceof java.util.Map) {
                 return ((java.util.Map)value).get(hash);
             }
+            else if(value instanceof TemplateContext) {
+                return ((TemplateContext)value).get(hash);
+            }
             else {
                 return null;
             }
@@ -121,7 +125,7 @@ class LookupNode implements LNode {
         }
 
         @Override
-        public Object get(Object value, Map<String, Object> context) {
+        public Object get(Object value, TemplateContext context) {
 
             if(value == null) {
                 return null;

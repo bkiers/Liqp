@@ -1,9 +1,8 @@
 package liqp.tags;
 
+import liqp.TemplateContext;
 import liqp.nodes.FilterNode;
 import liqp.nodes.LNode;
-
-import java.util.Map;
 
 class Assign extends Tag {
 
@@ -11,7 +10,7 @@ class Assign extends Tag {
      * Assigns some value to a variable
      */
     @Override
-    public Object render(Map<String, Object> context, LNode... nodes) {
+    public Object render(TemplateContext context, LNode... nodes) {
 
         String id = String.valueOf(nodes[0].render(context));
 

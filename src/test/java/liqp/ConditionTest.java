@@ -132,7 +132,7 @@ public class ConditionTest {
     @Test
     public void containsWorksOnArraysTest() throws Exception {
 
-        Map<String, Object> context = new HashMap<String, Object>();
+        TemplateContext context = new TemplateContext();
         context.put("array", new Long[]{1L, 2L, 3L, 4L, 5L});
 
         assertThat(getNode("array contains 0", "expr").render(context), is((Object)false));
@@ -155,7 +155,7 @@ public class ConditionTest {
     @Test
     public void containsReturnsFalseForNilOperandsTest() throws Exception {
 
-        Map<String, Object> context = new HashMap<String, Object>();
+        TemplateContext context = new TemplateContext();
 
         assertThat(getNode("not_assigned contains 0", "expr").render(context), is((Object)false));
         assertThat(getNode("0 contains not_assigned", "expr").render(context), is((Object)false));
@@ -172,7 +172,7 @@ public class ConditionTest {
     @Test
     public void leftOrRightMayContainOperatorsTest() throws Exception {
 
-        Map<String, Object> context = new HashMap<String, Object>();
+        TemplateContext context = new TemplateContext();
         context.put("one", "gnomeslab-and-or-liquid");
         context.put("another", "gnomeslab-and-or-liquid");
 

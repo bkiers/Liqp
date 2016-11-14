@@ -57,7 +57,7 @@ public class TemplateTest {
         Template.parse("mu").render(123, 456);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test(expected = RuntimeException.class)
     public void renderVarArgsTestInvalidKey2() throws RecognitionException {
         Template.parse("mu").render(null, 456);
     }

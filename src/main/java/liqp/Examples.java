@@ -18,6 +18,22 @@ import java.util.Map;
  */
 public class Examples {
 
+    private static void demoGuards() {
+
+        ProtectionSettings protectionSettings = new ProtectionSettings.Builder()
+                .withMaxSizeRenderedString(300)
+                .withMaxIterations(15)
+                .withMaxRenderTimeMillis(100L)
+                .withMaxTemplateSizeBytes(100)
+                .build();
+
+        String rendered = Template.parse("{% for i in (1..10) %}{{ text }}{% endfor %}")
+                .withProtectionSettings(protectionSettings)
+                .render("{\"text\": \"abcdefghijklmnopqrstuvwxyz\"}");
+
+        System.out.println(rendered);
+    }
+
     private static void demoPrintAST() {
 
         String input =
@@ -131,7 +147,7 @@ public class Examples {
 
         Tag.registerTag(new Tag("loop"){
             @Override
-            public Object render(Map<String, Object> context, LNode... nodes) {
+            public Object render(TemplateContext context, LNode... nodes) {
 
                 int n = super.asNumber(nodes[0].render(context)).intValue();
                 LNode block = nodes[1];
@@ -161,7 +177,7 @@ public class Examples {
 
         Template template = Template.parse(source).with(new Tag("loop"){
             @Override
-            public Object render(Map<String, Object> context, LNode... nodes) {
+            public Object render(TemplateContext context, LNode... nodes) {
 
                 int n = super.asNumber(nodes[0].render(context)).intValue();
                 LNode block = nodes[1];

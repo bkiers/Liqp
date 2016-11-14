@@ -1,5 +1,6 @@
 package liqp.nodes;
 
+import liqp.TemplateContext;
 import liqp.parser.Flavor;
 import liqp.tags.Include;
 import liqp.tags.Tag;
@@ -27,14 +28,7 @@ class TagNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> context) {
-
-        // Check if the INCLUDES_DIRECTORY_KEY has already been set, and if not,
-        // set it based on the value in the flavor.
-        if (!context.containsKey(Include.INCLUDES_DIRECTORY_KEY)) {
-            context.put(Include.INCLUDES_DIRECTORY_KEY, new File(flavor.snippetsFolderName));
-        }
-
+    public Object render(TemplateContext context) {
         return tag.render(context, tokens);
     }
 }

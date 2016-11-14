@@ -1,17 +1,23 @@
 package liqp.nodes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+
+import liqp.TemplateContext;
 import liqp.tags.Tag;
 
 public class BlockNode implements LNode {
 
     private List<LNode> children;
+    private final boolean isRootBlock;
 
     public BlockNode() {
-        children = new ArrayList<LNode>();
+        this(false);
+    }
+
+    public BlockNode(boolean isRootBlock) {
+        this.children = new ArrayList<LNode>();
+        this.isRootBlock = isRootBlock;
     }
 
     public void add(LNode node) {
@@ -23,7 +29,7 @@ public class BlockNode implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> context) {
+    public Object render(TemplateContext context) {
 
         StringBuilder builder = new StringBuilder();
 
@@ -49,6 +55,10 @@ public class BlockNode implements LNode {
             }
             else {
                 builder.append(String.valueOf(value));
+            }
+
+            if (builder.length() > context.protectionSettings.maxSizeRenderedString) {
+                throw new RuntimeException("rendered string exceeds " + context.protectionSettings.maxSizeRenderedString);
             }
         }
 

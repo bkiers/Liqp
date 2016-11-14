@@ -6,8 +6,6 @@ import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -45,11 +43,8 @@ public class IncludeTest {
     public void renderTestWithIncludeDirectorySpecifiedInContextLiquidFlavor() throws Exception {
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_with_quotes.html");
-        File includes = new File(jekyll, "_includes");
         Template template = Template.parse(index);
-        Map<String, Object> context = new HashMap<String,Object>();
-        context.put(Include.INCLUDES_DIRECTORY_KEY, includes);
-        String result = template.render(context);
+        String result = template.render();
         assertTrue(result.contains("HEADER"));
     }
 
@@ -57,11 +52,8 @@ public class IncludeTest {
     public void renderTestWithIncludeDirectorySpecifiedInContextJekyllFlavor() throws Exception {
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_without_quotes.html");
-        File includes = new File(jekyll, "_includes");
         Template template = Template.parse(index, Flavor.JEKYLL);
-        Map<String, Object> context = new HashMap<String,Object>();
-        context.put(Include.INCLUDES_DIRECTORY_KEY, includes);
-        String result = template.render(context);
+        String result = template.render();
         assertTrue(result.contains("HEADER"));
     }
 

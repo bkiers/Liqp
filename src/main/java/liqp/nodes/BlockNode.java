@@ -9,9 +9,15 @@ import liqp.tags.Tag;
 public class BlockNode implements LNode {
 
     private List<LNode> children;
+    private final boolean isRootBlock;
 
     public BlockNode() {
-        children = new ArrayList<LNode>();
+        this(false);
+    }
+
+    public BlockNode(boolean isRootBlock) {
+        this.children = new ArrayList<LNode>();
+        this.isRootBlock = isRootBlock;
     }
 
     public void add(LNode node) {
@@ -49,6 +55,10 @@ public class BlockNode implements LNode {
             }
             else {
                 builder.append(String.valueOf(value));
+            }
+
+            if (builder.length() > context.protectionSettings.maxSizeRenderedString) {
+                throw new RuntimeException("rendered string exceeds " + context.protectionSettings.maxSizeRenderedString);
             }
         }
 

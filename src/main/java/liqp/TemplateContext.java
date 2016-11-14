@@ -8,11 +8,10 @@ import java.util.Map;
 
 public class TemplateContext {
 
-    private final ProtectionSettings protectionSettings;
+    public final ProtectionSettings protectionSettings;
     public final Flavor flavor;
     private final Map<String, Object> variables;
-
-    public int iterations;
+    private int iterations;
 
     public TemplateContext() {
         this(new ProtectionSettings.Builder().build(), Flavor.LIQUID, new LinkedHashMap<String, Object>());

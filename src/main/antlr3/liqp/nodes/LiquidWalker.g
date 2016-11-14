@@ -47,6 +47,7 @@ options {
   private Map<String, Tag> tags;
   private Map<String, Filter> filters;
   private Flavor flavor;
+  private boolean isRootBlock = true;
 
   public LiquidWalker(TreeNodeStream nodes, Map<String, Tag> tags, Map<String, Filter> filters) {
     this(nodes, tags, filters, Flavor.LIQUID);
@@ -65,7 +66,10 @@ walk returns [LNode node]
  ;
 
 block returns [BlockNode node]
-@init{$node = new BlockNode();}
+@init{
+  $node = new BlockNode(isRootBlock);
+  isRootBlock = false;
+}
  : ^(BLOCK (atom {$node.add($atom.node);})*)
  ;
 

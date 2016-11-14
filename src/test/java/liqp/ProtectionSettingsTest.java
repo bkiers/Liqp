@@ -91,4 +91,21 @@ public class ProtectionSettingsTest {
                 .withProtectionSettings(new ProtectionSettings.Builder().withMaxTemplateSizeBytes(30).build())
                 .render("{ \"collections\" : { \"frontpage\" : [1,2,3,4,5,6] } }");
     }
+
+    @Test
+    public void testWithinMaxSizeRenderedString() {
+        Template.parse("{% for i in (1..100) %}{{ abc }}{% endfor %}")
+                .render("{\"abc\": \"abcdefghijklmnopqrstuvwxyz\"}");
+
+        Template.parse("{% for i in (1..100) %}{{ abc }}{% endfor %}")
+                .withProtectionSettings(new ProtectionSettings.Builder().withMaxSizeRenderedString(2700).build())
+                .render("{\"abc\": \"abcdefghijklmnopqrstuvwxyz\"}");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testExceedMaxSizeRenderedString() {
+        Template.parse("{% for i in (1..1000) %}{{ abc }}{% endfor %}")
+                .withProtectionSettings(new ProtectionSettings.Builder().withMaxSizeRenderedString(2500).build())
+                .render("{\"abc\": \"abcdefghijklmnopqrstuvwxyz\"}");
+    }
 }

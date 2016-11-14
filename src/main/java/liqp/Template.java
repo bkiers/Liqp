@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 
 /**
  * The main class of this library. Use one of its static
@@ -47,6 +48,10 @@ public class Template {
 
     private final Flavor flavor;
 
+    private final long templateSize;
+
+    private ProtectionSettings protectionSettings = new ProtectionSettings.Builder().build();
+
     /**
      * Creates a new Template instance from a given input.
      *  @param input
@@ -66,11 +71,13 @@ public class Template {
         this.filters = filters;
         this.flavor = flavor;
 
-        LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(input));
+        ANTLRStringStream stream = new ANTLRStringStream(input);
+        this.templateSize = stream.size();
+        LiquidLexer lexer = new LiquidLexer(stream);
         LiquidParser parser = new LiquidParser(flavor, new CommonTokenStream(lexer));
 
         try {
-            root = (CommonTree) parser.parse().getTree();
+            root = parser.parse().getTree();
         }
         catch (RecognitionException e) {
             throw new RuntimeException("could not parse input: " + input, e);
@@ -94,9 +101,11 @@ public class Template {
         this.flavor = flavor;
 
         try {
-            LiquidLexer lexer = new LiquidLexer(new ANTLRFileStream(file.getAbsolutePath()));
+            ANTLRFileStream stream = new ANTLRFileStream(file.getAbsolutePath());
+            this.templateSize = stream.size();
+            LiquidLexer lexer = new LiquidLexer(stream);
             LiquidParser parser = new LiquidParser(flavor, new CommonTokenStream(lexer));
-            root = (CommonTree) parser.parse().getTree();
+            root = parser.parse().getTree();
         }
         catch (RecognitionException e) {
             throw new RuntimeException("could not parse input from " + file, e);
@@ -140,6 +149,10 @@ public class Template {
         return new Template(file, Tag.getTags(), Filter.getFilters(), flavor);
     }
 
+    public static Template parse(String input, Flavor flavor) throws IOException {
+        return new Template(input, Tag.getTags(), Filter.getFilters(), flavor);
+    }
+
     public Template with(Tag tag) {
         this.tags.put(tag.name, tag);
         return this;
@@ -147,6 +160,11 @@ public class Template {
 
     public Template with(Filter filter) {
         this.filters.put(filter.name, filter);
+        return this;
+    }
+
+    public Template withProtectionSettings(ProtectionSettings protectionSettings) {
+        this.protectionSettings = protectionSettings;
         return this;
     }
 
@@ -174,10 +192,18 @@ public class Template {
         return render(map);
     }
 
+    public String render() {
+        return render(new HashMap<String, Object>());
+    }
+
     /**
      * Renders the template.
      *
-     * @param context
+     * @param key
+     *         a key
+     * @param value
+     *         the value belonging to the key
+     * @param keyValues
      *         an array denoting key-value pairs where the
      *         uneven numbers (even indexes) should be Strings.
      *         If the length of this array is uneven, the last
@@ -188,22 +214,15 @@ public class Template {
      *
      * @return a string denoting the rendered template.
      */
-    public String render(Object... context) {
+    public String render(Object key, Object value, Object... keyValues) {
 
         Map<String, Object> map = new HashMap<String, Object>();
+        putStringKey(key, value, map);
 
-        for (int i = 0; i < context.length - 1; i++) {
-
-            Object key = context[i];
-
-            if (key.getClass() != String.class) {
-                throw new RuntimeException("illegal key: " + String.valueOf(key) +
-                        " (" + key.getClass().getName() + "). Must be a String.");
-            }
-
-            Object value = context[i + 1];
-
-            map.put((String) key, value);
+        for (int i = 0; i < keyValues.length - 1; i += 2) {
+            key = String.valueOf(keyValues[i]);
+            value = keyValues[i + 1];
+            putStringKey(key, value, map);
         }
 
         return render(map);
@@ -212,25 +231,44 @@ public class Template {
     /**
      * Renders the template.
      *
-     * @param context
+     * @param variables
      *         a Map denoting the (possibly nested)
      *         variables that can be used in this
      *         Template.
      *
      * @return a string denoting the rendered template.
      */
-    public String render(Map<String, Object> context) {
+    public String render(final Map<String, Object> variables) {
 
-        context.put(Flavor.KEY, this.flavor);
-        LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root), this.tags, this.filters, this.flavor);
+        if (this.templateSize > this.protectionSettings.maxTemplateSizeBytes) {
+            throw new RuntimeException("template exceeds " + this.protectionSettings.maxTemplateSizeBytes + " bytes");
+        }
+
+        final LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root), this.tags, this.filters, this.flavor);
+
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+        Callable<String> task = new Callable<String>() {
+            public String call() throws Exception {
+                try {
+                    LNode node = walker.walk();
+                    Object rendered = node.render(new TemplateContext(protectionSettings, flavor, variables));
+                    return rendered == null ? "" : String.valueOf(rendered);
+                }
+                catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        };
+
+        Future<String> future = executorService.submit(task);
 
         try {
-            LNode node = walker.walk();
-            Object rendered = node.render(context);
-            return rendered == null ? "" : String.valueOf(rendered);
+            return future.get(this.protectionSettings.maxRenderTimeMillis, TimeUnit.MILLISECONDS);
         }
-        catch (Exception e) {
-            throw new RuntimeException(e);
+        catch (Throwable t) {
+            throw new RuntimeException("exceeded the max amount of time (" +
+                    this.protectionSettings.maxRenderTimeMillis + " ms.)");
         }
     }
 
@@ -301,5 +339,14 @@ public class Template {
                 }
             }
         }
+    }
+
+    private void putStringKey(Object key, Object value, Map<String, Object> map) {
+
+        if (key == null || key.getClass() != String.class) {
+            throw new RuntimeException("invalid key: " + key);
+        }
+
+        map.put((String) key, value);
     }
 }

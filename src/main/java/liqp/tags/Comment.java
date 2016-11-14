@@ -1,8 +1,7 @@
 package liqp.tags;
 
+import liqp.TemplateContext;
 import liqp.nodes.LNode;
-
-import java.util.Map;
 
 class Comment extends Tag {
 
@@ -10,7 +9,7 @@ class Comment extends Tag {
      * Block tag, comments out the text in the block
      */
     @Override
-    public Object render(Map<String, Object> context, LNode... nodes) {
+    public Object render(TemplateContext context, LNode... nodes) {
         return "";
     }
 }

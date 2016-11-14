@@ -1,6 +1,7 @@
 package liqp.nodes;
 
 import liqp.LValue;
+import liqp.TemplateContext;
 
 import java.util.Map;
 
@@ -15,7 +16,7 @@ class AndNode extends LValue implements LNode {
     }
 
     @Override
-    public Object render(Map<String, Object> context) {
+    public Object render(TemplateContext context) {
 
         Object a = lhs.render(context);
         Object b = rhs.render(context);

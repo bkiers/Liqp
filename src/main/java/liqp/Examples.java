@@ -18,6 +18,22 @@ import java.util.Map;
  */
 public class Examples {
 
+    private static void demoGuards() {
+
+        ProtectionSettings protectionSettings = new ProtectionSettings.Builder()
+                .withMaxSizeRenderedString(300)
+                .withMaxIterations(15)
+                .withMaxRenderTimeMillis(100L)
+                .withMaxTemplateSizeBytes(100)
+                .build();
+
+        String rendered = Template.parse("{% for i in (1..10) %}{{ text }}{% endfor %}")
+                .withProtectionSettings(protectionSettings)
+                .render("{\"text\": \"abcdefghijklmnopqrstuvwxyz\"}");
+
+        System.out.println(rendered);
+    }
+
     private static void demoPrintAST() {
 
         String input =

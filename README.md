@@ -347,3 +347,31 @@ System.out.println(rendered);
     15.0
 */
 ```
+
+### 2.3 Guards
+
+If you're evaluating template from untrusted sources, there are a couple of 
+ways you can guard against unwanted input.
+
+For example, if you'd like the input template to be no larger than 125 characters,
+the templating engine should not perform more than 15 iterations in total,
+the generated string should not exceed 300 characters and the total rendering (and parsing!) 
+time should not exceed 100 milliseconds, you could do something like this:
+
+```java
+ProtectionSettings protectionSettings = new ProtectionSettings.Builder()
+        .withMaxSizeRenderedString(300)
+        .withMaxIterations(15)
+        .withMaxRenderTimeMillis(100L)
+        .withMaxTemplateSizeBytes(125)
+        .build();
+
+String rendered = Template.parse("{% for i in (1..10) %}{{ text }}{% endfor %}")
+        .withProtectionSettings(protectionSettings)
+        .render("{\"text\": \"abcdefghijklmnopqrstuvwxyz\"}");
+
+System.out.println(rendered);
+```
+
+Note that not providing a `ProtectionSettings`, equals not having any guards in 
+place (or better, very large limits).

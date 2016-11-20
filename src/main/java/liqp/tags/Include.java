@@ -8,6 +8,7 @@ import java.io.File;
 
 public class Include extends Tag {
 
+    public static final String INCLUDES_DIRECTORY_KEY = "liqp@includes_directory";
     public static String DEFAULT_EXTENSION = ".liquid";
 
     @Override
@@ -19,9 +20,15 @@ public class Include extends Tag {
             if(includeResource.indexOf('.') > 0) {
                 extension = "";
             }
-            File includeResourceFile = new File(context.flavor.snippetsFolderName, includeResource + extension);
+            File includeResourceFile;            
+            File includesDirectory = (File) context.get(INCLUDES_DIRECTORY_KEY);
+            if (includesDirectory != null) {
+                includeResourceFile = new File(includesDirectory, includeResource + extension);
+            } 
+            else {
+              includeResourceFile = new File(context.flavor.snippetsFolderName, includeResource + extension);
+            }            
             Template template = Template.parse(includeResourceFile, context.flavor);
-
             // check if there's a optional "with expression"
             if(nodes.length > 1) {
                 Object value = nodes[1].render(context);

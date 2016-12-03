@@ -30,6 +30,7 @@ Add the following dependency:
 Or clone this repository and run: `mvn install` which will create a JAR of Liqp
 in your local Maven repository, as well as in the project's `target/` folder.
 
+# Usage
 
 This library can be used in two different ways:
 

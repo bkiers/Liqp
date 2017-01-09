@@ -15,7 +15,7 @@ class Date extends Filter {
 
     static {
         addDatePattern("yyyy-MM-dd HH:mm:ss");
-        addDatePattern("EEE MMM ddhh:mm:ss yyyy");
+        addDatePattern("EEE MMM dd hh:mm:ss yyyy");
         init();
     }
 

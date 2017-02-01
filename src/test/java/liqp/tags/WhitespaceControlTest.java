@@ -1,5 +1,6 @@
 package liqp.tags;
 
+import liqp.ParseSettings;
 import liqp.Template;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
@@ -75,6 +76,17 @@ public class WhitespaceControlTest {
 
         String source = "a  \n  {%- assign letter = 'b' -%}  \n{{- letter -}}\n  c";
         Template template = Template.parse(source);
+        String rendered = String.valueOf(template.render().replace(' ', '.'));
+
+        assertThat(rendered, is("abc"));
+    }
+
+    @Test
+    public void defaultStrip() throws RecognitionException {
+
+        String source = "a  \n  {% assign letter = 'b' %}  \n{{ letter }}\n  c";
+        ParseSettings settings = new ParseSettings.Builder().withStripSpaceAroundTags(true).build();
+        Template template = Template.parse(source, settings);
         String rendered = String.valueOf(template.render().replace(' ', '.'));
 
         assertThat(rendered, is("abc"));

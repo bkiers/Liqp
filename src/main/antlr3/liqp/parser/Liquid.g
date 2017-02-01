@@ -90,8 +90,16 @@ tokens {
 }
 
 @lexer::members {
+
+  private boolean stripSpacesAroundTags = false;
+
   private boolean inTag = false;
   private boolean inRaw = false;
+
+  public LiquidLexer(boolean stripSpacesAroundTags, CharStream input) {
+    this(input, new RecognizerSharedState());
+    this.stripSpacesAroundTags = stripSpacesAroundTags;
+  }
 
   private boolean openStripTagAhead() {
 
@@ -101,7 +109,9 @@ tokens {
       indexLA++;
     }
 
-    return input.LA(indexLA) == '{' && (input.LA(indexLA + 1) == '{' || input.LA(indexLA + 1) == '\u0025') && input.LA(indexLA + 2) == '-';
+    return stripSpacesAroundTags
+        ? input.LA(indexLA) == '{' && (input.LA(indexLA + 1) == '{' || input.LA(indexLA + 1) == '\u0025')
+        : input.LA(indexLA) == '{' && (input.LA(indexLA + 1) == '{' || input.LA(indexLA + 1) == '\u0025') && input.LA(indexLA + 2) == '-';
   }
 
   private boolean openRawEndTagAhead() {
@@ -399,6 +409,11 @@ other_than_tag_end
  ;
 
 /* lexer rules */
+OutStartDefaultStrip : {stripSpacesAroundTags}?=> WhitespaceChar* '{{' {inTag=true; $type=OutStart;};
+OutEndDefaultStrip   : {stripSpacesAroundTags}?=> '}}' WhitespaceChar* {inTag=false; $type=OutEnd;};
+TagStartDefaultStrip : {stripSpacesAroundTags}?=> WhitespaceChar* '{%' {inTag=true; $type=TagStart;};
+TagEndDefaultStrip   : {stripSpacesAroundTags}?=> '%}' WhitespaceChar* {inTag=false; $type=TagEnd;};
+
 OutStartStrip : WhitespaceChar* '{{-' {inTag=true; $type=OutStart;};
 OutEndStrip   : '-}}' WhitespaceChar* {inTag=false; $type=OutEnd;};
 TagStartStrip : WhitespaceChar* '{%-' {inTag=true; $type=TagStart;};

@@ -93,6 +93,17 @@ tokens {
   private boolean inTag = false;
   private boolean inRaw = false;
 
+  private boolean openStripTagAhead() {
+
+    int indexLA = 1;
+
+    while(Character.isSpaceChar(input.LA(indexLA)) || input.LA(indexLA) == '\r' || input.LA(indexLA) == '\n') {
+      indexLA++;
+    }
+
+    return input.LA(indexLA) == '{' && (input.LA(indexLA + 1) == '{' || input.LA(indexLA + 1) == '\u0025') && input.LA(indexLA + 2) == '-';
+  }
+
   private boolean openRawEndTagAhead() {
 
     if(!openTagAhead()) {
@@ -388,6 +399,11 @@ other_than_tag_end
  ;
 
 /* lexer rules */
+OutStartStrip : WhitespaceChar* '{{-' {inTag=true; $type=OutStart;};
+OutEndStrip   : '-}}' WhitespaceChar* {inTag=false; $type=OutEnd;};
+TagStartStrip : WhitespaceChar* '{%-' {inTag=true; $type=TagStart;};
+TagEndStrip   : '-%}' WhitespaceChar* {inTag=false; $type=TagEnd;};
+
 OutStart : '{{' {inTag=true;};
 OutEnd   : '}}' {inTag=false;};
 TagStart : '{%' {inTag=true;};
@@ -462,7 +478,7 @@ Id
  ;
 
 Other
- : ({!inTag && !openTagAhead()}?=> . )+
+ : ({!openStripTagAhead() && !inTag && !openTagAhead()}?=> . )+
  | ({!inTag && inRaw && !openRawEndTagAhead()}?=> . )+
  ;
 
@@ -471,6 +487,8 @@ NoSpace
  ;
 
 /* fragment rules */
+fragment WhitespaceChar : ' ' | '\t' | '\r' | '\n';
+
 fragment Letter : 'a'..'z' | 'A'..'Z';
 fragment Digit  : '0'..'9';
 fragment SStr   : '\'' ~'\''* '\'' {setText(strip($text, true));};

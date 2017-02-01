@@ -46,11 +46,11 @@ public class Template {
      */
     private final Map<String, Filter> filters;
 
-    private final Flavor flavor;
-
     private final long templateSize;
 
     private ProtectionSettings protectionSettings = new ProtectionSettings.Builder().build();
+
+    private final ParseSettings parseSettings;
 
     /**
      * Creates a new Template instance from a given input.
@@ -61,20 +61,16 @@ public class Template {
      * @param filters
      *         the filters this instance will make use of.
      */
-    private Template(String input, Map<String, Tag> tags, Map<String, Filter> filters) {
-        this(input, tags, filters, Flavor.LIQUID);
-    }
-
-    private Template(String input, Map<String, Tag> tags, Map<String, Filter> filters, Flavor flavor) {
+    private Template(String input, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings settings) {
 
         this.tags = tags;
         this.filters = filters;
-        this.flavor = flavor;
+        this.parseSettings = settings;
 
         ANTLRStringStream stream = new ANTLRStringStream(input);
         this.templateSize = stream.size();
-        LiquidLexer lexer = new LiquidLexer(stream);
-        LiquidParser parser = new LiquidParser(flavor, new CommonTokenStream(lexer));
+        LiquidLexer lexer = new LiquidLexer(parseSettings.stripSpacesAroundTags, stream);
+        LiquidParser parser = new LiquidParser(parseSettings.flavor, new CommonTokenStream(lexer));
 
         try {
             root = parser.parse().getTree();
@@ -90,21 +86,17 @@ public class Template {
      * @param file
      *         the file holding the Liquid source.
      */
-    private Template(File file, Map<String, Tag> tags, Map<String, Filter> filters) throws IOException {
-        this(file, tags, filters, Flavor.LIQUID);
-    }
-
-    private Template(File file, Map<String, Tag> tags, Map<String, Filter> filters, Flavor flavor) throws IOException {
+    private Template(File file, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings) throws IOException {
 
         this.tags = tags;
         this.filters = filters;
-        this.flavor = flavor;
+        this.parseSettings = parseSettings;
 
         try {
             ANTLRFileStream stream = new ANTLRFileStream(file.getAbsolutePath());
             this.templateSize = stream.size();
-            LiquidLexer lexer = new LiquidLexer(stream);
-            LiquidParser parser = new LiquidParser(flavor, new CommonTokenStream(lexer));
+            LiquidLexer lexer = new LiquidLexer(parseSettings.stripSpacesAroundTags, stream);
+            LiquidParser parser = new LiquidParser(parseSettings.flavor, new CommonTokenStream(lexer));
             root = parser.parse().getTree();
         }
         catch (RecognitionException e) {
@@ -130,7 +122,7 @@ public class Template {
      * @return a new Template instance from a given input string.
      */
     public static Template parse(String input) {
-        return new Template(input, Tag.getTags(), Filter.getFilters());
+        return new Template(input, Tag.getTags(), Filter.getFilters(), new ParseSettings.Builder().build());
     }
 
     /**
@@ -142,15 +134,27 @@ public class Template {
      * @return a new Template instance from a given input file.
      */
     public static Template parse(File file) throws IOException {
-        return parse(file, Flavor.LIQUID);
+        return new Template(file, Tag.getTags(), Filter.getFilters(), new ParseSettings.Builder().build());
     }
 
+    public static Template parse(File file, ParseSettings settings) throws IOException {
+        return new Template(file, Tag.getTags(), Filter.getFilters(), settings);
+    }
+
+    public static Template parse(String input, ParseSettings settings) {
+        return new Template(input, Tag.getTags(), Filter.getFilters(), settings);
+    }
+
+    @Deprecated // Use `parse(file, settings)` instead
     public static Template parse(File file, Flavor flavor) throws IOException {
-        return new Template(file, Tag.getTags(), Filter.getFilters(), flavor);
+        ParseSettings settings = new ParseSettings.Builder().withFlavor(flavor).build();
+        return parse(file, settings);
     }
 
+    @Deprecated // Use `parse(input, settings)` instead
     public static Template parse(String input, Flavor flavor) throws IOException {
-        return new Template(input, Tag.getTags(), Filter.getFilters(), flavor);
+        ParseSettings settings = new ParseSettings.Builder().withFlavor(flavor).build();
+        return parse(input, settings);
     }
 
     public Template with(Tag tag) {
@@ -244,7 +248,7 @@ public class Template {
             throw new RuntimeException("template exceeds " + this.protectionSettings.maxTemplateSizeBytes + " bytes");
         }
 
-        final LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root), this.tags, this.filters, this.flavor);
+        final LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root), this.tags, this.filters, this.parseSettings.flavor);
 
         ExecutorService executorService = Executors.newSingleThreadExecutor();
 
@@ -252,7 +256,7 @@ public class Template {
             public String call() throws Exception {
                 try {
                     LNode node = walker.walk();
-                    Object rendered = node.render(new TemplateContext(protectionSettings, flavor, variables));
+                    Object rendered = node.render(new TemplateContext(protectionSettings, parseSettings.flavor, variables));
                     return rendered == null ? "" : String.valueOf(rendered);
                 }
                 catch (Exception e) {

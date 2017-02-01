@@ -7,48 +7,30 @@ up by an ANTLR grammar.
 
 ### Gradle
 
-Add the repository:
-
-```groovy
-repositories {
-  maven {
-    url "https://jitpack.io"
-  }
-}
-```
-
-and then add the dependency:
+Add the dependency:
 
 ```groovy
 dependencies {
-  compile 'com.github.bkiers:Liqp:0.6.4'
+  compile 'nl.big-o:liqp:0.6.7'
 }
 ```
 
 ### Maven
 
-Add the following to your POM's `<repositories>` tag:
-
-```xml
-<repository>
-  <id>jitpack.io</id>
-  <url>https://jitpack.io</url>
-</repository>
-```
-
-then add the following dependency:
+Add the following dependency:
 
 ```xml
 <dependency>
-  <groupId>com.github.bkiers</groupId>
-  <artifactId>Liqp</artifactId>
-  <version>0.6.4</version>
+  <groupId>nl.big-o</groupId>
+  <artifactId>liqp</artifactId>
+  <version>0.6.7</version>
 </dependency>
 ```
 
 Or clone this repository and run: `mvn install` which will create a JAR of Liqp
 in your local Maven repository, as well as in the project's `target/` folder.
 
+# Usage
 
 This library can be used in two different ways:
 
@@ -350,7 +332,7 @@ System.out.println(rendered);
 
 ### 2.3 Guards
 
-If you're evaluating template from untrusted sources, there are a couple of 
+If you're evaluating templates from untrusted sources, there are a couple of 
 ways you can guard against unwanted input.
 
 For example, if you'd like the input template to be no larger than 125 characters,
@@ -373,5 +355,5 @@ String rendered = Template.parse("{% for i in (1..10) %}{{ text }}{% endfor %}")
 System.out.println(rendered);
 ```
 
-Note that not providing a `ProtectionSettings`, equals not having any guards in 
+Note that not providing a `ProtectionSettings`, is the same as not having any guards in 
 place (or better, very large limits).

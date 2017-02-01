@@ -7,6 +7,7 @@ import liqp.parser.LiquidLexer;
 import liqp.parser.LiquidParser;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 
@@ -28,7 +29,7 @@ public final class TestUtils {
      */
     public static LNode getNode(String source, String rule) throws Exception {
 
-        LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream("{{" + source + "}}"));
+        LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream("{{ " + source + " }}"));
         LiquidParser parser =  new LiquidParser(new CommonTokenStream(lexer));
 
         CommonTree root = (CommonTree)parser.parse().getTree();
@@ -39,5 +40,22 @@ public final class TestUtils {
         Method method = walker.getClass().getMethod(rule);
 
         return (LNode)method.invoke(walker);
+    }
+
+    public static void dumpTokens(String source) {
+
+        LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(source));
+        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+        tokenStream.fill();
+
+        for (Token t : tokenStream.getTokens()) {
+            System.out.printf("%-20s '%s'\n",
+                    t.getType() == -1 ? "EOF" : LiquidParser.tokenNames[t.getType()],
+                    t.getText().replace("\n", "\\n"));
+        }
+    }
+
+    public static void main(String[] args) {
+        dumpTokens("a  \n  {%-");
     }
 }

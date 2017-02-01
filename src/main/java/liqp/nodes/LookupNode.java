@@ -75,6 +75,10 @@ class LookupNode implements LNode {
                 else if(value.getClass().isArray()) {
                     return ((Object[])value).length;
                 }
+                else if(value instanceof CharSequence) {
+                    CharSequence charSequence = (CharSequence)value;
+                    return charSequence.length();
+                }
             }
             else if(hash.equals("first")) {
                 if(value instanceof java.util.List) {

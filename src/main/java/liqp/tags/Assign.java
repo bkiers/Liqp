@@ -31,7 +31,8 @@ class Assign extends Tag {
             value = filter.apply(value, context);
         }
 
-        context.put(id, value);
+        // Assign causes variable to be saved "globally"
+        context.put(id, value, true);
 
         return "";
     }

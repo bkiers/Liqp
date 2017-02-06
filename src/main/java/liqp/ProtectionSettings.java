@@ -1,11 +1,16 @@
 package liqp;
 
+import liqp.exceptions.ExceededMaxIterationsException;
+
 public class ProtectionSettings {
 
     public final int maxIterations;
     public final int maxSizeRenderedString;
     public final long maxRenderTimeMillis;
     public final long maxTemplateSizeBytes;
+
+    // A global counter that keeps track of the amount of iterations
+    private int iterations = 0;
 
     public static class Builder {
 
@@ -51,5 +56,14 @@ public class ProtectionSettings {
         this.maxSizeRenderedString = maxSizeRenderedString;
         this.maxRenderTimeMillis = maxRenderTimeMillis;
         this.maxTemplateSizeBytes = maxTemplateSizeBytes;
+    }
+
+    public void incrementIterations() {
+
+        this.iterations++;
+
+        if (this.iterations > this.maxIterations) {
+            throw new ExceededMaxIterationsException(this.maxIterations);
+        }
     }
 }

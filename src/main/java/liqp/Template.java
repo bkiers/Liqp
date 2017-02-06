@@ -270,9 +270,12 @@ public class Template {
         try {
             return future.get(this.protectionSettings.maxRenderTimeMillis, TimeUnit.MILLISECONDS);
         }
-        catch (Throwable t) {
+        catch (TimeoutException e) {
             throw new RuntimeException("exceeded the max amount of time (" +
                     this.protectionSettings.maxRenderTimeMillis + " ms.)");
+        }
+        catch (Throwable t) {
+            throw new RuntimeException("Oops, something unexpected happened: ", t);
         }
     }
 

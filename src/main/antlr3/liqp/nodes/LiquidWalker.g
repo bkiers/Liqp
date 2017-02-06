@@ -220,16 +220,15 @@ continue_tag returns [LNode node]
  : Continue {$node = new AtomNode(Tag.Statement.CONTINUE);}
  ;
 
-
 custom_tag returns [LNode node]
 @init{List<LNode> expressions = new ArrayList<LNode>();}
- : ^(CUSTOM_TAG Id (expr {expressions.add($expr.node);})*)
+ : ^(CUSTOM_TAG Id Str? {expressions.add(new AtomNode($Str.text));})
     {$node = new TagNode($Id.text, tags.get($Id.text), expressions.toArray(new LNode[expressions.size()]));}
  ;
 
 custom_tag_block returns [LNode node]
 @init{List<LNode> expressions = new ArrayList<LNode>();}
- : ^(CUSTOM_TAG_BLOCK Id (expr {expressions.add($expr.node);})* block {expressions.add($block.node);})
+ : ^(CUSTOM_TAG_BLOCK Id Str? {expressions.add(new AtomNode($Str.text));} block {expressions.add($block.node);})
     {$node = new TagNode($Id.text, tags.get($Id.text), expressions.toArray(new LNode[expressions.size()]));}
  ;
 

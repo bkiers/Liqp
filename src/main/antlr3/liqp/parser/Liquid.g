@@ -182,8 +182,8 @@ tag
  ;
 
 custom_tag
- : (TagStart Id (expr (Comma expr)*)? TagEnd -> ^(CUSTOM_TAG Id expr*))
-   ((custom_tag_block)=> custom_tag_block    -> ^(CUSTOM_TAG_BLOCK Id expr* custom_tag_block))?
+ : (TagStart Id custom_tag_parameters? TagEnd -> ^(CUSTOM_TAG Id custom_tag_parameters?))
+   ((custom_tag_block)=> custom_tag_block     -> ^(CUSTOM_TAG_BLOCK Id custom_tag_parameters? custom_tag_block))?
  ;
 
 custom_tag_block
@@ -401,6 +401,10 @@ index
  ;
 
 file_name_as_str
+ : other_than_tag_end -> Str[$text]
+ ;
+
+custom_tag_parameters
  : other_than_tag_end -> Str[$text]
  ;
 

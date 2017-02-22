@@ -48,11 +48,12 @@ class For extends Tag {
 
         String id = super.asString(nodes[1].render(context));
 
-        context.put(FORLOOP, new HashMap<String, Object>());
+        // Each for tag has its own context that keeps track of its own variables (scope)
+        TemplateContext nestedContext = new TemplateContext(context);
 
-        Object rendered = array ? renderArray(id, context, nodes) : renderRange(id, context, nodes);
+        nestedContext.put(FORLOOP, new HashMap<String, Object>());
 
-        context.remove(FORLOOP);
+        Object rendered = array ? renderArray(id, nestedContext, nodes) : renderRange(id, nestedContext, nodes);
 
         return rendered;
     }
@@ -140,7 +141,7 @@ class For extends Tag {
             }
         }
 
-        context.put(CONTINUE, continueIndex + 1);
+        context.put(CONTINUE, continueIndex + 1, true);
 
         return builder.toString();
     }

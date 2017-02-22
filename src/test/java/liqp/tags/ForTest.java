@@ -4,6 +4,9 @@ import liqp.Template;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -630,5 +633,70 @@ public class ForTest {
     public void blankStringNotIterableTest() throws RecognitionException {
 
         assertThat(Template.parse("{% for char in characters %}I WILL NOT BE OUTPUT{% endfor %}").render(), is(""));
+    }
+
+    /*
+     * Verified with the following Ruby code:
+     *
+     * require 'liquid'
+     *
+     * template = <<-HEREDOC
+     * `{% for c1 in chars %}
+     *   {{ forloop.index }}
+     *   {% for c2 in chars %}
+     *     {{ forloop.index }} {{ c1 }} {{ c2 }}
+     *   {% endfor %}
+     * {% endfor %}`
+     * HEREDOC
+     *
+     * @template = Liquid::Template.parse(template)
+     * rendered = @template.render('chars' => %w[a b c])
+     *
+     * puts(rendered)
+     */
+    @Test
+    public void nestedTest() {
+
+        Map<String, Object> variables = new HashMap<String, Object>();
+
+        variables.put("chars", new String[]{"a", "b", "c"});
+
+        String template = "`{% for c1 in chars %}\n" +
+                "  {{ forloop.index }}\n" +
+                "  {% for c2 in chars %}\n" +
+                "    {{ forloop.index }} {{ c1 }} {{ c2 }}\n" +
+                "  {% endfor %}\n" +
+                "{% endfor %}`";
+
+        String expected = "`\n" +
+                "  1\n" +
+                "  \n" +
+                "    1 a a\n" +
+                "  \n" +
+                "    2 a b\n" +
+                "  \n" +
+                "    3 a c\n" +
+                "  \n" +
+                "\n" +
+                "  2\n" +
+                "  \n" +
+                "    1 b a\n" +
+                "  \n" +
+                "    2 b b\n" +
+                "  \n" +
+                "    3 b c\n" +
+                "  \n" +
+                "\n" +
+                "  3\n" +
+                "  \n" +
+                "    1 c a\n" +
+                "  \n" +
+                "    2 c b\n" +
+                "  \n" +
+                "    3 c c\n" +
+                "  \n" +
+                "`";
+
+        assertThat(Template.parse(template).render(variables), is(expected));
     }
 }

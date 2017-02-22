@@ -15,7 +15,8 @@ class Capture extends Tag {
 
         LNode block = nodes[1];
 
-        context.put(id, block.render(context));
+        // Capture causes variable to be saved "globally"
+        context.put(id, block.render(context), true);
 
         return null;
     }

@@ -1,6 +1,5 @@
 package liqp;
 
-import liqp.exceptions.VariableNotExistException;
 import liqp.parser.Flavor;
 
 import java.util.LinkedHashMap;
@@ -67,10 +66,6 @@ public class TemplateContext {
         if (parent != null) {
             // Not available locally, try the parent context
             return parent.get(key);
-        }
-
-        if (renderSettings.strictVariables) {
-            throw new VariableNotExistException(key);
         }
 
         // Not available

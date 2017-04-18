@@ -55,6 +55,16 @@ public final class TestUtils {
         }
     }
 
+    public static Throwable getExceptionRootCause(Throwable e) {
+        Throwable cause = null;
+        Throwable result = e;
+
+        while (null != (cause = result.getCause())  && (result != cause) ) {
+            result = cause;
+        }
+        return result;
+    }
+
     public static void main(String[] args) {
         dumpTokens("a  \n  {%-");
     }

@@ -164,6 +164,17 @@ System.out.println(rendered);
 */
 ```
 
+#### Strict variables example
+
+Strict variables means that value for every key must be provided, otherwise an exception occurs.
+
+```java
+Template template = Template.parse("hi {{name}}")
+    .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build());
+String rendered = template.render(); // no value for "name"
+// exception is thrown
+```
+
 ### 2.1 Custom filters
 
 Let's say you want to create a custom filters, called `b`, that changes a string like 

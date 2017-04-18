@@ -50,6 +50,8 @@ public class Template {
 
     private ProtectionSettings protectionSettings = new ProtectionSettings.Builder().build();
 
+    private RenderSettings renderSettings = new RenderSettings.Builder().build();
+
     private final ParseSettings parseSettings;
 
     /**
@@ -172,6 +174,11 @@ public class Template {
         return this;
     }
 
+    public Template withRenderSettings(RenderSettings renderSettings) {
+        this.renderSettings = renderSettings;
+        return this;
+    }
+
     /**
      * Renders the template.
      *
@@ -256,7 +263,7 @@ public class Template {
             public String call() throws Exception {
                 try {
                     LNode node = walker.walk();
-                    Object rendered = node.render(new TemplateContext(protectionSettings, parseSettings.flavor, variables));
+                    Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings.flavor, variables));
                     return rendered == null ? "" : String.valueOf(rendered);
                 }
                 catch (Exception e) {
@@ -266,7 +273,6 @@ public class Template {
         };
 
         Future<String> future = executorService.submit(task);
-
         try {
             return future.get(this.protectionSettings.maxRenderTimeMillis, TimeUnit.MILLISECONDS);
         }

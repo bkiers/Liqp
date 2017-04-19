@@ -23,12 +23,12 @@ public class RenderSettingsTest {
     @Test
     public void renderWithStrictVariables2() {
         try {
-            Template.parse("{{mu}} {{asd}}")
+            Template.parse("{{mu}} {{qwe.asd.zxc}}")
                     .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build())
                     .render("mu", "muValue");
         } catch (RuntimeException ex) {
             VariableNotExistException e = (VariableNotExistException) TestUtils.getExceptionRootCause(ex);
-            assertThat(e.getVariableName(), is("asd"));
+            assertThat(e.getVariableName(), is("qwe.asd.zxc"));
         }
     }
 }

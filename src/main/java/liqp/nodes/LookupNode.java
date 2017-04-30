@@ -1,6 +1,7 @@
 package liqp.nodes;
 
 import liqp.TemplateContext;
+import liqp.exceptions.VariableNotExistException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,16 +34,23 @@ class LookupNode implements LNode {
             value = context.get(id);
         }
 
-        if(value == null) {
-            return null;
-        }
-
         for(Indexable index : indexes) {
-
             value = index.get(value, context);
         }
 
+        if(value == null && context.renderSettings.strictVariables) {
+            throw new VariableNotExistException(getVariableName());
+        }
+
         return value;
+    }
+
+    private String getVariableName() {
+        StringBuilder variableFullName = new StringBuilder(id);
+        for(Indexable index : indexes) {
+            variableFullName.append(index.toString());
+        }
+        return variableFullName.toString();
     }
 
     interface Indexable {

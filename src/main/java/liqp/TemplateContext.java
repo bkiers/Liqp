@@ -9,16 +9,22 @@ public class TemplateContext {
 
     protected TemplateContext parent;
     public final ProtectionSettings protectionSettings;
+    public final RenderSettings renderSettings;
     public final Flavor flavor;
     private Map<String, Object> variables;
 
     public TemplateContext() {
-        this(new ProtectionSettings.Builder().build(), Flavor.LIQUID, new LinkedHashMap<String, Object>());
+        this(new ProtectionSettings.Builder().build(),
+                new RenderSettings.Builder().build(),
+                Flavor.LIQUID,
+                new LinkedHashMap<String, Object>());
     }
 
-    public TemplateContext(ProtectionSettings protectionSettings, Flavor flavor, Map<String, Object> variables) {
+    public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings, Flavor flavor,
+                           Map<String, Object> variables) {
         this.parent = null;
         this.protectionSettings = protectionSettings;
+        this.renderSettings = renderSettings;
         this.flavor = flavor;
         this.variables = variables;
     }
@@ -26,6 +32,7 @@ public class TemplateContext {
     public TemplateContext(TemplateContext parent) {
         this.parent = parent;
         this.protectionSettings = parent.protectionSettings;
+        this.renderSettings = parent.renderSettings;
         this.flavor = parent.flavor;
         this.variables = new LinkedHashMap<String, Object>();
     }

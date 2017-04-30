@@ -219,6 +219,16 @@ public class Examples {
         System.out.println(rendered);
     }
 
+    public static void demoStrictVariables() {
+        try {
+            Template.parse("{{mu}}")
+                    .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build())
+                    .render();
+        } catch (RuntimeException ex) {
+            System.out.println("Caught an exception for strict variables");
+        }
+    }
+
     public static void main(String[] args) throws Exception {
 
         System.out.println("running liqp.Examples");
@@ -238,6 +248,8 @@ public class Examples {
         //instanceTag();
 
         //instanceFilter();
+
+        //demoStrictVariables();
 
         /*
             list = [{"a" => 3}, {"a" => 1}, {"a" => 2}]

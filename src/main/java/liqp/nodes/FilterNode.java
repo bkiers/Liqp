@@ -31,7 +31,7 @@ public class FilterNode implements LNode {
             paramValues.add(node.render(context));
         }
 
-        return filter.apply(value, paramValues.toArray(new Object[paramValues.size()]));
+        return filter.apply(value, context, paramValues.toArray(new Object[paramValues.size()]));
     }
 
     @Override

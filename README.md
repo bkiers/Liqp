@@ -130,7 +130,7 @@ System.out.println(rendered);
     hi tobi
 */
 ```
-The context provided as a parameter to `render(...)` can be:
+The template variables provided as parameters to `render(...)` can be:
 
 * a [varargs](http://docs.oracle.com/javase/1.5.0/docs/guide/language/varargs.html) where 
   the 0<sup>th</sup>, 2<sup>nd</sup>, 4<sup>th</sup>, ... indexes must be `String` literals
@@ -177,7 +177,7 @@ String rendered = template.render(); // no value for "name"
 
 ### 2.1 Custom filters
 
-Let's say you want to create a custom filters, called `b`, that changes a string like 
+Let's say you want to create a custom filter, called `b`, that changes a string like 
 `*text*` to `<strong>text</strong>`.
 
 You can do that as follows:
@@ -262,6 +262,7 @@ System.out.println(rendered);
     15.0
 */
 ```
+In short, override one of the `apply()` methods of the `Filter` class to create your own custom filter behaviour.
 
 ### 2.2 Custom tags
 

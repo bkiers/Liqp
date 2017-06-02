@@ -43,7 +43,7 @@ public class TemplateContext {
 
     public boolean containsKey(String key) {
 
-        if (this.containsKey(key)) {
+        if (this.variables.containsKey(key)) {
             return true;
         }
 

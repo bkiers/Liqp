@@ -283,6 +283,9 @@ public class Template {
         catch (Throwable t) {
             throw new RuntimeException("Oops, something unexpected happened: ", t);
         }
+        finally {
+            executorService.shutdown();
+        }
     }
 
     /**

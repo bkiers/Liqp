@@ -85,7 +85,7 @@ tokens {
 
   @Override
   public void reportError(RecognitionException e) {
-    throw new RuntimeException(e); 
+    throw new liqp.exceptions.LiquidException(e);
   }
 }
 
@@ -140,7 +140,7 @@ tokens {
   
   @Override
   public void reportError(RecognitionException e) {
-    throw new RuntimeException(e); 
+    throw new liqp.exceptions.LiquidException(e);
   }
 
   private String strip(String text, boolean singleQuoted) {
@@ -151,7 +151,6 @@ tokens {
 /* parser rules */
 parse
  : block EOF -> block
-   //(t=. {System.out.printf("\%-20s '\%s'\n", tokenNames[$t.type], $t.text);})* EOF
  ;
 
 block

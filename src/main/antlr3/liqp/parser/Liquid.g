@@ -319,7 +319,11 @@ or_expr
  ;
 
 and_expr
- : contains_expr (And^ contains_expr)*
+ : not_expr (And^ not_expr)*
+ ;
+
+not_expr
+ : (Not^)? contains_expr
  ;
 
 contains_expr
@@ -383,6 +387,7 @@ id2
  | In           -> Id[$In.text]
  | And          -> Id[$And.text]
  | Or           -> Id[$Or.text]
+ | Not          -> Id[$Not.text]
  | TableStart   -> Id[$TableStart.text]
  | TableEnd     -> Id[$TableEnd.text]
  | Assign       -> Id[$Assign.text]
@@ -480,6 +485,7 @@ Id
      else if($text.equals("in"))           $type = In;
      else if($text.equals("and"))          $type = And;
      else if($text.equals("or"))           $type = Or;
+     else if($text.equals("not"))          $type = Not;
      else if($text.equals("tablerow"))     $type = TableStart;
      else if($text.equals("endtablerow"))  $type = TableEnd;
      else if($text.equals("assign"))       $type = Assign;
@@ -533,6 +539,7 @@ fragment ForEnd : 'ForEnd';
 fragment In : 'In';
 fragment And : 'And';
 fragment Or : 'Or';
+fragment Not : 'Not';
 fragment TableStart : 'TableStart';
 fragment TableEnd : 'TableEnd';
 fragment Assign : 'Assign';

@@ -251,6 +251,7 @@ assignment returns [TagNode node]
 expr returns [LNode node]
  : ^(Or a=expr b=expr)       {$node = new OrNode($a.node, $b.node);}
  | ^(And a=expr b=expr)      {$node = new AndNode($a.node, $b.node);}
+ | ^(Not a=expr)             {$node = new NotNode($a.node);}
  | ^(Eq a=expr b=expr)       {$node = new EqNode($a.node, $b.node);}
  | ^(NEq a=expr b=expr)      {$node = new NEqNode($a.node, $b.node);}
  | ^(LtEq a=expr b=expr)     {$node = new LtEqNode($a.node, $b.node);}

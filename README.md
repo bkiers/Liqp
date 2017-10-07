@@ -111,7 +111,7 @@ to see what the AST looks like for each of the parser rules.
 
 ## 2. Render Liquid
 
-If you're not familiar with Liquid, have a look at their website: [http://liquidmarkup.org](liquidmarkup.org).
+If you're not familiar with Liquid, have a look at their website: [http://liquidmarkup.org](http://liquidmarkup.org).
 
 In Ruby, you'd render a template like this:
 

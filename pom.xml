@@ -46,7 +46,7 @@
 
     <antlr.version>3.5.1</antlr.version>
     <jackson.version>2.2.3</jackson.version>
-    <jsoup.version>1.7.2</jsoup.version>
+    <jsoup.version>1.10.3</jsoup.version>
     <junit.version>4.6</junit.version>
 
     <main.class />
@@ -55,7 +55,7 @@
     <releaseName>Takari Releases</releaseName>
     <releaseUrl>${repoHost}/service/local/staging/deploy/maven2</releaseUrl>
     <snapshotName>Takari Snapshots</snapshotName>
-    <snapshotUrl>${repoHost}/content/repositories/snapshots</snapshotUrl>        
+    <snapshotUrl>${repoHost}/content/repositories/snapshots</snapshotUrl>
   </properties>
 
   <dependencies>
@@ -138,7 +138,7 @@
           </archive>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -149,7 +149,7 @@
           </excludes>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -173,5 +173,5 @@
       <url>${snapshotUrl}</url>
     </snapshotRepository>
   </distributionManagement>
-  
+
 </project>

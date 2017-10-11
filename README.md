@@ -1,4 +1,3 @@
-
 # Liqp &nbsp; [![Build Status](https://travis-ci.org/bkiers/Liqp.png)](https://travis-ci.org/bkiers/Liqp)
 
 A Java implementation of the [Liquid templating engine](http://wiki.shopify.com/Liquid) backed 

@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.LValue;
+import liqp.TemplateContext;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -89,7 +90,28 @@ public abstract class Filter extends LValue {
      *
      * @return the result of the filter.
      */
-    public abstract Object apply(Object value, Object... params);
+    public Object apply(Object value, Object... params) {
+
+        // Default "no-op" filter.
+        return value;
+    }
+
+    /**
+     * Applies the filter on the 'value', with the given 'context'.
+     *
+     * @param value
+     *         the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
+     * @param context
+     *         the template context.
+     * @param params
+     *         the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
+     *
+     * @return the result of the filter.
+     */
+    public Object apply(Object value, TemplateContext context, Object... params) {
+
+        return apply(value, params);
+    }
 
     /**
      * Check the number of parameters and throws an exception if needed.
@@ -100,7 +122,8 @@ public abstract class Filter extends LValue {
      *         the expected number of parameters.
      */
     public final void checkParams(Object[] params, int expected) {
-        if(params == null || params.length != expected) {
+
+        if (params == null || params.length != expected) {
             throw new RuntimeException("Liquid error: wrong number of arguments (" +
                     (params.length + 1) + " for " + (expected + 1) + ")");
         }

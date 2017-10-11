@@ -311,15 +311,7 @@ assignment
  ;
 
 expr
- : or_expr
- ;
-
-or_expr
- : and_expr (Or^ and_expr)*
- ;
-
-and_expr
- : contains_expr (And^ contains_expr)*
+ : contains_expr ((And | Or)^ expr)?
  ;
 
 contains_expr

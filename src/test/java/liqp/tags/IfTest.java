@@ -385,4 +385,26 @@ public class IfTest {
 
         // TODO
     }
+
+    /*
+     * In tags with more than one and or or operator, operators are checked in order from right to left.
+     *
+     * {% if true or false and false %}
+     *   This evaluates to true, since the 'and' condition is checked first.
+     * {% endif %}
+     *
+     * {% if true and false and false or true %}
+     *   This evaluates to false, since the tags are checked like this:
+     *
+     *   true and (false and (false or true))
+     *   true and (false and true)
+     *   true and false
+     *   false
+     * {% endif %}
+     */
+    @Test
+    public void and_or_evaluation_orderTest() throws RecognitionException {
+        assertThat(Template.parse("{% if true or false and false %}TRUE{% else %}FALSE{% endif %}").render(), is("TRUE"));
+        assertThat(Template.parse("{% if true and false and false or true %}TRUE{% else %}FALSE{% endif %}").render(), is("FALSE"));
+    }
 }

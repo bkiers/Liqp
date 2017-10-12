@@ -356,11 +356,6 @@ lookup
 id
  : Id
  | Continue -> Id[$Continue.text]
- ;
-
-id2
- : id
- | Empty        -> Id[$Empty.text]
  | CaptureStart -> Id[$CaptureStart.text]
  | CaptureEnd   -> Id[$CaptureEnd.text]
  | CommentStart -> Id[$CommentStart.text]
@@ -386,13 +381,18 @@ id2
  | TableStart   -> Id[$TableStart.text]
  | TableEnd     -> Id[$TableEnd.text]
  | Assign       -> Id[$Assign.text]
- | True         -> Id[$True.text]
- | False        -> Id[$False.text]
- | Nil          -> Id[$Nil.text]
  | Include      -> Id[$Include.text]
  | With         -> Id[$With.text]
  | EndId        -> Id[$EndId.text]
  | Break        -> Id[$Break.text]
+ ;
+
+id2
+ : id
+ | Empty        -> Id[$Empty.text]
+ | Nil          -> Id[$Nil.text]
+ | True         -> Id[$True.text]
+ | False        -> Id[$False.text]
  ;
 
 index

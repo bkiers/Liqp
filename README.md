@@ -1,5 +1,7 @@
 # Liqp &nbsp; [![Build Status](https://travis-ci.org/bkiers/Liqp.png)](https://travis-ci.org/bkiers/Liqp)
 
+[![Maven Central](https://img.shields.io/maven-central/v/nl.big-o.bkiers/liqp.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22nl.big-o.bkiers%22%20AND%20a%3A%22liqp%22)
+
 A Java implementation of the [Liquid templating engine](http://wiki.shopify.com/Liquid) backed
 up by an ANTLR grammar.
 
@@ -11,7 +13,7 @@ Add the dependency:
 
 ```groovy
 dependencies {
-  compile 'nl.big-o:liqp:0.7.1'
+  compile 'nl.big-o:liqp:0.7.2'
 }
 ```
 
@@ -23,7 +25,7 @@ Add the following dependency:
 <dependency>
   <groupId>nl.big-o</groupId>
   <artifactId>liqp</artifactId>
-  <version>0.7.1</version>
+  <version>0.7.2</version>
 </dependency>
 ```
 
@@ -369,3 +371,21 @@ System.out.println(rendered);
 
 Note that not providing a `ProtectionSettings`, is the same as not having any guards in
 place (or better, very large limits).
+
+
+## Build and Release
+
+Use Maven 3.5.0 and run build with
+
+```
+mvn clean install
+````
+
+Release process into the [Central Repository](http://central.sonatype.org) is
+performed with
+
+```
+mvn release:prepare release:perform
+```
+
+

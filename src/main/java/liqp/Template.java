@@ -31,8 +31,6 @@ import java.util.concurrent.*;
  */
 public class Template {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
     /**
      * The root of the AST denoting the Liquid input source.
      */
@@ -369,6 +367,6 @@ public class Template {
             throw new RuntimeException("key cannot be null");
         }
 
-        map.put(key, convertValueToMap ? MAPPER.convertValue(value, Map.class) : value);
+        map.put(key, convertValueToMap ? parseSettings.mapper.convertValue(value, Map.class) : value);
     }
 }

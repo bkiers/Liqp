@@ -31,6 +31,8 @@ import java.util.concurrent.*;
  */
 public class Template {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     /**
      * The root of the AST denoting the Liquid input source.
      */
@@ -225,15 +227,19 @@ public class Template {
      *
      * @return a string denoting the rendered template.
      */
-    public String render(Object key, Object value, Object... keyValues) {
+    public String render(String key, Object value, Object... keyValues) {
+        return render(false, key, value, keyValues);
+    }
+
+    public String render(boolean convertValueToMap, String key, Object value, Object... keyValues) {
 
         Map<String, Object> map = new HashMap<String, Object>();
-        putStringKey(key, value, map);
+        putStringKey(convertValueToMap, key, value, map);
 
         for (int i = 0; i < keyValues.length - 1; i += 2) {
             key = String.valueOf(keyValues[i]);
             value = keyValues[i + 1];
-            putStringKey(key, value, map);
+            putStringKey(convertValueToMap, key, value, map);
         }
 
         return render(map);
@@ -357,12 +363,12 @@ public class Template {
         }
     }
 
-    private void putStringKey(Object key, Object value, Map<String, Object> map) {
+    private void putStringKey(boolean convertValueToMap, String key, Object value, Map<String, Object> map) {
 
-        if (key == null || key.getClass() != String.class) {
-            throw new RuntimeException("invalid key: " + key);
+        if (key == null) {
+            throw new RuntimeException("key cannot be null");
         }
 
-        map.put((String) key, value);
+        map.put(key, convertValueToMap ? MAPPER.convertValue(value, Map.class) : value);
     }
 }

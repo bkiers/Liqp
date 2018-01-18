@@ -254,14 +254,16 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String render(final Map<String, Object> variables) {
+        return render(variables, Executors.newSingleThreadExecutor(), true);
+    }
+
+    public String render(final Map<String, Object> variables, ExecutorService executorService, boolean shutdown) {
 
         if (this.templateSize > this.protectionSettings.maxTemplateSizeBytes) {
             throw new RuntimeException("template exceeds " + this.protectionSettings.maxTemplateSizeBytes + " bytes");
         }
 
         final LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root), this.tags, this.filters, this.parseSettings.flavor);
-
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
 
         Callable<String> task = new Callable<String>() {
             public String call() throws Exception {
@@ -276,8 +278,8 @@ public class Template {
             }
         };
 
-        Future<String> future = executorService.submit(task);
         try {
+            Future<String> future = executorService.submit(task);
             return future.get(this.protectionSettings.maxRenderTimeMillis, TimeUnit.MILLISECONDS);
         }
         catch (TimeoutException e) {
@@ -288,7 +290,9 @@ public class Template {
             throw new RuntimeException("Oops, something unexpected happened: ", t);
         }
         finally {
-            executorService.shutdown();
+            if (shutdown) {
+                executorService.shutdown();
+            }
         }
     }
 

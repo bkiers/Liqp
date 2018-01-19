@@ -1,6 +1,4 @@
-# Liqp &nbsp; [![Build Status](https://travis-ci.org/bkiers/Liqp.png)](https://travis-ci.org/bkiers/Liqp)
-
-[![Maven Central](https://img.shields.io/maven-central/v/nl.big-o/liqp.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22nl.big-o%22%20AND%20a%3A%22liqp%22)
+# Liqp &nbsp; [![Build Status](https://travis-ci.org/bkiers/Liqp.png)](https://travis-ci.org/bkiers/Liqp) [![Maven Central](https://img.shields.io/maven-central/v/nl.big-o/liqp.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22nl.big-o%22%20AND%20a%3A%22liqp%22)
 
 A Java implementation of the [Liquid templating engine](http://wiki.shopify.com/Liquid) backed
 up by an ANTLR grammar.

@@ -237,7 +237,7 @@ output returns [OutputNode node]
  ;
 
 filter returns [FilterNode node]
- : ^(FILTER Id {$node = new FilterNode($Id.text, filters.get($Id.text));} ^(PARAMS params[$node]?))
+ : ^(FILTER Id {$node = new FilterNode($Id, filters.get($Id.text));} ^(PARAMS params[$node]?))
  ;
 
 params[FilterNode node]

@@ -18,10 +18,6 @@ class Divided_By extends Filter {
 
         Object rhsObj = params[0];
 
-        if(super.asNumber(rhsObj).doubleValue() == 0.0) {
-            throw new RuntimeException("Liquid error: divided by 0");
-        }
-
         if (super.isInteger(value) && super.isInteger(rhsObj)) {
             return super.asNumber(value).longValue() / super.asNumber(rhsObj).longValue();
         }

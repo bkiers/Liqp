@@ -31,4 +31,66 @@ public class RenderSettingsTest {
             assertThat(e.getVariableName(), is("qwe.asd.zxc"));
         }
     }
+
+    @Test
+    public void renderWithStrictVariablesInCondition1() {
+        Template.parse("{% if mu == \"somethingElse\" %}{{ badVariableName }}{% endif %}")
+                .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build())
+                .render("mu", "muValue");
+    }
+
+    @Test
+    public void renderWithStrictVariablesInCondition2() {
+        try {
+            Template.parse("{% if mu == \"muValue\" %}{{ badVariableName }}{% endif %}")
+                    .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build())
+                    .render("mu", "muValue");
+        } catch (RuntimeException ex) {
+            VariableNotExistException e = (VariableNotExistException) TestUtils.getExceptionRootCause(ex);
+            assertThat(e.getVariableName(), is("badVariableName"));
+        }
+    }
+
+    @Test
+    public void renderWithStrictVariablesInAnd1() {
+        try {
+            Template.parse("{% if mu == \"muValue\" and checkThis %}{{ badVariableName }}{% endif %}")
+                    .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build())
+                    .render("mu", "muValue");
+        } catch (RuntimeException ex) {
+            VariableNotExistException e = (VariableNotExistException) TestUtils.getExceptionRootCause(ex);
+            assertThat(e.getVariableName(), is("checkThis"));
+        }
+    }
+
+    @Test
+    public void renderWithStrictVariablesInAnd2() {
+        Template.parse("{% if mu == \"somethingElse\" and doNotCheckThis %}{{ badVariableName }}{% endif %}")
+                .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build())
+                .render("mu", "muValue");
+    }
+
+    @Test
+    public void renderWithStrictVariablesInOr1() {
+        try {
+            Template.parse("{% if mu == \"muValue\" or doNotCheckThis %}{{ badVariableName }}{% endif %}")
+                    .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build())
+                    .render("mu", "muValue");
+        } catch (RuntimeException ex) {
+            VariableNotExistException e = (VariableNotExistException) TestUtils.getExceptionRootCause(ex);
+            assertThat(e.getVariableName(), is("badVariableName"));
+        }
+    }
+
+    @Test
+    public void renderWithStrictVariablesInOr2() {
+        try {
+            Template.parse("{% if mu == \"somethingElse\" or checkThis %}{{ badVariableName }}{% endif %}")
+                    .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build())
+                    .render("mu", "muValue");
+        } catch (RuntimeException ex) {
+            VariableNotExistException e = (VariableNotExistException) TestUtils.getExceptionRootCause(ex);
+            assertThat(e.getVariableName(), is("checkThis"));
+        }
+    }
 }

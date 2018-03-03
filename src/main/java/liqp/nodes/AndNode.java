@@ -18,10 +18,7 @@ class AndNode extends LValue implements LNode {
     @Override
     public Object render(TemplateContext context) {
 
-        Object a = lhs.render(context);
-        Object b = rhs.render(context);
-
-        return super.asBoolean(a) && super.asBoolean(b);
+        return super.asBoolean(lhs.render(context)) && super.asBoolean(rhs.render(context));
 
     }
 }

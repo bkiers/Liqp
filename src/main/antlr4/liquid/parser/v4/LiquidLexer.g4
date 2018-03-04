@@ -23,12 +23,8 @@ TagStart
    ) -> pushMode(IN_TAG)
  ;
 
-NoSpace
- : ~[ \t\r\n]
- ;
-
-Space
- : [ \t\r\n]
+Other
+ : .
  ;
 
 fragment SStr           : '\'' ~'\''* '\'';

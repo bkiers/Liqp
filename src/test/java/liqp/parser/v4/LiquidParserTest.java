@@ -137,7 +137,7 @@ public class LiquidParserTest {
     //  ;
     //
     // other
-    //  : ( Other | NoSpace )+
+    //  : Other+
     //  ;
     //
     // when_tag

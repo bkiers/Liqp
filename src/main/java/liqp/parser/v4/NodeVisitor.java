@@ -586,16 +586,6 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
 
   // term
   //  : ...
-  //  | NoSpace+       #term_NoSpaces
-  //  | ...
-  //  ;
-  @Override
-  public LNode visitTerm_NoSpaces(Term_NoSpacesContext ctx) {
-    return new AtomNode(ctx.getText());
-  }
-
-  // term
-  //  : ...
   //  | lookup         #term_lookup
   //  | ...
   //  ;

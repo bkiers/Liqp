@@ -178,7 +178,6 @@ term
  | True           #term_True
  | False          #term_False
  | Nil            #term_Nil
- | NoSpace+       #term_NoSpaces
  | lookup         #term_lookup
  | Empty          #term_Empty
  | OPar expr CPar #term_expr
@@ -260,5 +259,5 @@ outStart
  ;
 
 other
- : ( Space | NoSpace )+
+ : Other+
  ;

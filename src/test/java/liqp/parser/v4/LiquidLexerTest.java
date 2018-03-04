@@ -27,7 +27,7 @@ public class LiquidLexerTest {
 
         // Leading space
         boolean stripSpacesAroundTags = false;
-        assertThat(tokenise(" {{", stripSpacesAroundTags, true).get(0).getType(), is(LiquidLexer.Other));
+        assertThat(tokenise(" {{", stripSpacesAroundTags, true).get(0).getType(), is(LiquidLexer.Space));
         assertThat(tokenise(" {{", stripSpacesAroundTags, true).get(1).getType(), is(LiquidLexer.OutStart));
         stripSpacesAroundTags = true;
         assertThat(tokenise(" {{", stripSpacesAroundTags, true).get(0).getType(), is(LiquidLexer.OutStart));
@@ -47,7 +47,7 @@ public class LiquidLexerTest {
 
         // Leading space
         boolean stripSpacesAroundTags = false;
-        assertThat(tokenise(" {%", stripSpacesAroundTags, true).get(0).getType(), is(LiquidLexer.Other));
+        assertThat(tokenise(" {%", stripSpacesAroundTags, true).get(0).getType(), is(LiquidLexer.Space));
         assertThat(tokenise(" {%", stripSpacesAroundTags, true).get(1).getType(), is(LiquidLexer.TagStart));
         stripSpacesAroundTags = true;
         assertThat(tokenise(" {%", stripSpacesAroundTags, true).get(0).getType(), is(LiquidLexer.TagStart));
@@ -63,15 +63,15 @@ public class LiquidLexerTest {
         assertThat(singleToken("?").getType(), is(LiquidLexer.NoSpace));
     }
 
-    // Other
+    // Space
     //  : .
     //  ;
     @Test
     public void testOther() {
-        assertThat(singleToken(" ").getType(), is(LiquidLexer.Other));
-        assertThat(singleToken("\t").getType(), is(LiquidLexer.Other));
-        assertThat(singleToken("\r").getType(), is(LiquidLexer.Other));
-        assertThat(singleToken("\n").getType(), is(LiquidLexer.Other));
+        assertThat(singleToken(" ").getType(), is(LiquidLexer.Space));
+        assertThat(singleToken("\t").getType(), is(LiquidLexer.Space));
+        assertThat(singleToken("\r").getType(), is(LiquidLexer.Space));
+        assertThat(singleToken("\n").getType(), is(LiquidLexer.Space));
     }
 
     // mode IN_TAG;
@@ -109,7 +109,7 @@ public class LiquidLexerTest {
 
         boolean stripSpacesAroundTags = false;
         Token token = tokenise("{{}} ", stripSpacesAroundTags, true).get(2);
-        assertThat(token.getType(), is(LiquidLexer.Other));
+        assertThat(token.getType(), is(LiquidLexer.Space));
         assertThat(token.getText(), is(" "));
 
         stripSpacesAroundTags = true;
@@ -137,7 +137,7 @@ public class LiquidLexerTest {
 
         boolean stripSpacesAroundTags = false;
         Token token = tokenise("{{%} ", stripSpacesAroundTags, true).get(2);
-        assertThat(token.getType(), is(LiquidLexer.Other));
+        assertThat(token.getType(), is(LiquidLexer.Space));
         assertThat(token.getText(), is(" "));
 
         stripSpacesAroundTags = true;

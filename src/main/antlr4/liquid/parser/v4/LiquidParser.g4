@@ -260,5 +260,5 @@ outStart
  ;
 
 other
- : ( Other | NoSpace )+
+ : ( Space | NoSpace )+
  ;

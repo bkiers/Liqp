@@ -27,8 +27,8 @@ NoSpace
  : ~[ \t\r\n]
  ;
 
-Other
- : .
+Space
+ : [ \t\r\n]
  ;
 
 fragment SStr           : '\'' ~'\''* '\'';

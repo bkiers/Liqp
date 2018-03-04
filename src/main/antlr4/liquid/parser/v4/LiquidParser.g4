@@ -48,7 +48,7 @@ raw_tag
  ;
 
 raw_body
- : other_than_tag_start
+ : OtherRaw*
  ;
 
 comment_tag

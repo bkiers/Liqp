@@ -6,7 +6,7 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-public class LiquidParserTest {
+public class ParseTest {
 
     /*
      * def test_error_with_css

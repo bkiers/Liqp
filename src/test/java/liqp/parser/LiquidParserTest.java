@@ -1,9 +1,6 @@
 package liqp.parser;
 
 import liqp.Template;
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.hamcrest.core.Is;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -37,7 +34,6 @@ public class LiquidParserTest {
      */
     @Test(expected=RuntimeException.class)
     public void raise_on_single_close_bracetTest() throws Exception {
-
         Template.parse("text {{method} oh nos!");
     }
 
@@ -124,22 +120,5 @@ public class LiquidParserTest {
                 Template.parse("var2:{{var2}} {%assign var2 = var.end%} var2:{{var2}}")
                         .render(" { \"var\": { \"end\": \"content\" } } "),
                 is("var2:  var2:content"));
-    }
-
-    @Test
-    public void flavorTest() throws Exception {
-
-        // Both trees should look the same
-        assertThat(
-                asTree("{% include 'footer.html' %}", Flavor.LIQUID),
-                Is.is(asTree("{% include footer.html %}", Flavor.JEKYLL))
-        );
-    }
-
-    static String asTree(String input, Flavor flavor) throws Exception {
-        liqp.parser.LiquidLexer lexer = new liqp.parser.LiquidLexer(new ANTLRStringStream(input));
-        liqp.parser.LiquidParser parser = new liqp.parser.LiquidParser(flavor, new CommonTokenStream(lexer));
-        liqp.parser.LiquidParser.include_tag_return context = parser.include_tag();
-        return context.getTree().toStringTree();
     }
 }

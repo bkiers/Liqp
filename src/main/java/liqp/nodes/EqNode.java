@@ -5,7 +5,7 @@ import liqp.TemplateContext;
 
 import java.util.Map;
 
-class EqNode implements LNode {
+public class EqNode implements LNode {
 
     private LNode lhs;
     private LNode rhs;

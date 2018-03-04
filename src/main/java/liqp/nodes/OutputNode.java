@@ -5,7 +5,7 @@ import liqp.TemplateContext;
 import java.util.ArrayList;
 import java.util.List;
 
-class OutputNode implements LNode {
+public class OutputNode implements LNode {
 
     private LNode expression;
     private List<FilterNode> filters;

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-class LookupNode implements LNode {
+public class LookupNode implements LNode {
 
     private final String id;
     private final List<Indexable> indexes;
@@ -53,7 +53,7 @@ class LookupNode implements LNode {
         return variableFullName.toString();
     }
 
-    interface Indexable {
+    public interface Indexable {
         Object get(Object value, TemplateContext context);
     }
 

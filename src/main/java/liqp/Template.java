@@ -4,22 +4,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
 import liqp.parser.Flavor;
-import liqp.parser.LiquidLexer;
-import liqp.parser.LiquidParser;
-import liqp.nodes.LiquidWalker;
+import liqp.parser.v4.NodeVisitor;
 import liqp.tags.Tag;
+import liquid.parser.v4.LiquidLexer;
+import liquid.parser.v4.LiquidParser;
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.tree.CommonTree;
-import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -34,7 +30,7 @@ public class Template {
     /**
      * The root of the AST denoting the Liquid input source.
      */
-    private final CommonTree root;
+    private final ParseTree root;
 
     /**
      * This instance's tags.
@@ -63,21 +59,21 @@ public class Template {
      * @param filters
      *         the filters this instance will make use of.
      */
-    private Template(String input, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings settings) {
+    private Template(String input, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings) {
 
         this.tags = tags;
         this.filters = filters;
-        this.parseSettings = settings;
+        this.parseSettings = parseSettings;
 
         ANTLRStringStream stream = new ANTLRStringStream(input);
         this.templateSize = stream.size();
-        LiquidLexer lexer = new LiquidLexer(parseSettings.stripSpacesAroundTags, stream);
-        LiquidParser parser = new LiquidParser(parseSettings.flavor, new CommonTokenStream(lexer));
+        LiquidLexer lexer = new LiquidLexer(CharStreams.fromString(input), parseSettings.stripSpacesAroundTags);
+        LiquidParser parser = createParser(lexer);
 
         try {
-            root = parser.parse().getTree();
+             root = parser.parse();
         }
-        catch (RecognitionException e) {
+        catch (Exception e) {
             throw new RuntimeException("could not parse input: " + input, e);
         }
     }
@@ -97,21 +93,47 @@ public class Template {
         try {
             ANTLRFileStream stream = new ANTLRFileStream(file.getAbsolutePath());
             this.templateSize = stream.size();
-            LiquidLexer lexer = new LiquidLexer(parseSettings.stripSpacesAroundTags, stream);
-            LiquidParser parser = new LiquidParser(parseSettings.flavor, new CommonTokenStream(lexer));
-            root = parser.parse().getTree();
+            LiquidLexer lexer = new LiquidLexer(CharStreams.fromFileName(file.getAbsolutePath()), parseSettings.stripSpacesAroundTags);
+            LiquidParser parser = createParser(lexer);
+            root = parser.parse();
         }
-        catch (RecognitionException e) {
+        catch (Exception e) {
             throw new RuntimeException("could not parse input from " + file, e);
         }
     }
 
+    private LiquidParser createParser(LiquidLexer lexer) {
+
+        lexer.removeErrorListeners();
+
+        lexer.addErrorListener(new BaseErrorListener(){
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                throw new RuntimeException(String.format("lexer error on line %s, index %s", line, charPositionInLine), e);
+            }
+        });
+
+        LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
+
+        parser.removeErrorListeners();
+
+        parser.addErrorListener(new BaseErrorListener(){
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                throw new RuntimeException(String.format("parser error on line %s, index %s", line, charPositionInLine), e);
+            }
+        });
+
+        return parser;
+    }
+
+
     /**
-     * Returns the root of the AST of the parsed input.
+     * Returns the root of the parse tree of the parsed input.
      *
-     * @return the root of the AST of the parsed input.
+     * @return the root of the parse tree of the parsed input.
      */
-    public CommonTree getAST() {
+    public ParseTree getAST() {
         return root;
     }
 
@@ -263,12 +285,12 @@ public class Template {
             throw new RuntimeException("template exceeds " + this.protectionSettings.maxTemplateSizeBytes + " bytes");
         }
 
-        final LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(root), this.tags, this.filters, this.parseSettings.flavor);
+        final NodeVisitor visitor = new NodeVisitor(this.tags, this.filters, this.parseSettings);
 
         Callable<String> task = new Callable<String>() {
             public String call() throws Exception {
                 try {
-                    LNode node = walker.walk();
+                    LNode node = visitor.visit(root);
                     Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings.flavor, variables));
                     return rendered == null ? "" : String.valueOf(rendered);
                 }
@@ -296,73 +318,9 @@ public class Template {
         }
     }
 
-    /**
-     * Returns a string representation of the AST of the parsed
-     * input source.
-     *
-     * @return a string representation of the AST of the parsed
-     *         input source.
-     */
+    @Deprecated
     public String toStringAST() {
-
-        StringBuilder builder = new StringBuilder();
-
-        walk(root, builder);
-
-        return builder.toString();
-    }
-
-    /**
-     * Walks a (sub) tree of the root of the input source and builds
-     * a string representation of the structure of the AST.
-     * <p/>
-     * Note that line breaks and multiple white space characters are
-     * trimmed to a single white space character.
-     *
-     * @param tree
-     *         the (sub) tree.
-     * @param builder
-     *         the StringBuilder to fill.
-     */
-    @SuppressWarnings("unchecked")
-    private void walk(CommonTree tree, StringBuilder builder) {
-
-        List<CommonTree> firstStack = new ArrayList<CommonTree>();
-        firstStack.add(tree);
-
-        List<List<CommonTree>> childListStack = new ArrayList<List<CommonTree>>();
-        childListStack.add(firstStack);
-
-        while (!childListStack.isEmpty()) {
-
-            List<CommonTree> childStack = childListStack.get(childListStack.size() - 1);
-
-            if (childStack.isEmpty()) {
-                childListStack.remove(childListStack.size() - 1);
-            }
-            else {
-                tree = childStack.remove(0);
-
-                String indent = "";
-
-                for (int i = 0; i < childListStack.size() - 1; i++) {
-                    indent += (childListStack.get(i).size() > 0) ? "|  " : "   ";
-                }
-
-                String tokenName = LiquidParser.tokenNames[tree.getType()];
-                String tokenText = tree.getText().replaceAll("\\s+", " ").trim();
-
-                builder.append(indent)
-                        .append(childStack.isEmpty() ? "'- " : "|- ")
-                        .append(tokenName)
-                        .append(!tokenName.equals(tokenText) ? "='" + tokenText + "'" : "")
-                        .append("\n");
-
-                if (tree.getChildCount() > 0) {
-                    childListStack.add(new ArrayList<CommonTree>((List<CommonTree>) tree.getChildren()));
-                }
-            }
-        }
+        throw new RuntimeException("No longer supported with the use of ANTLR4!");
     }
 
     private void putStringKey(boolean convertValueToMap, String key, Object value, Map<String, Object> map) {

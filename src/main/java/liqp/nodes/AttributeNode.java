@@ -2,7 +2,7 @@ package liqp.nodes;
 
 import liqp.TemplateContext;
 
-class AttributeNode implements LNode {
+public class AttributeNode implements LNode {
 
     private LNode key;
     private LNode value;

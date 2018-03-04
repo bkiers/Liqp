@@ -1,15 +1,13 @@
 package liqp;
 
-import java.lang.reflect.Method;
+import liqp.filters.Filter;
 import liqp.nodes.LNode;
-import liqp.nodes.LiquidWalker;
-import liqp.parser.LiquidLexer;
-import liqp.parser.LiquidParser;
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.CommonTree;
-import org.antlr.runtime.tree.CommonTreeNodeStream;
+import liqp.parser.v4.NodeVisitor;
+import liqp.tags.Tag;
+import liquid.parser.v4.LiquidLexer;
+import liquid.parser.v4.LiquidParser;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 
 public final class TestUtils {
 
@@ -28,44 +26,27 @@ public final class TestUtils {
      * @throws Exception
      */
     public static LNode getNode(String source, String rule) throws Exception {
-
-        LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream("{{ " + source + " }}"));
-        LiquidParser parser =  new LiquidParser(new CommonTokenStream(lexer));
-
-        CommonTree root = (CommonTree)parser.parse().getTree();
-        CommonTree child = (CommonTree)root.getChild(0).getChild(0);
-
-        LiquidWalker walker = new LiquidWalker(new CommonTreeNodeStream(child));
-
-        Method method = walker.getClass().getMethod(rule);
-
-        return (LNode)method.invoke(walker);
+        return getNode(source, rule, new ParseSettings.Builder().build());
     }
 
-    public static void dumpTokens(String source) {
+    public static LNode getNode(String source, String rule, ParseSettings parseSettings) throws Exception {
 
-        LiquidLexer lexer = new LiquidLexer(new ANTLRStringStream(source));
-        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-        tokenStream.fill();
+        LiquidLexer lexer = new LiquidLexer(CharStreams.fromString("{{ " + source + " }}"));
+        LiquidParser parser =  new LiquidParser(new CommonTokenStream(lexer));
 
-        for (Token t : tokenStream.getTokens()) {
-            System.out.printf("%-20s '%s'\n",
-                    t.getType() == -1 ? "EOF" : LiquidParser.tokenNames[t.getType()],
-                    t.getText().replace("\n", "\\n"));
-        }
+        LiquidParser.OutputContext root = parser.output();
+        NodeVisitor visitor = new NodeVisitor(Tag.getTags(), Filter.getFilters(), parseSettings);
+
+        return visitor.visitOutput(root);
     }
 
     public static Throwable getExceptionRootCause(Throwable e) {
-        Throwable cause = null;
+        Throwable cause;
         Throwable result = e;
 
         while (null != (cause = result.getCause())  && (result != cause) ) {
             result = cause;
         }
         return result;
-    }
-
-    public static void main(String[] args) {
-        dumpTokens("a  \n  {%-");
     }
 }

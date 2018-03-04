@@ -3,13 +3,7 @@ package liqp;
 import java.io.File;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
-import liqp.parser.LiquidLexer;
-import liqp.parser.LiquidParser;
 import liqp.tags.Tag;
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
-
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,26 +26,6 @@ public class Examples {
                 .render("{\"text\": \"abcdefghijklmnopqrstuvwxyz\"}");
 
         System.out.println(rendered);
-    }
-
-    private static void demoPrintAST() {
-
-        String input =
-                "<ul id=\"products\">                                       \n" +
-                "  {% for product in products %}                            \n" +
-                "    <li>                                                   \n" +
-                "      <h2>{{ product.name }}</h2>                          \n" +
-                "      Only {{ product.price | price }}                     \n" +
-                "                                                           \n" +
-                "      {{ product.description | prettyprint | paragraph }}  \n" +
-                "    </li>                                                  \n" +
-                "  {% endfor %}                                             \n" +
-                "</ul>                                                      \n";
-        Template template = Template.parse(input);
-
-        CommonTree root = template.getAST();
-
-        System.out.println(template.toStringAST());
     }
 
     private static void demoSimple() {

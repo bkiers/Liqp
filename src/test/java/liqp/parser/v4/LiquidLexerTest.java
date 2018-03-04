@@ -9,6 +9,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class LiquidLexerTest {
 
@@ -524,6 +525,23 @@ public class LiquidLexerTest {
 
     private static List<Token> tokenise(String source, boolean stripSpacesAroundTags, boolean discardEof) {
 
+        CommonTokenStream tokenStream = commonTokenStream(source, stripSpacesAroundTags);
+        tokenStream.fill();
+        List<Token> tokens = tokenStream.getTokens();
+
+        if (discardEof) {
+            tokens.remove(tokens.size() - 1);
+        }
+
+        return tokens;
+    }
+
+    static CommonTokenStream commonTokenStream(String source) {
+        return commonTokenStream(source, false);
+    }
+
+    static CommonTokenStream commonTokenStream(String source, boolean stripSpacesAroundTags) {
+
         LiquidLexer lexer = new LiquidLexer(CharStreams.fromString(source), stripSpacesAroundTags);
 
         lexer.addErrorListener(new BaseErrorListener(){
@@ -533,14 +551,6 @@ public class LiquidLexerTest {
             }
         });
 
-        CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-        tokenStream.fill();
-        List<Token> tokens = tokenStream.getTokens();
-
-        if (discardEof) {
-            tokens.remove(tokens.size() - 1);
-        }
-
-        return tokens;
+        return new CommonTokenStream(lexer);
     }
 }

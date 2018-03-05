@@ -30,18 +30,19 @@ public abstract class Tag extends LValue {
     static {
         // Register all standard tags.
         registerTag(new Assign());
-        registerTag(new Case());
         registerTag(new Capture());
+        registerTag(new Case());
         registerTag(new Comment());
         registerTag(new Cycle());
+        registerTag(new Decrement());
         registerTag(new For());
         registerTag(new If());
+        registerTag(new Ifchanged());
         registerTag(new Include());
+        registerTag(new Increment());
         registerTag(new Raw());
         registerTag(new Tablerow());
         registerTag(new Unless());
-        registerTag(new Increment());
-        registerTag(new Decrement());
     }
 
     /**

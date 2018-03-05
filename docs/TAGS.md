@@ -6,7 +6,7 @@
  -[x] [unless](https://help.shopify.com/themes/liquid/tags/control-flow-tags#unless)
  -[x] [else / elsif](https://help.shopify.com/themes/liquid/tags/control-flow-tags#else-elsif)
  -[x] [case / when](https://help.shopify.com/themes/liquid/tags/control-flow-tags#case-when)
- -[ ] [ifchanged](https://shopifyengineering.myshopify.com/blogs/archived/17487852-new-liquid-tag-ifchanged)
+ -[x] [ifchanged](https://shopifyengineering.myshopify.com/blogs/archived/17487852-new-liquid-tag-ifchanged)
  
 ### Iteration
 

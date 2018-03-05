@@ -40,6 +40,8 @@ public abstract class Tag extends LValue {
         registerTag(new Raw());
         registerTag(new Tablerow());
         registerTag(new Unless());
+        registerTag(new Increment());
+        registerTag(new Decrement());
     }
 
     /**

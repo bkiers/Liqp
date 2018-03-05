@@ -3,6 +3,8 @@
 A Java implementation of the [Liquid templating engine](http://wiki.shopify.com/Liquid) backed
 up by an ANTLR grammar.
 
+More information can be found in [the `docs` folder](/docs/README.md).
+
 ## Installation
 
 ### Gradle

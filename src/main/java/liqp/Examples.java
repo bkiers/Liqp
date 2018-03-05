@@ -207,34 +207,30 @@ public class Examples {
 
         System.out.println("running liqp.Examples");
 
-        //demoPrintAST();
+        System.out.println("\n=== demoSimple() ===");
+        demoSimple();
 
-        //demoSimple();
+        System.out.println("\n=== demoCustomStrongFilter() ===");
+        demoCustomStrongFilter();
 
-        //demoCustomStrongFilter();
+        System.out.println("\n=== demoCustomRepeatFilter() ===");
+        demoCustomRepeatFilter();
 
-        //demoCustomRepeatFilter();
+        System.out.println("\n=== demoCustomSumFilter() ===");
+        demoCustomSumFilter();
 
-        //demoCustomSumFilter();
+        System.out.println("\n=== customLoopTag() ===");
+        customLoopTag();
 
-        //customLoopTag();
+        System.out.println("\n=== instanceTag() ===");
+        instanceTag();
 
-        //instanceTag();
+        System.out.println("\n=== instanceFilter() ===");
+        instanceFilter();
 
-        //instanceFilter();
+        System.out.println("\n=== demoStrictVariables() ===");
+        demoStrictVariables();
 
-        //demoStrictVariables();
-
-        /*
-            list = [{"a" => 3}, {"a" => 1}, {"a" => 2}]
-
-            text = "list={{list | sort, 'a'}}"
-
-            @template = Liquid::Template.parse(text)
-            print ">>>" + @template.render({'list' => list}) + "<<<\n"
-        */
-        String json = "{\"array\":[11, 22, 33, 44, 55]}";
-        Template t = Template.parse(new File("snippets/test.liquid"));
-        System.out.println(t.render(json));
+        System.out.println("Done!");
     }
 }

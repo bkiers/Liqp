@@ -10,12 +10,15 @@ import liquid.parser.v4.LiquidLexer;
 import liquid.parser.v4.LiquidParser;
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
+import org.antlr.runtime.tree.CommonTree;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -28,7 +31,7 @@ import java.util.concurrent.*;
 public class Template {
 
     /**
-     * The root of the AST denoting the Liquid input source.
+     * The root of the parse tree denoting the Liquid input source.
      */
     private final ParseTree root;
 
@@ -127,13 +130,18 @@ public class Template {
         return parser;
     }
 
+    // Use getParseTree()
+    @Deprecated
+    public CommonTree getAST() {
+        throw new UnsupportedOperationException("The ANTLR3 CommonTree isn't available in this version of Liqp, use: getParseTree()");
+    }
 
     /**
      * Returns the root of the parse tree of the parsed input.
      *
      * @return the root of the parse tree of the parsed input.
      */
-    public ParseTree getAST() {
+    public ParseTree getParseTree() {
         return root;
     }
 
@@ -318,9 +326,90 @@ public class Template {
         }
     }
 
+    // Use toStringTree()
     @Deprecated
     public String toStringAST() {
-        throw new RuntimeException("No longer supported with the use of ANTLR4!");
+        return toStringTree();
+    }
+
+    /**
+     * Returns a string representation of the parse tree of the parsed
+     * input source.
+     *
+     * @return a string representation of the parse tree of the parsed
+     *         input source.
+     */
+    public String toStringTree() {
+
+        StringBuilder builder = new StringBuilder();
+
+        walk(root, builder);
+
+        return builder.toString();
+    }
+
+    /**
+     * Walks a (sub) tree of the root of the input source and builds
+     * a string representation of the structure of the parse tree.
+     * <p/>
+     * Note that line breaks and multiple white space characters are
+     * trimmed to a single white space character.
+     *
+     * @param tree
+     *         the (sub) tree.
+     * @param builder
+     *         the StringBuilder to fill.
+     */
+    @SuppressWarnings("unchecked")
+    private void walk(ParseTree tree, StringBuilder builder) {
+
+        List<ParseTree> firstStack = new ArrayList<ParseTree>();
+        firstStack.add(tree);
+
+        List<List<ParseTree>> childListStack = new ArrayList<List<ParseTree>>();
+        childListStack.add(firstStack);
+
+        while (!childListStack.isEmpty()) {
+
+            List<ParseTree> childStack = childListStack.get(childListStack.size() - 1);
+
+            if (childStack.isEmpty()) {
+                childListStack.remove(childListStack.size() - 1);
+            }
+            else {
+                tree = childStack.remove(0);
+
+                String indent = "";
+
+                for (int i = 0; i < childListStack.size() - 1; i++) {
+                    indent += (childListStack.get(i).size() > 0) ? "|  " : "   ";
+                }
+
+                String tokenName = tree.getClass().getSimpleName().replaceAll("Context$", "");
+                String tokenText = tree.getText().replaceAll("\\s+", " ");
+
+                builder.append(indent)
+                        .append(childStack.isEmpty() ? "'- " : "|- ")
+                        .append(tokenName)
+                        .append(tree.getChildCount() == 0 ? "='" + tokenText + "'" : "")
+                        .append("\n");
+
+                if (tree.getChildCount() > 0) {
+                    childListStack.add(new ArrayList<ParseTree>(children(tree)));
+                }
+            }
+        }
+    }
+
+    private static List<ParseTree> children(ParseTree parent) {
+
+        List<ParseTree> children = new ArrayList<>();
+
+        for (int i = 0; i < parent.getChildCount(); i++) {
+            children.add(parent.getChild(i));
+        }
+
+        return children;
     }
 
     private void putStringKey(boolean convertValueToMap, String key, Object value, Map<String, Object> map) {

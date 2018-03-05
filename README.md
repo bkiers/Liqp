@@ -34,12 +34,12 @@ in your local Maven repository, as well as in the project's `target/` folder.
 
 This library can be used in two different ways:
 
-1. to construct an AST (abstract syntax tree) of some Liquid input
+1. to construct a parse tree of some Liquid input
 2. to render Liquid input source (either files, or input strings)
 
-## 1. Creating an AST
+## 1. Creating a parse tree
 
-To create an AST from input source, do the following:
+To create a parse tree from input source, do the following:
 
 ```java
 String input =
@@ -55,58 +55,13 @@ String input =
         "</ul>                                                      \n";
 Template template = Template.parse(input);
 
-CommonTree root = template.getAST();
+ParseTree root = template.getParseTree();
 ```
 
-As you can see, the `getAST()` method returns an instance of a
-[`CommonTree`](http://www.antlr.org/api/Java/org/antlr/runtime/tree/CommonTree.html) denoting the root
-node of the input source. To see how the AST is built, you can use `Template#toStringAST()` to print
-an ASCII representation of the tree:
-
-```java
-System.out.println(template.toStringAST());
-/*
-    '- BLOCK
-       |- PLAIN='<ul id="products">'
-       |- FOR_ARRAY
-       |  |- Id='product'
-       |  |- LOOKUP
-       |  |  '- Id='products'
-       |  |- BLOCK
-       |  |  |- PLAIN='<li> <h2>'
-       |  |  |- OUTPUT
-       |  |  |  |- LOOKUP
-       |  |  |  |  |- Id='product'
-       |  |  |  |  '- Id='name'
-       |  |  |  '- FILTERS
-       |  |  |- PLAIN='</h2> Only'
-       |  |  |- OUTPUT
-       |  |  |  |- LOOKUP
-       |  |  |  |  |- Id='product'
-       |  |  |  |  '- Id='price'
-       |  |  |  '- FILTERS
-       |  |  |     '- FILTER
-       |  |  |        |- Id='price'
-       |  |  |        '- PARAMS
-       |  |  |- PLAIN=''
-       |  |  |- OUTPUT
-       |  |  |  |- LOOKUP
-       |  |  |  |  |- Id='product'
-       |  |  |  |  '- Id='description'
-       |  |  |  '- FILTERS
-       |  |  |     |- FILTER
-       |  |  |     |  |- Id='prettyprint'
-       |  |  |     |  '- PARAMS
-       |  |  |     '- FILTER
-       |  |  |        |- Id='paragraph'
-       |  |  |        '- PARAMS
-       |  |  '- PLAIN='</li>'
-       |  '- ATTRIBUTES
-       '- PLAIN='</ul>'
-*/
-```
-Checkout the [ANTLR grammar](https://github.com/bkiers/Liqp/blob/master/src/grammar/Liquid.g)
-to see what the AST looks like for each of the parser rules.
+As you can see, the `getParseTree()` method returns an instance of a
+[`ParseTree`](http://www.antlr.org/api/Java/org/antlr/v4/runtime/tree/ParseTree.html) denoting the root
+node of the input source. To see how the parse tree is built, you can use `Template#toStringAST()` to print
+an ASCII representation of the tree.
 
 ## 2. Render Liquid
 

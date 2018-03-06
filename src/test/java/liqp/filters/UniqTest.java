@@ -9,26 +9,21 @@ import static org.junit.Assert.assertThat;
 
 public class UniqTest {
 
-    /*
-        def test_uniq
-          assert_equal ["foo"], @filters.uniq("foo")
-          assert_equal [1, 3, 2, 4], @filters.uniq([1, 1, 3, 2, 3, 1, 4, 3, 2, 1])
-          assert_equal [{ "a" => 1 }, { "a" => 3 }, { "a" => 2 }], @filters.uniq([{ "a" => 1 }, { "a" => 3 }, { "a" => 1 }, { "a" => 2 }], "a")
-          testdrop = TestDrop.new
-          assert_equal [testdrop], @filters.uniq([testdrop, TestDrop.new], 'test')
-        end
-    */
     @Test
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                {"", ""},
+                {"{{ x | uniq }}", "", "{ \"x\": [] }"},
+                {"{{ x | uniq }}", "true", "{ \"x\": true }"},
+                {"{{ x | uniq }}", "mu", "{ \"x\": \"mu\" }"},
+                {"{{ x | uniq }}", "", "{ \"x\": null }"},
+                {"{{ x | uniq }}", "1342", "{ \"x\": [1, 1, 3, 4, 3, 2, 1, 2, 3, 2, 1, 1, 2] }"},
         };
 
         for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
-            String rendered = String.valueOf(template.render());
+            String rendered = String.valueOf(template.render(test[2]));
 
             assertThat(rendered, is(test[1]));
         }

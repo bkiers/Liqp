@@ -23,7 +23,10 @@ public class Url_DecodeTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                {"", ""},
+                {"{{ 'foo+bar' | url_decode }}", "foo bar"},
+                {"{{ 'foo%20bar' | url_decode }}", "foo bar"},
+                {"{{ 'foo%2B1%40example.com' | url_decode }}", "foo+1@example.com"},
+                {"{{ nil | url_decode }}", ""},
         };
 
         for (String[] test : tests) {

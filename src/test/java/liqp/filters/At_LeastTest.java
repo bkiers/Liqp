@@ -25,13 +25,20 @@ public class At_LeastTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                {"", ""},
+                {"{{ 5 | at_least:4 }}", "5", "{}"},
+                {"{{ 5 | at_least:5 }}", "5", "{}"},
+                {"{{ 5 | at_least:6 }}", "6", "{}"},
+
+                {"{{ 4.5 | at_least:5 }}", "5", "{}"},
+                {"{{ width | at_least:5 }}", "6", "{ \"width\": 6 }"},
+                {"{{ width | at_least:5 }}", "5", "{ \"width\": 4 }"},
+                {"{{ 5 | at_least: width }}", "6", "{ \"width\": 6 }"}
         };
 
         for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
-            String rendered = String.valueOf(template.render());
+            String rendered = String.valueOf(template.render(test[2]));
 
             assertThat(rendered, is(test[1]));
         }

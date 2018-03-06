@@ -146,7 +146,12 @@ filter
  ;
 
 params
- : Col expr (Comma expr)*
+ : Col param_expr ( Comma param_expr )*
+ ;
+
+param_expr
+ : id2 Col expr #param_expr_key_value
+ | expr         #param_expr_expr
  ;
 
 assignment

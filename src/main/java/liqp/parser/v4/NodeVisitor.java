@@ -7,10 +7,12 @@ import liqp.nodes.BlockNode;
 import liqp.nodes.*;
 import liqp.parser.Flavor;
 import liqp.tags.Tag;
+import liquid.parser.v4.LiquidParser;
 import liquid.parser.v4.LiquidParserBaseVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -407,7 +409,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  ;
   //
   // params
-  //  : Col expr (Comma expr)*
+  //  : Col param_expr (Comma param_expr)*
   //  ;
   @Override
   public FilterNode visitFilter(FilterContext ctx) {
@@ -415,12 +417,30 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
     FilterNode node = new FilterNode(ctx, filters.get(ctx.Id().getText()));
 
     if (ctx.params() != null) {
-      for (ExprContext child : ctx.params().expr()) {
+      for (Param_exprContext child : ctx.params().param_expr()) {
         node.add(visit(child));
       }
     }
 
     return node;
+  }
+
+  // param_expr
+  //  : id2 Col expr #param_expr_key_value
+  //  | ...
+  //  ;
+  @Override
+  public LNode visitParam_expr_key_value(Param_expr_key_valueContext ctx) {
+    return new KeyValueNode(ctx.id2().getText(), visit(ctx.expr()));
+  }
+
+  // param_expr
+  //  : ...
+  //  | expr         #param_expr_expr
+  //  ;
+  @Override
+  public LNode visitParam_expr_expr(Param_expr_exprContext ctx) {
+    return visit(ctx.expr());
   }
 
   // assignment

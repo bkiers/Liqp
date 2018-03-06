@@ -30,7 +30,7 @@ public abstract class LValue {
 
     /**
      * Returns true iff a and b are equals, where (int) 1 is
-     * equals to (double) 1.0
+     * equal to (double) 1.0
      *
      * @param a
      *         the first object to compare.
@@ -83,6 +83,10 @@ public abstract class LValue {
 
         if (AtomNode.isEmpty(b) && (a.getClass().isArray())) {
             return ((Object[])a).length == 0;
+        }
+
+        if (AtomNode.isEmpty(b) && (a instanceof Map)) {
+            return ((Map)a).size() == 0;
         }
 
         return a.equals(b);
@@ -291,5 +295,13 @@ public abstract class LValue {
 
     public boolean canBeDouble(Object value) {
         return String.valueOf(value).matches("-?\\d+(\\.\\d*)?");
+    }
+
+    public boolean isMap(Object value) {
+        return value != null && (value instanceof Map);
+    }
+
+    public Map<String, Object> asMap(Object value) {
+        return (Map<String, Object>)value;
     }
 }

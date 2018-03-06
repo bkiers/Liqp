@@ -84,16 +84,16 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  : ~TagEnd+
   //  ;
   @Override
-  public LNode visitCustom_tag(Custom_tagContext ctx) {
+  public LNode visitOther_tag(Other_tagContext ctx) {
 
     List<LNode> expressions = new ArrayList<LNode>();
 
-    if (ctx.custom_tag_parameters() != null) {
-      expressions.add(new AtomNode(ctx.custom_tag_parameters().getText()));
+    if (ctx.other_tag_parameters() != null) {
+      expressions.add(new AtomNode(ctx.other_tag_parameters().getText()));
     }
 
-    if (ctx.custom_tag_block() != null) {
-      expressions.add(visitCustom_tag_block(ctx.custom_tag_block()));
+    if (ctx.other_tag_block() != null) {
+      expressions.add(visitOther_tag_block(ctx.other_tag_block()));
     }
 
     return new TagNode(tags.get(ctx.Id().getText()), expressions.toArray(new LNode[expressions.size()]));
@@ -103,7 +103,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  : atom+? tagStart EndId TagEnd
   //  ;
   @Override
-  public BlockNode visitCustom_tag_block(Custom_tag_blockContext ctx) {
+  public BlockNode visitOther_tag_block(Other_tag_blockContext ctx) {
 
     BlockNode node = new BlockNode(isRootBlock);
 

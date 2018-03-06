@@ -34,17 +34,17 @@ public class LiquidParserTest {
     public void testCustom_tag() {
 
         assertThat(
-                texts("{% mu %}", "custom_tag"),
+                texts("{% mu %}", "other_tag"),
                 equalTo(array("{%", "mu", "%}"))
         );
 
         assertThat(
-                texts("{% mu | 42 %}", "custom_tag"),
+                texts("{% mu | 42 %}", "other_tag"),
                 equalTo(array("{%", "mu", "|42", "%}"))
         );
 
         assertThat(
-                texts("{% mu %} . {% endmu %}", "custom_tag"),
+                texts("{% mu %} . {% endmu %}", "other_tag"),
                 equalTo(array("{%", "mu", "%}", " . {%endmu%}"))
         );
     }

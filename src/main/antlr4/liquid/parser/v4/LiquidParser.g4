@@ -20,8 +20,7 @@ atom
  ;
 
 tag
- : custom_tag
- | raw_tag
+ : raw_tag
  | comment_tag
  | if_tag
  | unless_tag
@@ -31,14 +30,15 @@ tag
  | table_tag
  | capture_tag
  | include_tag
+ | other_tag
  ;
 
-custom_tag
- : tagStart Id custom_tag_parameters? TagEnd custom_tag_block?
+other_tag
+ : tagStart Id other_tag_parameters? TagEnd other_tag_block?
  ;
 
-custom_tag_block
- : atom+? tagStart EndId TagEnd
+other_tag_block
+ : atom*? tagStart EndId TagEnd
  ;
 
 raw_tag
@@ -224,7 +224,7 @@ index
  | OBr expr CBr
  ;
 
-custom_tag_parameters
+other_tag_parameters
  : other_than_tag_end  
  ;
 

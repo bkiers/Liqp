@@ -141,13 +141,9 @@ public abstract class Filter extends LValue {
      */
     final void checkParams(Object[] params, int expected) {
 
-        if (expected == 0 && (params == null || params.length == 0)) {
-            return;
-        }
-
         if (params == null || params.length != expected) {
-            throw new RuntimeException("Liquid error: wrong number of arguments (" +
-                    (params == null ? "null" : (params.length + 1)) + " for " + (expected + 1) + ")");
+            throw new RuntimeException("Liquid error: wrong number of arguments (given " +
+                    (params == null ? 1 : (params.length + 1)) + " expected " + (expected + 1) + ")");
         }
     }
 

@@ -258,4 +258,12 @@ public abstract class LValue {
 
         return value != null && value instanceof CharSequence;
     }
+
+    public boolean canBeInteger(Object value) {
+        return String.valueOf(value).matches("-?\\d+");
+    }
+
+    public boolean canBeDouble(Object value) {
+        return String.valueOf(value).matches("-?\\d+(\\.\\d*)?");
+    }
 }

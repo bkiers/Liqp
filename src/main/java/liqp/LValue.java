@@ -2,6 +2,8 @@ package liqp;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
 import liqp.nodes.AtomNode;
 
 /**
@@ -257,6 +259,30 @@ public abstract class LValue {
     public boolean isString(Object value) {
 
         return value != null && value instanceof CharSequence;
+    }
+
+    public boolean isTruthy(Object value) {
+        return !this.isFalsy(value);
+    }
+
+    public boolean isFalsy(Object value) {
+
+        if (value == null)
+            return true;
+
+        if (value instanceof Boolean && !((Boolean) value))
+            return true;
+
+        if (value instanceof CharSequence && ((CharSequence) value).length() == 0)
+            return true;
+
+        if (this.isArray(value) && this.asArray(value).length == 0)
+            return true;
+
+        if ((value instanceof Map) && ((Map) value).isEmpty())
+            return true;
+
+        return false;
     }
 
     public boolean canBeInteger(Object value) {

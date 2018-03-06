@@ -23,13 +23,19 @@ public class DefaultTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                {"", ""},
+                {"{{ a | default: b }}", "foo", "{ \"a\": \"foo\", \"b\": \"bar\" }"},
+                {"{{ a | default: b }}", "bar", "{ \"a\": null, \"b\": \"bar\" }"},
+                {"{{ a | default: b }}", "bar", "{ \"a\": \"\", \"b\": \"bar\" }"},
+                {"{{ a | default: b }}", "bar", "{ \"a\": false, \"b\": \"bar\" }"},
+                {"{{ a | default: b }}", "bar", "{ \"a\": [], \"b\": \"bar\" }"},
+                {"{{ a | default: b }}", "bar", "{ \"a\": {}, \"b\": \"bar\" }"},
+                {"{{ a | default }}", "", "{ \"a\": null, \"b\": \"bar\" }"}
         };
 
         for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
-            String rendered = String.valueOf(template.render());
+            String rendered = String.valueOf(template.render(test[2]));
 
             assertThat(rendered, is(test[1]));
         }

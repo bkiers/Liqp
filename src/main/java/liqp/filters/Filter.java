@@ -143,7 +143,15 @@ public abstract class Filter extends LValue {
 
         if (params == null || params.length != expected) {
             throw new RuntimeException("Liquid error: wrong number of arguments (given " +
-                    (params == null ? 1 : (params.length + 1)) + " expected " + (expected + 1) + ")");
+                    (params == null ? 1 : (params.length + 1)) + " for " + (expected + 1) + ")");
+        }
+    }
+
+    final void checkParams(Object[] params, int min, int max) {
+
+        if (params == null || params.length < min || params.length > max) {
+            throw new RuntimeException("Liquid error: wrong number of arguments (given " +
+                    (params == null ? 1 : (params.length + 1)) + " expected " + (min + 1) + ".." + (max + 1) + ")");
         }
     }
 

@@ -21,7 +21,9 @@ public class Url_EncodeTest {
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                {"", ""},
+                {"{{ 'foo+1@example.com' | url_encode }}", "foo%2B1%40example.com"},
+                {"{{ '1' | url_encode }}", "1"},
+                {"{{ nil | url_encode }}", ""},
         };
 
         for (String[] test : tests) {

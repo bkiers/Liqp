@@ -9,22 +9,22 @@ import static org.junit.Assert.assertThat;
 
 public class ReverseTest {
 
-    /*
-        def test_reverse
-          assert_equal [4, 3, 2, 1], @filters.reverse([1, 2, 3, 4])
-        end
-    */
     @Test
     public void applyTest() throws RecognitionException {
 
         String[][] tests = {
-                {"", ""},
+                {"{{ values | reverse }}", "", "{ \"values\": null }" },
+                {"{{ values | reverse }}", "MU", "{ \"values\": \"MU\" }" },
+                {"{{ values | reverse }}", "1", "{ \"values\": [1] }" },
+                {"{{ values | reverse }}", "21", "{ \"values\": [1,2] }" },
+                {"{{ values | reverse }}", "321", "{ \"values\": [1,2,3] }" },
+                {"{{ values | reverse }}", "4321", "{ \"values\": [1,2,3,4] }" },
         };
 
         for (String[] test : tests) {
 
             Template template = Template.parse(test[0]);
-            String rendered = String.valueOf(template.render());
+            String rendered = String.valueOf(template.render(test[2]));
 
             assertThat(rendered, is(test[1]));
         }

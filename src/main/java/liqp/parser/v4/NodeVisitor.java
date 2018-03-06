@@ -387,22 +387,6 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
     return new AtomNode(ctx.other_than_tag_end_out_start().getText());
   }
 
-  // break_tag
-  //  : tagStart Break TagEnd
-  //  ;
-  @Override
-  public LNode visitBreak_tag(Break_tagContext ctx) {
-    return new AtomNode(Tag.Statement.BREAK);
-  }
-
-  // continue_tag
-  //  : tagStart Continue TagEnd
-  //  ;
-  @Override
-  public LNode visitContinue_tag(Continue_tagContext ctx) {
-    return new AtomNode(Tag.Statement.CONTINUE);
-  }
-
   // output
   //  : outStart expr filter* OutEnd
   //  ;

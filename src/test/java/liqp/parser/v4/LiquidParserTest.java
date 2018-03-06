@@ -303,30 +303,6 @@ public class LiquidParserTest {
         );
     }
 
-    // break_tag
-    //  : tagStart Break TagEnd
-    //  ;
-    @Test
-    public void testBreak_tag() {
-
-        assertThat(
-                texts("{%        break   \n\n\n %}", "break_tag"),
-                equalTo(array("{%", "break", "%}"))
-        );
-    }
-
-    // continue_tag
-    //  : tagStart Continue TagEnd
-    //  ;
-    @Test
-    public void testContinue_tag() {
-
-        assertThat(
-                texts("{%continue%}", "continue_tag"),
-                equalTo(array("{%", "continue", "%}"))
-        );
-    }
-
     // output
     //  : outStart expr filter* OutEnd
     //  ;

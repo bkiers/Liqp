@@ -31,8 +31,6 @@ tag
  | table_tag
  | capture_tag
  | include_tag
- | break_tag
- | continue_tag
  ;
 
 custom_tag
@@ -139,14 +137,6 @@ file_name_or_output
  | other_than_tag_end_out_start #file_name_or_output_other_than_tag_end_out_start // only valid for Flavor.JEKYLL
  ;
 
-break_tag
- : tagStart Break TagEnd
- ;
-
-continue_tag
- : tagStart Continue TagEnd
- ;
-
 output
  : outStart expr filter* OutEnd
  ;
@@ -191,7 +181,6 @@ lookup
 
 id
  : Id
- | Continue  
  | CaptureStart  
  | CaptureEnd  
  | CommentStart  
@@ -219,8 +208,7 @@ id
  | Assign  
  | Include  
  | With  
- | EndId  
- | Break  
+ | EndId
  ;
 
 id2

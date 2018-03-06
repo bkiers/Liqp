@@ -2,6 +2,7 @@ package liqp.tags;
 
 import java.util.List;
 
+import liqp.LValue;
 import liqp.TemplateContext;
 import liqp.exceptions.ExceededMaxIterationsException;
 import liqp.nodes.BlockNode;
@@ -111,12 +112,12 @@ class For extends Tag {
 
                 Object value = node.render(context);
 
-                if(value == Tag.Statement.CONTINUE) {
+                if(value == LValue.CONTINUE) {
                     // break from this inner loop: equals continue outer loop!
                     break;
                 }
 
-                if(value == Tag.Statement.BREAK) {
+                if(value == LValue.BREAK) {
                     // break from inner loop
                     isBreak = true;
                     break;
@@ -198,12 +199,12 @@ class For extends Tag {
                         continue;
                     }
 
-                    if(value == Tag.Statement.CONTINUE) {
+                    if(value == LValue.CONTINUE) {
                         // break from this inner loop: equals continue outer loop!
                         break;
                     }
 
-                    if(value == Tag.Statement.BREAK) {
+                    if(value == LValue.BREAK) {
                         // break from inner loop
                         isBreak = true;
                         break;

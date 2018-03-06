@@ -12,6 +12,20 @@ import liqp.nodes.AtomNode;
  */
 public abstract class LValue {
 
+    public static final LValue BREAK = new LValue() {
+        @Override
+        public String toString() {
+            return "";
+        }
+    };
+
+    public static final LValue CONTINUE = new LValue() {
+        @Override
+        public String toString() {
+            return "";
+        }
+    };
+
     /**
      * Returns true iff a and b are equals, where (int) 1 is
      * equals to (double) 1.0

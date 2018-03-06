@@ -12,16 +12,6 @@ import java.util.Map;
  */
 public abstract class Tag extends LValue {
 
-    public enum Statement {
-
-        BREAK, CONTINUE;
-
-        @Override
-        public String toString() {
-            return "";
-        }
-    }
-
     /**
      * A map holding all tags.
      */
@@ -30,9 +20,11 @@ public abstract class Tag extends LValue {
     static {
         // Register all standard tags.
         registerTag(new Assign());
+        registerTag(new Break());
         registerTag(new Capture());
         registerTag(new Case());
         registerTag(new Comment());
+        registerTag(new Continue());
         registerTag(new Cycle());
         registerTag(new Decrement());
         registerTag(new For());

@@ -4,6 +4,11 @@ public class Ceil extends Filter {
 
     @Override
     public Object apply(Object value, Object... params) {
-        throw new RuntimeException("TODO: " + getClass().getSimpleName());
+
+        if (!super.isNumber(value)) {
+            return value;
+        }
+
+        return (long)Math.ceil(super.asNumber(value).doubleValue());
     }
 }

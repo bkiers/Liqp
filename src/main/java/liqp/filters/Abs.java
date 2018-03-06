@@ -13,6 +13,6 @@ public class Abs extends Filter {
             return Math.abs(super.asNumber(value).doubleValue());
         }
 
-        return null;
+        return value;
     }
 }

@@ -2,6 +2,8 @@ package liqp;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
 import liqp.nodes.AtomNode;
 
 /**
@@ -12,9 +14,23 @@ import liqp.nodes.AtomNode;
  */
 public abstract class LValue {
 
+    public static final LValue BREAK = new LValue() {
+        @Override
+        public String toString() {
+            return "";
+        }
+    };
+
+    public static final LValue CONTINUE = new LValue() {
+        @Override
+        public String toString() {
+            return "";
+        }
+    };
+
     /**
      * Returns true iff a and b are equals, where (int) 1 is
-     * equals to (double) 1.0
+     * equal to (double) 1.0
      *
      * @param a
      *         the first object to compare.
@@ -67,6 +83,10 @@ public abstract class LValue {
 
         if (AtomNode.isEmpty(b) && (a.getClass().isArray())) {
             return ((Object[])a).length == 0;
+        }
+
+        if (AtomNode.isEmpty(b) && (a instanceof Map)) {
+            return ((Map)a).size() == 0;
         }
 
         return a.equals(b);
@@ -243,5 +263,45 @@ public abstract class LValue {
     public boolean isString(Object value) {
 
         return value != null && value instanceof CharSequence;
+    }
+
+    public boolean isTruthy(Object value) {
+        return !this.isFalsy(value);
+    }
+
+    public boolean isFalsy(Object value) {
+
+        if (value == null)
+            return true;
+
+        if (value instanceof Boolean && !((Boolean) value))
+            return true;
+
+        if (value instanceof CharSequence && ((CharSequence) value).length() == 0)
+            return true;
+
+        if (this.isArray(value) && this.asArray(value).length == 0)
+            return true;
+
+        if ((value instanceof Map) && ((Map) value).isEmpty())
+            return true;
+
+        return false;
+    }
+
+    public boolean canBeInteger(Object value) {
+        return String.valueOf(value).matches("-?\\d+");
+    }
+
+    public boolean canBeDouble(Object value) {
+        return String.valueOf(value).matches("-?\\d+(\\.\\d*)?");
+    }
+
+    public boolean isMap(Object value) {
+        return value != null && (value instanceof Map);
+    }
+
+    public Map<String, Object> asMap(Object value) {
+        return (Map<String, Object>)value;
     }
 }

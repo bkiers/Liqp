@@ -3,13 +3,7 @@ package liqp;
 import java.io.File;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
-import liqp.parser.LiquidLexer;
-import liqp.parser.LiquidParser;
 import liqp.tags.Tag;
-import org.antlr.runtime.*;
-import org.antlr.runtime.tree.*;
-
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,26 +26,6 @@ public class Examples {
                 .render("{\"text\": \"abcdefghijklmnopqrstuvwxyz\"}");
 
         System.out.println(rendered);
-    }
-
-    private static void demoPrintAST() {
-
-        String input =
-                "<ul id=\"products\">                                       \n" +
-                "  {% for product in products %}                            \n" +
-                "    <li>                                                   \n" +
-                "      <h2>{{ product.name }}</h2>                          \n" +
-                "      Only {{ product.price | price }}                     \n" +
-                "                                                           \n" +
-                "      {{ product.description | prettyprint | paragraph }}  \n" +
-                "    </li>                                                  \n" +
-                "  {% endfor %}                                             \n" +
-                "</ul>                                                      \n";
-        Template template = Template.parse(input);
-
-        CommonTree root = template.getAST();
-
-        System.out.println(template.toStringAST());
     }
 
     private static void demoSimple() {
@@ -233,34 +207,30 @@ public class Examples {
 
         System.out.println("running liqp.Examples");
 
-        //demoPrintAST();
+        System.out.println("\n=== demoSimple() ===");
+        demoSimple();
 
-        //demoSimple();
+        System.out.println("\n=== demoCustomStrongFilter() ===");
+        demoCustomStrongFilter();
 
-        //demoCustomStrongFilter();
+        System.out.println("\n=== demoCustomRepeatFilter() ===");
+        demoCustomRepeatFilter();
 
-        //demoCustomRepeatFilter();
+        System.out.println("\n=== demoCustomSumFilter() ===");
+        demoCustomSumFilter();
 
-        //demoCustomSumFilter();
+        System.out.println("\n=== customLoopTag() ===");
+        customLoopTag();
 
-        //customLoopTag();
+        System.out.println("\n=== instanceTag() ===");
+        instanceTag();
 
-        //instanceTag();
+        System.out.println("\n=== instanceFilter() ===");
+        instanceFilter();
 
-        //instanceFilter();
+        System.out.println("\n=== demoStrictVariables() ===");
+        demoStrictVariables();
 
-        //demoStrictVariables();
-
-        /*
-            list = [{"a" => 3}, {"a" => 1}, {"a" => 2}]
-
-            text = "list={{list | sort, 'a'}}"
-
-            @template = Liquid::Template.parse(text)
-            print ">>>" + @template.render({'list' => list}) + "<<<\n"
-        */
-        String json = "{\"array\":[11, 22, 33, 44, 55]}";
-        Template t = Template.parse(new File("snippets/test.liquid"));
-        System.out.println(t.render(json));
+        System.out.println("Done!");
     }
 }

@@ -2,6 +2,7 @@ package liqp.tags;
 
 import java.util.List;
 
+import liqp.LValue;
 import liqp.TemplateContext;
 import liqp.exceptions.ExceededMaxIterationsException;
 import liqp.nodes.BlockNode;
@@ -25,15 +26,15 @@ class For extends Tag {
      * forloop.first       # => is this the first iteration?
      * forloop.last        # => is this the last iteration?
      */
-    private static final String FORLOOP = "forloop";
-    private static final String LENGTH = "length";
-    private static final String INDEX = "index";
-    private static final String INDEX0 = "index0";
-    private static final String RINDEX = "rindex";
-    private static final String RINDEX0 = "rindex0";
-    private static final String FIRST = "first";
-    private static final String LAST = "last";
-    private static final String NAME = "name";
+    static final String FORLOOP = "forloop";
+    static final String LENGTH = "length";
+    static final String INDEX = "index";
+    static final String INDEX0 = "index0";
+    static final String RINDEX = "rindex";
+    static final String RINDEX0 = "rindex0";
+    static final String FIRST = "first";
+    static final String LAST = "last";
+    static final String NAME = "name";
 
     /*
      * For loop
@@ -111,12 +112,12 @@ class For extends Tag {
 
                 Object value = node.render(context);
 
-                if(value == Tag.Statement.CONTINUE) {
+                if(value == LValue.CONTINUE) {
                     // break from this inner loop: equals continue outer loop!
                     break;
                 }
 
-                if(value == Tag.Statement.BREAK) {
+                if(value == LValue.BREAK) {
                     // break from inner loop
                     isBreak = true;
                     break;
@@ -198,12 +199,12 @@ class For extends Tag {
                         continue;
                     }
 
-                    if(value == Tag.Statement.CONTINUE) {
+                    if(value == LValue.CONTINUE) {
                         // break from this inner loop: equals continue outer loop!
                         break;
                     }
 
-                    if(value == Tag.Statement.BREAK) {
+                    if(value == LValue.BREAK) {
                         // break from inner loop
                         isBreak = true;
                         break;

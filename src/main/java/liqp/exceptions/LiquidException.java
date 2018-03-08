@@ -1,10 +1,11 @@
 package liqp.exceptions;
 
-import liqp.parser.LiquidParser;
+import liquid.parser.v4.LiquidParser;
 import org.antlr.runtime.EarlyExitException;
 import org.antlr.runtime.MismatchedTokenException;
 import org.antlr.runtime.NoViableAltException;
 import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.ParserRuleContext;
 
 public class LiquidException extends RuntimeException {
 
@@ -17,6 +18,14 @@ public class LiquidException extends RuntimeException {
 
     this.line = e.line;
     this.charPositionInLine = e.charPositionInLine;
+  }
+
+  public LiquidException(String message, ParserRuleContext ctx) {
+
+    super(message);
+
+    this.line = ctx.start.getLine();;
+    this.charPositionInLine = ctx.start.getCharPositionInLine();
   }
 
   private static String createMessage(RecognitionException e) {
@@ -62,6 +71,7 @@ public class LiquidException extends RuntimeException {
   }
 
   private static String tokenName(int type) {
-    return type < 0 ? "<EOF>" : LiquidParser.tokenNames[type];
+
+    return type < 0 ? "<EOF>" : LiquidParser.VOCABULARY.getSymbolicName(type);
   }
 }

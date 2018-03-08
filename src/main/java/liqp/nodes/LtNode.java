@@ -3,7 +3,7 @@ package liqp.nodes;
 import liqp.LValue;
 import liqp.TemplateContext;
 
-class LtNode extends LValue implements LNode {
+public class LtNode extends LValue implements LNode {
 
     private LNode lhs;
     private LNode rhs;

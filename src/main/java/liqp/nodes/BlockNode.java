@@ -6,6 +6,9 @@ import java.util.List;
 import liqp.TemplateContext;
 import liqp.tags.Tag;
 
+import static liqp.LValue.BREAK;
+import static liqp.LValue.CONTINUE;
+
 public class BlockNode implements LNode {
 
     private List<LNode> children;
@@ -41,10 +44,17 @@ public class BlockNode implements LNode {
                 continue;
             }
 
-            if(value == Tag.Statement.BREAK || value == Tag.Statement.CONTINUE) {
+            if(value == BREAK || value == CONTINUE) {
                 return value;
             }
+            else if (value instanceof List) {
 
+                List list = (List) value;
+
+                for (Object obj : list) {
+                    builder.append(String.valueOf(obj));
+                }
+            }
             else if (value.getClass().isArray()) {
 
                 Object[] array = (Object[]) value;

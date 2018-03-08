@@ -50,6 +50,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <antlr.version>3.5.1</antlr.version>
+    <antlr4.version>4.7.1</antlr4.version>
     <jackson.version>2.2.3</jackson.version>
     <jsoup.version>1.10.3</jsoup.version>
     <junit.version>4.6</junit.version>
@@ -67,8 +68,16 @@
 
     <dependency>
       <groupId>org.antlr</groupId>
-      <artifactId>antlr</artifactId>
-      <version>${antlr.version}</version>
+      <artifactId>antlr4-runtime</artifactId>
+      <version>${antlr4.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4-maven-plugin</artifactId>
+      <version>${antlr4.version}</version>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -124,12 +133,17 @@
 
       <plugin>
         <groupId>org.antlr</groupId>
-        <artifactId>antlr3-maven-plugin</artifactId>
-        <version>3.5.2</version>
+        <artifactId>antlr4-maven-plugin</artifactId>
+        <version>${antlr4.version}</version>
+        <configuration>
+          <arguments>
+            <argument>-visitor</argument>
+          </arguments>
+        </configuration>
         <executions>
           <execution>
             <goals>
-              <goal>antlr</goal>
+              <goal>antlr4</goal>
             </goals>
           </execution>
         </executions>

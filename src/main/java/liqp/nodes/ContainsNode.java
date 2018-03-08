@@ -5,7 +5,7 @@ import java.util.Map;
 import liqp.LValue;
 import liqp.TemplateContext;
 
-class ContainsNode extends LValue implements LNode {
+public class ContainsNode extends LValue implements LNode {
 
     private LNode lhs;
     private LNode rhs;

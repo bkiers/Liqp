@@ -5,7 +5,7 @@ import liqp.TemplateContext;
 
 import java.util.Map;
 
-class AndNode extends LValue implements LNode {
+public class AndNode extends LValue implements LNode {
 
     private LNode lhs;
     private LNode rhs;

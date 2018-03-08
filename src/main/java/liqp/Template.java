@@ -70,7 +70,8 @@ public class Template {
 
         ANTLRStringStream stream = new ANTLRStringStream(input);
         this.templateSize = stream.size();
-        LiquidLexer lexer = new LiquidLexer(CharStreams.fromString(input), parseSettings.stripSpacesAroundTags);
+        LiquidLexer lexer = new LiquidLexer(CharStreams.fromString(input),
+                parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
         LiquidParser parser = createParser(lexer);
 
         try {
@@ -96,7 +97,8 @@ public class Template {
         try {
             ANTLRFileStream stream = new ANTLRFileStream(file.getAbsolutePath());
             this.templateSize = stream.size();
-            LiquidLexer lexer = new LiquidLexer(CharStreams.fromFileName(file.getAbsolutePath()), parseSettings.stripSpacesAroundTags);
+            LiquidLexer lexer = new LiquidLexer(CharStreams.fromFileName(file.getAbsolutePath()),
+                    parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
             LiquidParser parser = createParser(lexer);
             root = parser.parse();
         }

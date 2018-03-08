@@ -2,22 +2,30 @@ lexer grammar LiquidLexer;
 
 @lexer::members {
   private boolean stripSpacesAroundTags = false;
+  private boolean stripSingleLine = false;
 
   public LiquidLexer(CharStream charStream, boolean stripSpacesAroundTags) {
-    this(charStream);
-    this.stripSpacesAroundTags = stripSpacesAroundTags;
+    this(charStream, stripSpacesAroundTags, false);
   }
+
+  public LiquidLexer(CharStream charStream, boolean stripSpacesAroundTags, boolean stripSingleLine) {
+      this(charStream);
+      this.stripSpacesAroundTags = stripSpacesAroundTags;
+      this.stripSingleLine = stripSingleLine;
+    }
 }
 
 OutStart
- : ( {stripSpacesAroundTags}? WhitespaceChar* '{{'
+ : ( {stripSpacesAroundTags && stripSingleLine}? SpaceOrTab* '{{'
+   | {stripSpacesAroundTags && !stripSingleLine}? WhitespaceChar* '{{'
    | WhitespaceChar* '{{-'
    | '{{'
    ) -> pushMode(IN_TAG)
  ;
 
 TagStart
- : ( {stripSpacesAroundTags}? WhitespaceChar* '{%'
+ : ( {stripSpacesAroundTags && stripSingleLine}? SpaceOrTab* '{%'
+   | {stripSpacesAroundTags && !stripSingleLine}? WhitespaceChar* '{%'
    | WhitespaceChar* '{%-'
    | '{%'
    ) -> pushMode(IN_TAG)
@@ -30,6 +38,8 @@ Other
 fragment SStr           : '\'' ~'\''* '\'';
 fragment DStr           : '"' ~'"'* '"';
 fragment WhitespaceChar : [ \t\r\n];
+fragment SpaceOrTab     : [ \t];
+fragment LineBreak      : '\r'? '\n' | '\r';
 fragment Letter         : [a-zA-Z];
 fragment Digit          : [0-9];
 
@@ -39,14 +49,16 @@ mode IN_TAG;
   TagStart2 : '{%' -> pushMode(IN_TAG);
 
   OutEnd
-   : ( {stripSpacesAroundTags}? '}}' WhitespaceChar*
+   : ( {stripSpacesAroundTags && stripSingleLine}? '}}' SpaceOrTab* LineBreak?
+     | {stripSpacesAroundTags && !stripSingleLine}? '}}' WhitespaceChar*
      | '-}}' WhitespaceChar*
      | '}}'
      ) -> popMode
    ;
 
   TagEnd
-   : ( {stripSpacesAroundTags}? '%}' WhitespaceChar*
+   : ( {stripSpacesAroundTags && stripSingleLine}? '%}' SpaceOrTab* LineBreak?
+     | {stripSpacesAroundTags && !stripSingleLine}? '%}' WhitespaceChar*
      | '-%}' WhitespaceChar*
      | '%}'
      ) -> popMode

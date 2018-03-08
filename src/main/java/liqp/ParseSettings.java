@@ -33,6 +33,11 @@ public class ParseSettings {
         }
 
         public Builder withStripSpaceAroundTags(boolean stripSpacesAroundTags, boolean stripSingleLine) {
+
+            if (stripSingleLine && !stripSpacesAroundTags) {
+                throw new IllegalStateException("stripSpacesAroundTags must be true if stripSingleLine is true");
+            }
+
             this.stripSpacesAroundTags = stripSpacesAroundTags;
             this.stripSingleLine = stripSingleLine;
             return this;

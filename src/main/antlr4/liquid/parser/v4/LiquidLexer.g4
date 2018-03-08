@@ -111,8 +111,6 @@ mode IN_TAG;
   Nil          : 'nil' | 'null';
   Include      : 'include';
   With         : 'with';
-  Break        : 'break';
-  Continue     : 'continue';
   Empty        : 'empty';
   EndId        : 'end' Id;
 

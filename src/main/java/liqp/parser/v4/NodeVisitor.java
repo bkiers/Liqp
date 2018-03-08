@@ -7,10 +7,12 @@ import liqp.nodes.BlockNode;
 import liqp.nodes.*;
 import liqp.parser.Flavor;
 import liqp.tags.Tag;
+import liquid.parser.v4.LiquidParser;
 import liquid.parser.v4.LiquidParserBaseVisitor;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -84,16 +86,16 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  : ~TagEnd+
   //  ;
   @Override
-  public LNode visitCustom_tag(Custom_tagContext ctx) {
+  public LNode visitOther_tag(Other_tagContext ctx) {
 
     List<LNode> expressions = new ArrayList<LNode>();
 
-    if (ctx.custom_tag_parameters() != null) {
-      expressions.add(new AtomNode(ctx.custom_tag_parameters().getText()));
+    if (ctx.other_tag_parameters() != null) {
+      expressions.add(new AtomNode(ctx.other_tag_parameters().getText()));
     }
 
-    if (ctx.custom_tag_block() != null) {
-      expressions.add(visitCustom_tag_block(ctx.custom_tag_block()));
+    if (ctx.other_tag_block() != null) {
+      expressions.add(visitOther_tag_block(ctx.other_tag_block()));
     }
 
     return new TagNode(tags.get(ctx.Id().getText()), expressions.toArray(new LNode[expressions.size()]));
@@ -103,7 +105,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  : atom+? tagStart EndId TagEnd
   //  ;
   @Override
-  public BlockNode visitCustom_tag_block(Custom_tag_blockContext ctx) {
+  public BlockNode visitOther_tag_block(Other_tag_blockContext ctx) {
 
     BlockNode node = new BlockNode(isRootBlock);
 
@@ -387,22 +389,6 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
     return new AtomNode(ctx.other_than_tag_end_out_start().getText());
   }
 
-  // break_tag
-  //  : tagStart Break TagEnd
-  //  ;
-  @Override
-  public LNode visitBreak_tag(Break_tagContext ctx) {
-    return new AtomNode(Tag.Statement.BREAK);
-  }
-
-  // continue_tag
-  //  : tagStart Continue TagEnd
-  //  ;
-  @Override
-  public LNode visitContinue_tag(Continue_tagContext ctx) {
-    return new AtomNode(Tag.Statement.CONTINUE);
-  }
-
   // output
   //  : outStart expr filter* OutEnd
   //  ;
@@ -423,7 +409,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  ;
   //
   // params
-  //  : Col expr (Comma expr)*
+  //  : Col param_expr (Comma param_expr)*
   //  ;
   @Override
   public FilterNode visitFilter(FilterContext ctx) {
@@ -431,12 +417,30 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
     FilterNode node = new FilterNode(ctx, filters.get(ctx.Id().getText()));
 
     if (ctx.params() != null) {
-      for (ExprContext child : ctx.params().expr()) {
+      for (Param_exprContext child : ctx.params().param_expr()) {
         node.add(visit(child));
       }
     }
 
     return node;
+  }
+
+  // param_expr
+  //  : id2 Col expr #param_expr_key_value
+  //  | ...
+  //  ;
+  @Override
+  public LNode visitParam_expr_key_value(Param_expr_key_valueContext ctx) {
+    return new KeyValueNode(ctx.id2().getText(), visit(ctx.expr()));
+  }
+
+  // param_expr
+  //  : ...
+  //  | expr         #param_expr_expr
+  //  ;
+  @Override
+  public LNode visitParam_expr_expr(Param_expr_exprContext ctx) {
+    return visit(ctx.expr());
   }
 
   // assignment

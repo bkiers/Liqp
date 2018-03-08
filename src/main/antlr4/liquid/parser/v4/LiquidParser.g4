@@ -20,8 +20,7 @@ atom
  ;
 
 tag
- : custom_tag
- | raw_tag
+ : raw_tag
  | comment_tag
  | if_tag
  | unless_tag
@@ -31,16 +30,15 @@ tag
  | table_tag
  | capture_tag
  | include_tag
- | break_tag
- | continue_tag
+ | other_tag
  ;
 
-custom_tag
- : tagStart Id custom_tag_parameters? TagEnd custom_tag_block?
+other_tag
+ : tagStart Id other_tag_parameters? TagEnd other_tag_block?
  ;
 
-custom_tag_block
- : atom+? tagStart EndId TagEnd
+other_tag_block
+ : atom*? tagStart EndId TagEnd
  ;
 
 raw_tag
@@ -139,14 +137,6 @@ file_name_or_output
  | other_than_tag_end_out_start #file_name_or_output_other_than_tag_end_out_start // only valid for Flavor.JEKYLL
  ;
 
-break_tag
- : tagStart Break TagEnd
- ;
-
-continue_tag
- : tagStart Continue TagEnd
- ;
-
 output
  : outStart expr filter* OutEnd
  ;
@@ -156,7 +146,12 @@ filter
  ;
 
 params
- : Col expr (Comma expr)*
+ : Col param_expr ( Comma param_expr )*
+ ;
+
+param_expr
+ : id2 Col expr #param_expr_key_value
+ | expr         #param_expr_expr
  ;
 
 assignment
@@ -191,7 +186,6 @@ lookup
 
 id
  : Id
- | Continue  
  | CaptureStart  
  | CaptureEnd  
  | CommentStart  
@@ -219,8 +213,7 @@ id
  | Assign  
  | Include  
  | With  
- | EndId  
- | Break  
+ | EndId
  ;
 
 id2
@@ -236,7 +229,7 @@ index
  | OBr expr CBr
  ;
 
-custom_tag_parameters
+other_tag_parameters
  : other_than_tag_end  
  ;
 

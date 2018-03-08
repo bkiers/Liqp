@@ -403,7 +403,7 @@ public class Template {
 
     private static List<ParseTree> children(ParseTree parent) {
 
-        List<ParseTree> children = new ArrayList<>();
+        List<ParseTree> children = new ArrayList<ParseTree>();
 
         for (int i = 0; i < parent.getChildCount(); i++) {
             children.add(parent.getChild(i));

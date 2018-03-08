@@ -453,18 +453,6 @@ public class LiquidLexerTest {
         assertThat(tokenise("{{with").get(1).getType(), is(LiquidLexer.With));
     }
 
-    //   Break        : 'break';
-    @Test
-    public void testBreak() {
-        assertThat(tokenise("{{break").get(1).getType(), is(LiquidLexer.Break));
-    }
-
-    //   Continue     : 'continue';
-    @Test
-    public void testContinue() {
-        assertThat(tokenise("{{continue").get(1).getType(), is(LiquidLexer.Continue));
-    }
-
     //   Empty        : 'empty';
     @Test
     public void testEmpty() {

@@ -25,17 +25,26 @@ public abstract class Filter extends LValue {
 
     static {
         // Initialize all standard filters.
+        registerFilter(new Abs());
         registerFilter(new Append());
+        registerFilter(new At_Least());
+        registerFilter(new At_Most());
         registerFilter(new Capitalize());
+        registerFilter(new Ceil());
+        registerFilter(new Compact());
+        registerFilter(new Concat());
         registerFilter(new Date());
+        registerFilter(new Default());
         registerFilter(new Divided_By());
         registerFilter(new Downcase());
         registerFilter(new Escape());
         registerFilter(new Escape_Once());
         registerFilter(new First());
+        registerFilter(new Floor());
         registerFilter(new H());
         registerFilter(new Join());
         registerFilter(new Last());
+        registerFilter(new Lstrip());
         registerFilter(new liqp.filters.Map());
         registerFilter(new Minus());
         registerFilter(new Modulo());
@@ -46,15 +55,24 @@ public abstract class Filter extends LValue {
         registerFilter(new Remove_First());
         registerFilter(new Replace());
         registerFilter(new Replace_First());
+        registerFilter(new Reverse());
+        registerFilter(new Round());
+        registerFilter(new Rstrip());
         registerFilter(new Size());
+        registerFilter(new Slice());
         registerFilter(new Sort());
+        registerFilter(new Sort_Natural());
         registerFilter(new Split());
+        registerFilter(new Strip());
         registerFilter(new Strip_HTML());
         registerFilter(new Strip_Newlines());
         registerFilter(new Times());
         registerFilter(new Truncate());
         registerFilter(new Truncatewords());
+        registerFilter(new Uniq());
         registerFilter(new Upcase());
+        registerFilter(new Url_Decode());
+        registerFilter(new Url_Encode());
     }
 
     /**
@@ -121,11 +139,19 @@ public abstract class Filter extends LValue {
      * @param expected
      *         the expected number of parameters.
      */
-    public final void checkParams(Object[] params, int expected) {
+    final void checkParams(Object[] params, int expected) {
 
         if (params == null || params.length != expected) {
-            throw new RuntimeException("Liquid error: wrong number of arguments (" +
-                    (params.length + 1) + " for " + (expected + 1) + ")");
+            throw new RuntimeException("Liquid error: wrong number of arguments (given " +
+                    (params == null ? 1 : (params.length + 1)) + " for " + (expected + 1) + ")");
+        }
+    }
+
+    final void checkParams(Object[] params, int min, int max) {
+
+        if (params == null || params.length < min || params.length > max) {
+            throw new RuntimeException("Liquid error: wrong number of arguments (given " +
+                    (params == null ? 1 : (params.length + 1)) + " expected " + (min + 1) + ".." + (max + 1) + ")");
         }
     }
 

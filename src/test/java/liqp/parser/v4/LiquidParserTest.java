@@ -34,17 +34,17 @@ public class LiquidParserTest {
     public void testCustom_tag() {
 
         assertThat(
-                texts("{% mu %}", "custom_tag"),
+                texts("{% mu %}", "other_tag"),
                 equalTo(array("{%", "mu", "%}"))
         );
 
         assertThat(
-                texts("{% mu | 42 %}", "custom_tag"),
+                texts("{% mu | 42 %}", "other_tag"),
                 equalTo(array("{%", "mu", "|42", "%}"))
         );
 
         assertThat(
-                texts("{% mu %} . {% endmu %}", "custom_tag"),
+                texts("{% mu %} . {% endmu %}", "other_tag"),
                 equalTo(array("{%", "mu", "%}", " . {%endmu%}"))
         );
     }
@@ -300,30 +300,6 @@ public class LiquidParserTest {
         assertThat(
                 texts("{% include {{variable}} %}", "include_tag"),
                 equalTo(array("{%", "include", "{{variable}}", "%}"))
-        );
-    }
-
-    // break_tag
-    //  : tagStart Break TagEnd
-    //  ;
-    @Test
-    public void testBreak_tag() {
-
-        assertThat(
-                texts("{%        break   \n\n\n %}", "break_tag"),
-                equalTo(array("{%", "break", "%}"))
-        );
-    }
-
-    // continue_tag
-    //  : tagStart Continue TagEnd
-    //  ;
-    @Test
-    public void testContinue_tag() {
-
-        assertThat(
-                texts("{%continue%}", "continue_tag"),
-                equalTo(array("{%", "continue", "%}"))
         );
     }
 

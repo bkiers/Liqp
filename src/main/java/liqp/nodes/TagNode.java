@@ -6,12 +6,17 @@ import liqp.tags.Include;
 import liqp.tags.Tag;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 public class TagNode implements LNode {
 
     private Tag tag;
     private LNode[] tokens;
+
+    public TagNode(Tag tag, List<LNode> tokens) {
+        this(tag.name, tag, tokens.toArray(new LNode[tokens.size()]));
+    }
 
     public TagNode(Tag tag, LNode... tokens) {
         this(tag.name, tag, tokens);

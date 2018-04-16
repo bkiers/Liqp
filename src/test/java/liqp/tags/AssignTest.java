@@ -1,12 +1,9 @@
 package liqp.tags;
 
-import java.util.HashMap;
-import java.util.Map;
 import liqp.Template;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 
-import static liqp.TestUtils.getNode;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -63,6 +60,12 @@ public class AssignTest {
         assertThat(Template.parse("{% assign foo = values %}.{{ foo[1] }}.").render("values", values), is(".bar."));
 
         assertThat(Template.parse("{% assign foo = values | split: \",\" %}.{{ foo[1] }}.").render("values", "foo,bar,baz"), is(".bar."));
+    }
+
+    @Test
+    public void multipleFiltersTest() {
+        // https://github.com/bkiers/Liqp/issues/84
+        assertThat(Template.parse("{% assign v = 1 | minus: 10 | plus: 5 %}{{v}}").render(), is("-4"));
     }
 
     /*

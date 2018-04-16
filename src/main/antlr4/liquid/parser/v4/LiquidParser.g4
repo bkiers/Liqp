@@ -155,7 +155,7 @@ param_expr
  ;
 
 assignment
- : tagStart Assign Id EqSign expr filter? TagEnd
+ : tagStart Assign Id EqSign expr filter* TagEnd
  ;
 
 expr

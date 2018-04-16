@@ -444,16 +444,23 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   }
 
   // assignment
-  //  : tagStart Assign Id EqSign expr filter? TagEnd
+  //  : tagStart Assign Id EqSign expr filter* TagEnd
   //  ;
   @Override
   public LNode visitAssignment(AssignmentContext ctx) {
 
     AtomNode idNode = new AtomNode(ctx.Id().getText());
-    FilterNode filterNode = ctx.filter() == null ? null : visitFilter(ctx.filter());
     LNode exprNode = visit(ctx.expr());
+    List<LNode> allNodes = new ArrayList<>();
 
-    return new TagNode(tags.get("assign"), idNode, filterNode, exprNode);
+    allNodes.add(idNode);
+    allNodes.add(exprNode);
+
+    for (FilterContext filterContext : ctx.filter()) {
+      allNodes.add(visit(filterContext));
+    }
+
+    return new TagNode(tags.get("assign"), allNodes);
   }
 
   // expr

@@ -1,14 +1,9 @@
 package liqp.tags;
 
-import java.util.HashMap;
-import java.util.Map;
 import liqp.Template;
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 
-import javax.swing.table.TableModel;
-
-import static liqp.TestUtils.getNode;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 

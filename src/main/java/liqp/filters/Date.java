@@ -30,9 +30,12 @@ public class Date extends Filter {
      * %B - The  full  month  name (``January'')
      * %c - The preferred local date and time representation
      * %d - Day of the month (01..31)
+     * %e - Day of the month (1..31)
      * %H - Hour of the day, 24-hour clock (00..23)
      * %I - Hour of the day, 12-hour clock (01..12)
      * %j - Day of the year (001..366)
+     * %k - Hour of the day, 24-hour clock (0..23)
+     * %l - Hour of the day, 12-hour clock (0..12)
      * %m - Month of the year (01..12)
      * %M - Minute of the hour (00..59)
      * %p - Meridian indicator (``AM''  or  ``PM'')
@@ -145,6 +148,9 @@ public class Date extends Filter {
 
         // %d - Day of the month (01..31)
         LIQUID_TO_JAVA_FORMAT.put('d', new SimpleDateFormat("dd", locale));
+        
+        // %e - Day of the month (1..31)
+        LIQUID_TO_JAVA_FORMAT.put('e', new SimpleDateFormat("d", locale));
 
         // %H - Hour of the day, 24-hour clock (00..23)
         LIQUID_TO_JAVA_FORMAT.put('H', new SimpleDateFormat("HH", locale));
@@ -154,6 +160,12 @@ public class Date extends Filter {
 
         // %j - Day of the year (001..366)
         LIQUID_TO_JAVA_FORMAT.put('j', new SimpleDateFormat("DDD", locale));
+        
+        // %k - Hour of the day, 24-hour clock (0..23)
+        LIQUID_TO_JAVA_FORMAT.put('k', new SimpleDateFormat("H", locale));
+        
+        // %l - Hour of the day, 12-hour clock (1..12)
+        LIQUID_TO_JAVA_FORMAT.put('l', new SimpleDateFormat("h", locale));
 
         // %m - Month of the year (01..12)
         LIQUID_TO_JAVA_FORMAT.put('m', new SimpleDateFormat("MM", locale));

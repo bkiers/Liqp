@@ -169,6 +169,9 @@
             <manifest>
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
+            <manifestEntries>
+              <Automatic-Module-Name>liqp</Automatic-Module-Name>
+            </manifestEntries>
           </archive>
         </configuration>
       </plugin>

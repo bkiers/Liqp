@@ -12,6 +12,7 @@ import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.File;
@@ -72,10 +73,8 @@ public class Template {
         this.templateSize = stream.size();
         LiquidLexer lexer = new LiquidLexer(CharStreams.fromString(input),
                 parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
-        LiquidParser parser = createParser(lexer);
-
         try {
-             root = parser.parse();
+             root = parse(lexer);
         }
         catch (Exception e) {
             throw new RuntimeException("could not parse input: " + input, e);
@@ -99,15 +98,14 @@ public class Template {
             this.templateSize = stream.size();
             LiquidLexer lexer = new LiquidLexer(CharStreams.fromFileName(file.getAbsolutePath()),
                     parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
-            LiquidParser parser = createParser(lexer);
-            root = parser.parse();
+            root = parse(lexer);
         }
         catch (Exception e) {
             throw new RuntimeException("could not parse input from " + file, e);
         }
     }
 
-    private LiquidParser createParser(LiquidLexer lexer) {
+    private ParseTree parse(LiquidLexer lexer) {
 
         lexer.removeErrorListeners();
 
@@ -118,7 +116,8 @@ public class Template {
             }
         });
 
-        LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        LiquidParser parser = new LiquidParser(tokens);
 
         parser.removeErrorListeners();
 
@@ -128,8 +127,16 @@ public class Template {
                 throw new RuntimeException(String.format("parser error on line %s, index %s", line, charPositionInLine), e);
             }
         });
-
-        return parser;
+        
+        parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
+        try {
+            return parser.parse();
+        } catch (Exception e) {
+            tokens.seek(0);
+            parser.reset();
+            parser.getInterpreter().setPredictionMode(PredictionMode.LL);
+            return parser.parse();
+        }
     }
 
     // Use getParseTree()
@@ -362,7 +369,6 @@ public class Template {
      * @param builder
      *         the StringBuilder to fill.
      */
-    @SuppressWarnings("unchecked")
     private void walk(ParseTree tree, StringBuilder builder) {
 
         List<ParseTree> firstStack = new ArrayList<ParseTree>();

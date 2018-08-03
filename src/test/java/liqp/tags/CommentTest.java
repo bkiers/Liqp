@@ -75,4 +75,18 @@ public class CommentTest {
 
         assertThat(Template.parse("foo{%comment%}\n         {%endcomment%}bar").render(), is("foobar"));
     }
+
+    @Test
+    public void embeddedTagInCommentTagTest() {
+
+        // Fix for: https://github.com/bkiers/Liqp/issues/94
+
+        String source = "{% comment %}\n" +
+                "    {% if true %}\n" +
+                "        hello\n" +
+                "    {% endif %}\n" +
+                "{% endcomment %}";
+
+        assertThat(Template.parse(source).render(), is(""));
+    }
 }

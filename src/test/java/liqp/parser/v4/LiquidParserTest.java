@@ -66,22 +66,14 @@ public class LiquidParserTest {
     }
 
     // comment_tag
-    //  : tagStart CommentStart TagEnd comment_body tagStart CommentEnd TagEnd
-    //  ;
-    //
-    // comment_body
-    //  : other_than_tag_start
-    //  ;
-    //
-    // other_than_tag_start
-    //  : ~( TagStart | TagStart2 )*
+    //  : tagStart CommentStart TagEnd .*? tagStart CommentEnd TagEnd
     //  ;
     @Test
     public void testComment_tag() {
 
         assertThat(
                 texts("{% comment %}fubar{% endcomment %}", "comment_tag"),
-                equalTo(array("{%", "comment", "%}", "fubar", "{%", "endcomment", "%}"))
+                equalTo(array("{%", "comment", "%}", "f", "u", "b", "a", "r", "{%", "endcomment", "%}"))
         );
     }
 

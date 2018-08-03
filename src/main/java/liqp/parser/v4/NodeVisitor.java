@@ -125,11 +125,11 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   }
 
   // comment_tag
-  //  : tagStart CommentStart TagEnd comment_body tagStart CommentEnd TagEnd
+  //  : tagStart CommentStart TagEnd .*? tagStart CommentEnd TagEnd
   //  ;
   @Override
   public LNode visitComment_tag(Comment_tagContext ctx) {
-    return new TagNode(tags.get("comment"), new AtomNode(ctx.comment_body().getText()));
+    return new TagNode(tags.get("comment"), new AtomNode(ctx.getText()));
   }
 
   // if_tag

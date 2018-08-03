@@ -84,6 +84,7 @@ mode IN_TAG;
   OBr       : '[';
   CBr       : ']';
   QMark     : '?';
+  PathSep   : [/\\];
 
   DoubleNum
    : '-'? Digit+ '.' Digit+

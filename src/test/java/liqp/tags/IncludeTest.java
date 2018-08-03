@@ -57,6 +57,16 @@ public class IncludeTest {
         assertTrue(result.contains("HEADER"));
     }
 
+    // https://github.com/bkiers/Liqp/issues/95
+    @Test
+    public void renderTestWithIncludeSubdirectorySpecifiedInContextJekyllFlavor() throws Exception {
+        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
+        File index = new File(jekyll, "index_without_quotes_subdirectory.html");
+        Template template = Template.parse(index, Flavor.JEKYLL);
+        String result = template.render();
+        assertTrue(result.contains("FOOTER"));
+    }
+
     @Test
     public void renderTestWithIncludeDirectorySpecifiedInJekyllFlavor() throws Exception {
         File index = new File("src/test/jekyll/index_without_quotes.html");
@@ -71,6 +81,24 @@ public class IncludeTest {
         Template template = Template.parse(index, Flavor.LIQUID);
         String result = template.render();
         assertTrue(result.contains("HEADER"));
+    }
+
+    // https://github.com/bkiers/Liqp/issues/95
+    @Test
+    public void renderTestWithIncludeSubdirectorySpecifiedInJekyllFlavor() throws Exception {
+        File index = new File("src/test/jekyll/index_without_quotes_subdirectory.html");
+        Template template = Template.parse(index, Flavor.JEKYLL);
+        String result = template.render();
+        assertTrue(result.contains("FOOTER"));
+    }
+
+    // https://github.com/bkiers/Liqp/issues/95
+    @Test
+    public void renderTestWithIncludeSubdirectorySpecifiedInLiquidFlavor() throws Exception {
+        File index = new File("src/test/jekyll/index_with_quotes_subdirectory.html");
+        Template template = Template.parse(index, Flavor.LIQUID);
+        String result = template.render();
+        assertTrue(result.contains("FOOTER"));
     }
 
     // https://github.com/bkiers/Liqp/issues/75

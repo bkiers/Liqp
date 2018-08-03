@@ -50,11 +50,7 @@ raw_body
  ;
 
 comment_tag
- : tagStart CommentStart TagEnd comment_body tagStart CommentEnd TagEnd
- ;
-
-comment_body
- : other_than_tag_start
+ : tagStart CommentStart TagEnd .*? tagStart CommentEnd TagEnd
  ;
 
 other_than_tag_start

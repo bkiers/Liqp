@@ -64,18 +64,6 @@
     <snapshotUrl>${repoHost}/content/repositories/snapshots</snapshotUrl>
   </properties>
 
-  <repositories>
-    <repository>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <id>spring</id>
-      <name>Spring Lib Release</name>
-      <url>http://repo.spring.io/libs-release/</url>
-      <layout>default</layout>
-    </repository>
-  </repositories>
-
   <dependencies>
 
     <dependency>
@@ -97,12 +85,6 @@
       <artifactId>antlr-runtime</artifactId>
       <version>${antlr.version}</version>
       <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>edu.emory.mathcs.backport</groupId>
-      <artifactId>com.springsource.edu.emory.mathcs.backport</artifactId>
-      <version>3.1.0</version>
     </dependency>
 
     <dependency>

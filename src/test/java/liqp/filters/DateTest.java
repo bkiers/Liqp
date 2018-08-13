@@ -2,7 +2,7 @@ package liqp.filters;
 
 import java.util.Locale;
 import liqp.Template;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;

@@ -3,13 +3,10 @@ package liqp.tags;
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.nodes.LNode;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import java.util.Map;
-
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class TagTest {

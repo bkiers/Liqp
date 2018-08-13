@@ -8,9 +8,6 @@ import liqp.parser.v4.NodeVisitor;
 import liqp.tags.Tag;
 import liquid.parser.v4.LiquidLexer;
 import liquid.parser.v4.LiquidParser;
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.tree.CommonTree;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -69,10 +66,9 @@ public class Template {
         this.filters = filters;
         this.parseSettings = parseSettings;
 
-        ANTLRStringStream stream = new ANTLRStringStream(input);
+        CharStream stream = CharStreams.fromString(input);
         this.templateSize = stream.size();
-        LiquidLexer lexer = new LiquidLexer(CharStreams.fromString(input),
-                parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
+        LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
         try {
              root = parse(lexer);
         }
@@ -92,12 +88,11 @@ public class Template {
         this.tags = tags;
         this.filters = filters;
         this.parseSettings = parseSettings;
+        CharStream stream = CharStreams.fromFileName(file.getAbsolutePath());
 
         try {
-            ANTLRFileStream stream = new ANTLRFileStream(file.getAbsolutePath());
             this.templateSize = stream.size();
-            LiquidLexer lexer = new LiquidLexer(CharStreams.fromFileName(file.getAbsolutePath()),
-                    parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
+            LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
             root = parse(lexer);
         }
         catch (Exception e) {
@@ -137,12 +132,6 @@ public class Template {
             parser.getInterpreter().setPredictionMode(PredictionMode.LL);
             return parser.parse();
         }
-    }
-
-    // Use getParseTree()
-    @Deprecated
-    public CommonTree getAST() {
-        throw new UnsupportedOperationException("The ANTLR3 CommonTree isn't available in this version of Liqp, use: getParseTree()");
     }
 
     /**

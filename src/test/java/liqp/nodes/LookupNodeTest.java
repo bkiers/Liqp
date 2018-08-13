@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import liqp.Template;
 import liqp.TemplateContext;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
 import static liqp.TestUtils.getNode;

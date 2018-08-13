@@ -3,7 +3,7 @@ package liqp.nodes;
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.tags.Tag;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
 public class BlockNodeTest {

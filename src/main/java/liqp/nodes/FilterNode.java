@@ -1,13 +1,8 @@
 package liqp.nodes;
 
 import liqp.TemplateContext;
-import liqp.exceptions.LiquidException;
 import liqp.filters.Filter;
-import org.antlr.runtime.tree.CommonTree;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.List;

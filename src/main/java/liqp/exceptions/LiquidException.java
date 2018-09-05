@@ -1,11 +1,10 @@
 package liqp.exceptions;
 
 import liquid.parser.v4.LiquidParser;
-import org.antlr.runtime.EarlyExitException;
-import org.antlr.runtime.MismatchedTokenException;
-import org.antlr.runtime.NoViableAltException;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.misc.IntervalSet;
+
+import java.util.List;
 
 public class LiquidException extends RuntimeException {
 
@@ -16,55 +15,55 @@ public class LiquidException extends RuntimeException {
 
     super(createMessage(e), e);
 
-    this.line = e.line;
-    this.charPositionInLine = e.charPositionInLine;
+    this.line = e.getOffendingToken().getLine();
+    this.charPositionInLine = e.getOffendingToken().getCharPositionInLine();
   }
 
   public LiquidException(String message, ParserRuleContext ctx) {
 
     super(message);
 
-    this.line = ctx.start.getLine();;
+    this.line = ctx.start.getLine();
     this.charPositionInLine = ctx.start.getCharPositionInLine();
   }
 
   private static String createMessage(RecognitionException e) {
 
-    String[] inputLines = e.input.toString().split("\r?\n|\r");
-    String errorLine = inputLines[e.line - 1];
+    Token offendingToken = e.getOffendingToken();
+    String[] inputLines = e.getInputStream().toString().split("\r?\n|\r");
+    String errorLine = inputLines[offendingToken.getLine() - 1];
 
-    StringBuilder message = new StringBuilder(String.format("\nError on line %s, column %s:\n", e.line, e.charPositionInLine));
+    StringBuilder message = new StringBuilder(String.format("\nError on line %s, column %s:\n",
+            offendingToken.getLine(), offendingToken.getCharPositionInLine()));
 
     message.append(errorLine).append("\n");
 
-    for (int i = 0; i < e.charPositionInLine; i++) {
+    for (int i = 0; i < offendingToken.getCharPositionInLine(); i++) {
       message.append(" ");
     }
 
     message.append("^");
 
-    if (e instanceof MismatchedTokenException) {
+    if (e instanceof InputMismatchException) {
 
-      MismatchedTokenException mte = (MismatchedTokenException)e;
+      InputMismatchException ime = (InputMismatchException)e;
 
       return String.format("%s\nmatched '%s' as token <%s>, expecting token <%s>",
-          message, e.token.getText(), tokenName(mte.getUnexpectedType()), tokenName(mte.expecting));
+          message, offendingToken.getText(), tokenName(offendingToken.getType()), tokenNames(ime.getExpectedTokens()));
     }
 
-    if (e instanceof EarlyExitException) {
+    if (e instanceof FailedPredicateException) {
 
-      EarlyExitException eee = (EarlyExitException)e;
+      FailedPredicateException fpe = (FailedPredicateException)e;
 
-      return String.format("%s\nmissing character '%s' after position %s",
-          message, (char)eee.c, e.charPositionInLine);
+      return String.format("%s\nfailed predicate '%s' after position %s",
+          message, fpe.getPredicate(), offendingToken.getCharPositionInLine());
     }
 
-    if (e instanceof NoViableAltException) {
+    if (e instanceof NoViableAltException || e instanceof LexerNoViableAltException) {
 
-      NoViableAltException nvae = (NoViableAltException)e;
-
-      return String.format("%s\ncould not decide what path to take, at position %s, expecting one of: %s",
-          message, e.charPositionInLine, nvae.grammarDecisionDescription);
+      return String.format("%s\ncould not decide what path to take, at position %s",
+          message, offendingToken.getCharPositionInLine());
     }
 
     return message + "\nAn unknown error occurred!";
@@ -73,5 +72,16 @@ public class LiquidException extends RuntimeException {
   private static String tokenName(int type) {
 
     return type < 0 ? "<EOF>" : LiquidParser.VOCABULARY.getSymbolicName(type);
+  }
+
+  private static String tokenNames(IntervalSet types) {
+    List<Integer> typeList = types.toList();
+    StringBuilder expectedBuilder = new StringBuilder();
+
+    for (Integer t: typeList) {
+      expectedBuilder.append(tokenName(t)).append(" ");
+    }
+
+    return expectedBuilder.toString().trim();
   }
 }

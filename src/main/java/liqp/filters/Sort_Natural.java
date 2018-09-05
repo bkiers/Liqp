@@ -1,7 +1,5 @@
 package liqp.filters;
 
-import edu.emory.mathcs.backport.java.util.Collections;
-
 import java.util.*;
 
 public class Sort_Natural extends Filter {

@@ -1,7 +1,7 @@
 package liqp.tags;
 
 import liqp.Template;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;

@@ -1,10 +1,10 @@
 package liqp.filters;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import liqp.Template;
-import org.antlr.runtime.RecognitionException;
+import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
+
+import java.util.HashMap;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

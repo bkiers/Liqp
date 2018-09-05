@@ -1,7 +1,6 @@
 package liqp.filters;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 

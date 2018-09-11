@@ -66,4 +66,8 @@ public class ProtectionSettings {
             throw new ExceededMaxIterationsException(this.maxIterations);
         }
     }
+
+    public Boolean isRenderTimeLimited() {
+        return this.maxRenderTimeMillis != Long.MAX_VALUE;
+    }
 }

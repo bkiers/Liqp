@@ -282,7 +282,15 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String render(final Map<String, Object> variables) {
-        return render(variables, Executors.newSingleThreadExecutor(), true);
+
+        if (this.protectionSettings.isRenderTimeLimited()) {
+            return render(variables, Executors.newSingleThreadExecutor(), true);
+        } else {
+            if (this.templateSize > this.protectionSettings.maxTemplateSizeBytes) {
+                throw new RuntimeException("template exceeds " + this.protectionSettings.maxTemplateSizeBytes + " bytes");
+            }
+            return renderUnguarded(variables);
+        }
     }
 
     public String render(final Map<String, Object> variables, ExecutorService executorService, boolean shutdown) {

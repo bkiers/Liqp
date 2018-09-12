@@ -282,7 +282,15 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String render(final Map<String, Object> variables) {
-        return render(variables, Executors.newSingleThreadExecutor(), true);
+
+        if (this.protectionSettings.isRenderTimeLimited()) {
+            return render(variables, Executors.newSingleThreadExecutor(), true);
+        } else {
+            if (this.templateSize > this.protectionSettings.maxTemplateSizeBytes) {
+                throw new RuntimeException("template exceeds " + this.protectionSettings.maxTemplateSizeBytes + " bytes");
+            }
+            return renderUnguarded(variables);
+        }
     }
 
     public String render(final Map<String, Object> variables, ExecutorService executorService, boolean shutdown) {
@@ -291,18 +299,9 @@ public class Template {
             throw new RuntimeException("template exceeds " + this.protectionSettings.maxTemplateSizeBytes + " bytes");
         }
 
-        final NodeVisitor visitor = new NodeVisitor(this.tags, this.filters, this.parseSettings);
-
         Callable<String> task = new Callable<String>() {
-            public String call() throws Exception {
-                try {
-                    LNode node = visitor.visit(root);
-                    Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings.flavor, variables));
-                    return rendered == null ? "" : String.valueOf(rendered);
-                }
-                catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+            public String call() {
+                return renderUnguarded(variables);
             }
         };
 
@@ -321,6 +320,29 @@ public class Template {
             if (shutdown) {
                 executorService.shutdown();
             }
+        }
+    }
+
+    /**
+     * Renders the template without guards provided by protection settings. This method has about 300x times
+     * better performance than plain render.
+     *
+     * @param variables
+     *         a Map denoting the (possibly nested)
+     *         variables that can be used in this
+     *         Template.
+     *
+     * @return a string denoting the rendered template.
+     */
+    public String renderUnguarded(final Map<String, Object> variables) {
+        final NodeVisitor visitor = new NodeVisitor(this.tags, this.filters, this.parseSettings);
+        try {
+            LNode node = visitor.visit(root);
+            Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings.flavor, variables));
+            return rendered == null ? "" : String.valueOf(rendered);
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

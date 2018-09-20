@@ -16,16 +16,16 @@ lexer grammar LiquidLexer;
 }
 
 OutStart
- : ( {stripSpacesAroundTags && stripSingleLine}? SpaceOrTab* '{{'
-   | {stripSpacesAroundTags && !stripSingleLine}? WhitespaceChar* '{{'
+ : ( SpaceOrTab* '{{' {stripSpacesAroundTags && stripSingleLine}?
+   | WhitespaceChar* '{{' {stripSpacesAroundTags && !stripSingleLine}?
    | WhitespaceChar* '{{-'
    | '{{'
    ) -> pushMode(IN_TAG)
  ;
 
 TagStart
- : ( {stripSpacesAroundTags && stripSingleLine}? SpaceOrTab* '{%'
-   | {stripSpacesAroundTags && !stripSingleLine}? WhitespaceChar* '{%'
+ : ( SpaceOrTab* '{%' {stripSpacesAroundTags && stripSingleLine}?
+   | WhitespaceChar* '{%' {stripSpacesAroundTags && !stripSingleLine}?
    | WhitespaceChar* '{%-'
    | '{%'
    ) -> pushMode(IN_TAG)
@@ -49,16 +49,16 @@ mode IN_TAG;
   TagStart2 : '{%' -> pushMode(IN_TAG);
 
   OutEnd
-   : ( {stripSpacesAroundTags && stripSingleLine}? '}}' SpaceOrTab* LineBreak?
-     | {stripSpacesAroundTags && !stripSingleLine}? '}}' WhitespaceChar*
+   : ( '}}' SpaceOrTab* LineBreak? {stripSpacesAroundTags && stripSingleLine}?
+     | '}}' WhitespaceChar* {stripSpacesAroundTags && !stripSingleLine}?
      | '-}}' WhitespaceChar*
      | '}}'
      ) -> popMode
    ;
 
   TagEnd
-   : ( {stripSpacesAroundTags && stripSingleLine}? '%}' SpaceOrTab* LineBreak?
-     | {stripSpacesAroundTags && !stripSingleLine}? '%}' WhitespaceChar*
+   : ( '%}' SpaceOrTab* LineBreak? {stripSpacesAroundTags && stripSingleLine}?
+     | '%}' WhitespaceChar* {stripSpacesAroundTags && !stripSingleLine}?
      | '-%}' WhitespaceChar*
      | '%}'
      ) -> popMode

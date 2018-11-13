@@ -1,5 +1,6 @@
 package liqp.filters;
 
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 public class Round extends Filter {
@@ -28,6 +29,7 @@ public class Round extends Filter {
         }
 
         DecimalFormat formatter = new DecimalFormat(formatBuilder.toString());
+        formatter.setRoundingMode(RoundingMode.HALF_UP);
 
         return formatter.format(number);
     }

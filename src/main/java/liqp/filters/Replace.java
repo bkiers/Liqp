@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Replace extends Filter {
+public class Replace extends Filter {
 
     /*
      * replace(input, string, replacement = '')

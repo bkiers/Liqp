@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Times extends Filter {
+public class Times extends Filter {
 
     /*
      * times(input, operand)

@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Strip_Newlines extends Filter {
+public class Strip_Newlines extends Filter {
 
     /*
      * strip_newlines(input) click to toggle source

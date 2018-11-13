@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Truncate extends Filter {
+public class Truncate extends Filter {
 
     /*
      * truncate(input, length = 50, truncate_string = "...")

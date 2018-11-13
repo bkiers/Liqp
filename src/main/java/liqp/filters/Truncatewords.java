@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Truncatewords extends Filter {
+public class Truncatewords extends Filter {
 
     /*
      * truncatewords(input, words = 15, truncate_string = "...")

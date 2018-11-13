@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Upcase extends Filter {
+public class Upcase extends Filter {
 
     /*
      * upcase(input)

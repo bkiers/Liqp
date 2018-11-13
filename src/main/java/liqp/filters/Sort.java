@@ -3,7 +3,7 @@ package liqp.filters;
 import java.util.*;
 import java.util.Map;
 
-class Sort extends Filter {
+public class Sort extends Filter {
 
     /*
      * sort(input, property = nil)

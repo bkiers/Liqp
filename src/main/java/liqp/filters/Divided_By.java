@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Divided_By extends Filter {
+public class Divided_By extends Filter {
 
     /*
      * divided_by(input, operand)

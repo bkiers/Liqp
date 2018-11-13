@@ -1,8 +1,6 @@
 package liqp.filters;
 
-import java.util.Arrays;
-
-class Join extends Filter {
+public class Join extends Filter {
 
     /*
      * join(input, glue = ' ')

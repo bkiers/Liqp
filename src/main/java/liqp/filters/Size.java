@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Size extends Filter {
+public class Size extends Filter {
 
     /*
      * size(input)

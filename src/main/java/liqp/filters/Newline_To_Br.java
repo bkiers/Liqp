@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Newline_To_Br extends Filter {
+public class Newline_To_Br extends Filter {
 
     /*
      * newline_to_br(input)

@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Escape_Once extends Filter {
+public class Escape_Once extends Filter {
 
     /*
      * escape_once(input)

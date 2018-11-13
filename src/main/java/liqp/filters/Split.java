@@ -2,7 +2,7 @@ package liqp.filters;
 
 import java.util.regex.Pattern;
 
-class Split extends Filter {
+public class Split extends Filter {
 
     /*
      * split(input, delimiter = ' ')

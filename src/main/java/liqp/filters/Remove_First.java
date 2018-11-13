@@ -2,7 +2,7 @@ package liqp.filters;
 
 import java.util.regex.Pattern;
 
-class Remove_First extends Filter {
+public class Remove_First extends Filter {
 
     /*
      * remove_first(input, string)

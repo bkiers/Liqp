@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Last extends Filter {
+public class Last extends Filter {
 
     /*
      * last(array)

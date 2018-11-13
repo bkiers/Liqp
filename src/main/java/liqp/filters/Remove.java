@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Remove extends Filter {
+public class Remove extends Filter {
 
     /*
      * remove(input, string)

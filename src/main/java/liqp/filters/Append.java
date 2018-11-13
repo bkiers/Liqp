@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Append extends Filter {
+public class Append extends Filter {
 
     /*
      * (Object) append(input, string)

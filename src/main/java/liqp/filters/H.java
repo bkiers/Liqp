@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class H extends Filter {
+public class H extends Filter {
 
     /*
      * h(input)

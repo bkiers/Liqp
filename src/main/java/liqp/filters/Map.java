@@ -3,7 +3,7 @@ package liqp.filters;
 import java.util.ArrayList;
 import java.util.List;
 
-class Map extends Filter {
+public class Map extends Filter {
 
     /*
      * map(input, property)

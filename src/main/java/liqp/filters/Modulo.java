@@ -1,6 +1,6 @@
 package liqp.filters;
 
-class Modulo extends Filter {
+public class Modulo extends Filter {
 
     /*
      * plus(input, operand)

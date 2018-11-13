@@ -26,6 +26,7 @@ public class RoundTest {
                 {"{{ 'MU' | round }}", "0", "{}"},
                 {"{{ input | round }}", "5", "{ \"input\": 4.6 }"},
                 {"{{ '4.3' | round }}", "4", "{}"},
+                {"{{ '10.5' | round }}", "11", "{}"},
                 {"{{ input | round: 2 }}", "4.56", "{ \"input\": 4.5612 }"},
                 {"{{ input | round: 2.999 }}", "4.56", "{ \"input\": 4.5612 }"},
                 {"{{ price | round }}", "5", "{ \"price\": 4.6 }"},

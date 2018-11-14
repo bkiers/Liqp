@@ -18,7 +18,7 @@ public class Divided_By extends Filter {
 
         Object rhsObj = params[0];
 
-        if (super.isInteger(value) && super.isInteger(rhsObj)) {
+        if (super.canBeInteger(value) && super.canBeInteger(rhsObj)) {
             return super.asNumber(value).longValue() / super.asNumber(rhsObj).longValue();
         }
 

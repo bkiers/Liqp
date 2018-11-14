@@ -3,7 +3,7 @@ package liqp.filters;
 public class Minus extends Filter {
 
     /*
-     * plus(input, operand)
+     * minus(input, operand)
      *
      * subtraction
      */
@@ -18,7 +18,7 @@ public class Minus extends Filter {
 
         Object rhsObj = params[0];
 
-        if (super.isInteger(value) && super.isInteger(rhsObj)) {
+        if (super.canBeInteger(value) && super.canBeInteger(rhsObj)) {
             return super.asNumber(value).longValue() - super.asNumber(rhsObj).longValue();
         }
 

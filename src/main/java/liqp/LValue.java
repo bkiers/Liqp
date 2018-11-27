@@ -160,7 +160,7 @@ public abstract class LValue {
             return (Number) value;
         }
 
-        String str = String.valueOf(value);
+        String str = String.valueOf(value).trim();
 
         return str.matches("\\d+") ? Long.valueOf(str) : Double.valueOf(str);
     }
@@ -238,13 +238,13 @@ public abstract class LValue {
         }
 
         // valid Long?
-        if(String.valueOf(value).matches("\\d+")) {
+        if(String.valueOf(value).trim().matches("\\d+")) {
             return true;
         }
 
         try {
             // valid Double?
-            Double.parseDouble(String.valueOf(value));
+            Double.parseDouble(String.valueOf(value).trim());
         } catch(Exception e) {
             return false;
         }
@@ -290,11 +290,11 @@ public abstract class LValue {
     }
 
     public boolean canBeInteger(Object value) {
-        return String.valueOf(value).matches("-?\\d+");
+        return String.valueOf(value).trim().matches("-?\\d+");
     }
 
     public boolean canBeDouble(Object value) {
-        return String.valueOf(value).matches("-?\\d+(\\.\\d*)?");
+        return String.valueOf(value).trim().matches("-?\\d+(\\.\\d*)?");
     }
 
     public boolean isMap(Object value) {

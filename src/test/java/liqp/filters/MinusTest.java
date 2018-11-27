@@ -94,4 +94,39 @@ public class MinusTest {
         assertThat(Template.parse("{{ \"5\" | minus: \"2\" }}").render(), is((Object)"3"));
         assertThat(Template.parse("{{ \"5\" | minus: \"2.0\" }}").render(), is((Object)"3.0"));
     }
+
+    /*
+        Ruby source:
+
+            # gem 'liquid', '~> 4.0.0'
+
+            require 'liquid'
+
+            sources = [
+                '{{ " 5 " | minus: 2 }}',         # string_int - int
+                '{{ "5" | minus: "  2     " }}',  # string_int - string_int
+                '{{ "  5" | minus: "   2.0" }}'   # string_int - string_double
+            ]
+
+            sources.each { |source|
+              @template = Liquid::Template.parse(source)
+              result = @template.render({})
+              printf("result: '%s'\n", result)
+            }
+
+
+        Yields:
+
+            result: '3'
+            result: '3'
+            result: '3.0'
+
+        https://github.com/bkiers/Liqp/issues/115
+    */
+    @Test
+    public void bug115() {
+        assertThat(Template.parse("{{ \" 5 \" | minus: 2 }}").render(), is((Object)"3"));
+        assertThat(Template.parse("{{ \"5\" | minus: \"  2     \" }}").render(), is((Object)"3"));
+        assertThat(Template.parse("{{ \"  5\" | minus: \"   2.0\" }}").render(), is((Object)"3.0"));
+    }
 }

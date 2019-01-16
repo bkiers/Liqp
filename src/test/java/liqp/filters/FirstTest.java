@@ -18,6 +18,15 @@ public class FirstTest {
 
         assertThat(rendered, is("Mu"));
     }
+    
+    @Test
+    public void applyObjectTest() {
+    	Template template = Template.parse("{%- assign product = values | first -%}{{product.title}} {{product.price}}");
+
+        String rendered = String.valueOf(template.render("{\"values\" : [{ \"title\": \"Product 1\", \"price\": 1299 }, { \"title\": \"Product 2\", \"price\": 2999 }]}"));
+
+        assertThat(rendered, is("Product 1 1299"));
+    }
 
     /*
      * def test_first_last
@@ -32,7 +41,7 @@ public class FirstTest {
 
         Filter filter = Filter.getFilter("first");
 
-        assertThat(filter.apply(new Integer[]{1, 2, 3}), is((Object)"1"));
+        assertThat(filter.apply(new Integer[]{1, 2, 3}), is((Object)1));
         assertThat(filter.apply(new Integer[]{}), is((Object)null));
     }
 }

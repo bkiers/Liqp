@@ -12,6 +12,6 @@ public class First extends Filter {
 
         Object[] array = super.asArray(value);
 
-        return array.length == 0 ? null : super.asString(array[0]);
+        return array.length == 0 ? null : array[0];
     }
 }

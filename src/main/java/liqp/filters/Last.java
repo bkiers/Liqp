@@ -12,6 +12,6 @@ public class Last extends Filter {
 
         Object[] array = super.asArray(value);
 
-        return array.length == 0 ? null : super.asString(array[array.length - 1]);
+        return array.length == 0 ? null : array[array.length - 1];
     }
 }

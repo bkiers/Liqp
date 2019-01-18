@@ -56,12 +56,6 @@
     <junit.version>4.12</junit.version>
 
     <main.class />
-    <!-- Properties for releasing to Maven Central via Takari -->
-    <repoHost>https://otto.takari.io</repoHost>
-    <releaseName>Takari Releases</releaseName>
-    <releaseUrl>${repoHost}/service/local/staging/deploy/maven2</releaseUrl>
-    <snapshotName>Takari Snapshots</snapshotName>
-    <snapshotUrl>${repoHost}/content/repositories/snapshots</snapshotUrl>
   </properties>
 
   <dependencies>
@@ -145,7 +139,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.7.0</version>
+        <version>3.8.0</version>
         <configuration>
           <source>1.7</source>
           <target>1.7</target>
@@ -177,7 +171,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.0.2</version>
+        <version>3.1.1</version>
         <configuration>
           <archive>
             <manifest>
@@ -225,9 +219,9 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.10.4</version>
+            <version>3.0.1</version>
             <configuration>
-              <additionalparam>-Xdoclint:none</additionalparam>
+              <doclint>none</doclint>
             </configuration>
             <executions>
               <execution>

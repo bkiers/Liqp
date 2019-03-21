@@ -14,6 +14,8 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -122,7 +124,7 @@ public class Template {
                 throw new RuntimeException(String.format("parser error on line %s, index %s", line, charPositionInLine), e);
             }
         });
-        
+
         parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
         try {
             return parser.parse();
@@ -321,6 +323,20 @@ public class Template {
                 executorService.shutdown();
             }
         }
+    }
+
+    // add test
+    public String render(final Map<String, Object> data, boolean convertValueToMap) {
+        if (!convertValueToMap) {
+            return render(data);
+        } else {
+            Map<String, Object> map = new HashMap<String, Object>();
+            for (Map.Entry<String, Object> e: data.entrySet()) {
+                putStringKey(true, e.getKey(), e.getValue(), map);
+            }
+            return render(map);
+        }
+
     }
 
     /**

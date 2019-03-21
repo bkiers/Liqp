@@ -23,8 +23,7 @@ public abstract class Filter extends LValue {
      */
     private static final Map<String, Filter> FILTERS = new HashMap<String, Filter>();
 
-    static {
-        // Initialize all standard filters.
+    private static void addDefaultFilters() {
         registerFilter(new Abs());
         registerFilter(new Append());
         registerFilter(new At_Least());
@@ -73,6 +72,10 @@ public abstract class Filter extends LValue {
         registerFilter(new Upcase());
         registerFilter(new Url_Decode());
         registerFilter(new Url_Encode());
+    }
+    static {
+        // Initialize all standard filters.
+        addDefaultFilters();
     }
 
     /**
@@ -214,5 +217,11 @@ public abstract class Filter extends LValue {
      */
     public static void registerFilter(Filter filter) {
         FILTERS.put(filter.name, filter);
+    }
+
+    // for testing purpose
+    private static void reset_filters(){
+        FILTERS.clear();
+        addDefaultFilters();
     }
 }

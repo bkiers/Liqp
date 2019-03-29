@@ -23,8 +23,7 @@ public abstract class Filter extends LValue {
      */
     private static final Map<String, Filter> FILTERS = new HashMap<String, Filter>();
 
-    static {
-        // Initialize all standard filters.
+    private static void addDefaultFilters() {
         registerFilter(new Abs());
         registerFilter(new Append());
         registerFilter(new At_Least());
@@ -75,6 +74,11 @@ public abstract class Filter extends LValue {
         registerFilter(new Url_Encode());
     }
 
+    static {
+        // Initialize all standard filters.
+        addDefaultFilters();
+    }
+
     /**
      * The name of the filter.
      */
@@ -91,8 +95,7 @@ public abstract class Filter extends LValue {
     /**
      * Creates a new instance of a Filter.
      *
-     * @param name
-     *         the name of the filter.
+     * @param name the name of the filter.
      */
     public Filter(String name) {
         this.name = name;
@@ -101,11 +104,8 @@ public abstract class Filter extends LValue {
     /**
      * Applies the filter on the 'value'.
      *
-     * @param value
-     *         the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
-     * @param params
-     *         the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
-     *
+     * @param value  the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
+     * @param params the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
      * @return the result of the filter.
      */
     public Object apply(Object value, Object... params) {
@@ -117,13 +117,9 @@ public abstract class Filter extends LValue {
     /**
      * Applies the filter on the 'value', with the given 'context'.
      *
-     * @param value
-     *         the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
-     * @param context
-     *         the template context.
-     * @param params
-     *         the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
-     *
+     * @param value   the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
+     * @param context the template context.
+     * @param params  the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
      * @return the result of the filter.
      */
     public Object apply(Object value, TemplateContext context, Object... params) {
@@ -134,10 +130,8 @@ public abstract class Filter extends LValue {
     /**
      * Check the number of parameters and throws an exception if needed.
      *
-     * @param params
-     *         the parameters to check.
-     * @param expected
-     *         the expected number of parameters.
+     * @param params   the parameters to check.
+     * @param expected the expected number of parameters.
      */
     final void checkParams(Object[] params, int expected) {
 
@@ -159,13 +153,10 @@ public abstract class Filter extends LValue {
      * Returns a value at a specific index from an array of parameters.
      * If no such index exists, a RuntimeException is thrown.
      *
-     * @param index
-     *         the index of the value to be retrieved.
-     * @param params
-     *         the values.
-     *
+     * @param index  the index of the value to be retrieved.
+     * @param params the values.
      * @return a value at a specific index from an array of
-     *         parameters.
+     * parameters.
      */
     protected Object get(int index, Object... params) {
 
@@ -181,9 +172,7 @@ public abstract class Filter extends LValue {
     /**
      * Retrieves a filter with a specific name.
      *
-     * @param name
-     *         the name of the filter to retrieve.
-     *
+     * @param name the name of the filter to retrieve.
      * @return a filter with a specific name.
      */
     public static Filter getFilter(String name) {
@@ -209,10 +198,15 @@ public abstract class Filter extends LValue {
     /**
      * Registers a new filter.
      *
-     * @param filter
-     *         the filter to be registered.
+     * @param filter the filter to be registered.
      */
     public static void registerFilter(Filter filter) {
         FILTERS.put(filter.name, filter);
+    }
+
+    // for testing purpose
+    private static void reset_filters() {
+        FILTERS.clear();
+        addDefaultFilters();
     }
 }

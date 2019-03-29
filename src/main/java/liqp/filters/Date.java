@@ -19,6 +19,18 @@ public class Date extends Filter {
         init();
     }
 
+    private CustomDateFormatSupport typeSupport;
+
+
+    protected Date() {
+        super();
+    }
+
+    protected Date(CustomDateFormatSupport typeSupport) {
+        super();
+        this.typeSupport = typeSupport;
+    }
+
     /*
      * (Object) date(input, format)
      *
@@ -60,17 +72,17 @@ public class Date extends Filter {
         try {
             final Long seconds;
 
-            if(super.asString(value).equals("now")) {
+            if (super.asString(value).equals("now")) {
                 seconds = System.currentTimeMillis() / 1000L;
-            }
-            else if(super.isNumber(value)) {
+            } else if (isCustomDateType(value)) {
+                seconds = getFromCustomType(value);
+            } else if (super.isNumber(value)) {
                 // No need to divide this by 1000, the param is expected to be in seconds already!
                 seconds = super.asNumber(value).longValue();
-            }
-            else {
+            } else {
                 seconds = trySeconds(super.asString(value)); // formatter.parse(super.asString(value)).getTime() / 1000L;
 
-                if(seconds == null) {
+                if (seconds == null) {
                     return value;
                 }
             }
@@ -78,7 +90,7 @@ public class Date extends Filter {
             final java.util.Date date = new java.util.Date(seconds * 1000L);
             final String format = super.asString(super.get(0, params));
 
-            if(format == null || format.trim().isEmpty()) {
+            if (format == null || format.trim().isEmpty()) {
                 return value;
             }
 
@@ -108,21 +120,26 @@ public class Date extends Filter {
                     if (javaFormat == null) {
                         // no valid date-format: append the '%' and the 'next'-char
                         builder.append("%").append(next);
-                    }
-                    else {
+                    } else {
                         builder.append(javaFormat.format(date));
                     }
-                }
-                else {
+                } else {
                     builder.append(ch);
                 }
             }
 
             return builder.toString();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return value;
         }
+    }
+
+    private boolean isCustomDateType(Object value) {
+        return typeSupport != null && typeSupport.support(value);
+    }
+
+    private Long getFromCustomType(Object value) {
+        return typeSupport.getAsSeconds(value);
     }
 
     private static void init() {
@@ -148,7 +165,7 @@ public class Date extends Filter {
 
         // %d - Day of the month (01..31)
         LIQUID_TO_JAVA_FORMAT.put('d', new SimpleDateFormat("dd", locale));
-        
+
         // %e - Day of the month (1..31)
         LIQUID_TO_JAVA_FORMAT.put('e', new SimpleDateFormat("d", locale));
 
@@ -160,10 +177,10 @@ public class Date extends Filter {
 
         // %j - Day of the year (001..366)
         LIQUID_TO_JAVA_FORMAT.put('j', new SimpleDateFormat("DDD", locale));
-        
+
         // %k - Hour of the day, 24-hour clock (0..23)
         LIQUID_TO_JAVA_FORMAT.put('k', new SimpleDateFormat("H", locale));
-        
+
         // %l - Hour of the day, 12-hour clock (1..12)
         LIQUID_TO_JAVA_FORMAT.put('l', new SimpleDateFormat("h", locale));
 
@@ -225,7 +242,7 @@ public class Date extends Filter {
      */
     public static void addDatePattern(String pattern) {
 
-        if(pattern == null) {
+        if (pattern == null) {
             throw new NullPointerException("date-pattern cannot be null");
         }
 
@@ -248,20 +265,29 @@ public class Date extends Filter {
      */
     private Long trySeconds(String str) {
 
-        for(String pattern : datePatterns) {
+        for (String pattern : datePatterns) {
 
             SimpleDateFormat parser = new SimpleDateFormat(pattern, locale);
 
             try {
                 long milliseconds = parser.parse(str).getTime();
                 return milliseconds / 1000L;
-            }
-            catch(Exception e) {
+            } catch (Exception e) {
                 // Just ignore and try the next pattern in `datePatterns`.
             }
         }
 
         // Could not parse the string into a meaningful date, return null.
         return null;
+    }
+
+    public interface CustomDateFormatSupport<T> {
+        Long getAsSeconds(T value);
+
+        boolean support(Object in);
+    }
+
+    public static Filter withCustomDateType(CustomDateFormatSupport typeSupport) {
+        return new Date(typeSupport);
     }
 }

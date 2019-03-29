@@ -1,16 +1,23 @@
 package liqp.filters;
 
-import java.util.Locale;
 import liqp.Template;
 import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class DateTest {
+
+    @Before
+    public void init() {
+        // reset
+        Filter.registerFilter(new Date());
+    }
 
     @Test
     public void applyTest() throws RecognitionException {
@@ -85,31 +92,62 @@ public class DateTest {
 
         final Filter filter = Filter.getFilter("date");
 
-        assertThat(filter.apply(seconds("2006-05-05 10:00:00"), "%B"), is((Object)"May"));
-        assertThat(filter.apply(seconds("2006-06-05 10:00:00"), "%B"), is((Object)"June"));
-        assertThat(filter.apply(seconds("2006-07-05 10:00:00"), "%B"), is((Object)"July"));
+        assertThat(filter.apply(seconds("2006-05-05 10:00:00"), "%B"), is((Object) "May"));
+        assertThat(filter.apply(seconds("2006-06-05 10:00:00"), "%B"), is((Object) "June"));
+        assertThat(filter.apply(seconds("2006-07-05 10:00:00"), "%B"), is((Object) "July"));
 
-        assertThat(filter.apply("2006-05-05 10:00:00", "%B"), is((Object)"May"));
-        assertThat(filter.apply("2006-06-05 10:00:00", "%B"), is((Object)"June"));
-        assertThat(filter.apply("2006-07-05 10:00:00", "%B"), is((Object)"July"));
+        assertThat(filter.apply("2006-05-05 10:00:00", "%B"), is((Object) "May"));
+        assertThat(filter.apply("2006-06-05 10:00:00", "%B"), is((Object) "June"));
+        assertThat(filter.apply("2006-07-05 10:00:00", "%B"), is((Object) "July"));
 
-        assertThat(filter.apply("2006-07-05 10:00:00", ""), is((Object)"2006-07-05 10:00:00"));
-        assertThat(filter.apply("2006-07-05 10:00:00", null), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", ""), is((Object) "2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", null), is((Object) "2006-07-05 10:00:00"));
 
-        assertThat(filter.apply("2006-07-05 10:00:00", "%m/%d/%Y"), is((Object)"07/05/2006"));
+        assertThat(filter.apply("2006-07-05 10:00:00", "%m/%d/%Y"), is((Object) "07/05/2006"));
 
-        assertThat(filter.apply("Fri Jul 16 01:00:00 2004", "%m/%d/%Y"), is((Object)"07/16/2004"));
+        assertThat(filter.apply("Fri Jul 16 01:00:00 2004", "%m/%d/%Y"), is((Object) "07/16/2004"));
 
-        assertThat(filter.apply(null, "%B"), is((Object)null));
+        assertThat(filter.apply(null, "%B"), is((Object) null));
 
-        assertThat(filter.apply(1152098955, "%m/%d/%Y"), is((Object)"07/05/2006"));
-        assertThat(filter.apply("1152098955", "%m/%d/%Y"), is((Object)"07/05/2006"));
+        assertThat(filter.apply(1152098955, "%m/%d/%Y"), is((Object) "07/05/2006"));
+        assertThat(filter.apply("1152098955", "%m/%d/%Y"), is((Object) "07/05/2006"));
+    }
+
+    @Test
+    public void customDateTypeSupport() {
+        // given
+        class CustomDate {
+            public CustomDate(long time) {
+                this.time = time;
+            }
+
+            long time;
+        }
+
+        Filter f = Date.withCustomDateType(new Date.CustomDateFormatSupport<CustomDate>() {
+            @Override
+            public Long getAsSeconds(CustomDate value) {
+                return value.time;
+            }
+
+            @Override
+            public boolean support(Object in) {
+                return CustomDate.class.isInstance(in);
+            }
+        });
+        Filter.registerFilter(f);
+
+        // when
+        CustomDate customDate = new CustomDate(1152098955);
+
+        // then
+        assertThat(Filter.getFilter("date").apply(customDate, "%m/%d/%Y"), is((Object) "07/05/2006"));
     }
 
     private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 
     private static long seconds(String str) throws Exception {
-        long milliSeconds =  formatter.parse(str).getTime();
+        long milliSeconds = formatter.parse(str).getTime();
         return milliSeconds / 1000L;
     }
 

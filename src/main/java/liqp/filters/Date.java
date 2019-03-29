@@ -19,6 +19,18 @@ public class Date extends Filter {
         init();
     }
 
+    private CustomDateFormatSupport typeSupport;
+
+
+    protected Date() {
+        super();
+    }
+
+    protected Date(CustomDateFormatSupport typeSupport) {
+        super();
+        this.typeSupport = typeSupport;
+    }
+
     /*
      * (Object) date(input, format)
      *
@@ -62,6 +74,8 @@ public class Date extends Filter {
 
             if(super.asString(value).equals("now")) {
                 seconds = System.currentTimeMillis() / 1000L;
+            } else if (isCustomDateType(value)) {
+                seconds = getFromCustomType(value);
             }
             else if(super.isNumber(value)) {
                 // No need to divide this by 1000, the param is expected to be in seconds already!
@@ -125,6 +139,14 @@ public class Date extends Filter {
         }
     }
 
+    private boolean isCustomDateType(Object value) {
+        return typeSupport != null && typeSupport.support(value);
+    }
+
+    private Long getFromCustomType(Object value) {
+        return typeSupport.getAsSeconds(value);
+    }
+
     private static void init() {
 
         // %% - Literal ``%'' character
@@ -148,7 +170,7 @@ public class Date extends Filter {
 
         // %d - Day of the month (01..31)
         LIQUID_TO_JAVA_FORMAT.put('d', new SimpleDateFormat("dd", locale));
-        
+
         // %e - Day of the month (1..31)
         LIQUID_TO_JAVA_FORMAT.put('e', new SimpleDateFormat("d", locale));
 
@@ -160,10 +182,10 @@ public class Date extends Filter {
 
         // %j - Day of the year (001..366)
         LIQUID_TO_JAVA_FORMAT.put('j', new SimpleDateFormat("DDD", locale));
-        
+
         // %k - Hour of the day, 24-hour clock (0..23)
         LIQUID_TO_JAVA_FORMAT.put('k', new SimpleDateFormat("H", locale));
-        
+
         // %l - Hour of the day, 12-hour clock (1..12)
         LIQUID_TO_JAVA_FORMAT.put('l', new SimpleDateFormat("h", locale));
 
@@ -263,5 +285,15 @@ public class Date extends Filter {
 
         // Could not parse the string into a meaningful date, return null.
         return null;
+    }
+
+    public interface CustomDateFormatSupport<T> {
+        Long getAsSeconds(T value);
+
+        boolean support(Object in);
+    }
+
+    public static Filter withCustomDateType(CustomDateFormatSupport typeSupport) {
+        return new Date(typeSupport);
     }
 }

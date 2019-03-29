@@ -451,7 +451,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
 
     AtomNode idNode = new AtomNode(ctx.Id().getText());
     LNode exprNode = visit(ctx.expr());
-    List<LNode> allNodes = new ArrayList<>();
+    List<LNode> allNodes = new ArrayList<LNode>();
 
     allNodes.add(idNode);
     allNodes.add(exprNode);

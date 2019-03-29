@@ -122,7 +122,7 @@ public class Template {
                 throw new RuntimeException(String.format("parser error on line %s, index %s", line, charPositionInLine), e);
             }
         });
-        
+
         parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
         try {
             return parser.parse();
@@ -293,6 +293,19 @@ public class Template {
         }
     }
 
+
+    public String render(final Map<String, Object> data, boolean convertValueToMap) {
+        if (!convertValueToMap) {
+            return render(data);
+        } else {
+            Map<String, Object> map = new HashMap<String, Object>();
+            for (Map.Entry<String, Object> e : data.entrySet()) {
+                putStringKey(true, e.getKey(), e.getValue(), map);
+            }
+            return render(map);
+        }
+
+    }
     public String render(final Map<String, Object> variables, ExecutorService executorService, boolean shutdown) {
 
         if (this.templateSize > this.protectionSettings.maxTemplateSizeBytes) {

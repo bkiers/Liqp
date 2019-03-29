@@ -1,16 +1,28 @@
 package liqp.tags;
 
 import liqp.*;
+import liqp.filters.Filter;
 import liqp.parser.Flavor;
 import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 public class IncludeTest {
+
+    @Before
+    public void init() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Method method = Filter.class.getDeclaredMethod("reset_filters");
+        method.setAccessible(true);
+        method.invoke(null);
+    }
 
     @Test
     public void renderTest() throws RecognitionException {
@@ -38,7 +50,7 @@ public class IncludeTest {
                 "color: 'red'\n" +
                 "shape: 'square'"));
     }
-    
+
     @Test
     public void renderTestWithIncludeDirectorySpecifiedInContextLiquidFlavor() throws Exception {
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
@@ -130,5 +142,57 @@ public class IncludeTest {
         String source = "{% assign variable = 'header.html' %}{% include {{variable}} %}";
 
         Template.parse(source).render();
+    }
+
+    @Test
+    public void errorInIncludeCauseMissingIncludeWithDefaultRendering() throws IOException {
+        //given
+        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
+        File index = new File(jekyll, "index_with_errored_include.html");
+        Template template = Template.parse(index, Flavor.JEKYLL);
+
+
+        // when
+        String result = template.render();
+
+        // them
+        assertFalse(result.contains("THE_ERROR"));
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void errorInIncludeCauseMissingIncludeWithCustomRendering() throws IOException {
+        //given
+        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
+        File index = new File(jekyll, "index_with_errored_include.html");
+        ParseSettings parseSettings = new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build();
+        RenderSettings renderSettings = new RenderSettings.Builder().withShowExceptionsFromInclude(true).build();
+        Template template = Template.parse(index, parseSettings).withRenderSettings(renderSettings);
+
+
+        // when
+        template.render();
+
+        // them
+        fail();
+    }
+
+    @Test
+    public void errorInIncludeCauseMissingIncludeWithCustomRenderingAndFixedError() throws IOException {
+        //given
+        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
+        File index = new File(jekyll, "index_with_errored_include.html");
+        ParseSettings parseSettings = new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build();
+        RenderSettings renderSettings = new RenderSettings.Builder().withShowExceptionsFromInclude(true).build();
+        Template template = Template.parse(index, parseSettings).withRenderSettings(renderSettings);
+
+        Filter.registerFilter(new Filter("normalize_whitespace") {
+        });
+
+        // when
+        String result = template.render();
+
+        // them
+        assertTrue(result.contains("THE_ERROR"));
+
     }
 }

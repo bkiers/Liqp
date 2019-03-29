@@ -1,10 +1,12 @@
 package liqp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
 import liqp.parser.Flavor;
 import liqp.parser.v4.NodeVisitor;
+import liqp.tags.Include;
 import liqp.tags.Tag;
 import liquid.parser.v4.LiquidLexer;
 import liquid.parser.v4.LiquidParser;
@@ -122,7 +124,7 @@ public class Template {
                 throw new RuntimeException(String.format("parser error on line %s, index %s", line, charPositionInLine), e);
             }
         });
-        
+
         parser.getInterpreter().setPredictionMode(PredictionMode.SLL);
         try {
             return parser.parse();
@@ -335,10 +337,20 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String renderUnguarded(final Map<String, Object> variables) {
+
+        if (variables.containsKey(Include.INCLUDES_DIRECTORY_KEY)) {
+            Object includeDirectory = variables.get(Include.INCLUDES_DIRECTORY_KEY);
+            if (includeDirectory instanceof File) {
+                variables.put(Include.INCLUDES_DIRECTORY_KEY, ((File) includeDirectory).getAbsolutePath());
+            }
+        }
+        ObjectNode value = parseSettings.mapper.convertValue(variables, ObjectNode.class);
+        Map map = parseSettings.mapper.convertValue(value, Map.class);
+
         final NodeVisitor visitor = new NodeVisitor(this.tags, this.filters, this.parseSettings);
         try {
             LNode node = visitor.visit(root);
-            Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings.flavor, variables));
+            Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings.flavor, map));
             return rendered == null ? "" : String.valueOf(rendered);
         }
         catch (Exception e) {

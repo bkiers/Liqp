@@ -6,6 +6,9 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -38,7 +41,7 @@ public class IncludeTest {
                 "color: 'red'\n" +
                 "shape: 'square'"));
     }
-    
+
     @Test
     public void renderTestWithIncludeDirectorySpecifiedInContextLiquidFlavor() throws Exception {
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
@@ -130,5 +133,40 @@ public class IncludeTest {
         String source = "{% assign variable = 'header.html' %}{% include {{variable}} %}";
 
         Template.parse(source).render();
+    }
+
+
+    @Test
+    public void includeDirectoryKeyInInputShouldChangeIncludeDirectory() throws IOException {
+        // given
+        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
+        File index = new File(jekyll, "index_without_quotes.html");
+        Template template = Template.parse(index, new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build());
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put(Include.INCLUDES_DIRECTORY_KEY, new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes"));
+
+        // when
+
+        String result = template.render(data);
+
+        // then
+        assertTrue(result.contains("ALTERNATIVE"));
+    }
+
+    @Test
+    public void includeDirectoryKeyStringInInputShouldChangeIncludeDirectory() throws IOException {
+        // given
+        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
+        File index = new File(jekyll, "index_without_quotes.html");
+        Template template = Template.parse(index, new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build());
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put(Include.INCLUDES_DIRECTORY_KEY, "alternative_includes");
+
+        // when
+
+        String result = template.render(data);
+
+        // then
+        assertTrue(result.contains("ALTERNATIVE"));
     }
 }

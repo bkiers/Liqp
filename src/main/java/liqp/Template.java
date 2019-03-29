@@ -335,10 +335,16 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String renderUnguarded(final Map<String, Object> variables) {
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        for (Map.Entry<String, Object> e : variables.entrySet()) {
+            putStringKey(true, e.getKey(), e.getValue(), map);
+        }
+
         final NodeVisitor visitor = new NodeVisitor(this.tags, this.filters, this.parseSettings);
         try {
             LNode node = visitor.visit(root);
-            Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings.flavor, variables));
+            Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings.flavor, map));
             return rendered == null ? "" : String.valueOf(rendered);
         }
         catch (Exception e) {

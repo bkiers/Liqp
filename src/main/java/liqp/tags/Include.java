@@ -29,6 +29,7 @@ public class Include extends Tag {
               includeResourceFile = new File(context.parseSettings.flavor.snippetsFolderName, includeResource + extension);
             }
             Template template = Template.parse(includeResourceFile, context.parseSettings);
+
             // check if there's a optional "with expression"
             if(nodes.length > 1) {
                 Object value = nodes[1].render(context);
@@ -38,7 +39,11 @@ public class Include extends Tag {
             return template.render(context.getVariables());
 
         } catch(Exception e) {
-            return "";
+            if (context.renderSettings.showExceptionsFromInclude) {
+                throw new RuntimeException("problem with evaluating include", e);
+            } else {
+                return "";
+            }
         }
     }
 }

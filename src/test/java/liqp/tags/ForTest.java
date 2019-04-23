@@ -2,6 +2,7 @@ package liqp.tags;
 
 import liqp.Template;
 import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -698,5 +699,24 @@ public class ForTest {
                 "`";
 
         assertThat(Template.parse(template).render(variables), is(expected));
+    }
+
+    /*
+     * @template = Liquid::Template.parse("{% for item in hash %}{{ item[0] }} is {{ item[1] }};{% endfor %}")
+     *
+     * puts @template.render('hash' => {'a' => 'AAA', 'b' => 'BBB'})
+     */
+    @Test
+    public void mapTest() {
+
+        // https://github.com/bkiers/Liqp/issues/125
+
+        String hash = "{ \"hash\": { \"a\": \"AAA\", \"b\": \"BBB\" } }";
+        String template = "{% for item in hash %}{{ item[0] }} is {{ item[1] }};{% endfor %}";
+
+        String expected = "a is AAA;b is BBB;";
+        String rendered = Template.parse(template).render(hash);
+
+        Assert.assertThat(rendered, is(expected));
     }
 }

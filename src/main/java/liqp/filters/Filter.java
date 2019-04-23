@@ -221,7 +221,7 @@ public abstract class Filter extends LValue {
     }
 
     // for testing purpose
-    private static void reset_filters() {
+    private static void resetFilters() {
         FILTERS.clear();
         addDefaultFilters();
     }

@@ -72,7 +72,7 @@ public class Template {
         this.templateSize = stream.size();
         LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
         try {
-             root = parse(lexer);
+            root = parse(lexer);
         }
         catch (Exception e) {
             throw new RuntimeException("could not parse input: " + input, e);
@@ -350,7 +350,7 @@ public class Template {
         final NodeVisitor visitor = new NodeVisitor(this.tags, this.filters, this.parseSettings);
         try {
             LNode node = visitor.visit(root);
-            Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings.flavor, map));
+            Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings, map));
             return rendered == null ? "" : String.valueOf(rendered);
         }
         catch (Exception e) {

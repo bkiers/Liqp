@@ -1,5 +1,6 @@
 package liqp;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -103,6 +104,7 @@ public abstract class LValue {
      *
      * @return this value as an array.
      */
+    @SuppressWarnings("unchecked")
     public Object[] asArray(Object value) {
 
         if(value == null) {
@@ -115,6 +117,17 @@ public abstract class LValue {
 
         if (value instanceof List) {
             return ((List) value).toArray();
+        }
+
+        if (value instanceof Map) {
+
+            List<Object[]> keyValuePairs = new ArrayList<>();
+
+            for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) value).entrySet()) {
+                keyValuePairs.add(new Object[]{ entry.getKey(), entry.getValue()});
+            }
+
+            return keyValuePairs.toArray();
         }
 
         return new Object[]{value};

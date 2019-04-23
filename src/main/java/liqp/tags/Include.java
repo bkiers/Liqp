@@ -21,14 +21,16 @@ public class Include extends Tag {
                 extension = "";
             }
             File includeResourceFile;
-            String includesDirectory = (String) context.get(INCLUDES_DIRECTORY_KEY);
+            File includesDirectory = (File) context.get(INCLUDES_DIRECTORY_KEY);
+
             if (includesDirectory != null) {
                 includeResourceFile = new File(includesDirectory, includeResource + extension);
             }
             else {
-              includeResourceFile = new File(context.flavor.snippetsFolderName, includeResource + extension);
+              includeResourceFile = new File(context.parseSettings.flavor.snippetsFolderName, includeResource + extension);
             }
-            Template template = Template.parse(includeResourceFile, context.flavor);
+            Template template = Template.parse(includeResourceFile, context.parseSettings);
+
             // check if there's a optional "with expression"
             if(nodes.length > 1) {
                 Object value = nodes[1].render(context);
@@ -38,7 +40,11 @@ public class Include extends Tag {
             return template.render(context.getVariables());
 
         } catch(Exception e) {
-            return "";
+            if (context.renderSettings.showExceptionsFromInclude) {
+                throw new RuntimeException("problem with evaluating include", e);
+            } else {
+                return "";
+            }
         }
     }
 }

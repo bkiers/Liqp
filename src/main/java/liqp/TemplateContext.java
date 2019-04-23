@@ -10,31 +10,33 @@ public class TemplateContext {
     protected TemplateContext parent;
     public final ProtectionSettings protectionSettings;
     public final RenderSettings renderSettings;
-    public final Flavor flavor;
+    public final ParseSettings parseSettings;
     private Map<String, Object> variables;
 
     public TemplateContext() {
         this(new ProtectionSettings.Builder().build(),
                 new RenderSettings.Builder().build(),
-                Flavor.LIQUID,
+                new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build(),
                 new LinkedHashMap<String, Object>());
     }
 
-    public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings, Flavor flavor,
+    @Deprecated // Use `TemplateContext(protectionSettings, renderSettings, parseSettings, variables)` instead
+    public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings, Flavor flavor, Map<String, Object> variables) {
+        this(protectionSettings, renderSettings, new ParseSettings.Builder().withFlavor(flavor).build(), variables);
+    }
+
+    public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings, ParseSettings parseSettings,
                            Map<String, Object> variables) {
         this.parent = null;
         this.protectionSettings = protectionSettings;
         this.renderSettings = renderSettings;
-        this.flavor = flavor;
+        this.parseSettings = parseSettings;
         this.variables = new LinkedHashMap<String, Object>(variables);
     }
 
     public TemplateContext(TemplateContext parent) {
+        this(parent.protectionSettings, parent.renderSettings, parent.parseSettings, new LinkedHashMap<String, Object>());
         this.parent = parent;
-        this.protectionSettings = parent.protectionSettings;
-        this.renderSettings = parent.renderSettings;
-        this.flavor = parent.flavor;
-        this.variables = new LinkedHashMap<String, Object>();
     }
 
     public void incrementIterations() {

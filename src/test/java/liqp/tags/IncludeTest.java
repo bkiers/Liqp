@@ -147,7 +147,24 @@ public class IncludeTest {
     }
 
     @Test
-    public void errorInIncludeCauseMissingIncludeWithDefaultRendering() throws IOException {
+    public void includeDirectoryKeyInInputShouldChangeIncludeDirectory() throws IOException {
+        // given
+        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
+        File index = new File(jekyll, "index_without_quotes.html");
+        Template template = Template.parse(index, new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build());
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put(Include.INCLUDES_DIRECTORY_KEY, new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes"));
+
+        // when
+
+        String result = template.render(data);
+
+        // then
+        assertTrue(result.contains("ALTERNATIVE"));
+    }
+
+    @Test
+    public void includeDirectoryKeyStringInInputShouldChangeIncludeDirectory() throws IOException {
         //given
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_with_errored_include.html");
@@ -203,7 +220,7 @@ public class IncludeTest {
         File index = new File(jekyll, "index_without_quotes.html");
         Template template = Template.parse(index, new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build());
         Map<String, Object> data = new HashMap<String, Object>();
-        data.put(Include.INCLUDES_DIRECTORY_KEY, new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes"));
+        data.put(Include.INCLUDES_DIRECTORY_KEY, "alternative_includes");
 
         // when
 

@@ -1,9 +1,14 @@
 package liqp;
 
 import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class TemplateTest {
@@ -80,4 +85,17 @@ public class TemplateTest {
     public void renderVarArgsTestInvalidKey2() throws RecognitionException {
         Template.parse("mu").render(null, 456);
     }
+
+    @Test
+    public void renderMapWithPojosExistedNotRender() {
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("foo", new Foo());
+        data.put("bar", "zoo");
+        data.put("bear", true);
+
+        String fooA = Template.parse("{{foo.a}}{{bar}}{{bear}}").render(data);
+
+        assertThat(fooA, is("Azootrue"));
+    }
+
 }

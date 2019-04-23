@@ -22,6 +22,7 @@ public class Include extends Tag {
             }
             File includeResourceFile;
             File includesDirectory = (File) context.get(INCLUDES_DIRECTORY_KEY);
+
             if (includesDirectory != null) {
                 includeResourceFile = new File(includesDirectory, includeResource + extension);
             }

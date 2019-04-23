@@ -21,7 +21,7 @@ public class IncludeTest {
 
     @Before
     public void init() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method method = Filter.class.getDeclaredMethod("reset_filters");
+        Method method = Filter.class.getDeclaredMethod("resetFilters");
         method.setAccessible(true);
         method.invoke(null);
     }

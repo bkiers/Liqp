@@ -3,6 +3,7 @@ package liqp.filters;
 import java.util.Locale;
 import liqp.Template;
 import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
@@ -11,6 +12,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class DateTest {
+
+    @Before
+    public void init() {
+        // reset
+        Filter.registerFilter(new Date());
+    }
 
     @Test
     public void applyTest() throws RecognitionException {
@@ -115,5 +122,35 @@ public class DateTest {
 
     public static SimpleDateFormat simpleDateFormat(String pattern) {
         return new SimpleDateFormat(pattern, Locale.ENGLISH);
+    }
+
+    @Test
+    public void customDateTypeSupport() {
+        // given
+        class CustomDate {
+            long time;
+
+            public CustomDate(long time) {
+                this.time = time;
+            }
+        }
+        Filter f = Date.withCustomDateType(new Date.CustomDateFormatSupport<CustomDate>() {
+            @Override
+            public Long getAsSeconds(CustomDate value) {
+                return value.time;
+            }
+
+            @Override
+            public boolean support(Object in) {
+                return CustomDate.class.isInstance(in);
+            }
+        });
+        Filter.registerFilter(f);
+
+        // when
+        CustomDate customDate = new CustomDate(1152098955);
+
+        // then
+        assertThat(Filter.getFilter("date").apply(customDate, "%m/%d/%Y"), is((Object) "07/05/2006"));
     }
 }

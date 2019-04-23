@@ -146,22 +146,21 @@ public class IncludeTest {
         Template.parse(source).render();
     }
 
-    // TODO see why this fails
-//    @Test
-//    public void includeDirectoryKeyInInputShouldChangeIncludeDirectory() throws IOException {
-//        // given
-//        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
-//        File index = new File(jekyll, "index_without_quotes.html");
-//        Template template = Template.parse(index, new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build());
-//        Map<String, Object> data = new HashMap<String, Object>();
-//        data.put(Include.INCLUDES_DIRECTORY_KEY, new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes"));
-//
-//        // when
-//        String result = template.render(data);
-//
-//        // then
-//        assertTrue(result.contains("ALTERNATIVE"));
-//    }
+    @Test
+    public void includeDirectoryKeyInInputShouldChangeIncludeDirectory() throws IOException {
+        // given
+        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
+        File index = new File(jekyll, "index_without_quotes.html");
+        Template template = Template.parse(index, new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build());
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put(Include.INCLUDES_DIRECTORY_KEY, new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes"));
+
+        // when
+        String result = template.render(data);
+
+        // then
+        assertTrue(result.contains("ALTERNATIVE"));
+    }
 
     @Test
     public void includeDirectoryKeyStringInInputShouldChangeIncludeDirectory() throws IOException {

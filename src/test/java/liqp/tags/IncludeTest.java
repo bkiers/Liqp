@@ -1,11 +1,16 @@
 package liqp.tags;
 
 import liqp.*;
+import liqp.exceptions.VariableNotExistException;
 import liqp.filters.Filter;
 import liqp.parser.Flavor;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.internal.matchers.ThrowableCauseMatcher;
+import org.junit.rules.ExpectedException;
+import org.hamcrest.Matcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,9 +20,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.*;
 
 public class IncludeTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void init() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -104,6 +113,35 @@ public class IncludeTest {
         Template template = Template.parse(index, Flavor.JEKYLL);
         String result = template.render();
         assertTrue(result.contains("FOOTER"));
+    }
+
+    @Test
+    public void renderTestWithIncludeSubdirectorySpecifiedInLiquidFlavorWithStrictVariables() throws Exception {
+
+        String expected = "Sample Footer";
+        File index = new File("src/test/jekyll/index_with_variables.html");
+        Template template = Template.parse(
+            index,
+            new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build(),
+            new RenderSettings.Builder().withStrictVariables(true).withShowExceptionsFromInclude(true).build());
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("FOOTERTEXT", expected);
+        String result = template.render(variables);
+        assertTrue(result.contains(expected));
+    }
+
+
+    @Test
+    public void renderTestWithIncludeSubdirectorySpecifiedInLiquidFlavorWithStrictVariablesException() throws Exception {
+
+        thrown.expectCause(new NestedCauseMatcher<>(isA(VariableNotExistException.class)));
+
+        File index = new File("src/test/jekyll/index_with_variables.html");
+        Template template = Template.parse(
+            index,
+            new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build(),
+            new RenderSettings.Builder().withStrictVariables(true).withShowExceptionsFromInclude(true).build());
+        template.render();
     }
 
     // https://github.com/bkiers/Liqp/issues/95
@@ -210,5 +248,32 @@ public class IncludeTest {
 
         // them
         assertTrue(result.contains("THE_ERROR"));
+    }
+
+    private static class NestedCauseMatcher<T extends Throwable> extends ThrowableCauseMatcher<T> {
+
+        private Matcher<? extends Throwable> causeMatcher;
+
+        public NestedCauseMatcher(Matcher<T> causeMatcher) {
+            
+            super(causeMatcher);
+            this.causeMatcher = causeMatcher;
+        }
+
+        @Override
+        protected boolean matchesSafely(T item) {
+
+            boolean match = false;
+            Throwable parent = item;
+            Throwable cause = null;
+
+            while (((cause = parent.getCause()) != null) && (cause != parent) && !(match = causeMatcher.matches(cause))) {
+
+                parent = cause;
+            }
+
+            return match;
+        }
+
     }
 }

@@ -29,7 +29,8 @@ public class Include extends Tag {
             else {
               includeResourceFile = new File(context.parseSettings.flavor.snippetsFolderName, includeResource + extension);
             }
-            Template template = Template.parse(includeResourceFile, context.parseSettings);
+
+            Template template = Template.parse(includeResourceFile, context.parseSettings, context.renderSettings);
 
             // check if there's a optional "with expression"
             if(nodes.length > 1) {

@@ -98,6 +98,7 @@ public abstract class LValue {
      * it is casted to a `Object[]`, if it's a `java.util.List`, it is
      * converted to an array and in all other cases, `value` is simply
      * returned as an `Object[]` with a single value in it.
+     * This function treat `Map` as single element.
      *
      * @param value
      *         the value to convert/cast to an array.
@@ -119,6 +120,21 @@ public abstract class LValue {
             return ((List) value).toArray();
         }
         return new Object[]{value};
+    }
+
+    /**
+     * Usually we need array representation of items, so the {@link #asArray(Object)} do the work well.
+     * But occasionally we need introspect the object (usually `Map`) as array.
+     * So this function do so.
+     * @param value
+     * @return
+     */
+    protected Object[] mapAsArray(Map value) {
+        List<Object[]> keyValuePairs = new ArrayList<>();
+        for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) value).entrySet()) {
+            keyValuePairs.add(new Object[]{entry.getKey(), entry.getValue()});
+        }
+        return keyValuePairs.toArray();
     }
 
     /**
@@ -303,6 +319,7 @@ public abstract class LValue {
     }
 
     public Map<String, Object> asMap(Object value) {
+
         return (Map<String, Object>)value;
     }
 }

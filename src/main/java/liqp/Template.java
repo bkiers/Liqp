@@ -80,6 +80,26 @@ public class Template {
     }
 
     /**
+     * Creates a new Template instance from a given input.
+     *  @param input
+     *         the file holding the Liquid source.
+     * @param tags
+     *         the tags this instance will make use of.
+     * @param filters
+     *         the filters this instance will make use of.
+     * @param parseSettings
+     *         the parseSettings this instance will make use of.
+     * @param renderSettings
+     *         the renderSettings this instance will make use of.
+     */
+    private Template(String input, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings,
+        RenderSettings renderSettings) {
+        
+        this(input, tags, filters, parseSettings);
+        this.renderSettings = renderSettings;
+    }
+
+   /**
      * Creates a new Template instance from a given file.
      *
      * @param file
@@ -100,6 +120,27 @@ public class Template {
         catch (Exception e) {
             throw new RuntimeException("could not parse input from " + file, e);
         }
+    }
+
+    /**
+     * Creates a new Template instance from a given file.
+     *
+     * @param file
+     *         the file holding the Liquid source.
+     * @param tags
+     *         the tags this instance will make use of.
+     * @param filters
+     *         the filters this instance will make use of.
+     * @param parseSettings
+     *         the parseSettings this instance will make use of.
+     * @param renderSettings
+     *         the renderSettings this instance will make use of.
+     */
+    private Template(File file, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings,
+        RenderSettings renderSettings) throws IOException {
+        
+        this(file, tags, filters, parseSettings);
+        this.renderSettings = renderSettings;
     }
 
     private ParseTree parse(LiquidLexer lexer) {
@@ -175,6 +216,10 @@ public class Template {
 
     public static Template parse(String input, ParseSettings settings) {
         return new Template(input, Tag.getTags(), Filter.getFilters(), settings);
+    }
+
+    public static Template parse(File file, ParseSettings parseSettings, RenderSettings renderSettings) throws IOException {
+        return new Template(file, Tag.getTags(), Filter.getFilters(), parseSettings, renderSettings);
     }
 
     @Deprecated // Use `parse(file, settings)` instead

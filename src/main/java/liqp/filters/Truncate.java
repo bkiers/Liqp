@@ -26,18 +26,18 @@ public class Truncate extends Filter {
             truncateString = super.asString(super.get(1, params));
         }
 
+        // If the entire string fits untruncated, return the string.
+        if (length >= text.length()) {
+            return text;
+        }
+
+        // If the 'marker' takes up all the space, output the marker (even if
+        // it's longer than the requested length).
         if (truncateString.length() >= length) {
             return truncateString;
         }
 
-        if (length == text.length()) {
-            return text;
-        }
-
-        if (length >= (text.length() + truncateString.length())) {
-            return text;
-        }
-
+        // Otherwise, output as much text as will fit.
         int remainingChars = length - truncateString.length();
 
         return text.substring(0, remainingChars) + truncateString;

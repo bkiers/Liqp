@@ -134,7 +134,7 @@ public class IncludeTest {
     @Test
     public void renderTestWithIncludeSubdirectorySpecifiedInLiquidFlavorWithStrictVariablesException() throws Exception {
 
-        thrown.expectCause(isA(VariableNotExistException.class));
+        thrown.expectCause(new NestedCauseMatcher<>(isA(VariableNotExistException.class)));
 
         File index = new File("src/test/jekyll/index_with_variables.html");
         Template template = Template.parse(
@@ -143,6 +143,21 @@ public class IncludeTest {
             new RenderSettings.Builder().withStrictVariables(true).withShowExceptionsFromInclude(true).build());
         template.render();
     }
+
+    @Test
+    public void renderTestWithIncludeSubdirectorySpecifiedInLiquidFlavorWithShowInternalErrorWithStrictVariablesException() throws Exception {
+
+        thrown.expectCause(isA(VariableNotExistException.class));
+
+        File index = new File("src/test/jekyll/index_with_variables.html");
+        Template template = Template.parse(
+                index,
+                new ParseSettings.Builder().withFlavor(Flavor.LIQUID).withShowInternalError(true).build(),
+                new RenderSettings.Builder().withStrictVariables(true).withShowExceptionsFromInclude(true).build());
+        template.render();
+    }
+
+
 
     // https://github.com/bkiers/Liqp/issues/95
     @Test

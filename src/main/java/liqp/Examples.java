@@ -1,6 +1,5 @@
 package liqp;
 
-import java.io.File;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
 import liqp.tags.Tag;
@@ -199,7 +198,55 @@ public class Examples {
                     .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build())
                     .render();
         } catch (RuntimeException ex) {
+            printExceptionWithCause(ex);
             System.out.println("Caught an exception for strict variables");
+        }
+    }
+
+    private static void demoParsingErrors() {
+        ParseSettings parseSettings = new ParseSettings.Builder().withShowInternalError(true).build();
+
+        try {
+            Template template = Template.parse("Invalid {{end bracket} }", parseSettings);
+        } catch (RuntimeException ex) {
+            printExceptionWithCause(ex);
+        }
+        try {
+            Template template = Template.parse("hi {%name}}", parseSettings);
+        } catch (RuntimeException ex) {
+            printExceptionWithCause(ex);
+        }
+    }
+
+    private static void demoRenderErrors() {
+        ParseSettings parseSettings = new ParseSettings.Builder().withShowInternalError(true).build();
+
+        try {
+            Template template = Template.parse("hi {{%name | invalidFilter}}", parseSettings);
+            String rendered = template.render("noname", "tobi");
+            System.out.println("If you see this then something is wrong!");
+        } catch (RuntimeException ex) {
+            printExceptionWithCause(ex);
+        }
+        try {
+            Template template = Template.parse("hi {{%name}}", parseSettings);
+            String rendered = template.render("{\"name\" : \"invalid_json\"");
+        } catch (RuntimeException ex) {
+            printExceptionWithCause(ex);
+        }
+        try {
+            Template template = Template.parse("{% include no_jekyll_here.html %}}", parseSettings);
+            String rendered = template.render();
+        } catch (RuntimeException ex) {
+            printExceptionWithCause(ex);
+        }
+    }
+
+    private static void printExceptionWithCause(Throwable ex) {
+        System.out.println(ex.toString());
+        while (ex.getCause() != null && ex.getCause() != ex) {
+            ex = ex.getCause();
+            System.out.println("    Cause: " + ex.toString());
         }
     }
 
@@ -230,6 +277,12 @@ public class Examples {
 
         System.out.println("\n=== demoStrictVariables() ===");
         demoStrictVariables();
+
+        System.out.println("\n=== demoParsingErrors() ===");
+        demoParsingErrors();
+
+        System.out.println("\n=== demoRenderErrors() ===");
+        demoRenderErrors();
 
         System.out.println("Done!");
     }

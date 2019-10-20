@@ -1,5 +1,6 @@
 package liqp;
 
+import liqp.exceptions.LiquidException;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -84,6 +85,11 @@ public class TemplateTest {
     @Test(expected = RuntimeException.class)
     public void renderVarArgsTestInvalidKey2() throws RecognitionException {
         Template.parse("mu").render(null, 456);
+    }
+
+    @Test(expected = LiquidException.class)
+    public void renderInvalidTemplateShowInternalError() throws RecognitionException {
+        Template.parse("Invalid {{end bracket} }", new ParseSettings.Builder().withShowInternalError(true).build());
     }
 
     @Test

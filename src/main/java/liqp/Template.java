@@ -75,11 +75,12 @@ public class Template {
         try {
             root = parse(lexer);
         }
-        catch (LiquidException e) {
-            throw e;
-        }
         catch (Exception e) {
-            throw new RuntimeException("could not parse input: " + input, e);
+            if (parseSettings.showInternalError && e instanceof RuntimeException) {
+                throw e;
+            } else {
+                throw new RuntimeException("could not parse input: " + input, e);
+            }
         }
     }
 
@@ -122,7 +123,11 @@ public class Template {
             root = parse(lexer);
         }
         catch (Exception e) {
-            throw new RuntimeException("could not parse input from " + file, e);
+            if (parseSettings.showInternalError && e instanceof RuntimeException) {
+                throw e;
+            } else {
+                throw new RuntimeException("could not parse input from " + file, e);
+            }
         }
     }
 
@@ -403,7 +408,7 @@ public class Template {
             return rendered == null ? "" : String.valueOf(rendered);
         }
         catch (Exception e) {
-            if (e instanceof RuntimeException) {
+            if (this.parseSettings.showInternalError && e instanceof RuntimeException) {
                 throw e;
             } else {
                 throw new RuntimeException(e);

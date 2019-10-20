@@ -1,5 +1,6 @@
 package liqp.parser;
 
+import liqp.ParseSettings;
 import liqp.Template;
 import liqp.exceptions.LiquidException;
 import org.junit.Test;
@@ -33,9 +34,14 @@ public class ParseTest {
      *   end
      * end
      */
-    @Test(expected=LiquidException.class)
+    @Test(expected=RuntimeException.class)
     public void raise_on_single_close_bracetTest() throws Exception {
         Template.parse("text {{method} oh nos!");
+    }
+
+    @Test(expected=LiquidException.class)
+    public void raise_on_single_close_bracetTest_withShowInternalError() throws Exception {
+        Template.parse("text {{method} oh nos!", new ParseSettings.Builder().withShowInternalError(true).build());
     }
 
     /*
@@ -45,7 +51,7 @@ public class ParseTest {
      *   end
      * end
      */
-    @Test(expected=LiquidException.class)
+    @Test(expected=RuntimeException.class)
     public void raise_on_label_and_no_close_bracetsTest() throws Exception {
         Template.parse("TEST {{ ");
     }
@@ -57,7 +63,7 @@ public class ParseTest {
      *   end
      * end
      */
-    @Test(expected=LiquidException.class)
+    @Test(expected=RuntimeException.class)
     public void raise_on_label_and_no_close_bracets_percentTest() throws Exception {
         Template.parse("TEST {% ");
     }

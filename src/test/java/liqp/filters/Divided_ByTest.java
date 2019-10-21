@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.exceptions.LiquidException;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 

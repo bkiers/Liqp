@@ -1,6 +1,7 @@
 package liqp.tags;
 
 import liqp.Template;
+import liqp.exceptions.LiquidException;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -311,12 +312,12 @@ public class CaseTest {
      *
      * end
      */
-    @Test(expected=RuntimeException.class)
+    @Test(expected=LiquidException.class)
     public void case_detects_bad_syntax1Test() throws Exception {
         Template.parse("{% case false %}{% when %}true{% endcase %}");
     }
 
-    @Test(expected=RuntimeException.class)
+    @Test(expected=LiquidException.class)
     public void case_detects_bad_syntax2Test() throws Exception {
         Template.parse("{% case false %}{% huh %}true{% endcase %}");
     }

@@ -108,7 +108,7 @@ public abstract class LValue {
     public Object[] asArray(Object value) {
 
         if(value == null) {
-            return null;
+            return new Object[]{};
         }
 
         if (value.getClass().isArray()) {

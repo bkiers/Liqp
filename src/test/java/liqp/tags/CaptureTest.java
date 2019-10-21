@@ -1,6 +1,7 @@
 package liqp.tags;
 
 import liqp.Template;
+import liqp.exceptions.LiquidException;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -127,7 +128,7 @@ public class CaptureTest {
      *   end
      * end
      */
-    @Test(expected=RuntimeException.class)
+    @Test(expected=LiquidException.class)
     public void capture_detects_bad_syntaxTest() throws Exception {
 
         Template.parse("{{ var2 }}{% capture %}{{ var }} foo {% endcapture %}{{ var2 }}{{ var2 }}");

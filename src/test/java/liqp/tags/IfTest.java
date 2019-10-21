@@ -1,6 +1,7 @@
 package liqp.tags;
 
 import liqp.Template;
+import liqp.exceptions.LiquidException;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -340,7 +341,7 @@ public class IfTest {
      *   assert_raise(SyntaxError){ assert_template_result('', '{% if jerry == 1 %}')}
      * end
      */
-    @Test(expected=RuntimeException.class)
+    @Test(expected=LiquidException.class)
     public void syntax_error_no_variableTest() throws RecognitionException {
         Template.parse("{% if jerry == 1 %}").render();
     }
@@ -350,7 +351,7 @@ public class IfTest {
      *   assert_raise(SyntaxError) { assert_template_result('', '{% if %}') }
      * end
      */
-    @Test(expected=RuntimeException.class)
+    @Test(expected=LiquidException.class)
     public void syntax_error_no_expressionTest() throws RecognitionException {
 
         Template.parse("{% if %}").render();

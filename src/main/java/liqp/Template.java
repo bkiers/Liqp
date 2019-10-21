@@ -2,6 +2,7 @@ package liqp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import liqp.exceptions.LiquidException;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
 import liqp.parser.Flavor;
@@ -73,6 +74,9 @@ public class Template {
         LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
         try {
             root = parse(lexer);
+        }
+        catch (LiquidException e) {
+            throw e;
         }
         catch (Exception e) {
             throw new RuntimeException("could not parse input: " + input, e);
@@ -150,7 +154,7 @@ public class Template {
         lexer.addErrorListener(new BaseErrorListener(){
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                throw new RuntimeException(String.format("lexer error on line %s, index %s", line, charPositionInLine), e);
+                throw new LiquidException(String.format("lexer error on line %s, index %s", line, charPositionInLine), line, charPositionInLine);
             }
         });
 
@@ -162,7 +166,7 @@ public class Template {
         parser.addErrorListener(new BaseErrorListener(){
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                throw new RuntimeException(String.format("parser error on line %s, index %s", line, charPositionInLine), e);
+                throw new LiquidException(String.format("parser error on line %s, index %s", line, charPositionInLine), line, charPositionInLine);
             }
         });
 

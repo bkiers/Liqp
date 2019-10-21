@@ -617,6 +617,16 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
 
   // term
   //  : ...
+  //  | Blank          #term_Blank
+  //  | ...
+  //  ;
+  @Override
+  public LNode visitTerm_Blank(Term_BlankContext ctx) {
+    return AtomNode.BLANK;
+  }
+
+  // term
+  //  : ...
   //  | OPar expr CPar #term_expr
   //  ;
   @Override

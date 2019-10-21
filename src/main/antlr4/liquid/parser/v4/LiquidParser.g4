@@ -171,6 +171,7 @@ term
  | Nil            #term_Nil
  | lookup         #term_lookup
  | Empty          #term_Empty
+ | Blank          #term_Blank
  | OPar expr CPar #term_expr
  ;
 
@@ -182,42 +183,42 @@ lookup
 
 id
  : Id
- | CaptureStart  
- | CaptureEnd  
- | CommentStart  
- | CommentEnd  
- | RawStart  
- | RawEnd  
- | IfStart  
- | Elsif  
- | IfEnd  
- | UnlessStart  
- | UnlessEnd  
- | Else  
- | Contains  
- | CaseStart  
- | CaseEnd  
- | When  
- | Cycle  
- | ForStart  
- | ForEnd  
- | In  
- | And  
- | Or  
- | TableStart  
- | TableEnd  
- | Assign  
- | Include  
- | With  
+ | CaptureStart
+ | CaptureEnd
+ | CommentStart
+ | CommentEnd
+ | RawStart
+ | RawEnd
+ | IfStart
+ | Elsif
+ | IfEnd
+ | UnlessStart
+ | UnlessEnd
+ | Else
+ | Contains
+ | CaseStart
+ | CaseEnd
+ | When
+ | Cycle
+ | ForStart
+ | ForEnd
+ | In
+ | And
+ | Or
+ | TableStart
+ | TableEnd
+ | Assign
+ | Include
+ | With
  | EndId
  ;
 
 id2
  : id
- | Empty  
- | Nil  
- | True  
- | False  
+ | Empty
+ | Nil
+ | True
+ | False
  ;
 
 index
@@ -226,7 +227,7 @@ index
  ;
 
 other_tag_parameters
- : other_than_tag_end  
+ : other_than_tag_end
  ;
 
 other_than_tag_end

@@ -68,7 +68,7 @@ public class LiquidLexerTest {
     }
 
     // mode IN_TAG;
-    // 
+    //
     //   OutStart2 : '{{' -> pushMode(IN_TAG);
     @Test
     public void testOutStart2() {
@@ -459,6 +459,13 @@ public class LiquidLexerTest {
         assertThat(tokenise("{{empty").get(1).getType(), is(LiquidLexer.Empty));
     }
 
+    //   Blank        : 'blank';
+    @Test
+    public void testBlank() {
+        assertThat(tokenise("{{blank").get(1).getType(), is(LiquidLexer.Blank));
+    }
+
+
     //   EndId        : 'end' Id;
     @Test
     public void testEndId() {
@@ -472,7 +479,7 @@ public class LiquidLexerTest {
     }
 
     // mode IN_RAW;
-    // 
+    //
     //   RawEnd : '{%' WhitespaceChar* 'endraw' -> popMode;
     @Test
     public void testRawEnd() {

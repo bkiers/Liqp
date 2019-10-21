@@ -125,6 +125,7 @@ mode IN_TAG;
   Include      : 'include';
   With         : 'with';
   Empty        : 'empty';
+  Blank        : 'blank';
   EndId        : 'end' Id;
 
   Id : ( Letter | '_' ) (Letter | '_' | '-' | Digit)*;

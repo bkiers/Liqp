@@ -27,8 +27,8 @@ public class LiquidException extends RuntimeException {
     this.charPositionInLine = ctx.start.getCharPositionInLine();
   }
 
-  public LiquidException(String message, int line, int charPositionInLine) {
-    super(message);
+  public LiquidException(String message, int line, int charPositionInLine, Throwable cause) {
+    super(message, cause);
     this.line = line;
     this.charPositionInLine = charPositionInLine;
   }

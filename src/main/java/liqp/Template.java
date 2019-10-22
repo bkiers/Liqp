@@ -403,7 +403,11 @@ public class Template {
             return rendered == null ? "" : String.valueOf(rendered);
         }
         catch (Exception e) {
-            throw new RuntimeException(e);
+            if (e instanceof RuntimeException) {
+                throw e;
+            } else {
+                throw new RuntimeException(e);
+            }
         }
     }
 

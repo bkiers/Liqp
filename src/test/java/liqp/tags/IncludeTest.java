@@ -134,7 +134,7 @@ public class IncludeTest {
     @Test
     public void renderTestWithIncludeSubdirectorySpecifiedInLiquidFlavorWithStrictVariablesException() throws Exception {
 
-        thrown.expectCause(new NestedCauseMatcher<>(isA(VariableNotExistException.class)));
+        thrown.expectCause(isA(VariableNotExistException.class));
 
         File index = new File("src/test/jekyll/index_with_variables.html");
         Template template = Template.parse(

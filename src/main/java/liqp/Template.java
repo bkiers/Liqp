@@ -154,7 +154,7 @@ public class Template {
         lexer.addErrorListener(new BaseErrorListener(){
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                throw new LiquidException(String.format("lexer error on line %s, index %s", line, charPositionInLine), line, charPositionInLine);
+                throw new LiquidException(String.format("lexer error \"%s\" on line %s, index %s", msg, line, charPositionInLine), line, charPositionInLine, e);
             }
         });
 
@@ -166,7 +166,7 @@ public class Template {
         parser.addErrorListener(new BaseErrorListener(){
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                throw new LiquidException(String.format("parser error on line %s, index %s", line, charPositionInLine), line, charPositionInLine);
+                throw new LiquidException(String.format("parser error \"%s\" on line %s, index %s", msg, line, charPositionInLine), line, charPositionInLine, e);
             }
         });
 
@@ -403,7 +403,11 @@ public class Template {
             return rendered == null ? "" : String.valueOf(rendered);
         }
         catch (Exception e) {
-            throw new RuntimeException(e);
+            if (e instanceof RuntimeException) {
+                throw e;
+            } else {
+                throw new RuntimeException(e);
+            }
         }
     }
 

@@ -118,18 +118,6 @@ public abstract class LValue {
         if (value instanceof List) {
             return ((List) value).toArray();
         }
-
-        if (value instanceof Map) {
-
-            List<Object[]> keyValuePairs = new ArrayList<>();
-
-            for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) value).entrySet()) {
-                keyValuePairs.add(new Object[]{ entry.getKey(), entry.getValue()});
-            }
-
-            return keyValuePairs.toArray();
-        }
-
         return new Object[]{value};
     }
 

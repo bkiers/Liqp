@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class ForTest {
@@ -718,5 +719,20 @@ public class ForTest {
         String rendered = Template.parse(template).render(hash);
 
         Assert.assertThat(rendered, is(expected));
+    }
+
+
+    @Test
+    public void shouldProperlyUseMapAfterFirstOnArrayOfMaps() {
+        // given
+        String hash = "{ \"x\": [{\"rating\": 4.5 }, {\"rating\": 7.2 }] }";
+
+        String template = "{{ x | first | map: 'rating' }}";
+
+        // when
+        String rendered = Template.parse(template).render(hash);
+
+        // then
+        assertEquals("4.5", rendered);
     }
 }

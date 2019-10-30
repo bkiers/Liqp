@@ -240,7 +240,7 @@ public class IncludeTest {
         RenderSettings renderSettings = new RenderSettings.Builder().withShowExceptionsFromInclude(true).build();
         Template template = Template.parse(index, parseSettings).withRenderSettings(renderSettings);
 
-        Filter.registerFilter(new Filter("normalize_whitespace") {
+        Filter.registerFilter(new Filter("unknown_and_for_sure_enexist_filter") {
         });
 
         // when
@@ -255,7 +255,7 @@ public class IncludeTest {
         private Matcher<? extends Throwable> causeMatcher;
 
         public NestedCauseMatcher(Matcher<T> causeMatcher) {
-            
+
             super(causeMatcher);
             this.causeMatcher = causeMatcher;
         }

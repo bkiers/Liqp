@@ -98,7 +98,7 @@ public class Template {
      */
     private Template(String input, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings,
         RenderSettings renderSettings) {
-        
+
         this(input, tags, filters, parseSettings);
         this.renderSettings = renderSettings;
     }
@@ -142,7 +142,7 @@ public class Template {
      */
     private Template(File file, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings,
         RenderSettings renderSettings) throws IOException {
-        
+
         this(file, tags, filters, parseSettings);
         this.renderSettings = renderSettings;
     }
@@ -199,7 +199,7 @@ public class Template {
      * @return a new Template instance from a given input string.
      */
     public static Template parse(String input) {
-        return new Template(input, Tag.getTags(), Filter.getFilters(), new ParseSettings.Builder().build());
+        return new Template(input, Tag.getTags(), Filter.getFilters(ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
     }
 
     /**
@@ -211,19 +211,19 @@ public class Template {
      * @return a new Template instance from a given input file.
      */
     public static Template parse(File file) throws IOException {
-        return new Template(file, Tag.getTags(), Filter.getFilters(), new ParseSettings.Builder().build());
+        return new Template(file, Tag.getTags(), Filter.getFilters(ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
     }
 
     public static Template parse(File file, ParseSettings settings) throws IOException {
-        return new Template(file, Tag.getTags(), Filter.getFilters(), settings);
+        return new Template(file, Tag.getTags(), Filter.getFilters(settings.flavor), settings);
     }
 
     public static Template parse(String input, ParseSettings settings) {
-        return new Template(input, Tag.getTags(), Filter.getFilters(), settings);
+        return new Template(input, Tag.getTags(), Filter.getFilters(settings.flavor), settings);
     }
 
     public static Template parse(File file, ParseSettings parseSettings, RenderSettings renderSettings) throws IOException {
-        return new Template(file, Tag.getTags(), Filter.getFilters(), parseSettings, renderSettings);
+        return new Template(file, Tag.getTags(), Filter.getFilters(parseSettings.flavor), parseSettings, renderSettings);
     }
 
     @Deprecated // Use `parse(file, settings)` instead

@@ -1,5 +1,9 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+import liqp.parser.Inspectable;
+import liqp.parser.LiquidSupport;
+
 import java.util.*;
 import java.util.Map;
 
@@ -12,7 +16,7 @@ public class Sort extends Filter {
      * which to sort an array of hashes or drops
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         if (value == null) {
             return "";
@@ -25,7 +29,7 @@ public class Sort extends Filter {
         Object[] array = super.asArray(value);
         String property = params.length == 0 ? null : super.asString(params[0]);
 
-        List<Comparable> list = asComparableList(array, property);
+        List<Comparable> list = asComparableList(context, array, property);
 
         Collections.sort(list);
 
@@ -34,12 +38,16 @@ public class Sort extends Filter {
                 list.toArray(new SortableMap[list.size()]);
     }
 
-    private List<Comparable> asComparableList(Object[] array, String property) {
+    private List<Comparable> asComparableList(TemplateContext context, Object[] array, String property) {
 
         List<Comparable> list = new ArrayList<Comparable>();
 
         for (Object obj : array) {
 
+            if (property != null && obj instanceof Inspectable) {
+                LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) obj);
+                obj = evaluated.toLiquid();
+            }
             if(obj instanceof java.util.Map && property != null) {
                 list.add(new SortableMap((java.util.Map<String, Comparable>)obj, property));
             }

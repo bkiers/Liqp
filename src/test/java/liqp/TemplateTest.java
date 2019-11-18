@@ -1,5 +1,6 @@
 package liqp;
 
+import liqp.parser.Inspectable;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -13,7 +14,7 @@ import static org.junit.Assert.assertThat;
 
 public class TemplateTest {
 
-    static class Foo {
+    static class Foo implements Inspectable {
 
         public String a = "A";
         private String b = "B";

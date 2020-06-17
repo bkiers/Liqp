@@ -393,13 +393,11 @@ public class Template {
                 variables.put(Include.INCLUDES_DIRECTORY_KEY, ((File) includeDirectory).getAbsolutePath());
             }
         }
-        ObjectNode value = parseSettings.mapper.convertValue(variables, ObjectNode.class);
-        Map map = parseSettings.mapper.convertValue(value, Map.class);
 
         final NodeVisitor visitor = new NodeVisitor(this.tags, this.filters, this.parseSettings);
         try {
             LNode node = visitor.visit(root);
-            Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings, map));
+            Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings, variables));
             return rendered == null ? "" : String.valueOf(rendered);
         }
         catch (Exception e) {

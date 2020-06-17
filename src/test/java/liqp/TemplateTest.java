@@ -1,5 +1,7 @@
 package liqp;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -89,7 +91,8 @@ public class TemplateTest {
     @Test
     public void renderMapWithPojosExistedNotRender() {
         Map<String, Object> data = new HashMap<String, Object>();
-        data.put("foo", new Foo());
+        //data.put("foo", new Foo());
+        data.put("foo", Helper.transformMap(new Foo()));
         data.put("bar", "zoo");
         data.put("bear", true);
 

@@ -501,7 +501,14 @@ public class Template {
         if (key == null) {
             throw new RuntimeException("key cannot be null");
         }
-
-        map.put(key, convertValueToMap ? parseSettings.mapper.convertValue(value, Map.class) : value);
+        if (convertValueToMap && value != null) {
+            if ((value.getClass().isArray() || value instanceof List) && (!(value instanceof Map))) {
+                map.put(key, parseSettings.mapper.convertValue(value, List.class));
+            } else {
+                map.put(key, parseSettings.mapper.convertValue(value, Map.class));
+            }
+        } else {
+            map.put(key, value);
+        }
     }
 }

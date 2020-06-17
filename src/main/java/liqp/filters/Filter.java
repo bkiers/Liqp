@@ -81,6 +81,8 @@ public abstract class Filter extends LValue {
 
         Filter filter = new Normalize_Whitespace();
         JEKYLL_FILTERS.put(filter.name, filter);
+
+        registerFilter(new Where());
     }
 
     static {

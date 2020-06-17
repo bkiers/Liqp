@@ -1,5 +1,6 @@
 package liqp.tags;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import liqp.LValue;
@@ -69,7 +70,11 @@ class For extends Tag {
         int offset = attributes.get(OFFSET);
         int limit = attributes.get(LIMIT);
 
-        Object[] array = super.asArray(tokens[2].render(context));
+        Object data = tokens[2].render(context);
+        if (data instanceof Map) {
+            data = mapAsArray((Map) data);
+        }
+        Object[] array = super.asArray(data);
 
         LNode block = tokens[3];
         LNode blockIfEmptyOrNull = tokens[4];

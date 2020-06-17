@@ -42,7 +42,12 @@ public class LookupNode implements LNode {
         }
 
         if(value == null && context.renderSettings.strictVariables) {
-            throw new VariableNotExistException(getVariableName());
+            RuntimeException e = new VariableNotExistException(getVariableName());
+            context.addError(e);
+
+            if (context.renderSettings.raiseExceptionsInStrictMode) {
+                throw e;
+            }
         }
 
         return value;

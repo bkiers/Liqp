@@ -39,22 +39,30 @@ public class RenderSettings {
 
     public final boolean strictVariables;
     public final boolean showExceptionsFromInclude;
+    public final boolean raiseExceptionsInStrictMode;
     public final EvaluateMode evaluateMode;
 
     public static class Builder {
 
         boolean strictVariables;
         boolean showExceptionsFromInclude;
+        boolean raiseExceptionsInStrictMode;
         EvaluateMode evaluateMode;
 
         public Builder() {
             this.strictVariables = false;
+            this.raiseExceptionsInStrictMode = true;
             this.evaluateMode = EvaluateMode.LAZY;
         }
 
         public Builder withStrictVariables(boolean strictVariables) {
             this.strictVariables = strictVariables;
             this.showExceptionsFromInclude = false;
+            return this;
+        }
+
+        public Builder withRaiseExceptionsInStrictMode(boolean raiseExceptionsInStrictMode) {
+            this.raiseExceptionsInStrictMode = raiseExceptionsInStrictMode;
             return this;
         }
 
@@ -69,13 +77,14 @@ public class RenderSettings {
         }
 
         public RenderSettings build() {
-            return new RenderSettings(this.strictVariables, this.showExceptionsFromInclude, this.evaluateMode);
+            return new RenderSettings(this.strictVariables, this.showExceptionsFromInclude, this.raiseExceptionsInStrictMode, this.evaluateMode);
         }
     }
 
-    private RenderSettings(boolean strictVariables, boolean showExceptionsFromInclude, EvaluateMode evaluateMode) {
+    private RenderSettings(boolean strictVariables, boolean showExceptionsFromInclude, boolean raiseExceptionsInStrictMode, EvaluateMode evaluateMode) {
         this.strictVariables = strictVariables;
         this.showExceptionsFromInclude = showExceptionsFromInclude;
+        this.raiseExceptionsInStrictMode = raiseExceptionsInStrictMode;
         this.evaluateMode = evaluateMode;
     }
 }

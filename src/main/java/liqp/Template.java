@@ -56,6 +56,8 @@ public class Template {
 
     private final ParseSettings parseSettings;
 
+    private TemplateContext templateContext = null;
+
     /**
      * Creates a new Template instance from a given input.
      *  @param input
@@ -288,6 +290,10 @@ public class Template {
         return this;
     }
 
+    public List<RuntimeException> errors() {
+        return this.templateContext == null ? new ArrayList<RuntimeException>() : this.templateContext.errors();
+    }
+
     /**
      * Renders the template.
      *
@@ -428,7 +434,8 @@ public class Template {
         final NodeVisitor visitor = new NodeVisitor(this.tags, this.filters, this.parseSettings);
         try {
             LNode node = visitor.visit(root);
-            Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings, variables));
+            this.templateContext = new TemplateContext(protectionSettings, renderSettings, parseSettings, variables);
+            Object rendered = node.render(this.templateContext);
             return rendered == null ? "" : String.valueOf(rendered);
         }
         catch (Exception e) {

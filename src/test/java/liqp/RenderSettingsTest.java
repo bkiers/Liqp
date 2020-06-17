@@ -93,4 +93,24 @@ public class RenderSettingsTest {
             assertThat(e.getVariableName(), is("checkThis"));
         }
     }
+
+    @Test
+    public void raiseExceptionsInStrictModeFalseTest() {
+        RenderSettings renderSettings = new RenderSettings.Builder()
+                .withStrictVariables(true)
+                .withRaiseExceptionsInStrictMode(false)
+                .build();
+
+        Template template = Template.parse("{{a}}{{b}}{{c}}").withRenderSettings(renderSettings);
+
+        assertThat(template.errors().size(), is(0));
+
+        String rendered = template.render("b", "FOO");
+
+        // There should be 2 exceptions recorded for non-existing variables `a` and `c`
+        assertThat(template.errors().size(), is(2));
+
+        // Rendering should not terminate
+        assertThat(rendered, is("FOO"));
+    }
 }

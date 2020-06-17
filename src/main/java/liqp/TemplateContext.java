@@ -2,7 +2,9 @@ package liqp;
 
 import liqp.parser.Flavor;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TemplateContext {
@@ -12,6 +14,7 @@ public class TemplateContext {
     public final RenderSettings renderSettings;
     public final ParseSettings parseSettings;
     private Map<String, Object> variables;
+    private List<RuntimeException> errors;
 
     public TemplateContext() {
         this(new ProtectionSettings.Builder().build(),
@@ -32,11 +35,20 @@ public class TemplateContext {
         this.renderSettings = renderSettings;
         this.parseSettings = parseSettings;
         this.variables = new LinkedHashMap<>(variables);
+        this.errors = new ArrayList<>();
     }
 
     public TemplateContext(TemplateContext parent) {
         this(parent.protectionSettings, parent.renderSettings, parent.parseSettings, new LinkedHashMap<String, Object>());
         this.parent = parent;
+    }
+
+    public void addError(RuntimeException exception) {
+        this.errors.add(exception);
+    }
+
+    public List<RuntimeException> errors() {
+        return new ArrayList<>(this.errors);
     }
 
     public void incrementIterations() {

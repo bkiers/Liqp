@@ -2,6 +2,7 @@ package liqp.filters;
 
 import java.util.HashMap;
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -55,6 +56,7 @@ public class MapTest {
                         new HashMap<String, Integer>(){{ put("a", 3); }},
                         new HashMap<String, Integer>(){{ put("a", 4); }},
                 },
+                new TemplateContext(),
                 "a"
         );
 

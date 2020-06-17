@@ -6,6 +6,7 @@ import liqp.exceptions.LiquidException;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
 import liqp.parser.Flavor;
+import liqp.parser.LiquidSupport;
 import liqp.parser.v4.NodeVisitor;
 import liqp.tags.Include;
 import liqp.tags.Tag;
@@ -385,7 +386,7 @@ public class Template {
      *
      * @return a string denoting the rendered template.
      */
-    public String renderUnguarded(final Map<String, Object> variables) {
+    public String renderUnguarded(Map<String, Object> variables) {
 
         if (variables.containsKey(Include.INCLUDES_DIRECTORY_KEY)) {
             Object includeDirectory = variables.get(Include.INCLUDES_DIRECTORY_KEY);
@@ -393,13 +394,12 @@ public class Template {
                 variables.put(Include.INCLUDES_DIRECTORY_KEY, ((File) includeDirectory).getAbsolutePath());
             }
         }
-        ObjectNode value = parseSettings.mapper.convertValue(variables, ObjectNode.class);
-        Map map = parseSettings.mapper.convertValue(value, Map.class);
+        variables = renderSettings.evaluate(parseSettings.mapper, variables);
 
         final NodeVisitor visitor = new NodeVisitor(this.tags, this.filters, this.parseSettings);
         try {
             LNode node = visitor.visit(root);
-            Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings, map));
+            Object rendered = node.render(new TemplateContext(protectionSettings, renderSettings, parseSettings, variables));
             return rendered == null ? "" : String.valueOf(rendered);
         }
         catch (Exception e) {

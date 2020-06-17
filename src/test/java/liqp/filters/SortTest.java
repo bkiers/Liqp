@@ -1,15 +1,21 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
+import liqp.parser.Inspectable;
+import liqp.parser.LiquidSupport;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class SortTest {
+
+    static final TemplateContext context = new TemplateContext();
 
     @Test
     public void applyTest() throws RecognitionException {
@@ -48,7 +54,7 @@ public class SortTest {
 
         Filter filter = Filter.getFilter("sort");
 
-        assertThat(filter.apply(new Integer[]{4,3,2,1}), is((Object)new Integer[]{1,2,3,4}));
+        assertThat(filter.apply(new Integer[]{4,3,2,1}, context), is((Object)new Integer[]{1,2,3,4}));
 
         java.util.Map[] unsorted = new java.util.Map[]{
                 new HashMap<String, Integer>(){{ put("a", 4); }},
@@ -57,13 +63,88 @@ public class SortTest {
                 new HashMap<String, Integer>(){{ put("a", 1); }}
         };
 
-        java.util.Map[] sorted = (Sort.SortableMap[])filter.apply(unsorted, "a");
+        java.util.Map[] sorted = (Sort.SortableMap[])filter.apply(unsorted, context, "a");
 
         java.util.Map[] expected = new java.util.Map[]{
                 new HashMap<String, Integer>(){{ put("a", 1); }},
                 new HashMap<String, Integer>(){{ put("a", 2); }},
                 new HashMap<String, Integer>(){{ put("a", 3); }},
                 new HashMap<String, Integer>(){{ put("a", 4); }}
+        };
+
+        assertThat(sorted, is(expected));
+    }
+
+    public static class Pojo implements Inspectable {
+        public Pojo(int a) {
+            this.a = a;
+        }
+
+        private int a;
+
+        public int getA() {
+            return a;
+        }
+
+        public void setA(int a) {
+            this.a = a;
+        }
+    }
+
+    @Test
+    public void testInspectable() {
+        Filter filter = Filter.getFilter("sort");
+
+        Inspectable[] unsortedIns = new Inspectable[]{
+                new Pojo(4), new Pojo(3), new Pojo(2), new Pojo(1)
+        };
+
+        java.util.Map[] sorted = (Sort.SortableMap[]) filter.apply(unsortedIns, context, "a");
+        java.util.Map[] expected = new java.util.Map[]{
+                new HashMap<String, Integer>() {{ put("a", 1); }},
+                new HashMap<String, Integer>() {{ put("a", 2); }},
+                new HashMap<String, Integer>() {{ put("a", 3); }},
+                new HashMap<String, Integer>() {{ put("a", 4); }}
+        };
+
+        assertThat(sorted, is(expected));
+    }
+
+    public static class PojoWithSupport implements LiquidSupport {
+        public PojoWithSupport(int a) {
+            this.map = new HashMap<>();
+            this.map.put("a", a);
+        }
+        private java.util.Map<String, Object> map;
+
+        @Override
+        public Map<String, Object> toLiquid() {
+            return map;
+        }
+    }
+
+    @Test
+    public void testLiquidSupport() {
+        Filter filter = Filter.getFilter("sort");
+
+        Inspectable[] unsortedIns = new Inspectable[]{
+                new PojoWithSupport(4), new PojoWithSupport(3), new PojoWithSupport(2), new PojoWithSupport(1)
+        };
+
+        java.util.Map[] sorted = (Sort.SortableMap[]) filter.apply(unsortedIns, context, "a");
+        java.util.Map[] expected = new java.util.Map[]{
+                new HashMap<String, Integer>() {{
+                    put("a", 1);
+                }},
+                new HashMap<String, Integer>() {{
+                    put("a", 2);
+                }},
+                new HashMap<String, Integer>() {{
+                    put("a", 3);
+                }},
+                new HashMap<String, Integer>() {{
+                    put("a", 4);
+                }}
         };
 
         assertThat(sorted, is(expected));

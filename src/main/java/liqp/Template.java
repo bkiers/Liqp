@@ -18,6 +18,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,6 +75,26 @@ public class Template {
         this.templateSize = stream.size();
         LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
         try {
+            root = parse(lexer);
+        }
+        catch (LiquidException e) {
+            throw e;
+        }
+        catch (Exception e) {
+            throw new RuntimeException("could not parse input: " + input, e);
+        }
+    }
+
+    private Template(InputStream input, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings) {
+
+        this.tags = tags;
+        this.filters = filters;
+        this.parseSettings = parseSettings;
+
+        try {
+            CharStream stream = CharStreams.fromStream(input);
+            this.templateSize = stream.size();
+            LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
             root = parse(lexer);
         }
         catch (LiquidException e) {
@@ -225,6 +246,14 @@ public class Template {
 
     public static Template parse(File file, ParseSettings parseSettings, RenderSettings renderSettings) throws IOException {
         return new Template(file, Tag.getTags(), Filter.getFilters(parseSettings.flavor), parseSettings, renderSettings);
+    }
+
+    public static Template parse(InputStream input) {
+        return new Template(input, Tag.getTags(), Filter.getFilters(ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
+    }
+
+    public static Template parse(InputStream input, ParseSettings settings) {
+        return new Template(input, Tag.getTags(), Filter.getFilters(settings.flavor), settings);
     }
 
     @Deprecated // Use `parse(file, settings)` instead

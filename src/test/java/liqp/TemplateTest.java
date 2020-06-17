@@ -2,14 +2,15 @@ package liqp;
 
 import liqp.parser.Inspectable;
 import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class TemplateTest {
@@ -99,4 +100,10 @@ public class TemplateTest {
         assertThat(fooA, is("Azootrue"));
     }
 
+    @Test
+    public void parseWithInputStream() throws Exception {
+        InputStream inputStream = new FileInputStream(new File("./snippets/header.html"));
+        Template template = Template.parse(inputStream);
+        assertThat(template.render(), is("HEADER\n"));
+    }
 }

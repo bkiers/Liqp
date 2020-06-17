@@ -1,6 +1,7 @@
 package liqp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import liqp.parser.Flavor;
 
 public class ParseSettings {
@@ -21,6 +22,7 @@ public class ParseSettings {
             this.flavor = Flavor.LIQUID;
             this.stripSpacesAroundTags = false;
             this.mapper = new ObjectMapper();
+            mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         }
 
         public Builder withFlavor(Flavor flavor) {

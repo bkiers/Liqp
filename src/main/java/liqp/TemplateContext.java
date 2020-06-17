@@ -31,7 +31,7 @@ public class TemplateContext {
         this.protectionSettings = protectionSettings;
         this.renderSettings = renderSettings;
         this.parseSettings = parseSettings;
-        this.variables = new LinkedHashMap<String, Object>(variables);
+        this.variables = new LinkedHashMap<>(variables);
     }
 
     public TemplateContext(TemplateContext parent) {

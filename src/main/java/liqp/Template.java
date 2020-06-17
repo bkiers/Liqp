@@ -98,7 +98,6 @@ public class Template {
      */
     private Template(String input, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings,
         RenderSettings renderSettings) {
-        
         this(input, tags, filters, parseSettings);
         this.renderSettings = renderSettings;
     }
@@ -142,7 +141,6 @@ public class Template {
      */
     private Template(File file, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings,
         RenderSettings renderSettings) throws IOException {
-        
         this(file, tags, filters, parseSettings);
         this.renderSettings = renderSettings;
     }
@@ -501,7 +499,14 @@ public class Template {
         if (key == null) {
             throw new RuntimeException("key cannot be null");
         }
-
-        map.put(key, convertValueToMap ? parseSettings.mapper.convertValue(value, Map.class) : value);
+        if (convertValueToMap && value != null) {
+            if ((value.getClass().isArray() || value instanceof List) && (!(value instanceof Map))) {
+                map.put(key, parseSettings.mapper.convertValue(value, List.class));
+            } else {
+                map.put(key, parseSettings.mapper.convertValue(value, Map.class));
+            }
+        } else {
+            map.put(key, value);
+        }
     }
 }

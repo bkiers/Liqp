@@ -72,6 +72,7 @@ public abstract class Filter extends LValue {
         registerFilter(new Upcase());
         registerFilter(new Url_Decode());
         registerFilter(new Url_Encode());
+        registerFilter(new Where());
     }
 
     static {

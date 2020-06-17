@@ -98,6 +98,7 @@ public abstract class LValue {
      * it is casted to a `Object[]`, if it's a `java.util.List`, it is
      * converted to an array and in all other cases, `value` is simply
      * returned as an `Object[]` with a single value in it.
+     * This function treat `Map` as single element.
      *
      * @param value
      *         the value to convert/cast to an array.
@@ -319,6 +320,7 @@ public abstract class LValue {
     }
 
     public Map<String, Object> asMap(Object value) {
+
         return (Map<String, Object>)value;
     }
 }

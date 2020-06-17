@@ -2,10 +2,13 @@ package liqp.filters;
 
 import liqp.LValue;
 import liqp.TemplateContext;
+import liqp.parser.Flavor;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static liqp.ParseSettings.DEFAULT_FLAVOR;
 
 /**
  * Output markup takes filters. Filters are simple methods. The first
@@ -19,9 +22,12 @@ import java.util.Map;
 public abstract class Filter extends LValue {
 
     /**
-     * A map holding all filters.
+     * A map holding all common filters.
      */
-    private static final Map<String, Filter> FILTERS = new HashMap<String, Filter>();
+    private static final Map<String, Filter> COMMON_FILTERS = new HashMap<>();
+
+    private static final Map<String, Filter> JEKYLL_FILTERS = new HashMap<>();
+
 
     private static void addDefaultFilters() {
         registerFilter(new Abs());
@@ -72,6 +78,10 @@ public abstract class Filter extends LValue {
         registerFilter(new Upcase());
         registerFilter(new Url_Decode());
         registerFilter(new Url_Encode());
+
+        Filter filter = new Normalize_Whitespace();
+        JEKYLL_FILTERS.put(filter.name, filter);
+
         registerFilter(new Where());
     }
 
@@ -193,7 +203,7 @@ public abstract class Filter extends LValue {
      */
     public static Filter getFilter(String name) {
 
-        Filter filter = FILTERS.get(name);
+        Filter filter = COMMON_FILTERS.get(name);
 
         if (filter == null) {
             throw new RuntimeException("unknown filter: " + name);
@@ -208,7 +218,15 @@ public abstract class Filter extends LValue {
      * @return all default filters.
      */
     public static Map<String, Filter> getFilters() {
-        return new HashMap<String, Filter>(FILTERS);
+        return getFilters(DEFAULT_FLAVOR);
+    }
+
+    public static Map<String, Filter> getFilters(Flavor flavor) {
+        HashMap<String, Filter> filers = new HashMap<>(COMMON_FILTERS);
+        if (Flavor.JEKYLL == flavor) {
+            filers.putAll(JEKYLL_FILTERS);
+        }
+        return filers;
     }
 
     /**
@@ -218,12 +236,13 @@ public abstract class Filter extends LValue {
      *         the filter to be registered.
      */
     public static void registerFilter(Filter filter) {
-        FILTERS.put(filter.name, filter);
+        COMMON_FILTERS.put(filter.name, filter);
     }
 
     // for testing purpose
     private static void resetFilters() {
-        FILTERS.clear();
+        COMMON_FILTERS.clear();
+        JEKYLL_FILTERS.clear();
         addDefaultFilters();
     }
 }

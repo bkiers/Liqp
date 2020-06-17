@@ -6,6 +6,8 @@ import liqp.parser.Flavor;
 
 public class ParseSettings {
 
+    public final static Flavor DEFAULT_FLAVOR = Flavor.LIQUID;
+
     public final Flavor flavor;
     public final boolean stripSpacesAroundTags;
     public final boolean stripSingleLine;
@@ -19,7 +21,7 @@ public class ParseSettings {
         ObjectMapper mapper;
 
         public Builder() {
-            this.flavor = Flavor.LIQUID;
+            this.flavor = DEFAULT_FLAVOR;
             this.stripSpacesAroundTags = false;
             this.mapper = new ObjectMapper();
             mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);

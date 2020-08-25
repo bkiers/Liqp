@@ -25,6 +25,8 @@ public class DateTest {
         final int seconds = 946702800;
         final java.util.Date date = new java.util.Date(seconds * 1000L);
 
+        // Change the test case according to
+        // https://ruby-doc.org/stdlib-2.7.1/libdoc/time/rdoc/Time.html#method-c-parse
         String[][] tests = {
                 {"{{" + seconds + " | date: 'mu'}}", "mu"},
                 {"{{" + seconds + " | date: '%'}}", "%"},
@@ -33,26 +35,31 @@ public class DateTest {
                 {"{{" + seconds + " | date: '%A'}}", simpleDateFormat("EEEE").format(date)},
                 {"{{" + seconds + " | date: '%b'}}", simpleDateFormat("MMM").format(date)},
                 {"{{" + seconds + " | date: '%B'}}", simpleDateFormat("MMMM").format(date)},
-                {"{{" + seconds + " | date: '%c'}}", simpleDateFormat("EEE MMM dd HH:mm:ss yyyy").format(date)},
+                {"{{" + seconds + " | date: '%c'}}", simpleDateFormat("EEE MMM  d HH:mm:ss yyyy").format(date)},
                 {"{{" + seconds + " | date: '%d'}}", simpleDateFormat("dd").format(date)},
-                {"{{" + seconds + " | date: '%e'}}", simpleDateFormat("d").format(date)},
+                {"{{" + seconds + " | date: '%e'}}", simpleDateFormat(" d").format(date)},
                 {"{{" + seconds + " | date: '%H'}}", simpleDateFormat("HH").format(date)},
                 {"{{" + seconds + " | date: '%I'}}", simpleDateFormat("hh").format(date)},
                 {"{{" + seconds + " | date: '%j'}}", simpleDateFormat("DDD").format(date)},
                 {"{{" + seconds + " | date: '%k'}}", simpleDateFormat("H").format(date)},
-                {"{{" + seconds + " | date: '%l'}}", simpleDateFormat("h").format(date)},
+                {"{{" + seconds + " | date: '%l'}}", simpleDateFormat(" h").format(date)},
                 {"{{" + seconds + " | date: '%m'}}", simpleDateFormat("MM").format(date)},
                 {"{{" + seconds + " | date: '%M'}}", simpleDateFormat("mm").format(date)},
                 {"{{" + seconds + " | date: '%p'}}", simpleDateFormat("a").format(date)},
                 {"{{" + seconds + " | date: '%S'}}", simpleDateFormat("ss").format(date)},
-                {"{{" + seconds + " | date: '%U'}}", simpleDateFormat("ww").format(date)},
-                {"{{" + seconds + " | date: '%W'}}", simpleDateFormat("ww").format(date)},
-                {"{{" + seconds + " | date: '%w'}}", simpleDateFormat("F").format(date)},
+                // `%U` Week number of the current year, starting with the first Sunday as the first day of the first week (00..53)
+                // `%W` Week number of the current year, starting with the first Monday as the first day of the first week (00..53)
+                {"{{" + seconds + " | date: '%U'}}", "00"},
+                {"{{" + seconds + " | date: '%W'}}", "00"},
+                {"{{" + (seconds+3600*24) + " | date: '%U'}}", "01"},
+                {"{{" + (seconds+3600*24) + " | date: '%W'}}", "00"},
+                {"{{" + seconds + " | date: '%w'}}", "6" /* `%w` Day of the week (Sunday is 0, 0..6)*/},
                 {"{{" + seconds + " | date: '%x'}}", simpleDateFormat("MM/dd/yy").format(date)},
                 {"{{" + seconds + " | date: '%X'}}", simpleDateFormat("HH:mm:ss").format(date)},
                 {"{{" + seconds + " | date: 'x=%y'}}", "x=" + simpleDateFormat("yy").format(date)},
                 {"{{" + seconds + " | date: '%Y'}}", simpleDateFormat("yyyy").format(date)},
-                {"{{" + seconds + " | date: '%Z'}}", simpleDateFormat("z").format(date)}
+                {"{{" + seconds + " | date: '%z'}}", simpleDateFormat("Z").format(date)},
+                {"{{" + seconds + " | date: '%Y-%m-%dT%H:%M:%S.%L%z' }}", simpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ").format(date)}
         };
 
         for (String[] test : tests) {

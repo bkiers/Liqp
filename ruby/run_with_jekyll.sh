@@ -6,5 +6,6 @@ fi
 
 docker run -it --rm --name jekyll \
     --volume=$PWD:/srv/jekyll \
+    -p 1234:1234 \
      ruby_with_jekyll \
      $1

@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class RenderSettings {
 
+    public static final RenderSettings EXCEPTIONS_FROM_INCLUDE = new RenderSettings.Builder().withShowExceptionsFromInclude(true).build();
 
     public enum EvaluateMode {
         LAZY,

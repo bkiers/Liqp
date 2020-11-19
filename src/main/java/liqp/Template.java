@@ -19,6 +19,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -252,6 +253,10 @@ public class Template {
         return new Template(file, Tag.getTags(), Filter.getFilters(parseSettings.flavor), parseSettings, renderSettings);
     }
 
+    public static Template parse(String  template, ParseSettings parseSettings, RenderSettings renderSettings) throws IOException {
+        return new Template(template, Tag.getTags(), Filter.getFilters(parseSettings.flavor), parseSettings, renderSettings);
+    }
+
     public static Template parse(InputStream input) {
         return new Template(input, Tag.getTags(), Filter.getFilters(ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
     }
@@ -444,11 +449,16 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String renderUnguarded(Map<String, Object> variables) {
+        return renderUnguarded(variables, null);
+    }
 
+    private String renderUnguarded(Map<String, Object> variables, TemplateContext parent) {
         if (variables.containsKey(Include.INCLUDES_DIRECTORY_KEY)) {
             Object includeDirectory = variables.get(Include.INCLUDES_DIRECTORY_KEY);
             if (includeDirectory instanceof File) {
                 variables.put(Include.INCLUDES_DIRECTORY_KEY, ((File) includeDirectory).getAbsolutePath());
+            } else if (includeDirectory instanceof Path) {
+                variables.put(Include.INCLUDES_DIRECTORY_KEY, ((Path) includeDirectory).toAbsolutePath().toString());
             }
         }
         variables = renderSettings.evaluate(parseSettings.mapper, variables);
@@ -456,7 +466,11 @@ public class Template {
         final NodeVisitor visitor = new NodeVisitor(this.tags, this.filters, this.parseSettings);
         try {
             LNode node = visitor.visit(root);
-            this.templateContext = new TemplateContext(protectionSettings, renderSettings, parseSettings, variables);
+            if (parent == null) {
+                this.templateContext = new TemplateContext(protectionSettings, renderSettings, parseSettings, variables);
+            } else {
+                this.templateContext = new TemplateContext(parent);
+            }
             if (this.contextHolder != null) {
                 contextHolder.setContext(templateContext);
             }
@@ -470,6 +484,15 @@ public class Template {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    /**
+     * Renders the template using parent context
+     * @param parent
+     * @return
+     */
+    public String renderUnguarded(TemplateContext parent) {
+        return renderUnguarded(new HashMap<String, Object>(), parent);
     }
 
     // Use toStringTree()

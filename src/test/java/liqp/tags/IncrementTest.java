@@ -29,7 +29,8 @@ public class IncrementTest {
                 {"{% increment var %}{% increment var %}{{ var }}{% increment var %}", "0122"},
                 {"{% increment var %}{% assign var=5 %}{% increment var %}{{ var }}{% increment var %}", "0152"},
                 {"{% increment var %}{{ var }}{% assign var=5 %}{% increment var %}{{ var }}{% increment var %}", "01152"},
-                {"{% increment var %}{% assign exp='var' %}{{ [exp] }}", "01"}
+                {"{% increment var %}{% assign exp='var' %}{{ [exp] }}", "01"},
+                {"{% increment var %}{% assign a = var | plus: 5 %}{{ a }}", "06"}
         };
 
         for (String[] test : tests) {

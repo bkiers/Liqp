@@ -98,7 +98,8 @@ if isJekyll
   def site_configuration(overrides = {})
     full_overrides = build_configs(overrides, build_configs(
         "destination" => dest_dir,
-        "incremental" => false
+        "incremental" => false,
+        "disable_disk_cache" => true
     ))
     Jekyll::Configuration.from(full_overrides.merge(
         "source" => source_dir

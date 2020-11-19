@@ -18,9 +18,13 @@ RUN apk update && apk add --no-cache \
   libc6-compat
 
 RUN gem install jekyll
+RUN gem install ruby-debug-ide
 
 RUN mkdir -p /srv/jekyll
 WORKDIR /srv/jekyll
 VOLUME  /srv/jekyll
 
+EXPOSE 1234
+
+# ENTRYPOINT ["sh"]
 ENTRYPOINT ["ruby"]

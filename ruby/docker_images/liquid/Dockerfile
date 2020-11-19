@@ -18,6 +18,7 @@ RUN apk update && apk add --no-cache \
   libc6-compat
 
 RUN gem install liquid
+RUN gem install ruby-debug-ide
 
 RUN mkdir -p /srv/liquid
 WORKDIR /srv/liquid

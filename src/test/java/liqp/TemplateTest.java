@@ -1,7 +1,11 @@
 package liqp;
 
 import liqp.parser.Inspectable;
+import liqp.temprunner.InTmpFolder;
+import liqp.temprunner.IncludeContext;
+import liqp.temprunner.TmpFolderRule;
 import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
@@ -14,6 +18,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class TemplateTest {
+
+    @Rule
+    public TmpFolderRule tmpFolderRule = new TmpFolderRule();
 
     static class Foo implements Inspectable {
 
@@ -101,9 +108,13 @@ public class TemplateTest {
     }
 
     @Test
+    @InTmpFolder
     public void parseWithInputStream() throws Exception {
-        InputStream inputStream = new FileInputStream(new File("./snippets/header.html"));
+        IncludeContext context = tmpFolderRule.getContext();
+        File header = context.writeFile("snippets/header.html", "HEADER");
+
+        InputStream inputStream = new FileInputStream(header);
         Template template = Template.parse(inputStream);
-        assertThat(template.render(), is("HEADER\n"));
+        assertThat(template.render(), is("HEADER"));
     }
 }

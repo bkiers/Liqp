@@ -38,7 +38,7 @@ public class Include extends Tag {
                 context.put(includeResource, value);
             }
 
-            return template.render(context.getVariables());
+            return template.render(context.getAllVariables());
 
         } catch(Exception e) {
             if (context.renderSettings.showExceptionsFromInclude) {

@@ -55,7 +55,12 @@ class For extends Tag {
 
         nestedContext.put(FORLOOP, new HashMap<String, Object>());
 
-        Object rendered = array ? renderArray(id, nestedContext, nodes) : renderRange(id, nestedContext, nodes);
+        Object rendered;
+        if (array) {
+            rendered = renderArray(id, nestedContext, nodes);
+        } else {
+            rendered = renderRange(id, nestedContext, nodes);
+        }
 
         return rendered;
     }

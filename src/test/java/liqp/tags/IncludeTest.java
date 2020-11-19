@@ -16,6 +16,10 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -248,6 +252,52 @@ public class IncludeTest {
 
         // them
         assertTrue(result.contains("THE_ERROR"));
+    }
+
+    @Test
+    public void testIncludesWithinForLoopIsMissingVariables() throws IOException {
+        // given
+        Path tempDirectory = Files.createTempDirectory(null);
+        tempDirectory.toFile().deleteOnExit();
+
+        Path parent = Files.createFile(Paths.get(tempDirectory.toAbsolutePath().toString(), "parent.txt"));
+        parent.toFile().deleteOnExit();
+
+        byte[] bytes = ("{% assign list = \"1,2,3,4\" | split: \",\" %}{% for n in list %}{% assign inner = n %}{% include include.liquid %}{% endfor %}").getBytes();
+        Files.write(parent, bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+        Path includePath = Paths.get(tempDirectory.toAbsolutePath().toString(), "_includes", "include.liquid");
+        Path includeFolderPath = includePath.getParent();
+        Files.createDirectories(includeFolderPath);
+        includeFolderPath.toFile().deleteOnExit();
+        Path include = Files.createFile(includePath);
+        include.toFile().deleteOnExit();
+        bytes = ("list: {{ list }}\n"
+                + "inner: {{ inner }}\n"
+                + "n: {{ n }}\n").getBytes();
+        Files.write(include, bytes, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(Include.INCLUDES_DIRECTORY_KEY, includeFolderPath.toAbsolutePath().toFile());
+
+        // when
+        String render = Template.parse(parent.toFile(),
+                new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build())
+                .render(data);
+
+        // then
+        assertEquals("list: 1234\n"
+                + "inner: 1\n"
+                + "n: 1\n"
+                + "list: 1234\n"
+                + "inner: 2\n"
+                + "n: 2\n"
+                + "list: 1234\n"
+                + "inner: 3\n"
+                + "n: 3\n"
+                + "list: 1234\n"
+                + "inner: 4\n"
+                + "n: 4\n", render);
     }
 
     private static class NestedCauseMatcher<T extends Throwable> extends ThrowableCauseMatcher<T> {

@@ -120,4 +120,18 @@ public class TemplateContext {
     public Map<String,Object> getVariables() {
         return new LinkedHashMap<String, Object>(this.variables);
     }
+
+    /**
+     * @return all context variables, including those from parent.
+     */
+    public Map<String,Object> getAllVariables() {
+        Map<String, Object> allVariables;
+        if (parent!= null) {
+            allVariables = parent.getAllVariables();
+        } else {
+            allVariables = new LinkedHashMap<>();
+        }
+        allVariables.putAll(this.variables);
+        return allVariables;
+    }
 }

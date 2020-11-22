@@ -1,5 +1,7 @@
 package liqp.tags;
 
+import java.util.Map;
+
 import liqp.TemplateContext;
 import liqp.nodes.LNode;
 
@@ -40,28 +42,17 @@ public class Increment extends Tag {
 
         Long value = INITIAL;
         String variable = super.asString(nodes[0].render(context));
-        String incrementVariable = String.format("@increment_%s", variable);
-        String variableExistsFlag = String.format("@variable_%s_exists", variable);
 
-        if (context.containsKey(incrementVariable)) {
-            // Retrieve the old 'increment' value
-            value = (Long) context.get(incrementVariable);
+        Map<String, Object> environmentMap = context.getEnvironmentMap();
+        if (environmentMap.containsKey(variable)) {
+            // Retrieve the old 'decrement' value
+            value = (Long) environmentMap.get(variable);
         }
 
         Long nextValue = value + 1;
 
-        if (value.equals(INITIAL)) {
-            // If this is the first 'increment' tag, check if the variable exists in the outer scope.
-            context.put(variableExistsFlag, context.containsKey(variable));
-        }
-
-        if (!((Boolean) context.get(variableExistsFlag))) {
-            // Set the 'variable' to the next value, only if it was flagged as not being defined in the outer scope
-            context.put(variable, nextValue);
-        }
-
         // Store the nextValue
-        context.put(incrementVariable, nextValue);
+        environmentMap.put(variable, nextValue);
 
         return value;
     }

@@ -27,14 +27,23 @@ public class LookupNode implements LNode {
     @Override
     public Object render(TemplateContext context) {
 
-        Object value;
+        Object value = null;
 
+        String realId;
         // Check if there's a [var] lookup, AST: ^(LOOKUP Id["@var"])
         if(id.startsWith("@")) {
-            value = context.get(String.valueOf(context.get(id.substring(1))));
+            realId = String.valueOf(context.get(id.substring(1)));
+        } else {
+            realId = id;
         }
-        else {
-            value = context.get(id);
+        if (context.containsKey(realId)) {
+            value = context.get(realId);
+        }
+        if (value == null) {
+            Map<String, Object> environmentMap = context.getEnvironmentMap();
+            if (environmentMap.containsKey(realId)) {
+                value = environmentMap.get(realId);
+            }
         }
 
         for(Indexable index : indexes) {

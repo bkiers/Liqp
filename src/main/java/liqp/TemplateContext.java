@@ -3,6 +3,7 @@ package liqp;
 import liqp.parser.Flavor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,8 @@ public class TemplateContext {
     public final RenderSettings renderSettings;
     public final ParseSettings parseSettings;
     private Map<String, Object> variables;
+    private Map<String, Object> environmentMap;
+
     private List<RuntimeException> errors;
 
     public TemplateContext() {
@@ -119,5 +122,15 @@ public class TemplateContext {
 
     public Map<String,Object> getVariables() {
         return new LinkedHashMap<String, Object>(this.variables);
+    }
+
+    public Map<String, Object> getEnvironmentMap() {
+        if (parent != null) {
+            return parent.getEnvironmentMap();
+        }
+        if (environmentMap == null) {
+            environmentMap = new HashMap<>();
+        }
+        return environmentMap;
     }
 }

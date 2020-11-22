@@ -25,7 +25,11 @@ public class IncrementTest {
                 {"{%increment port %} {%increment port%}", "0 1"},
                 {"{%increment port %} {%increment starboard%} {%increment port %} {%increment port%} {%increment starboard %}", "0 0 1 2 1"},
                 {"{% assign x = 42 %}{{x}} {%increment x %} {%increment x %} {{x}}", "42 0 1 42"},
-                {"{% increment x %} {% increment x %} {{x}}", "0 1 2"}
+                {"{% increment x %} {% increment x %} {{x}}", "0 1 2"},
+                {"{% increment var %}{% increment var %}{{ var }}{% increment var %}", "0122"},
+                {"{% increment var %}{% assign var=5 %}{% increment var %}{{ var }}{% increment var %}", "0152"},
+                {"{% increment var %}{{ var }}{% assign var=5 %}{% increment var %}{{ var }}{% increment var %}", "01152"},
+                {"{% increment var %}{% assign exp='var' %}{{ [exp] }}", "01"}
         };
 
         for (String[] test : tests) {

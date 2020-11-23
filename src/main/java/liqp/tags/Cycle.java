@@ -5,10 +5,9 @@ import liqp.nodes.LNode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 class Cycle extends Tag {
-
-    private static final String PREPEND = "\"'";
 
     /*
      * Cycle is usually used within a loop to alternate
@@ -17,24 +16,24 @@ class Cycle extends Tag {
     @Override
     public Object render(TemplateContext context, LNode... nodes) {
 
-        // The group-name is either the first token-expression, or if that is
-        // null (indicating there is no name), give it the name PREPEND followed
-        // by the number of expressions in the cycle-group.
-        String groupName = nodes[0] == null ?
-                PREPEND + (nodes.length - 1) :
-                super.asString(nodes[0].render(context));
 
-        // Prepend a groupName with a single- and double quote as to not
-        // let the groupName conflict with other variable assignments
-        groupName = PREPEND + groupName;
-
-        Object obj = context.remove(groupName);
-
-        List<Object> elements = new ArrayList<Object>();
+        // collect all the variants to the list first
+        List<Object> elements = new ArrayList<>();
 
         for (int i = 1; i < nodes.length; i++) {
             elements.add(nodes[i].render(context));
         }
+
+
+        // The group-name is either the first token-expression, or if that is
+        // null (indicating there is no name), give it the name as stringified parameters
+        String groupName = nodes[0] == null ?
+                super.asString(elements) :
+                super.asString(nodes[0].render(context));
+
+        Map<String, Object> cycleRegistry = context.getRegistry(TemplateContext.REGISTRY_CYCLE);
+
+        Object obj = cycleRegistry.remove(groupName);
 
         CycleGroup group;
 
@@ -45,7 +44,7 @@ class Cycle extends Tag {
             group = (CycleGroup) obj;
         }
 
-        context.put(groupName, group);
+        cycleRegistry.put(groupName, group);
 
         return group.next(elements);
     }

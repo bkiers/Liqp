@@ -153,4 +153,15 @@ public class CycleTest {
                         "{%cycle var1: \"one\", \"two\" %} {%cycle var2: \"one\", \"two\" %}").render(assigns),
                 is("one one two two one one"));
     }
+
+    @Test
+    public void testCycleInNestedScope() {
+        assertThat(Template.parse("{% cycle 1,2,3 %}"
+                        + "{% assign list = \"1\" | split: \",\" %}"
+                        + "{% for n in list %}"
+                        + "{% cycle 1,2,3 %}"
+                        + "{% endfor %}"
+                        + "{% cycle 1,2,3 %}").render(),
+                is("123"));
+    }
 }

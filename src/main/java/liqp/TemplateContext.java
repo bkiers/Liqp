@@ -10,12 +10,15 @@ import java.util.Map;
 
 public class TemplateContext {
 
+    public static final String REGISTRY_CYCLE = "cycle";
+
     protected TemplateContext parent;
     public final ProtectionSettings protectionSettings;
     public final RenderSettings renderSettings;
     public final ParseSettings parseSettings;
     private Map<String, Object> variables;
     private Map<String, Object> environmentMap;
+    private Map<String, Map<String, Object>> registry;
 
     private List<RuntimeException> errors;
 
@@ -132,5 +135,25 @@ public class TemplateContext {
             environmentMap = new HashMap<>();
         }
         return environmentMap;
+    }
+
+    /**
+     * The registry is
+     * */
+    public Map<String, Object> getRegistry(String registryName) {
+        if (parent != null) {
+            return parent.getRegistry(registryName);
+        }
+        if (!REGISTRY_CYCLE.equals(registryName)) {
+            // so far support only registry for cycle
+            throw new RuntimeException("unknown registry type: " + registryName);
+        }
+        if (registry == null) {
+            registry = new HashMap<>();
+        }
+        if (!registry.containsKey(registryName)) {
+            registry.put(registryName, new HashMap<String, Object>());
+        }
+        return registry.get(registryName);
     }
 }

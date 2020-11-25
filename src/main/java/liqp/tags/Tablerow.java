@@ -57,10 +57,13 @@ class Tablerow extends Tag {
         int cols = attributes.get(COLS);
         int limit = attributes.get(LIMIT);
         int offset = attributes.get(OFFSET);
-        if ((collection.length > 0) && (offset < collection.length)) {
-            collection = Arrays.copyOfRange(collection, offset, collection.length);
-        } else {
-            collection = new Object[]{};
+
+        if(offset != 0) {
+            if ((collection.length > 0) && (offset < collection.length)) {
+                collection = Arrays.copyOfRange(collection, offset, collection.length);
+            } else {
+                collection = new Object[]{};
+            }
         }
 
         TemplateContext nestedContext = new TemplateContext(context);

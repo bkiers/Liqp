@@ -35,4 +35,10 @@ public class IfchangedTest {
             assertThat(rendered, is(test[2]));
         }
     }
+
+    @Test
+    public void testIfChangedScope() {
+        String render = Template.parse("{% ifchanged %}1{% endifchanged %}{%for item in (1..4) %}{% ifchanged %}{{ item }}{% endifchanged %}{% endfor %}{% ifchanged %}4{% endifchanged %}{% ifchanged %}5{% endifchanged %}").render();
+        assertThat(render, is("12345"));
+    }
 }

@@ -422,7 +422,37 @@ public class TablerowTest {
 
         assertThat(
                 Template.parse("{% tablerow n in numbers cols:3 offset:1 limit:6%} {{n}} {% endtablerow %}")
-                        .render("{ \"numbers\" : [1,2,3,4,5,6] }"),
+                        .render("{ \"numbers\" : [0,1,2,3,4,5,6] }"),
                 is("<tr class=\"row1\">\n<td class=\"col1\"> 1 </td><td class=\"col2\"> 2 </td><td class=\"col3\"> 3 </td></tr>\n<tr class=\"row2\"><td class=\"col1\"> 4 </td><td class=\"col2\"> 5 </td><td class=\"col3\"> 6 </td></tr>\n"));
+    }
+
+    /*
+     *   def test_blank_string_not_iterable
+     *     assert_template_result("<tr class=\"row1\">\n</tr>\n", "{% tablerow char in characters cols:3 %}I WILL NOT BE OUTPUT{% endtablerow %}", 'characters' => '')
+     *   end
+     */
+    @Test
+    public void testBlankStringNotIterable() {
+        assertThat(Template.parse("{% tablerow char in characters cols:3 %}I WILL NOT BE OUTPUT{% endtablerow %}").render(), is("<tr class=\"row1\">\n</tr>\n"));
+    }
+
+    @Test
+    public void testVariableScopeShouldNotAffect() {
+        assertThat(Template.parse("{% for item in array %}{% tablerow item in array%}{{ item.id }}{% endtablerow %}-->[{{ item.id }}]<--\n{% endfor %}")
+                .render("{ \"array\" : [{\"id\" : \"id1\"},{\"id\" : \"id2\"}] }"),
+                is("<tr class=\"row1\">\n" +
+                "<td class=\"col1\">id1</td><td class=\"col2\">id2</td></tr>\n" +
+                "-->[id1]<--\n" +
+                "<tr class=\"row1\">\n" +
+                "<td class=\"col1\">id1</td><td class=\"col2\">id2</td></tr>\n" +
+                "-->[id2]<--\n"));
+    }
+
+    @Test
+    public void testVariableShouldNotBeVisibleAfterTag() {
+        assertThat(Template.parse("{% tablerow item in array%}{{ item.id }}{% endtablerow %}{{ item.id }}")
+                .render("{ \"array\" : [{\"id\" : \"id1\"},{\"id\" : \"id2\"}] }"),
+                is("<tr class=\"row1\">\n" +
+                        "<td class=\"col1\">id1</td><td class=\"col2\">id2</td></tr>\n"));
     }
 }

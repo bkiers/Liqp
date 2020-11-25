@@ -11,6 +11,7 @@ import java.util.Map;
 public class TemplateContext {
 
     public static final String REGISTRY_CYCLE = "cycle";
+    public static final String REGISTRY_IFCHANGED = "ifchanged";
 
     protected TemplateContext parent;
     public final ProtectionSettings protectionSettings;
@@ -144,7 +145,7 @@ public class TemplateContext {
         if (parent != null) {
             return parent.getRegistry(registryName);
         }
-        if (!REGISTRY_CYCLE.equals(registryName)) {
+        if (!REGISTRY_CYCLE.equals(registryName) && !REGISTRY_IFCHANGED.equals(registryName)) {
             // so far support only registry for cycle
             throw new RuntimeException("unknown registry type: " + registryName);
         }

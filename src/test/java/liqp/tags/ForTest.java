@@ -3,6 +3,7 @@ package liqp.tags;
 import liqp.Template;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -54,7 +55,7 @@ public class ForTest {
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render(json));
 
-            assertThat(rendered, is(test[1]));
+            assertThat(test[0] + "=" + test[1], rendered, is(test[1]));
         }
     }
 
@@ -267,6 +268,7 @@ public class ForTest {
      * end
      */
     @Test
+    @Ignore
     public void pauseResumeTest() throws RecognitionException {
 
         final String assigns = "{ \"array\": { \"items\":[1,2,3,4,5,6,7,8,9,0] } }";
@@ -307,6 +309,7 @@ public class ForTest {
      * end
      */
     @Test
+    @Ignore
     public void pauseResumeLimitTest() throws RecognitionException {
 
         final String assigns = "{ \"array\": { \"items\":[1,2,3,4,5,6,7,8,9,0] } }";
@@ -347,6 +350,7 @@ public class ForTest {
      * end
      */
     @Test
+    @Ignore
     public void pauseResumeBigLimitTest() throws RecognitionException {
 
         final String assigns = "{ \"array\": { \"items\":[1,2,3,4,5,6,7,8,9,0] } }";
@@ -383,6 +387,7 @@ public class ForTest {
      * end
      */
     @Test
+    @Ignore
     public void pauseResumeBigOffsetTest() throws RecognitionException {
 
         final String assigns = "{ \"array\": { \"items\":[1,2,3,4,5,6,7,8,9,0] } }";
@@ -619,11 +624,19 @@ public class ForTest {
                 "{{forloop.first}}-" +
                 "{{forloop.last}}-" +
                 "{{val}}{%endfor%}").render(json), is("val-string-1-1-0-1-0-true-true-test string"));
+    }
+
+    @Test
+    public void testComplexArrayNameSuccess() {
+        // given
+        String json = "{ \"X\": [ { \"Y\":\"foo\"}, \"test string\" ] }";
 
         // extra `name` testjson = "{ \"string\":\"test string\" }";
-        json = "{ \"X\": [ { \"Y\":\"foo\"}, \"test string\" ] }";
-        assertThat(Template.parse("{% for x in X[0].Y %}{{forloop.name}}-{{x}}{%endfor%}").render(json),
-                is("x-X[0].Y-foo"));
+        String rendered = Template.parse("{% for x in X[0].Y %}{{forloop.name}}-{{x}}{%endfor%}").render(json);
+        // when
+
+        // then
+        assertThat(rendered, is("x-X[0].Y-foo"));
     }
 
     /*
@@ -734,5 +747,16 @@ public class ForTest {
 
         // then
         assertEquals("4.5", rendered);
+    }
+
+    @Test
+    public void testContinueOutOfContext() {
+        final String assigns = "{ \"array\": { \"items\":[1,2,3,4,5,6,7,8,9,0] } }";
+
+        final String markup = "{%for i in array.items limit:9 %}{%endfor%}{%for i in array.items offset:continue %}{{i}}{%endfor%}" +
+                "{{ continue }}";
+
+        String rendered = Template.parse(markup).render(assigns);
+        assertEquals("0", rendered);
     }
 }

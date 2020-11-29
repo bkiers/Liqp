@@ -69,7 +69,7 @@ public class OutputNodeTest {
             Template template = Template.parse(test);
             String rendered = template.render(json);
 
-            assertThat(rendered, is(expected));
+            assertThat(rendered + "=" + expected, rendered, is(expected));
         }
     }
 

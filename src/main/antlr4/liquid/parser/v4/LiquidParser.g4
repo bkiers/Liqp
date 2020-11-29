@@ -30,11 +30,16 @@ tag
  | table_tag
  | capture_tag
  | include_tag
+ | continue_tag
  | other_tag
  ;
 
 other_tag
  : tagStart Id other_tag_parameters? TagEnd other_tag_block?
+ ;
+
+continue_tag
+ : tagStart Continue TagEnd
  ;
 
 other_tag_block
@@ -95,13 +100,13 @@ for_tag
  ;
 
 for_array
- : tagStart ForStart Id In lookup attribute* TagEnd
+ : tagStart ForStart Id In lookup for_attribute* TagEnd
    for_block
    tagStart ForEnd TagEnd
  ;
 
 for_range
- : tagStart ForStart Id In OPar from=expr DotDot to=expr CPar attribute* TagEnd
+ : tagStart ForStart Id In OPar from=expr DotDot to=expr CPar for_attribute* TagEnd
    block
    tagStart ForEnd TagEnd
  ;
@@ -110,8 +115,15 @@ for_block
  : a=block (tagStart Else TagEnd b=block)?
  ;
 
+for_attribute
+ : Offset Col Continue
+ | Offset Col expr
+ | Id Col expr
+ ;
+
 attribute
- : Id Col expr
+ : Offset Col expr
+ | Id Col expr
  ;
 
 table_tag
@@ -210,6 +222,8 @@ id
  | Assign
  | Include
  | With
+ | Offset
+ | Continue
  | EndId
  ;
 

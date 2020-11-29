@@ -3,6 +3,7 @@ package liqp;
 import liqp.parser.Flavor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ public class TemplateContext {
 
     public static final String REGISTRY_CYCLE = "cycle";
     public static final String REGISTRY_IFCHANGED = "ifchanged";
+    public static final String REGISTRY_FOR = "for";
 
     protected TemplateContext parent;
     public final ProtectionSettings protectionSettings;
@@ -19,7 +21,7 @@ public class TemplateContext {
     public final ParseSettings parseSettings;
     private Map<String, Object> variables;
     private Map<String, Object> environmentMap;
-    private Map<String, Map<String, Object>> registry;
+    private Map<String, Object> registry;
 
     private List<RuntimeException> errors;
 
@@ -141,20 +143,22 @@ public class TemplateContext {
     /**
      * The registry is
      * */
-    public Map<String, Object> getRegistry(String registryName) {
+    public<T extends Map<String, ?>> T getRegistry(String registryName) {
         if (parent != null) {
             return parent.getRegistry(registryName);
         }
-        if (!REGISTRY_CYCLE.equals(registryName) && !REGISTRY_IFCHANGED.equals(registryName)) {
-            // so far support only registry for cycle
+
+        if (!Arrays.asList(REGISTRY_CYCLE, REGISTRY_IFCHANGED, REGISTRY_FOR).contains(registryName)) {
+            // this checking exists for safety of library, any listed type is expected, not more
             throw new RuntimeException("unknown registry type: " + registryName);
         }
         if (registry == null) {
             registry = new HashMap<>();
         }
+
         if (!registry.containsKey(registryName)) {
-            registry.put(registryName, new HashMap<String, Object>());
+            registry.put(registryName, new HashMap<String, T>());
         }
-        return registry.get(registryName);
+        return (T)registry.get(registryName);
     }
 }

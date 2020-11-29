@@ -1,5 +1,6 @@
 package liqp.parser.v4;
 
+import liqp.LValue;
 import liqp.ParseSettings;
 import liqp.exceptions.LiquidException;
 import liqp.filters.Filter;
@@ -242,7 +243,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   }
 
   // for_array
-  //  : tagStart ForStart Id In lookup attribute* TagEnd
+  //  : tagStart ForStart Id In lookup for_attribute* TagEnd
   //    for_block
   //    tagStart ForEnd TagEnd
   //  ;
@@ -262,7 +263,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
     expressions.add(visitBlock(ctx.for_block().a));
     expressions.add(ctx.for_block().Else() == null ? null : visitBlock(ctx.for_block().b));
 
-    for (AttributeContext attribute : ctx.attribute()) {
+    for (For_attributeContext attribute : ctx.for_attribute()) {
       expressions.add(visit(attribute));
     }
 
@@ -270,7 +271,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   }
 
   // for_range
-  //  : tagStart ForStart Id In OPar expr DotDot expr CPar attribute* TagEnd
+  //  : tagStart ForStart Id In OPar expr DotDot expr CPar for_attribute* TagEnd
   //    block
   //    tagStart ForEnd TagEnd
   //  ;
@@ -286,7 +287,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
 
     expressions.add(visitBlock(ctx.block()));
 
-    for (AttributeContext attribute : ctx.attribute()) {
+    for (For_attributeContext attribute : ctx.for_attribute()) {
       expressions.add(visit(attribute));
     }
 
@@ -298,10 +299,33 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  ;
   @Override
   public LNode visitAttribute(AttributeContext ctx) {
-    return new AttributeNode(new AtomNode(ctx.Id().getText()), visit(ctx.expr()));
+    if (ctx.Offset() != null) {
+        return new AttributeNode(new AtomNode(ctx.Offset().getText()), visit(ctx.expr()));
+    } else {
+        return new AttributeNode(new AtomNode(ctx.Id().getText()), visit(ctx.expr()));
+    }
   }
 
-  // table_tag
+
+
+  @Override
+  public LNode visitFor_attribute(For_attributeContext ctx) {
+    if (ctx.Id() != null) {
+        return new AttributeNode(new AtomNode(ctx.Id().getText()), visit(ctx.expr()));
+    }
+    // else "offset" attr
+    if (ctx.Continue() != null) {
+        return new AttributeNode(new AtomNode(ctx.Offset().getText()), new AtomNode(LValue.CONTINUE));
+    }
+    return new AttributeNode(new AtomNode(ctx.Offset().getText()), visit(ctx.expr()));
+    }
+
+    @Override
+    public LNode visitContinue_tag(Continue_tagContext ctx) {
+        return new AtomNode(LValue.CONTINUE);
+    }
+
+    // table_tag
   //  : tagStart TableStart Id In lookup attribute* TagEnd block tagStart TableEnd TagEnd
   //  ;
   @Override

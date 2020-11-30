@@ -262,6 +262,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
 
     expressions.add(visitBlock(ctx.for_block().a));
     expressions.add(ctx.for_block().Else() == null ? null : visitBlock(ctx.for_block().b));
+    expressions.add(new AtomNode(ctx.lookup().getText()));
 
     for (For_attributeContext attribute : ctx.for_attribute()) {
       expressions.add(visit(attribute));
@@ -285,7 +286,10 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
     expressions.add(visit(ctx.from));
     expressions.add(visit(ctx.to));
 
+      System.err.println(" range name: (" + ctx.from.getText() + ".." + ctx.to.getText() + ")");
+
     expressions.add(visitBlock(ctx.block()));
+    expressions.add(new AtomNode("(" + ctx.from.getText() + ".." + ctx.to.getText() + ")"));
 
     for (For_attributeContext attribute : ctx.for_attribute()) {
       expressions.add(visit(attribute));

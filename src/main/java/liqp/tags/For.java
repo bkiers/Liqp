@@ -58,24 +58,24 @@ class For extends Tag {
         boolean array = super.asBoolean(nodes[0].render(context));
 
         String id = super.asString(nodes[1].render(context));
+        String tagName = id + "-" + nodes[5].render(context);
 
         // Each for tag has its own context that keeps track of its own variables (scope)
         TemplateContext nestedContext = new TemplateContext(context);
 
-        Object rendered = array ? renderArray(id, nestedContext, nodes) : renderRange(id, nestedContext, nodes);
+        Object rendered = array ? renderArray(id, nestedContext, tagName, nodes) : renderRange(id, nestedContext, tagName, nodes);
 
         return rendered;
     }
 
-    private Object renderArray(String id, TemplateContext context, LNode... tokens) {
+    private Object renderArray(String id, TemplateContext context, String tagName, LNode... tokens) {
 
         StringBuilder builder = new StringBuilder();
         // without early rendering the tag name will be incorrect
         Object data = tokens[2].render(context);
-        String tagName = id + "-" + tokens[2].toString();
 
-        // attributes start from index 5
-        Map<String, Integer> attributes = getAttributes(5, context, tagName, tokens);
+        // attributes start from index 6
+        Map<String, Integer> attributes = getAttributes(6, context, tagName, tokens);
 
         int from = attributes.get(OFFSET);
         int limit = attributes.get(LIMIT);
@@ -164,15 +164,12 @@ class For extends Tag {
         return isBreak;
     }
 
-    private Object renderRange(String id, TemplateContext context, LNode... tokens) {
+    private Object renderRange(String id, TemplateContext context, String tagName, LNode... tokens) {
 
         StringBuilder builder = new StringBuilder();
 
-        String tagName = id + "-" + "(" + tokens[2].toString() + ".." + tokens[3].toString() + ")";
-
-        System.err.println("tage name for range is: " + tagName);
-        // attributes start from index 5
-        Map<String, Integer> attributes = getAttributes(5, context, tagName, tokens);
+        // attributes start from index 6
+        Map<String, Integer> attributes = getAttributes(6, context, tagName, tokens);
 
         int offset = attributes.get(OFFSET);
         int limit = attributes.get(LIMIT);

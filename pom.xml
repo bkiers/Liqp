@@ -53,6 +53,7 @@
     <antlr4.version>4.7.2</antlr4.version>
     <jackson.version>2.10.0</jackson.version>
     <jsoup.version>1.11.3</jsoup.version>
+    <joda.version>2.9.9</joda.version>
     <junit.version>4.12</junit.version>
 
     <main.class />
@@ -90,6 +91,13 @@
       <artifactId>jsoup</artifactId>
       <version>${jsoup.version}</version>
     </dependency>
+
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>${joda.version}</version>
+    </dependency>
+
 
     <dependency>
       <groupId>junit</groupId>

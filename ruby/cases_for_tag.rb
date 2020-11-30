@@ -31,3 +31,5 @@ pp render({ "array" => { "items" => [1,2,3,4,5,6,7,8,9] } }, "{%for i in array.i
 # as we see here: continue works with ranges
 pp render({ }, "{%for i in (1..9) limit:8 %}{%endfor%}{%for i in (1..9) offset:continue %}{{i}}{%endfor%}")
 pp render({ }, "{%for i in (1..9) limit:8 %}{%endfor%}{% assign continue = 0 %}{%for i in (1..9) offset:continue %}{{i}}{%endfor%}")
+pp render({}, "{% for x in (1..9) %}{{forloop.name}}-{{x}}{%endfor%}")
+pp render({}, "{% assign st = 1 %}{% assign end = 7 %}{% for x in (st..end) %}{{forloop.name}}-{{x}}{%endfor%}")

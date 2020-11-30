@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import liqp.LValue;
 import liqp.TemplateContext;
@@ -46,6 +47,7 @@ class For extends Tag {
     static final String FIRST = "first";
     static final String LAST = "last";
     static final String NAME = "name";
+    static final String PARENTLOOP = "parentloop";
 
     /*
      * For loop
@@ -125,20 +127,43 @@ class For extends Tag {
         Map<String, Integer> registry = context.getRegistry(TemplateContext.REGISTRY_FOR);
         registry.put(tagName, from + length);
 
-        ForLoopDrop forLoopDrop = new ForLoopDrop(tagName, length);
-        context.put(FORLOOP, forLoopDrop);
-
-        for (Object o : arrayList) {
-            context.incrementIterations();
-            context.put(id, o);
-            boolean isBreak = renderForLoopBody(context, builder, ((BlockNode) block).getChildren());
-            forLoopDrop.increment();
-            if (isBreak) {
-                break;
+        ForLoopDrop forLoopDrop = createLoopDropInStack(context, tagName, length);
+        try {
+            for (Object o : arrayList) {
+                context.incrementIterations();
+                context.put(id, o);
+                boolean isBreak = renderForLoopBody(context, builder, ((BlockNode) block).getChildren());
+                forLoopDrop.increment();
+                if (isBreak) {
+                    break;
+                }
             }
+        } finally {
+            popLoopDropFromStack(context);
         }
+
         return builder.toString();
     }
+
+    private ForLoopDrop createLoopDropInStack(TemplateContext context, String tagName, int length) {
+        Stack<ForLoopDrop> stack = getParentForloopDropStack(context);
+        ForLoopDrop parent = null;
+        if (!stack.empty()) {
+            parent = stack.peek();
+        }
+        ForLoopDrop forLoopDrop =  new ForLoopDrop(tagName, length, parent);
+        stack.push(forLoopDrop);
+        context.put(FORLOOP, forLoopDrop);
+        return forLoopDrop;
+    }
+
+    public void popLoopDropFromStack(TemplateContext context) {
+        Stack<ForLoopDrop> stack = getParentForloopDropStack(context);
+        if (!stack.isEmpty()) {
+            stack.pop();
+        }
+    }
+
 
     private boolean renderForLoopBody(TemplateContext context, StringBuilder builder, List<LNode> children) {
         boolean isBreak = false;
@@ -201,25 +226,29 @@ class For extends Tag {
             }
 
             int length = (to - from);
-            ForLoopDrop forLoopDrop = new ForLoopDrop(null, length);
-            context.put(FORLOOP, forLoopDrop);
 
-            for (int i = from + offset; i <= effectiveTo; i++) {
-                int realI;
-                if (reversed) {
-                    realI = effectiveTo - (i - from - offset);
-                } else {
-                    realI = i;
-                }
+            ForLoopDrop forLoopDrop = createLoopDropInStack(context, tagName, length);
+            try {
 
-                context.incrementIterations();
-                context.put(id, realI);
-                boolean isBreak = renderForLoopBody(context, builder, ((BlockNode)block).getChildren());
-                forLoopDrop.increment();
-                if(isBreak) {
-                    // break from outer loop
-                    break;
+                for (int i = from + offset; i <= effectiveTo; i++) {
+                    int realI;
+                    if (reversed) {
+                        realI = effectiveTo - (i - from - offset);
+                    } else {
+                        realI = i;
+                    }
+
+                    context.incrementIterations();
+                    context.put(id, realI);
+                    boolean isBreak = renderForLoopBody(context, builder, ((BlockNode)block).getChildren());
+                    forLoopDrop.increment();
+                    if(isBreak) {
+                        // break from outer loop
+                        break;
+                    }
                 }
+            } finally {
+                popLoopDropFromStack(context);
             }
 
         }
@@ -231,6 +260,16 @@ class For extends Tag {
         }
 
         return builder.toString();
+    }
+
+    private Stack<ForLoopDrop> getParentForloopDropStack(TemplateContext context) {
+        Map<String, Stack<ForLoopDrop>> registry = context.getRegistry(TemplateContext.REGISTRY_FOR_STACK);
+        Stack<ForLoopDrop> stack = registry.get(TemplateContext.REGISTRY_FOR_STACK);
+        if (stack == null) {
+            stack = new Stack<>();
+            registry.put(TemplateContext.REGISTRY_FOR_STACK, stack);
+        }
+        return stack;
     }
 
     private Map<String, Integer> getAttributes(int fromIndex, TemplateContext context, String tagName, LNode... tokens) {
@@ -271,16 +310,17 @@ class For extends Tag {
 
         private final Map<String, Object> map = new HashMap<>();
 
+        private final ForLoopDrop parentloop;
+
         private int index;
 
         private int length;
 
-        public ForLoopDrop(String forName, int length) {
-            if (forName != null) {
-                map.put(NAME, forName);
-            }
+        public ForLoopDrop(String forName, int length, ForLoopDrop parent) {
+            map.put(NAME, forName);
             this.length = length;
             this.index = 0;
+            this.parentloop = parent;
         }
 
         @Override
@@ -294,6 +334,9 @@ class For extends Tag {
             boolean last = (index == (length-1));
             map.put(FIRST, first);
             map.put(LAST, last);
+            if (parentloop != null) {
+                map.put(PARENTLOOP, parentloop);
+            }
             return map;
         }
 

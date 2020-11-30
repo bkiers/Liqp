@@ -759,5 +759,23 @@ public class ForTest {
     public void testReversedSimple() {
         assertEquals("987654321", Template.parse("{%for i in (1..9) reversed %}{{i}}{%endfor%}").render());
         assertEquals("121:120:", Template.parse("{%for i in (116..121) reversed offset: 4 %}{{i}}:{%endfor%}").render());
+        assertEquals("", Template.parse("{%for i in (121..116) reversed offset: 4 %}{{i}}:{%endfor%}").render());
+    }
+
+    /*
+     * def test_for_parentloop_references_parent_loop
+     *     assert_template_result('1.1 1.2 1.3 2.1 2.2 2.3 ',
+     *       '{% for inner in outer %}{% for k in inner %}' \
+     *       '{{ forloop.parentloop.index }}.{{ forloop.index }} ' \
+     *       '{% endfor %}{% endfor %}',
+     *       'outer' => [[1, 1, 1], [1, 1, 1]])
+     *   end
+     */
+    @Test
+    public void testSimpleParentRef() {
+        assertEquals("1.1 1.2 1.3 2.1 2.2 2.3 ", Template.parse("{% for inner in outer %}{% for k in inner %}"
+                + "{{ forloop.parentloop.index }}.{{ forloop.index }} "
+                + "{% endfor %}{% endfor %}")
+                .render("{\"outer\" : [[1, 1, 1], [1, 1, 1]]}"));
     }
 }

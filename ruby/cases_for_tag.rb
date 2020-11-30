@@ -45,3 +45,4 @@ pp render({"a" => [1,2]}, "{% for i in a reversed %}{{i}} - forloop.first: {{for
 }} forloop.index0: {{forloop.index0}} forloop.last: {{forloop.last}} forloop.length: {{forloop.length}} forloop.rindex: {{forloop.rindex}} forloop.rindex0: {{forloop.rindex0}} \n
 {% endfor %}")
 pp render({}, "{%for i in (116..121) reversed offset: 4 %}{{i}}:{%endfor%}")
+pp render({}, "{%for i in (221..116) reversed offset: 4 %}{{i}}:{%endfor%}")

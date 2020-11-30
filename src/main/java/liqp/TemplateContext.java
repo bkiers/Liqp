@@ -14,6 +14,7 @@ public class TemplateContext {
     public static final String REGISTRY_CYCLE = "cycle";
     public static final String REGISTRY_IFCHANGED = "ifchanged";
     public static final String REGISTRY_FOR = "for";
+    public static final String REGISTRY_FOR_STACK = "for_stack";
 
     protected TemplateContext parent;
     public final ProtectionSettings protectionSettings;
@@ -148,7 +149,7 @@ public class TemplateContext {
             return parent.getRegistry(registryName);
         }
 
-        if (!Arrays.asList(REGISTRY_CYCLE, REGISTRY_IFCHANGED, REGISTRY_FOR).contains(registryName)) {
+        if (!Arrays.asList(REGISTRY_CYCLE, REGISTRY_IFCHANGED, REGISTRY_FOR, REGISTRY_FOR_STACK).contains(registryName)) {
             // this checking exists for safety of library, any listed type is expected, not more
             throw new RuntimeException("unknown registry type: " + registryName);
         }

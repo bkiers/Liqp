@@ -33,3 +33,4 @@ pp render({ }, "{%for i in (1..9) limit:8 %}{%endfor%}{%for i in (1..9) offset:c
 pp render({ }, "{%for i in (1..9) limit:8 %}{%endfor%}{% assign continue = 0 %}{%for i in (1..9) offset:continue %}{{i}}{%endfor%}")
 pp render({}, "{% for x in (1..9) %}{{forloop.name}}-{{x}}{%endfor%}")
 pp render({}, "{% assign st = 1 %}{% assign end = 7 %}{% for x in (st..end) %}{{forloop.name}}-{{x}}{%endfor%}")
+pp render({"end" => {"data" => [{"here" => 5}]}}, "{% assign st = 1 %}{% for x in (st..end['data'][0].here) %}{{forloop.name}}-{{x}}{%endfor%}")

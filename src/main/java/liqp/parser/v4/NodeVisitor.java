@@ -243,7 +243,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   }
 
   // for_array
-  //  : tagStart ForStart Id In lookup for_attribute* TagEnd
+  //  : tagStart ForStart Id In lookup Reversed? for_attribute* TagEnd
   //    for_block
   //    tagStart ForEnd TagEnd
   //  ;
@@ -263,6 +263,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
     expressions.add(visitBlock(ctx.for_block().a));
     expressions.add(ctx.for_block().Else() == null ? null : visitBlock(ctx.for_block().b));
     expressions.add(new AtomNode(ctx.lookup().getText()));
+    expressions.add(new AtomNode(ctx.Reversed() != null));
 
     for (For_attributeContext attribute : ctx.for_attribute()) {
       expressions.add(visit(attribute));
@@ -272,7 +273,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   }
 
   // for_range
-  //  : tagStart ForStart Id In OPar expr DotDot expr CPar for_attribute* TagEnd
+  //  : tagStart ForStart Id In OPar expr DotDot expr CPar Reversed? for_attribute* TagEnd
   //    block
   //    tagStart ForEnd TagEnd
   //  ;
@@ -286,10 +287,9 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
     expressions.add(visit(ctx.from));
     expressions.add(visit(ctx.to));
 
-      System.err.println(" range name: (" + ctx.from.getText() + ".." + ctx.to.getText() + ")");
-
     expressions.add(visitBlock(ctx.block()));
     expressions.add(new AtomNode("(" + ctx.from.getText() + ".." + ctx.to.getText() + ")"));
+    expressions.add(new AtomNode(ctx.Reversed() != null));
 
     for (For_attributeContext attribute : ctx.for_attribute()) {
       expressions.add(visit(attribute));

@@ -40,3 +40,8 @@ pp render({"a" => [1,2,3,4,5,6], "b" => [1,2,3,4,5,6]}, "{%for i in a limit:5 %}
 
 pp render({"a" => {"prop" => [1,2,3,4,5,6]}}, "{%for i in a.prop limit:5 %}{%endfor%}{%for i in a['prop'] offset:continue %}[{{forloop.name}}]-{{i}}{%endfor%}")
 pp render({"a" => {"prop" => [1,2,3,4,5,6]}}, "{%for i in a.prop limit:5 %}{%endfor%}{%for i in a.prop offset:continue %}[{{forloop.name}}]-{{i}}{%endfor%}")
+
+pp render({"a" => [1,2]}, "{% for i in a reversed %}{{i}} - forloop.first: {{forloop.first}} forloop.index: {{forloop.index
+}} forloop.index0: {{forloop.index0}} forloop.last: {{forloop.last}} forloop.length: {{forloop.length}} forloop.rindex: {{forloop.rindex}} forloop.rindex0: {{forloop.rindex0}} \n
+{% endfor %}")
+pp render({}, "{%for i in (116..121) reversed offset: 4 %}{{i}}:{%endfor%}")

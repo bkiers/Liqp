@@ -1,18 +1,19 @@
 package liqp.tags;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import liqp.LValue;
 import liqp.TemplateContext;
 import liqp.exceptions.ExceededMaxIterationsException;
-import liqp.nodes.AtomNode;
 import liqp.nodes.BlockNode;
 import liqp.nodes.LNode;
+import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Documentation:
@@ -59,27 +60,32 @@ class For extends Tag {
 
         String id = super.asString(nodes[1].render(context));
         String tagName = id + "-" + nodes[5].render(context);
+        boolean reversed = super.asBoolean(nodes[6].render(context));
 
         // Each for tag has its own context that keeps track of its own variables (scope)
         TemplateContext nestedContext = new TemplateContext(context);
 
-        Object rendered = array ? renderArray(id, nestedContext, tagName, nodes) : renderRange(id, nestedContext, tagName, nodes);
+        Object rendered = array ? renderArray(id, nestedContext, tagName, reversed, nodes) : renderRange(id, nestedContext, tagName, reversed, nodes);
 
         return rendered;
     }
 
-    private Object renderArray(String id, TemplateContext context, String tagName, LNode... tokens) {
+    private Object renderArray(String id, TemplateContext context, String tagName, boolean reversed, LNode... tokens) {
 
         StringBuilder builder = new StringBuilder();
         // without early rendering the tag name will be incorrect
         Object data = tokens[2].render(context);
 
         // attributes start from index 6
-        Map<String, Integer> attributes = getAttributes(6, context, tagName, tokens);
+        Map<String, Integer> attributes = getAttributes(7, context, tagName, tokens);
 
         int from = attributes.get(OFFSET);
         int limit = attributes.get(LIMIT);
 
+        if (data instanceof Inspectable) {
+            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) data);
+            data = evaluated.toLiquid();
+        }
         if (data instanceof Map) {
             data = mapAsArray((Map) data);
         }
@@ -103,9 +109,15 @@ class For extends Tag {
         } else {
             to = array.length;
         }
+        from = Math.min(from, array.length);
         int length = to - from;
 
         List<Object> arrayList = Arrays.asList(array).subList(from, to);
+        if (reversed) {
+            ArrayList<Object> listCopy = new ArrayList<>(arrayList);
+            Collections.reverse(listCopy);
+            arrayList = listCopy;
+        }
 
         // now the current offset and limit is known, so its safe to set "continue" lexem
         // in case of fail it will fail
@@ -164,12 +176,12 @@ class For extends Tag {
         return isBreak;
     }
 
-    private Object renderRange(String id, TemplateContext context, String tagName, LNode... tokens) {
+    private Object renderRange(String id, TemplateContext context, String tagName, boolean reversed, LNode... tokens) {
 
         StringBuilder builder = new StringBuilder();
 
         // attributes start from index 6
-        Map<String, Integer> attributes = getAttributes(6, context, tagName, tokens);
+        Map<String, Integer> attributes = getAttributes(7, context, tagName, tokens);
 
         int offset = attributes.get(OFFSET);
         int limit = attributes.get(LIMIT);
@@ -193,9 +205,15 @@ class For extends Tag {
             context.put(FORLOOP, forLoopDrop);
 
             for (int i = from + offset; i <= effectiveTo; i++) {
+                int realI;
+                if (reversed) {
+                    realI = effectiveTo - (i - from - offset);
+                } else {
+                    realI = i;
+                }
 
                 context.incrementIterations();
-                context.put(id, i);
+                context.put(id, realI);
                 boolean isBreak = renderForLoopBody(context, builder, ((BlockNode)block).getChildren());
                 forLoopDrop.increment();
                 if(isBreak) {

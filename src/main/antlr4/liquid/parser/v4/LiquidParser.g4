@@ -100,13 +100,13 @@ for_tag
  ;
 
 for_array
- : tagStart ForStart Id In lookup for_attribute* TagEnd
+ : tagStart ForStart Id In lookup Reversed? for_attribute* TagEnd
    for_block
    tagStart ForEnd TagEnd
  ;
 
 for_range
- : tagStart ForStart Id In OPar from=expr DotDot to=expr CPar for_attribute* TagEnd
+ : tagStart ForStart Id In OPar from=expr DotDot to=expr CPar Reversed? for_attribute* TagEnd
    block
    tagStart ForEnd TagEnd
  ;
@@ -224,6 +224,7 @@ id
  | With
  | Offset
  | Continue
+ | Reversed
  | EndId
  ;
 

@@ -126,6 +126,7 @@ mode IN_TAG;
   With         : 'with';
   Offset       : 'offset';
   Continue     : 'continue';
+  Reversed     : 'reversed';
   Empty        : 'empty';
   Blank        : 'blank';
   EndId        : 'end' Id;

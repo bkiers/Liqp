@@ -1,17 +1,16 @@
 package liqp.tags;
 
-import liqp.Template;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class ForTest {
 
@@ -268,7 +267,6 @@ public class ForTest {
      * end
      */
     @Test
-    @Ignore
     public void pauseResumeTest() throws RecognitionException {
 
         final String assigns = "{ \"array\": { \"items\":[1,2,3,4,5,6,7,8,9,0] } }";
@@ -309,7 +307,6 @@ public class ForTest {
      * end
      */
     @Test
-    @Ignore
     public void pauseResumeLimitTest() throws RecognitionException {
 
         final String assigns = "{ \"array\": { \"items\":[1,2,3,4,5,6,7,8,9,0] } }";
@@ -350,7 +347,6 @@ public class ForTest {
      * end
      */
     @Test
-    @Ignore
     public void pauseResumeBigLimitTest() throws RecognitionException {
 
         final String assigns = "{ \"array\": { \"items\":[1,2,3,4,5,6,7,8,9,0] } }";
@@ -387,7 +383,6 @@ public class ForTest {
      * end
      */
     @Test
-    @Ignore
     public void pauseResumeBigOffsetTest() throws RecognitionException {
 
         final String assigns = "{ \"array\": { \"items\":[1,2,3,4,5,6,7,8,9,0] } }";
@@ -758,5 +753,11 @@ public class ForTest {
 
         String rendered = Template.parse(markup).render(assigns);
         assertEquals("0", rendered);
+    }
+
+    @Test
+    public void testReversedSimple() {
+        assertEquals("987654321", Template.parse("{%for i in (1..9) reversed %}{{i}}{%endfor%}").render());
+        assertEquals("121:120:", Template.parse("{%for i in (116..121) reversed offset: 4 %}{{i}}:{%endfor%}").render());
     }
 }

@@ -59,6 +59,8 @@ public class OutputNodeTest {
                 "end",
                 "break",
                 "continue",
+                "offset",
+                "reversed"
         };
 
         for (String keyword : keywords) {

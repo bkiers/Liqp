@@ -1,22 +1,33 @@
 package liqp.tags;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 import liqp.LValue;
 import liqp.TemplateContext;
 import liqp.exceptions.ExceededMaxIterationsException;
+import liqp.nodes.AtomNode;
 import liqp.nodes.BlockNode;
 import liqp.nodes.LNode;
+import liqp.parser.Inspectable;
+import liqp.parser.LiquidSupport;
 
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * Documentation:
+ * https://shopify.dev/docs/themes/liquid/reference/tags/iteration-tags
+ * https://shopify.github.io/liquid/tags/iteration/
+ * https://shopify.dev/docs/themes/liquid/reference/objects/for-loops
+ *
+ */
 class For extends Tag {
 
     private static final String OFFSET = "offset";
     private static final String LIMIT = "limit";
-    private static final String CONTINUE = "continue";
 
     /*
      * forloop.length      # => length of the entire for loop
@@ -36,6 +47,7 @@ class For extends Tag {
     static final String FIRST = "first";
     static final String LAST = "last";
     static final String NAME = "name";
+    static final String PARENTLOOP = "parentloop";
 
     /*
      * For loop
@@ -49,28 +61,36 @@ class For extends Tag {
         boolean array = super.asBoolean(nodes[0].render(context));
 
         String id = super.asString(nodes[1].render(context));
+        String tagName = id + "-" + nodes[5].render(context);
+        boolean reversed = super.asBoolean(nodes[6].render(context));
 
         // Each for tag has its own context that keeps track of its own variables (scope)
         TemplateContext nestedContext = new TemplateContext(context);
 
-        nestedContext.put(FORLOOP, new HashMap<String, Object>());
-
-        Object rendered = array ? renderArray(id, nestedContext, nodes) : renderRange(id, nestedContext, nodes);
+        Object rendered = array ? renderArray(id, nestedContext, tagName, reversed, nodes) : renderRange(id, nestedContext, tagName, reversed, nodes);
 
         return rendered;
     }
 
-    private Object renderArray(String id, TemplateContext context, LNode... tokens) {
+    private Object renderArray(String id, TemplateContext context, String tagName, boolean reversed, LNode... tokens) {
 
         StringBuilder builder = new StringBuilder();
 
-        // attributes start from index 5
-        Map<String, Integer> attributes = getAttributes(5, context, tokens);
+        Object data = tokens[2].render(context);
+        if (AtomNode.isEmpty(data) || "".equals(data)) {
+            data = new ArrayList<>();
+        }
 
-        int offset = attributes.get(OFFSET);
+        // attributes start from index 7
+        Map<String, Integer> attributes = getAttributes(7, context, tagName, tokens);
+
+        int from = attributes.get(OFFSET);
         int limit = attributes.get(LIMIT);
 
-        Object data = tokens[2].render(context);
+        if (data instanceof Inspectable) {
+            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) data);
+            data = evaluated.toLiquid();
+        }
         if (data instanceof Map) {
             data = mapAsArray((Map) data);
         }
@@ -83,188 +103,239 @@ class For extends Tag {
             return blockIfEmptyOrNull == null ? null : blockIfEmptyOrNull.render(context);
         }
 
-        int length = Math.min(limit, array.length);
 
-        Map<String, Object> forLoopMap = (Map<String, Object>)context.get(FORLOOP);
+        // these conversions still works with original array without cloning
+        // by just fixing offsets
+        // from - from
+        // to = limit ? limit.to_i + from : nil
+        int to;
+        if (limit > -1) {
+            to = Math.min(from + limit, array.length);
+        } else {
+            to = array.length;
+        }
+        from = Math.min(from, array.length);
+        int length = to - from;
 
-        forLoopMap.put(NAME, id + "-" + tokens[2].toString());
-
-        int continueIndex = offset;
-
-        for (int i = offset, n = 0; n < limit && i < array.length; i++, n++) {
-
-            context.incrementIterations();
-
-            continueIndex = i;
-
-            boolean first = (i == offset);
-            boolean last = ((n == limit - 1) || (i == array.length - 1));
-
-            context.put(id, array[i]);
-
-            forLoopMap.put(LENGTH, length);
-            forLoopMap.put(INDEX, n + 1);
-            forLoopMap.put(INDEX0, n);
-            forLoopMap.put(RINDEX, length - n);
-            forLoopMap.put(RINDEX0, length - n - 1);
-            forLoopMap.put(FIRST, first);
-            forLoopMap.put(LAST, last);
-
-            List<LNode> children = ((BlockNode)block).getChildren();
-            boolean isBreak = false;
-
-            for (LNode node : children) {
-
-                Object value = node.render(context);
-
-                if(value == LValue.CONTINUE) {
-                    // break from this inner loop: equals continue outer loop!
-                    break;
-                }
-
-                if(value == LValue.BREAK) {
-                    // break from inner loop
-                    isBreak = true;
-                    break;
-                }
-
-                if (value != null && value.getClass().isArray()) {
-
-                    Object[] arr = (Object[]) value;
-
-                    for (Object obj : arr) {
-                        builder.append(String.valueOf(obj));
-                    }
-                }
-                else {
-                    builder.append(super.asString(value));
-                }
-            }
-
-            if(isBreak) {
-                // break from outer loop
-                break;
-            }
+        List<Object> arrayList = Arrays.asList(array).subList(from, to);
+        if (reversed) {
+            ArrayList<Object> listCopy = new ArrayList<>(arrayList);
+            Collections.reverse(listCopy);
+            arrayList = listCopy;
         }
 
-        context.put(CONTINUE, continueIndex + 1, true);
+        // now the current offset and limit is known, so its safe to set "continue" lexem
+        // in case of fail it will fail
+        // offsets[@name] = from + segment.length
+        Map<String, Integer> registry = context.getRegistry(TemplateContext.REGISTRY_FOR);
+        registry.put(tagName, from + length);
+
+        ForLoopDrop forLoopDrop = createLoopDropInStack(context, tagName, length);
+        try {
+            for (Object o : arrayList) {
+                context.incrementIterations();
+                context.put(id, o);
+                boolean isBreak = renderForLoopBody(context, builder, ((BlockNode) block).getChildren());
+                forLoopDrop.increment();
+                if (isBreak) {
+                    break;
+                }
+            }
+        } finally {
+            popLoopDropFromStack(context);
+        }
 
         return builder.toString();
     }
 
-    private Object renderRange(String id, TemplateContext context, LNode... tokens) {
+    private ForLoopDrop createLoopDropInStack(TemplateContext context, String tagName, int length) {
+        Stack<ForLoopDrop> stack = getParentForloopDropStack(context);
+        ForLoopDrop parent = null;
+        if (!stack.empty()) {
+            parent = stack.peek();
+        }
+        ForLoopDrop forLoopDrop =  new ForLoopDrop(tagName, length, parent);
+        stack.push(forLoopDrop);
+        context.put(FORLOOP, forLoopDrop);
+        return forLoopDrop;
+    }
+
+    public void popLoopDropFromStack(TemplateContext context) {
+        Stack<ForLoopDrop> stack = getParentForloopDropStack(context);
+        if (!stack.isEmpty()) {
+            stack.pop();
+        }
+    }
+
+
+    private boolean renderForLoopBody(TemplateContext context, StringBuilder builder, List<LNode> children) {
+        boolean isBreak = false;
+
+        for (LNode node : children) {
+
+            Object value = node.render(context);
+
+            if(value == null) {
+                continue;
+            }
+
+            if(value == LValue.CONTINUE) {
+                // break from this inner loop: equals continue outer loop!
+                break;
+            }
+
+            if(value == LValue.BREAK) {
+                // break from inner loop
+                isBreak = true;
+                break;
+            }
+
+            if(super.isArray(value)) {
+
+                Object[] arr = super.asArray(value);
+
+                for (Object obj : arr) {
+                    builder.append(String.valueOf(obj));
+                }
+            } else {
+                builder.append(super.asString(value));
+            }
+        }
+        return isBreak;
+    }
+
+    private Object renderRange(String id, TemplateContext context, String tagName, boolean reversed, LNode... tokens) {
 
         StringBuilder builder = new StringBuilder();
 
-        // attributes start from index 5
-        Map<String, Integer> attributes = getAttributes(5, context, tokens);
+        // attributes start from index 7
+        Map<String, Integer> attributes = getAttributes(7, context, tagName, tokens);
 
         int offset = attributes.get(OFFSET);
         int limit = attributes.get(LIMIT);
 
         LNode block = tokens[4];
 
+        int from = super.asNumber(tokens[2].render(context)).intValue();
+        int to   = super.asNumber(tokens[3].render(context)).intValue();
+        int effectiveTo;
+        if (limit < 0) {
+            effectiveTo = to;
+        } else {
+            // 1 is because ranges right is inclusive
+            effectiveTo = Math.min(to, from + limit - 1);
+        }
+
+        int length = (to - from);
+
+        ForLoopDrop forLoopDrop = createLoopDropInStack(context, tagName, length);
         try {
-            int from = super.asNumber(tokens[2].render(context)).intValue();
-            int to = super.asNumber(tokens[3].render(context)).intValue();
 
-            int length = (to - from);
-
-            Map<String, Object> forLoopMap = (Map<String, Object>)context.get(FORLOOP);
-
-            int continueIndex = from + offset;
-
-            for (int i = from + offset, n = 0; i <= to && n < limit; i++, n++) {
-
-                context.incrementIterations();
-
-                continueIndex = i;
-
-                boolean first = (i == (from + offset));
-                boolean last = ((i == to) || (n == limit - 1));
-
-                context.put(id, i);
-
-                forLoopMap.put(LENGTH, length);
-                forLoopMap.put(INDEX, n + 1);
-                forLoopMap.put(INDEX0, n);
-                forLoopMap.put(RINDEX, length - n);
-                forLoopMap.put(RINDEX0, length - n - 1);
-                forLoopMap.put(FIRST, first);
-                forLoopMap.put(LAST, last);
-
-                List<LNode> children = ((BlockNode)block).getChildren();
-                boolean isBreak = false;
-
-                for (LNode node : children) {
-
-                    Object value = node.render(context);
-
-                    if(value == null) {
-                        continue;
-                    }
-
-                    if(value == LValue.CONTINUE) {
-                        // break from this inner loop: equals continue outer loop!
-                        break;
-                    }
-
-                    if(value == LValue.BREAK) {
-                        // break from inner loop
-                        isBreak = true;
-                        break;
-                    }
-
-                    if(super.isArray(value)) {
-
-                        Object[] arr = super.asArray(value);
-
-                        for (Object obj : arr) {
-                            builder.append(String.valueOf(obj));
-                        }
-                    }
-                    else {
-                        builder.append(super.asString(value));
-                    }
+            for (int i = from + offset; i <= effectiveTo; i++) {
+                int realI;
+                if (reversed) {
+                    realI = effectiveTo - (i - from - offset);
+                } else {
+                    realI = i;
                 }
 
+                context.incrementIterations();
+                context.put(id, realI);
+                boolean isBreak = renderForLoopBody(context, builder, ((BlockNode)block).getChildren());
+                forLoopDrop.increment();
                 if(isBreak) {
                     // break from outer loop
                     break;
                 }
             }
+        } finally {
+            popLoopDropFromStack(context);
+        }
 
-            context.put(CONTINUE, continueIndex + 1);
-        }
-        catch (ExceededMaxIterationsException e) {
-            throw e;
-        }
-        catch (Exception e) {
-            /* just ignore incorrect expressions */
-        }
 
         return builder.toString();
     }
 
-    private Map<String, Integer> getAttributes(int fromIndex, TemplateContext context, LNode... tokens) {
+    private Stack<ForLoopDrop> getParentForloopDropStack(TemplateContext context) {
+        Map<String, Stack<ForLoopDrop>> registry = context.getRegistry(TemplateContext.REGISTRY_FOR_STACK);
+        Stack<ForLoopDrop> stack = registry.get(TemplateContext.REGISTRY_FOR_STACK);
+        if (stack == null) {
+            stack = new Stack<>();
+            registry.put(TemplateContext.REGISTRY_FOR_STACK, stack);
+        }
+        return stack;
+    }
+
+    private Map<String, Integer> getAttributes(int fromIndex, TemplateContext context, String tagName, LNode... tokens) {
 
         Map<String, Integer> attributes = new HashMap<String, Integer>();
 
         attributes.put(OFFSET, 0);
-        attributes.put(LIMIT, Integer.MAX_VALUE);
+        attributes.put(LIMIT, -1);
 
         for (int i = fromIndex; i < tokens.length; i++) {
 
-            Object[] attribute = super.asArray(tokens[i].render(context));
-
-            try {
-                attributes.put(super.asString(attribute[0]), super.asNumber(attribute[1]).intValue());
-            }
-            catch (Exception e) {
-                /* just ignore incorrect attributes */
+            LNode token = tokens[i];
+            Object[] attribute = super.asArray(token.render(context));
+            // offset:continue
+            if (OFFSET.equals(super.asString(attribute[0])) && attribute[1] == LValue.CONTINUE) {
+                //      offsets = context.registers[:for] ||= {}
+                //      from = if @from == :continue
+                //        offsets[@name].to_i
+                //      else
+                //        context.evaluate(@from).to_i
+                //      end
+                Map<String, Integer> offsets = context.getRegistry(TemplateContext.REGISTRY_FOR);
+                attributes.put(OFFSET, offsets.get(tagName));
+            } else {
+                try {
+                    attributes.put(super.asString(attribute[0]), super.asNumber(attribute[1]).intValue());
+                }
+                catch (Exception e) {
+                    /* just ignore incorrect attributes */
+                }
             }
         }
 
         return attributes;
+    }
+
+    public static class ForLoopDrop implements LiquidSupport {
+
+        private final Map<String, Object> map = new HashMap<>();
+
+        private final ForLoopDrop parentloop;
+
+        private int index;
+
+        private int length;
+
+        public ForLoopDrop(String forName, int length, ForLoopDrop parent) {
+            map.put(NAME, forName);
+            this.length = length;
+            this.index = 0;
+            this.parentloop = parent;
+        }
+
+        @Override
+        public Map<String, Object> toLiquid() {
+            map.put(LENGTH, length);
+            map.put(INDEX, index + 1);
+            map.put(INDEX0, index);
+            map.put(RINDEX, length - index);
+            map.put(RINDEX0, length - index - 1);
+            boolean first = (index == 0);
+            boolean last = (index == (length-1));
+            map.put(FIRST, first);
+            map.put(LAST, last);
+            if (parentloop != null) {
+                map.put(PARENTLOOP, parentloop);
+            }
+            return map;
+        }
+
+        public void increment() {
+            index++;
+        }
     }
 }

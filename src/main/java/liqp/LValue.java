@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import liqp.nodes.AtomNode;
 
@@ -174,7 +176,11 @@ public abstract class LValue {
      */
     public Number asNumber(Object value) throws NumberFormatException {
 
-        if(value instanceof Number) {
+        if (value == null) {
+            return 0;
+        }
+
+        if (value instanceof Number) {
             return (Number) value;
         }
 

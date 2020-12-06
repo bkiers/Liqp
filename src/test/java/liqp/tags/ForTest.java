@@ -1,16 +1,23 @@
 package liqp.tags;
 
-import liqp.Template;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
+import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import liqp.RenderSettings;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.parser.Inspectable;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class ForTest {
 
@@ -27,7 +34,7 @@ public class ForTest {
                 {"{% for i in (1..item.quantity) %}{{ i }}{% endfor %}", "12345"},
                 {"{% for i in (1..3) %}{{ i }}{% endfor %}", "123"},
                 {"{% for i in (1..nil) %}{{ i }}{% endfor %}", ""},
-                {"{% for i in (XYZ .. 7) %}{{ i }}{% endfor %}", ""},
+                {"{% for i in (XYZ .. 7) %}{{ i }}{% endfor %}", "01234567"},
                 {"{% for i in (1 .. item.quantity) offset:2 %}{{ i }}{% endfor %}", "345"},
                 {"{% for i in (1.. item.quantity) offset:nil %}{{ i }}{% endfor %}", "12345"},
                 {"{% for i in (1 ..item.quantity) limit:4 OFFSET:2 %}{{ i }}{% endfor %}", "1234"},
@@ -54,7 +61,7 @@ public class ForTest {
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render(json));
 
-            assertThat(rendered, is(test[1]));
+            assertThat(test[0] + "=" + test[1], rendered, is(test[1]));
         }
     }
 
@@ -88,17 +95,85 @@ public class ForTest {
         assertThat(Template.parse("{%for item in array%}yo{%endfor%}").render("{\"array\":[1,2]}"), is("yoyo"));
         assertThat(Template.parse("{%for item in array%} yo {%endfor%}").render("{\"array\":[1]}"), is(" yo "));
         assertThat(Template.parse("{%for item in array%}{%endfor%}").render("{\"array\":[1,2]}"), is(""));
+        assertTemplateResult("\n"
+                + "  yo\n"
+                + "\n"
+                + "  yo\n"
+                + "\n"
+                + "  yo\n", "{%for item in array%}\n"
+                + "  yo\n"
+                + "{%endfor%}", singletonMap("array", new Integer[]{1,2,3}));
     }
 
     /*
-     * def test_for_with_range
-     *   assert_template_result(' 1  2  3 ','{%for item in (1..3) %} {{item}} {%endfor%}')
-     * end
+     *   def test_for_reversed
+     *     assigns = { 'array' => [ 1, 2, 3] }
+     *     assert_template_result('321', '{%for item in array reversed %}{{item}}{%endfor%}', assigns)
+     *   end
      */
     @Test
-    public void forWithRangeTest() throws RecognitionException {
+    public void testForReversed() {
+        assertTemplateResult("321", "{%for item in array reversed %}{{item}}{%endfor%}", singletonMap("array", new Integer[]{1,2,3}));
+    }
 
-        assertThat(Template.parse("{%for item in (1..3) %} {{item}} {%endfor%}").render(), is(" 1  2  3 "));
+    /*
+     *
+     *   def test_for_with_range
+     *     assert_template_result(' 1  2  3 ', '{%for item in (1..3) %} {{item}} {%endfor%}')
+     *
+     *     assert_raises(Liquid::ArgumentError) do
+     *       Template.parse('{% for i in (a..2) %}{% endfor %}').render!("a" => [1, 2])
+     *     end
+     *
+     *     assert_template_result(' 0  1  2  3 ', '{% for item in (a..3) %} {{item}} {% endfor %}', "a" => "invalid integer")
+     *   end
+     */
+    @Test
+    public void forWithRangeTest() {
+        assertTemplateResult(" 1  2  3 ", "{%for item in (1..3) %} {{item}} {%endfor%}");
+
+        try{
+            Template.parse("{% for i in (a..2) %}{% endfor %}").render("{\"a\" : [1, 2]}");
+            fail();
+        } catch (Exception e) { }
+
+        // assertTemplateResult(" 0  1  2  3 ", "{% for item in (a..3) %} {{item}} {% endfor %}", singletonMap("a", "invalid integer"));
+    }
+
+    /*
+     *  def test_for_with_variable_range
+     *     assert_template_result(' 1  2  3 ', '{%for item in (1..foobar) %} {{item}} {%endfor%}', "foobar" => 3)
+     *   end
+     */
+    @Test
+    public void test_for_with_variable_range () {
+        assertTemplateResult(" 1  2  3 ", "{%for item in (1..foobar) %} {{item}} {%endfor%}", singletonMap("foobar", 3));
+    }
+
+    /*
+     *   def test_for_with_hash_value_range
+     *     foobar = { "value" => 3 }
+     *     assert_template_result(' 1  2  3 ', '{%for item in (1..foobar.value) %} {{item}} {%endfor%}', "foobar" => foobar)
+     *   end
+     */
+    @Test
+    public void test_for_with_hash_value_range() {
+        assertTemplateResult(" 1  2  3 ", "{%for item in (1..foobar.value) %} {{item}} {%endfor%}", singletonMap("foobar", singletonMap("value", 3)));
+    }
+
+    /*
+     * def test_for_with_drop_value_range
+     *     foobar = ThingWithValue.new
+     *     assert_template_result(' 1  2  3 ', '{%for item in (1..foobar.value) %} {{item}} {%endfor%}', "foobar" => foobar)
+     *   end
+     */
+    @Test
+    public void test_for_with_drop_value_range() {
+        //noinspection unused
+        Object foobar = new Inspectable() {
+            public final int value = 3;
+        };
+        assertTemplateResult(" 1  2  3 ", "{%for item in (1..foobar.value) %} {{item}} {%endfor%}", singletonMap("foobar", foobar));
     }
 
     /*
@@ -619,11 +694,61 @@ public class ForTest {
                 "{{forloop.first}}-" +
                 "{{forloop.last}}-" +
                 "{{val}}{%endfor%}").render(json), is("val-string-1-1-0-1-0-true-true-test string"));
+    }
+
+    /*
+     *   def test_for_parentloop_references_parent_loop
+     *     assert_template_result('1.1 1.2 1.3 2.1 2.2 2.3 ',
+     *       '{% for inner in outer %}{% for k in inner %}' \
+     *       '{{ forloop.parentloop.index }}.{{ forloop.index }} ' \
+     *       '{% endfor %}{% endfor %}',
+     *       'outer' => [[1, 1, 1], [1, 1, 1]])
+     *   end
+     */
+    @Test
+    public void test_for_parentloop_references_parent_loop() {
+        assertTemplateResult("1.1 1.2 1.3 2.1 2.2 2.3 ", "{% for inner in outer %}{% for k in inner %}" +
+        "{{ forloop.parentloop.index }}.{{ forloop.index }} " +
+        "{% endfor %}{% endfor %}","{\"outer\" : [[1, 1, 1], [1, 1, 1]]}");
+    }
+
+    /*
+     *   def test_for_parentloop_nil_when_not_present
+     *     assert_template_result('.1 .2 ',
+     *       '{% for inner in outer %}' \
+     *       '{{ forloop.parentloop.index }}.{{ forloop.index }} ' \
+     *       '{% endfor %}',
+     *       'outer' => [[1, 1, 1], [1, 1, 1]])
+     *   end
+     */
+    @Test
+    public void test_for_parentloop_nil_when_not_present() {
+        assertTemplateResult(".1 .2 ", "{% for inner in outer %}" +
+                "{{ forloop.parentloop.index }}.{{ forloop.index }} " +
+                "{% endfor %}","{\"outer\" : [[1, 1, 1], [1, 1, 1]]}");
+    }
+
+    /*
+     *  def test_inner_for_over_empty_input
+     *     assert_template_result 'oo', '{% for a in (1..2) %}o{% for b in empty %}{% endfor %}{% endfor %}'
+     *   end
+     */
+    @Test
+    public void test_inner_for_over_empty_input() {
+        assertTemplateResult("oo", "{% for a in (1..2) %}o{% for b in empty %} {% endfor %}{% endfor %}");
+    }
+
+    @Test
+    public void testComplexArrayNameSuccess() {
+        // given
+        String json = "{ \"X\": [ { \"Y\":\"foo\"}, \"test string\" ] }";
 
         // extra `name` testjson = "{ \"string\":\"test string\" }";
-        json = "{ \"X\": [ { \"Y\":\"foo\"}, \"test string\" ] }";
-        assertThat(Template.parse("{% for x in X[0].Y %}{{forloop.name}}-{{x}}{%endfor%}").render(json),
-                is("x-X[0].Y-foo"));
+        String rendered = Template.parse("{% for x in X[0].Y %}{{forloop.name}}-{{x}}{%endfor%}").render(json);
+        // when
+
+        // then
+        assertThat(rendered, is("x-X[0].Y-foo"));
     }
 
     /*
@@ -633,9 +758,10 @@ public class ForTest {
      */
     @Test
     public void blankStringNotIterableTest() throws RecognitionException {
-
+        assertTemplateResult("", "{% for char in characters %}I WILL NOT BE OUTPUT{% endfor %}", singletonMap("characters", ""));
         assertThat(Template.parse("{% for char in characters %}I WILL NOT BE OUTPUT{% endfor %}").render(), is(""));
     }
+
 
     /*
      * Verified with the following Ruby code:
@@ -734,5 +860,62 @@ public class ForTest {
 
         // then
         assertEquals("4.5", rendered);
+    }
+
+    @Test
+    public void testContinueOutOfContext() {
+        final String assigns = "{ \"array\": { \"items\":[1,2,3,4,5,6,7,8,9,0] } }";
+
+        final String markup = "{%for i in array.items limit:9 %}{%endfor%}{%for i in array.items offset:continue %}{{i}}{%endfor%}" +
+                "{{ continue }}";
+
+        String rendered = Template.parse(markup).render(assigns);
+        assertEquals("0", rendered);
+    }
+
+    @Test
+    public void testReversedSimple() {
+        assertEquals("987654321", Template.parse("{%for i in (1..9) reversed %}{{i}}{%endfor%}").render());
+        assertEquals("121:120:", Template.parse("{%for i in (116..121) reversed offset: 4 %}{{i}}:{%endfor%}").render());
+        assertEquals("", Template.parse("{%for i in (121..116) reversed offset: 4 %}{{i}}:{%endfor%}").render());
+    }
+
+    /*
+     * def test_for_cleans_up_registers
+     *     context = Context.new(ErrorDrop.new)
+     *
+     *     assert_raises(StandardError) do
+     *       Liquid::Template.parse('{% for i in (1..2) %}{{ standard_error }}{% endfor %}').render!(context)
+     *     end
+     *
+     *     assert context.registers[:for_stack].empty?
+     *   end
+     */
+    @Test
+    public void test_for_cleans_up_registers() {
+        Template.ContextHolder holder = new Template.ContextHolder();
+        try {
+            Template.parse("{% for i in (1..2) %}{{ standard_error }}{% endfor %}")
+                    .withContextHolder(holder)
+                    .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build())
+                    .render();
+            fail();
+        } catch (Exception e) {
+
+        } finally {
+            assertTrue(holder.getContext().getRegistry(TemplateContext.REGISTRY_FOR).isEmpty());
+        }
+    }
+
+
+    public void assertTemplateResult(String expected, String template) {
+        assertThat(Template.parse(template).render(), is(expected));
+    }
+
+    public void assertTemplateResult(String expected, String template, Map data) {
+        assertThat(Template.parse(template).render(data), is(expected));
+    }
+    public void assertTemplateResult(String expected, String template, String data) {
+        assertThat(Template.parse(template).render(data), is(expected));
     }
 }

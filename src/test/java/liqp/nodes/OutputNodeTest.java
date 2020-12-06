@@ -59,6 +59,8 @@ public class OutputNodeTest {
                 "end",
                 "break",
                 "continue",
+                "offset",
+                "reversed"
         };
 
         for (String keyword : keywords) {
@@ -69,7 +71,7 @@ public class OutputNodeTest {
             Template template = Template.parse(test);
             String rendered = template.render(json);
 
-            assertThat(rendered, is(expected));
+            assertThat(rendered + "=" + expected, rendered, is(expected));
         }
     }
 

@@ -81,7 +81,7 @@ class For extends Tag {
             data = new ArrayList<>();
         }
 
-        // attributes start from index 6
+        // attributes start from index 7
         Map<String, Integer> attributes = getAttributes(7, context, tagName, tokens);
 
         int from = attributes.get(OFFSET);
@@ -208,7 +208,7 @@ class For extends Tag {
 
         StringBuilder builder = new StringBuilder();
 
-        // attributes start from index 6
+        // attributes start from index 7
         Map<String, Integer> attributes = getAttributes(7, context, tagName, tokens);
 
         int offset = attributes.get(OFFSET);

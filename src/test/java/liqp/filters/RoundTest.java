@@ -37,7 +37,7 @@ public class RoundTest {
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render(test[2]));
 
-            assertTrue(rendered.equals(test[1]) || rendered.equals(test[1].replace('.', ',')));
+            assertTrue(test[0] + " with data: " + test[2] + " = " + test[1] + " ,but was: " + rendered, rendered.equals(test[1]) || rendered.equals(test[1].replace('.', ',')));
         }
     }
 }

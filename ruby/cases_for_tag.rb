@@ -52,3 +52,4 @@ end
 # assert_template_result(' 0  1  2  3 ', '{% for item in (a..3) %} {{item}} {% endfor %}', "a" => "invalid integer")
 # pp render({"a" => "invalid integer"}, '{% for item in (a..3) %} {{item}} {% endfor %}')
 # pp render({"empty" => [1,2,3] }, "{% for item in empty %} {{item}} {% endfor %}")
+assertEqual(1, render({"num" => "1.2foo"}, "{{ num | round: 2 }}"))

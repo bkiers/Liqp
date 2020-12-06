@@ -180,14 +180,6 @@ public abstract class LValue {
             return 0;
         }
 
-        if (value instanceof String) {
-            Matcher matcher = Pattern.compile("[\\d.]+").matcher((String) value);
-            if (matcher.find()) {
-                return Double.valueOf(matcher.group());
-            }
-            return 0;
-        }
-
         if (value instanceof Number) {
             return (Number) value;
         }

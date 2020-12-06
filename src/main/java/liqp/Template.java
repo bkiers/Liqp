@@ -58,6 +58,8 @@ public class Template {
 
     private TemplateContext templateContext = null;
 
+    private ContextHolder contextHolder;
+
     /**
      * Creates a new Template instance from a given input.
      *  @param input
@@ -290,6 +292,26 @@ public class Template {
         return this;
     }
 
+    /**
+     * Sometimes the custom tags needs to return some extra-data, that is not rendarable.
+     * Best way to allow this and keeping existing
+     * simplicity(when the result is a string) is: provide holder with container for that data.
+     * Best container is current templateContext, and it is set into this holder during creation.
+     */
+    public static class ContextHolder {
+        private TemplateContext context;
+        private void setContext(TemplateContext context) {
+            this.context = context;
+        }
+        public TemplateContext getContext() {
+            return context;
+        }
+    }
+    public Template withContextHolder(ContextHolder holder) {
+        this.contextHolder = holder;
+        return this;
+    }
+
     public List<RuntimeException> errors() {
         return this.templateContext == null ? new ArrayList<RuntimeException>() : this.templateContext.errors();
     }
@@ -435,6 +457,9 @@ public class Template {
         try {
             LNode node = visitor.visit(root);
             this.templateContext = new TemplateContext(protectionSettings, renderSettings, parseSettings, variables);
+            if (this.contextHolder != null) {
+                contextHolder.setContext(templateContext);
+            }
             Object rendered = node.render(this.templateContext);
             return rendered == null ? "" : String.valueOf(rendered);
         }

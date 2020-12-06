@@ -188,7 +188,8 @@ term
  ;
 
 lookup
- : id index* QMark?   #lookup_id_indexes
+ : Empty              #lookup_empty
+ | id index* QMark?   #lookup_id_indexes
  | OBr Str CBr QMark? #lookup_Str
  | OBr Id CBr QMark?  #lookup_Id
  ;

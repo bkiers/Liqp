@@ -11,6 +11,7 @@ import java.util.Stack;
 import liqp.LValue;
 import liqp.TemplateContext;
 import liqp.exceptions.ExceededMaxIterationsException;
+import liqp.nodes.AtomNode;
 import liqp.nodes.BlockNode;
 import liqp.nodes.LNode;
 import liqp.parser.Inspectable;
@@ -27,7 +28,6 @@ class For extends Tag {
 
     private static final String OFFSET = "offset";
     private static final String LIMIT = "limit";
-    private static final String CONTINUE = "continue";
 
     /*
      * forloop.length      # => length of the entire for loop
@@ -75,8 +75,11 @@ class For extends Tag {
     private Object renderArray(String id, TemplateContext context, String tagName, boolean reversed, LNode... tokens) {
 
         StringBuilder builder = new StringBuilder();
-        // without early rendering the tag name will be incorrect
+
         Object data = tokens[2].render(context);
+        if (AtomNode.isEmpty(data) || "".equals(data)) {
+            data = new ArrayList<>();
+        }
 
         // attributes start from index 6
         Map<String, Integer> attributes = getAttributes(7, context, tagName, tokens);
@@ -213,51 +216,42 @@ class For extends Tag {
 
         LNode block = tokens[4];
 
+        int from = super.asNumber(tokens[2].render(context)).intValue();
+        int to   = super.asNumber(tokens[3].render(context)).intValue();
+        int effectiveTo;
+        if (limit < 0) {
+            effectiveTo = to;
+        } else {
+            // 1 is because ranges right is inclusive
+            effectiveTo = Math.min(to, from + limit - 1);
+        }
+
+        int length = (to - from);
+
+        ForLoopDrop forLoopDrop = createLoopDropInStack(context, tagName, length);
         try {
-            int from = super.asNumber(tokens[2].render(context)).intValue();
-            int to = super.asNumber(tokens[3].render(context)).intValue();
 
-            int effectiveTo;
-            if (limit < 0) {
-                effectiveTo = to;
-            } else {
-                // 1 is because ranges right is inclusive
-                effectiveTo = Math.min(to, from + limit - 1);
-            }
-
-            int length = (to - from);
-
-            ForLoopDrop forLoopDrop = createLoopDropInStack(context, tagName, length);
-            try {
-
-                for (int i = from + offset; i <= effectiveTo; i++) {
-                    int realI;
-                    if (reversed) {
-                        realI = effectiveTo - (i - from - offset);
-                    } else {
-                        realI = i;
-                    }
-
-                    context.incrementIterations();
-                    context.put(id, realI);
-                    boolean isBreak = renderForLoopBody(context, builder, ((BlockNode)block).getChildren());
-                    forLoopDrop.increment();
-                    if(isBreak) {
-                        // break from outer loop
-                        break;
-                    }
+            for (int i = from + offset; i <= effectiveTo; i++) {
+                int realI;
+                if (reversed) {
+                    realI = effectiveTo - (i - from - offset);
+                } else {
+                    realI = i;
                 }
-            } finally {
-                popLoopDropFromStack(context);
-            }
 
+                context.incrementIterations();
+                context.put(id, realI);
+                boolean isBreak = renderForLoopBody(context, builder, ((BlockNode)block).getChildren());
+                forLoopDrop.increment();
+                if(isBreak) {
+                    // break from outer loop
+                    break;
+                }
+            }
+        } finally {
+            popLoopDropFromStack(context);
         }
-        catch (ExceededMaxIterationsException e) {
-            throw e;
-        }
-        catch (Exception e) {
-            /* just ignore incorrect expressions */
-        }
+
 
         return builder.toString();
     }

@@ -662,7 +662,12 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
     return visit(ctx.expr());
   }
 
-  // lookup
+  @Override
+  public LNode visitLookup_empty(Lookup_emptyContext ctx) {
+    return AtomNode.EMPTY;
+  }
+
+    // lookup
   //  : id index* QMark?   #lookup_id_indexes
   //  | ...
   //  ;

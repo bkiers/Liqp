@@ -1,3 +1,5 @@
 language: java
-
 sudo: false
+env:
+  global:
+    - TMPDIR=/tmp

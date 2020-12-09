@@ -2,6 +2,7 @@ package liqp;
 
 import liqp.parser.Inspectable;
 import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;

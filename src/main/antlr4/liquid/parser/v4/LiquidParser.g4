@@ -4,6 +4,24 @@ options {
   tokenVocab=LiquidLexer;
 }
 
+@members {
+    private boolean isLiquid = true;
+
+    private boolean isLiquid(){
+        return isLiquid;
+    }
+
+    private boolean isJekyll(){
+        return !isLiquid;
+    }
+
+    public LiquidParser(TokenStream input, boolean isLiquid) {
+        this(input);
+        this.isLiquid = isLiquid;
+    }
+
+}
+
 parse
  : block EOF
  ;
@@ -136,13 +154,19 @@ capture_tag
  ;
 
 include_tag
- : tagStart Include file_name_or_output (With Str)? TagEnd
+ : {isLiquid()}? tagStart liquid=Include expr (With Str)? TagEnd
+ | {isJekyll()}? tagStart jekyll=Include file_name_or_output (jekyll_include_params)* TagEnd
  ;
 
+// only valid for Flavor.JEKYLL
 file_name_or_output
- : Str                          #file_name_or_output_Str
- | output                       #file_name_or_output_output // only valid for Flavor.JEKYLL
- | other_than_tag_end_out_start #file_name_or_output_other_than_tag_end_out_start // only valid for Flavor.JEKYLL
+ : output   #jekyll_include_output
+ | filename #jekyll_include_filename
+ ;
+
+// only valid for Flavor.JEKYLL
+jekyll_include_params
+ : id '=' expr
  ;
 
 output
@@ -250,8 +274,8 @@ other_than_tag_end
  : ~TagEnd+
  ;
 
-other_than_tag_end_out_start
- : ~(TagEnd | OutStart | OutStart2)+
+filename
+ : ( . )+?
  ;
 
 tagStart

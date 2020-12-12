@@ -10,8 +10,8 @@ import org.junit.Test;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
 
 public class LiquidParserTest {
 
@@ -280,17 +280,17 @@ public class LiquidParserTest {
         );
 
         assertThat(
-                texts("{% include 'some-file.ext' wihk 'something-esse' %}", "include_tag"),
+                texts("{% include 'some-file.ext' wihk 'something-esse' %}", "include_tag", false),
                 equalTo(array("{%", "include", "'some-file.ext'wihk'something-esse'", "%}"))
         );
 
         assertThat(
-                texts("{% include some-file.ext with mu %}", "include_tag"),
+                texts("{% include some-file.ext with mu %}", "include_tag", false),
                 equalTo(array("{%", "include", "some-file.extwithmu", "%}"))
         );
 
         assertThat(
-                texts("{% include {{variable}} %}", "include_tag"),
+                texts("{% include {{variable}} %}", "include_tag", false),
                 equalTo(array("{%", "include", "{{variable}}", "%}"))
         );
     }
@@ -334,11 +334,16 @@ public class LiquidParserTest {
         );
     }
 
-    private static String[] texts(String source, String ruleName) {
 
-        ParseTree tree = parse(source, ruleName);
+    private static String[] texts(String source, String ruleName, boolean isLiquid) {
+        ParseTree tree = parse(source, ruleName, isLiquid);
 
         return texts(tree);
+    }
+
+
+    private static String[] texts(String source, String ruleName) {
+        return texts(source, ruleName, true);
     }
 
     private static String[] texts(ParseTree tree) {
@@ -352,9 +357,9 @@ public class LiquidParserTest {
         return childrenTexts;
     }
 
-    private static ParseTree parse(String source, String ruleName) {
+    private static ParseTree parse(String source, String ruleName, boolean isLiquid) {
 
-        LiquidParser parser = new LiquidParser(LiquidLexerTest.commonTokenStream(source, false));
+        LiquidParser parser = new LiquidParser(LiquidLexerTest.commonTokenStream(source, false), isLiquid);
 
         parser.addErrorListener(new BaseErrorListener(){
             @Override

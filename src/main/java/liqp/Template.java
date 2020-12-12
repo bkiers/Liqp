@@ -145,7 +145,7 @@ public class Template {
 
         try {
             this.templateSize = stream.size();
-            LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
+            LiquidLexer lexer = new LiquidLexer(stream,parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine);
             root = parse(lexer);
         }
         catch (Exception e) {
@@ -186,7 +186,7 @@ public class Template {
         });
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        LiquidParser parser = new LiquidParser(tokens);
+        LiquidParser parser = new LiquidParser(tokens, this.parseSettings.flavor == Flavor.LIQUID);
 
         parser.removeErrorListeners();
 
@@ -253,7 +253,7 @@ public class Template {
         return new Template(file, Tag.getTags(), Filter.getFilters(parseSettings.flavor), parseSettings, renderSettings);
     }
 
-    public static Template parse(String  template, ParseSettings parseSettings, RenderSettings renderSettings) throws IOException {
+    public static Template parse(String  template, ParseSettings parseSettings, RenderSettings renderSettings) {
         return new Template(template, Tag.getTags(), Filter.getFilters(parseSettings.flavor), parseSettings, renderSettings);
     }
 

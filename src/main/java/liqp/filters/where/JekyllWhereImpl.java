@@ -1,6 +1,7 @@
 package liqp.filters.where;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import liqp.TemplateContext;
 import liqp.nodes.AtomNode;
 import liqp.parser.Flavor;
 
@@ -17,8 +18,8 @@ import java.util.Map;
  */
 public class JekyllWhereImpl extends WhereImpl {
 
-    public JekyllWhereImpl(ObjectMapper mapper, PropertyResolverAdapter.Helper helper) {
-        super(mapper, Flavor.JEKYLL, helper);
+    public JekyllWhereImpl(TemplateContext templateContext, PropertyResolverAdapter.Helper helper) {
+        super(templateContext, helper);
     }
 
     /*
@@ -193,7 +194,7 @@ public class JekyllWhereImpl extends WhereImpl {
     private Object itemProperty(Object e, Object property) {
         PropertyResolverAdapter adapter = resolverHelper.findFor(e);
         if (adapter != null) {
-            return parseSortInput(adapter.getItemProperty(mapper, e, property));
+            return parseSortInput(adapter.getItemProperty(context, e, property));
         }
         return parseSortInput(((Map) e).get(property));
     }

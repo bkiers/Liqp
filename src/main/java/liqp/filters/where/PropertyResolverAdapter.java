@@ -1,6 +1,7 @@
 package liqp.filters.where;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import liqp.TemplateContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.List;
  *
  */
 public interface PropertyResolverAdapter {
-    Object getItemProperty(ObjectMapper mapper,  Object input, Object property);
+    Object getItemProperty(TemplateContext context, Object input, Object property);
 
     boolean support(Object target);
 

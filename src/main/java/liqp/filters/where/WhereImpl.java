@@ -2,6 +2,7 @@ package liqp.filters.where;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.LValue;
+import liqp.TemplateContext;
 import liqp.parser.Flavor;
 
 /**
@@ -9,14 +10,12 @@ import liqp.parser.Flavor;
  */
 public abstract class WhereImpl extends LValue {
 
-    protected final ObjectMapper mapper;
-    protected final Flavor flavor;
+    protected final TemplateContext context;
     protected final PropertyResolverAdapter.Helper resolverHelper;
 
-    protected WhereImpl(ObjectMapper mapper, Flavor flavor, PropertyResolverAdapter.Helper helper) {
-        this.mapper = mapper;
-        this.flavor = flavor;
-        resolverHelper = helper;
+    protected WhereImpl(TemplateContext context, PropertyResolverAdapter.Helper helper) {
+        this.context = context;
+        this.resolverHelper = helper;
     }
 
     public abstract Object apply(Object value, Object... params);

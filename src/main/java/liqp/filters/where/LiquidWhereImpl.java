@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import liqp.TemplateContext;
 import liqp.parser.Flavor;
 
 import java.lang.reflect.Array;
@@ -19,8 +20,8 @@ import java.util.Objects;
  */
 public class LiquidWhereImpl extends WhereImpl {
 
-    public LiquidWhereImpl(ObjectMapper mapper, PropertyResolverAdapter.Helper helper) {
-        super(mapper, Flavor.LIQUID, helper);
+    public LiquidWhereImpl(TemplateContext mapper, PropertyResolverAdapter.Helper helper) {
+        super(mapper, helper);
     }
 
     /*
@@ -83,8 +84,9 @@ public class LiquidWhereImpl extends WhereImpl {
         String property = asString(rawProperty);
         PropertyResolverAdapter resolver = resolverHelper.findFor(el);
         Object node;
+        ObjectMapper mapper = context.parseSettings.mapper;
         if (resolver != null) {
-            node = resolver.getItemProperty(mapper, el, rawProperty);
+            node = resolver.getItemProperty(context, el, rawProperty);
         } else {
             Map map = mapper.convertValue(el, Map.class);
             if (!map.containsKey(property)) {

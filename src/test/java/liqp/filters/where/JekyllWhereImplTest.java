@@ -3,6 +3,7 @@ package liqp.filters.where;
 import liqp.ParseSettings;
 import liqp.Template;
 import liqp.parser.Flavor;
+import liqp.parser.LiquidSupport;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -416,5 +417,44 @@ public class JekyllWhereImplTest {
         String rendered = parse("{{ x | where: 'rating', 1.2 | first | map: 'rating' }}")
                 .render(true, "x", data);
         assertEquals("1.2", rendered);
+    }
+
+
+    public static class SampleLiquidSupport implements LiquidSupport {
+        public final JekyllWhereImplTest.SampleLiquidSupport notMappableCircularRef;
+        public Boolean val;
+        public final String marker;
+
+        public SampleLiquidSupport(Boolean val, String marker) {
+            this.val = val;
+            this.marker = marker;
+            this.notMappableCircularRef = this;
+        }
+
+        @Override
+        public Map<String, Object> toLiquid() {
+            HashMap<String, Object> res = new HashMap<>();
+            res.put("val", !val);
+            res.put("marker", marker + "!");
+            return res;
+        }
+    }
+    @Test
+    public void testLiquidSupportIsInspected() {
+        // given
+        List<SampleLiquidSupport> arr = new ArrayList<>();
+        arr.add(new SampleLiquidSupport(true, "good1"));
+        arr.add(new SampleLiquidSupport(false, "good2"));
+        arr.add(new SampleLiquidSupport(true, "good3"));
+        Map<String, Object> data = Collections.singletonMap("x", (Object)arr);
+
+        // when
+        String rendered = parse("{% assign items = x | where: 'val', 'true' %}" +
+                "{% for item in items %}" +
+                "{{ item.marker }} " +
+                "{% endfor %}").render(data);
+
+        // then
+        assertEquals("good2! ", rendered);
     }
 }

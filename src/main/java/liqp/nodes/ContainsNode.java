@@ -1,9 +1,12 @@
 package liqp.nodes;
 
-import java.util.Arrays;
-import java.util.Map;
 import liqp.LValue;
 import liqp.TemplateContext;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ContainsNode extends LValue implements LNode {
 
@@ -23,7 +26,9 @@ public class ContainsNode extends LValue implements LNode {
 
         if(super.isArray(collection)) {
             Object[] array = super.asArray(collection);
-            return Arrays.asList(array).contains(needle);
+            List<Object> finalCollection = toSingleNumberType(Arrays.asList(array));
+            needle = toSingleNumberType(needle);
+            return finalCollection.contains(needle);
         }
 
         if(super.isString(collection)) {
@@ -31,5 +36,24 @@ public class ContainsNode extends LValue implements LNode {
         }
 
         return false;
+    }
+
+    private Object toSingleNumberType(Object needle) {
+        if (needle instanceof Number) {
+            needle = new BigDecimal(needle.toString()).stripTrailingZeros();
+        }
+        return needle;
+    }
+
+    private List<Object> toSingleNumberType(List<Object> asList) {
+        ArrayList<Object> res = new ArrayList<>(asList.size());
+        for(Object item: asList) {
+            if (item instanceof Number) {
+                res.add(new BigDecimal(item.toString()).stripTrailingZeros());
+            } else {
+                res.add(item);
+            }
+        }
+        return res;
     }
 }

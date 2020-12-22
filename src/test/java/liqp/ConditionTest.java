@@ -3,9 +3,9 @@ package liqp;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
 
 import static liqp.TestUtils.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class ConditionTest {
 

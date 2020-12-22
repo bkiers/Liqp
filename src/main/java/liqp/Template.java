@@ -452,7 +452,7 @@ public class Template {
         return renderUnguarded(variables, null);
     }
 
-    private String renderUnguarded(Map<String, Object> variables, TemplateContext parent) {
+    public String renderUnguarded(Map<String, Object> variables, TemplateContext parent) {
         if (variables.containsKey(Include.INCLUDES_DIRECTORY_KEY)) {
             Object includeDirectory = variables.get(Include.INCLUDES_DIRECTORY_KEY);
             if (includeDirectory instanceof File) {
@@ -469,7 +469,7 @@ public class Template {
             if (parent == null) {
                 this.templateContext = new TemplateContext(protectionSettings, renderSettings, parseSettings, variables);
             } else {
-                this.templateContext = new TemplateContext(parent);
+                this.templateContext = new TemplateContext(parent, variables);
             }
             if (this.contextHolder != null) {
                 contextHolder.setContext(templateContext);

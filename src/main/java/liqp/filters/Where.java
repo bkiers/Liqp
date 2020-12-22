@@ -1,15 +1,11 @@
 package liqp.filters;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import liqp.LValue;
 import liqp.TemplateContext;
 import liqp.filters.where.JekyllWhereImpl;
 import liqp.filters.where.LiquidWhereImpl;
-import liqp.filters.where.PropertyResolverAdapter;
+import liqp.filters.where.PropertyResolverHelper;
 import liqp.filters.where.WhereImpl;
 import liqp.parser.Flavor;
-import liqp.parser.Inspectable;
-import liqp.parser.LiquidSupport;
 
 /**
  * There are two different implementations of this filter in ruby.
@@ -28,25 +24,6 @@ import liqp.parser.LiquidSupport;
  */
 public class Where extends Filter {
 
-    public static final PropertyResolverAdapter.Helper HELPER = new PropertyResolverAdapter.Helper();
-    static {
-        // default resolver for Inspectable type
-        // allow Inspectable items to be inspected via "where" filter
-        HELPER.add(new PropertyResolverAdapter() {
-            // dummy LValue for accessing helper method #asString
-            private final LValue lValue = new LValue() {};
-            @Override
-            public Object getItemProperty(TemplateContext context, Object input, Object property) {
-                LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) input);
-                return evaluated.toLiquid().get(lValue.asString(property));
-            }
-
-            @Override
-            public boolean support(Object target) {
-                return target instanceof Inspectable;
-            }
-        });
-    }
 
     public Where(){
         super("where");
@@ -57,10 +34,10 @@ public class Where extends Filter {
         WhereImpl delegate;
         if (context.parseSettings.flavor == Flavor.JEKYLL) {
             checkParams(params, 2);
-            delegate = new JekyllWhereImpl(context, HELPER);
+            delegate = new JekyllWhereImpl(context, PropertyResolverHelper.INSTANCE);
         } else {
             checkParams(params, 1, 2);
-            delegate = new LiquidWhereImpl(context, HELPER);
+            delegate = new LiquidWhereImpl(context, PropertyResolverHelper.INSTANCE);
         }
         return delegate.apply(value, params);
     }

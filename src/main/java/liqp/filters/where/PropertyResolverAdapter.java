@@ -1,10 +1,6 @@
 package liqp.filters.where;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.TemplateContext;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Used for resolving properties by name for specific kind of objects.
@@ -25,27 +21,4 @@ public interface PropertyResolverAdapter {
     Object getItemProperty(TemplateContext context, Object input, Object property);
 
     boolean support(Object target);
-
-    class Helper {
-        private final List<PropertyResolverAdapter> propertyResolverAdapters;
-
-        public Helper() {
-            this.propertyResolverAdapters = new ArrayList<>();
-        }
-
-        public void add(PropertyResolverAdapter one) {
-            this.propertyResolverAdapters.add(one);
-        }
-
-        public PropertyResolverAdapter findFor(Object target) {
-            for (PropertyResolverAdapter e : propertyResolverAdapters) {
-                if (e.support(target)) {
-                    return e;
-                }
-            }
-            return null;
-        }
-    }
-
-
 }

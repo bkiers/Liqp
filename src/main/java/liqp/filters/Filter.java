@@ -79,8 +79,10 @@ public abstract class Filter extends LValue {
         registerFilter(new Url_Decode());
         registerFilter(new Url_Encode());
 
-        Filter filter = new Normalize_Whitespace();
-        JEKYLL_FILTERS.put(filter.name, filter);
+        Filter nWSFilter = new Normalize_Whitespace();
+        JEKYLL_FILTERS.put(nWSFilter.name, nWSFilter);
+        Filter whereExp = new Where_Exp();
+        JEKYLL_FILTERS.put(whereExp.name, whereExp);
 
         registerFilter(new Where());
     }

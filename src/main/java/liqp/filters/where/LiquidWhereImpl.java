@@ -2,15 +2,11 @@ package liqp.filters.where;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import liqp.TemplateContext;
-import liqp.parser.Flavor;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -20,7 +16,7 @@ import java.util.Objects;
  */
 public class LiquidWhereImpl extends WhereImpl {
 
-    public LiquidWhereImpl(TemplateContext mapper, PropertyResolverAdapter.Helper helper) {
+    public LiquidWhereImpl(TemplateContext mapper, PropertyResolverHelper helper) {
         super(mapper, helper);
     }
 

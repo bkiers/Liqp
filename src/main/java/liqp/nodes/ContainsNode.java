@@ -2,6 +2,8 @@ package liqp.nodes;
 
 import liqp.LValue;
 import liqp.TemplateContext;
+import liqp.parser.Inspectable;
+import liqp.parser.LiquidSupport;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,6 +31,15 @@ public class ContainsNode extends LValue implements LNode {
             List<Object> finalCollection = toSingleNumberType(Arrays.asList(array));
             needle = toSingleNumberType(needle);
             return finalCollection.contains(needle);
+        }
+
+        if (collection instanceof Inspectable) {
+            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) collection);
+            collection = evaluated.toLiquid();
+        }
+
+        if (isMap(collection)) {
+            return asMap(collection).containsKey(asString(needle));
         }
 
         if(super.isString(collection)) {

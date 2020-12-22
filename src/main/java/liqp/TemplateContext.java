@@ -53,6 +53,11 @@ public class TemplateContext {
         this.parent = parent;
     }
 
+    public TemplateContext(TemplateContext parent, Map<String, Object> variables) {
+        this(parent);
+        this.variables = variables;
+    }
+
     public void addError(RuntimeException exception) {
         this.errors.add(exception);
     }

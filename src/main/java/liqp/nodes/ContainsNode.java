@@ -26,20 +26,20 @@ public class ContainsNode extends LValue implements LNode {
         Object collection = lhs.render(context);
         Object needle = rhs.render(context);
 
-        if(super.isArray(collection)) {
-            Object[] array = super.asArray(collection);
-            List<Object> finalCollection = toSingleNumberType(Arrays.asList(array));
-            needle = toSingleNumberType(needle);
-            return finalCollection.contains(needle);
-        }
-
         if (collection instanceof Inspectable) {
             LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) collection);
             collection = evaluated.toLiquid();
         }
 
         if (isMap(collection)) {
-            return asMap(collection).containsKey(asString(needle));
+            collection = asMap(collection).keySet().toArray();
+        }
+
+        if(super.isArray(collection)) {
+            Object[] array = super.asArray(collection);
+            List<Object> finalCollection = toSingleNumberType(Arrays.asList(array));
+            needle = toSingleNumberType(needle);
+            return finalCollection.contains(needle);
         }
 
         if(super.isString(collection)) {

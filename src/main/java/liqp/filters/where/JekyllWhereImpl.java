@@ -1,9 +1,7 @@
 package liqp.filters.where;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.TemplateContext;
 import liqp.nodes.AtomNode;
-import liqp.parser.Flavor;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,7 +16,7 @@ import java.util.Map;
  */
 public class JekyllWhereImpl extends WhereImpl {
 
-    public JekyllWhereImpl(TemplateContext templateContext, PropertyResolverAdapter.Helper helper) {
+    public JekyllWhereImpl(TemplateContext templateContext, PropertyResolverHelper helper) {
         super(templateContext, helper);
     }
 

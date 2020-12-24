@@ -83,6 +83,8 @@ public abstract class Filter extends LValue {
         JEKYLL_FILTERS.put(nWSFilter.name, nWSFilter);
         Filter whereExp = new Where_Exp();
         JEKYLL_FILTERS.put(whereExp.name, whereExp);
+        Filter relativeUrl = new Relative_Url();
+        JEKYLL_FILTERS.put(relativeUrl.name, relativeUrl);
 
         registerFilter(new Where());
     }

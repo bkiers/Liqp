@@ -1,19 +1,32 @@
 package liqp.filters;
 
 import liqp.TemplateContext;
+import liqp.parser.Inspectable;
+import liqp.parser.LiquidSupport;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 /**
  * This filter requires <code>baseurl</code> parameter
  * that will be used as base for building relative url.
  */
 public class Relative_Url extends Filter {
+    public static final String root = "site";
     public static final String baseurl = "baseurl";
     @Override
     public Object apply(Object value, TemplateContext context, Object... params) {
-        Object baseUrl = context.get(baseurl);
+        Object configRoot = context.get(root);
+
+        if (configRoot instanceof Inspectable) {
+            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) configRoot);
+            configRoot = evaluated.toLiquid();
+        }
+        Object baseUrl = null;
+        if (isMap(configRoot)) {
+            baseUrl = asMap(configRoot).get(baseurl);
+        }
         String valAsString = asString(value);
 
         // fast exit for valid absolute urls

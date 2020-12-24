@@ -3,10 +3,12 @@ package liqp.filters;
 import liqp.ParseSettings;
 import liqp.Template;
 import liqp.parser.Flavor;
+import liqp.parser.Inspectable;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 public class Relative_UrlTest {
@@ -20,7 +22,7 @@ public class Relative_UrlTest {
     @Test
     public void testProduceARelativeURLFromAPageURL() {
         String res = Template.parse("{{ '/about/my_favorite_page/' | relative_url }}", jekyll())
-                .render(Collections.singletonMap("baseurl", (Object) "/base"));
+                .render(getData("/base"));
         assertEquals("/base/about/my_favorite_page/", res);
     }
 
@@ -33,7 +35,7 @@ public class Relative_UrlTest {
     @Test
     public void testEnsureTheLeadingSlashBetweenBaseurlAndInput() {
         String res = Template.parse("{{ 'about/my_favorite_page/' | relative_url }}", jekyll())
-                .render(Collections.singletonMap("baseurl", (Object) "/base"));
+                .render(getData("/base"));
         assertEquals("/base/about/my_favorite_page/", res);
     }
 
@@ -47,14 +49,14 @@ public class Relative_UrlTest {
     @Test
     public void testEnsureTheLeadingSlashForTheBaseurl() {
         String res = Template.parse("{{ 'about/my_favorite_page/' | relative_url }}", jekyll())
-                .render(Collections.singletonMap("baseurl", (Object) "base"));
+                .render(getData("base"));
         assertEquals("/base/about/my_favorite_page/", res);
     }
 
     @Test
     public void testNormalizeInternationalURLs() {
         String res = Template.parse("{{ '错误.html' | relative_url }}", jekyll())
-                .render(Collections.singletonMap("baseurl", (Object) "/base"));
+                .render(getData("/base"));
         assertEquals("/base/%E9%94%99%E8%AF%AF.html", res);
     }
 
@@ -89,7 +91,7 @@ public class Relative_UrlTest {
     @Test
     public void testShouldNotPrependAForwardSlashIfInputIsEmpty() {
         String res = Template.parse("{{ '' | relative_url }}", jekyll())
-                .render(Collections.singletonMap("baseurl", (Object) "/base"));
+                .render(getData("/base"));
         assertEquals("/base", res);
     }
 
@@ -106,7 +108,7 @@ public class Relative_UrlTest {
     @Test
     public void testShouldNotPrependAForwardSlashIfBaseurlEndsWithASingleOne() {
         String res = Template.parse("{{ '/css/main.css' | relative_url }}", jekyll())
-                .render(Collections.singletonMap("baseurl", (Object) "/base/"));
+                .render(getData("/base/"));
         assertEquals("/base/css/main.css", res);
     }
 
@@ -123,7 +125,7 @@ public class Relative_UrlTest {
     @Test
     public void testShouldNotReturnValidURIIfBaseurlEndsWithMultipleOnes() {
         String res = Template.parse("{{ '/css/main.css' | relative_url }}", jekyll())
-                .render(Collections.singletonMap("baseurl", (Object) "/base//"));
+                .render(getData("/base//"));
         assertEquals("/base/css/main.css", res);
     }
     /**
@@ -139,7 +141,7 @@ public class Relative_UrlTest {
     @Test
     public void testNotPrependAForwardSlashIfBothInputAndBaseurlAreSimplySlashes() {
         String res = Template.parse("{{ '/' | relative_url }}", jekyll())
-                .render(Collections.singletonMap("baseurl", (Object) "/"));
+                .render(getData("/"));
         assertEquals("/", res);
     }
 
@@ -153,11 +155,9 @@ public class Relative_UrlTest {
     @Test
     public void testsShouldTransformTheInputBaseurlToAString() {
         java.util.Map<String, Object> data = new HashMap<>();
-        data.put("baseurl", new Object() {
-            @Override
-            public String toString() {
-                return "/baseurl/";
-            }
+        //noinspection unused
+        data.put("site", new Inspectable() {
+            public final String baseurl = "/baseurl/";
         });
 
         String res = Template.parse("{{ '/my-page.html' | relative_url }}", jekyll())
@@ -173,7 +173,7 @@ public class Relative_UrlTest {
     @Test
     public void testShouldTransformProtocolRelativeUrl() {
         String res = Template.parse("{{ '//example.com/' | relative_url }}", jekyll())
-                .render(Collections.singletonMap("baseurl", (Object) "/base"));
+                .render(getData("/base"));
         assertEquals("/base/example.com/", res);
     }
 
@@ -186,7 +186,7 @@ public class Relative_UrlTest {
     @Test
     public void testShouldNotModifyAnAbsoluteUrlWithScheme() {
         String res = Template.parse("{{ 'file:///file.html' | relative_url }}", jekyll())
-                .render(Collections.singletonMap("baseurl", (Object) "/base"));
+                .render(getData("/base"));
         assertEquals("file:///file.html", res);
     }
 
@@ -199,15 +199,21 @@ public class Relative_UrlTest {
     @Test
     public void testShouldNotNormalizeAbsoluteInternationalURLs() {
         String res = Template.parse("{{ 'https://example.com/错误' | relative_url }}", jekyll())
-                .render(Collections.singletonMap("baseurl", (Object) "/base"));
+                .render(getData("/base"));
         assertEquals("https://example.com/错误", res);
     }
 
     @Test
     public void testWithFullyFeaturedUrl() {
         String res = Template.parse("{{ '/some/path?with=extra&parameters=true#anchorhere' | relative_url }}", jekyll())
-                .render(Collections.singletonMap("baseurl", (Object) "/base"));
+                .render(getData("/base"));
         assertEquals("/base/some/path?with=extra&parameters=true#anchorhere", res);
+    }
+
+    // site.baseurl
+    private Map<String, Object> getData(String s) {
+        Map<String, Object> siteMap = Collections.singletonMap("baseurl", (Object) s);
+        return Collections.singletonMap("site", (Object)siteMap);
     }
 
     private ParseSettings jekyll() {

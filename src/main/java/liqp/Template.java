@@ -1,11 +1,11 @@
 package liqp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import liqp.exceptions.LiquidException;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
 import liqp.parser.Flavor;
+import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
 import liqp.parser.v4.NodeVisitor;
 import liqp.tags.Include;
@@ -347,6 +347,12 @@ public class Template {
 
     public String render() {
         return render(new HashMap<String, Object>());
+    }
+
+    public String render(Inspectable object) {
+        LiquidSupport evaluated = renderSettings.evaluate(parseSettings.mapper, object);
+        Map<String, Object> map = evaluated.toLiquid();
+        return render(map);
     }
 
     /**

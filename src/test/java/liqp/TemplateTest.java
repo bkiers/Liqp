@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class TemplateTest {
@@ -106,5 +107,24 @@ public class TemplateTest {
         InputStream inputStream = new FileInputStream(new File("./snippets/header.html"));
         Template template = Template.parse(inputStream);
         assertThat(template.render(), is("HEADER\n"));
+    }
+
+    @Test
+    public void testRenderInspectable() {
+        // given
+        Template template = Template.parse("{{ some.val }}");
+        class MyInspectable implements Inspectable {
+            public final Map<String, String> some = new HashMap<>();
+            {
+                some.put("val", "321");
+            }
+        }
+        MyInspectable data = new MyInspectable();
+
+        // when
+        String res = template.render(data);
+
+        // then
+        assertEquals("321", res);
     }
 }

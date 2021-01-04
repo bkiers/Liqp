@@ -6,7 +6,7 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class IfTest {
 
@@ -22,7 +22,7 @@ public class IfTest {
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
-            assertThat(rendered, is(test[1]));
+            assertThat(test[0] + " = " + test[1], rendered, is(test[1]));
         }
 
         String json = "{\"user\" : {\"name\" : \"Tobi\", \"age\" : 42} }";
@@ -38,7 +38,7 @@ public class IfTest {
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render(json));
 
-            assertThat(rendered, is(test[1]));
+            assertThat(test[0] + "(" + json + ") = " + test[1],rendered, is(test[1]));
         }
     }
 

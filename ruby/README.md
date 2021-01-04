@@ -48,12 +48,13 @@ config = Jekyll::Utils.deep_merge_hashes(Marshal.load(Marshal.dump(Jekyll::Confi
       "baseurl" => "/base",
       "disable_disk_cache" => true
   })
-  @site = Jekyll::Site.new(Jekyll::Configuration.from(config))
-  @context = Liquid::Context.new({}, {}, :site => @site)
+site = Jekyll::Site.new(Jekyll::Configuration.from(config))
+@context = Liquid::Context.new({}, {}, :site => site)
 
-  def render(data = {}, source)
-    Liquid::Template.parse(source, {:strict_variables => true}).render!(@context, data);
-  end
+def render(data, source)
+  @context.scopes[0] = data
+  Liquid::Template.parse(source).render!(@context)
+end
 ```
 
 *Liquid* is more simple one:

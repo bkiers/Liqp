@@ -10,12 +10,14 @@ import liqp.parser.Flavor;
 import liqp.tags.Tag;
 import liquid.parser.v4.LiquidParser;
 import liquid.parser.v4.LiquidParserBaseVisitor;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static liquid.parser.v4.LiquidParser.*;
 
@@ -367,33 +369,31 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   }
 
   // include_tag
-  //  : tagStart Include file_name_or_output (With Str)? TagEnd
-  //  ;
+  // : {isLiquid()}? tagStart liquid=Include expr (With Str)? TagEnd
+  // | {isJekyll()}? tagStart jekyll=Include file_name_or_output TagEnd
+  // ;
   @Override
   public LNode visitInclude_tag(Include_tagContext ctx) {
-    if (ctx.Str() != null)  {
-      return new TagNode(tags.get("include"), visit(ctx.file_name_or_output()), fromString(ctx.Str()));
-    }
-    return new TagNode(tags.get("include"), visit(ctx.file_name_or_output()));
-  }
+    if (ctx.jekyll!=null) {
+      return new TagNode(tags.get("include"), visit(ctx.file_name_or_output()));
+    } else if (ctx.liquid != null) {
+      if (ctx.Str() != null) {
+        return new TagNode(tags.get("include"), visit(ctx.expr()), new AtomNode(strip(ctx.Str().getText())));
+      } else {
+        return new TagNode(tags.get("include"), visit(ctx.expr()));
+      }
 
-  // file_name_or_output
-  //  : Str                          #file_name_or_output_Str
-  //  | ...
-  //  ;
-  @Override
-  public LNode visitFile_name_or_output_Str(File_name_or_output_StrContext ctx) {
-    return fromString(ctx.Str());
+    }
+    throw new LiquidException("Unknown syntax of `Include` tag", ctx);
   }
 
   // file_name_or_output
   //  : ...
-  //  | output                       #file_name_or_output_output
+  //  | output                       #jekyll_include_output
   //  | ...
   //  ;
   @Override
-  public LNode visitFile_name_or_output_output(File_name_or_output_outputContext ctx) {
-
+  public LNode visitJekyll_include_output(Jekyll_include_outputContext ctx) {
     if (this.parseSettings.flavor != Flavor.JEKYLL)
       throw new LiquidException("`{% include ouput %}` can only be used for Flavor.JEKYLL", ctx);
 
@@ -402,19 +402,29 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
 
   // file_name_or_output
   //  : ...
-  //  | other_than_tag_end_out_start #file_name_or_output_other_than_tag_end_out_start
-  //  ;
-  //
-  // other_than_tag_end_out_start
-  //  : ~(TagEnd | OutStart | OutStart2)+
+  //  | filename                       #jekyll_include_filename
+  //  | ...
   //  ;
   @Override
-  public LNode visitFile_name_or_output_other_than_tag_end_out_start(File_name_or_output_other_than_tag_end_out_startContext ctx) {
-
-    if (this.parseSettings.flavor != Flavor.JEKYLL)
+  public LNode visitJekyll_include_filename(Jekyll_include_filenameContext ctx) {
+    if (this.parseSettings.flavor != Flavor.JEKYLL) {
       throw new LiquidException("`{% include other_than_tag_end_out_start %}` can only be used for Flavor.JEKYLL", ctx);
+    }
+    // valid filename in jekyll doesn't allow whitespaces
+    // as far as whitespaces are in hidden channel, we are reading
+    // the whole interval between first and last token
+    Interval interval = Interval.of(ctx.filename().start.getStartIndex(), ctx.filename().stop.getStopIndex());
+    String filename = ctx.filename().start.getInputStream().getText(interval);
 
-    return new AtomNode(ctx.other_than_tag_end_out_start().getText());
+    if (filename.matches(".*\\s.*")) {
+      throw new LiquidException("in `{% include filename %}` the `filename` is {" + filename + "}, but it cannot have spaces for Flavor.JEKYLL", ctx);
+    }
+    return new AtomNode(filename);
+  }
+
+  @Override
+  public LNode visitFilename(FilenameContext ctx) {
+    return super.visitFilename(ctx);
   }
 
   // output

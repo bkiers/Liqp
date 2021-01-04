@@ -1,6 +1,7 @@
 package liqp.tags;
 
 import liqp.*;
+import liqp.exceptions.LiquidException;
 import liqp.exceptions.VariableNotExistException;
 import liqp.filters.Filter;
 import liqp.parser.Flavor;
@@ -61,6 +62,51 @@ public class IncludeTest {
                 "\n" +
                 "color: 'red'\n" +
                 "shape: 'square'"));
+    }
+
+    @Test
+    public void testIncludeVariableSyntaxTag() {
+        Template template = Template.parse("{% include {{ tmpl }} %}", jekyll());
+        String res = template.render("{ \"var\" : \"TEST\", \"tmpl\" : \"include_read_var\"}");
+        assertEquals("TEST", res);
+    }
+
+    @Test(expected = LiquidException.class)
+    public void renderWithShouldThrowExceptionInJekyll() throws RecognitionException {
+
+        Template template = Template.parse("{% include 'color' with 'red' %}",
+                new ParseSettings.Builder()
+                        .withFlavor(Flavor.JEKYLL)
+                        .build(),
+                new RenderSettings
+                        .Builder()
+                        .withRaiseExceptionsInStrictMode(true)
+                        .withShowExceptionsFromInclude(true)
+                        .build()
+        );
+
+        template.render();
+
+        fail();
+    }
+
+    @Test
+    public void renderWithShouldWorkInLiquid() throws RecognitionException {
+
+        Template template = Template.parse("{% include 'color' with 'red' %}",
+                new ParseSettings.Builder()
+                        .withFlavor(Flavor.LIQUID)
+                        .build(),
+                new RenderSettings
+                        .Builder()
+                        .withRaiseExceptionsInStrictMode(true)
+                        .withShowExceptionsFromInclude(true)
+                        .build()
+        );
+
+        String render = template.render();
+
+        assertEquals("color: 'red'\nshape: ''", render);
     }
 
     @Test

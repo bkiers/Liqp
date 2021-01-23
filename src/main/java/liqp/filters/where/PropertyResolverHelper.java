@@ -7,6 +7,7 @@ import liqp.parser.LiquidSupport;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class PropertyResolverHelper {
     private final List<PropertyResolverAdapter> propertyResolverAdapters;
@@ -20,13 +21,24 @@ public class PropertyResolverHelper {
             private final LValue lValue = new LValue() {};
             @Override
             public Object getItemProperty(TemplateContext context, Object input, Object property) {
-                LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) input);
+                LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, input);
                 return evaluated.toLiquid().get(lValue.asString(property));
             }
 
             @Override
             public boolean support(Object target) {
                 return target instanceof Inspectable;
+            }
+        });
+        INSTANCE.add(new PropertyResolverAdapter() {
+            @Override
+            public Object getItemProperty(TemplateContext context, Object input, Object property) {
+                return ((Map)input).get(property);
+            }
+
+            @Override
+            public boolean support(Object target) {
+                return target instanceof Map;
             }
         });
     }

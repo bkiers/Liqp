@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import java.math.BigDecimal;
+
 public class Minus extends Filter {
 
     /*
@@ -10,8 +12,8 @@ public class Minus extends Filter {
     @Override
     public Object apply(Object value, Object... params) {
 
-        if(value == null) {
-            value = 0L;
+        if (!isNumber(value)) {
+            value = 0;
         }
 
         super.checkParams(params, 1);
@@ -22,6 +24,8 @@ public class Minus extends Filter {
             return super.asNumber(value).longValue() - super.asNumber(rhsObj).longValue();
         }
 
-        return super.asNumber(value).doubleValue() - super.asNumber(rhsObj).doubleValue();
+        BigDecimal first = new BigDecimal(super.asNumber(value).toString());
+        BigDecimal second = new BigDecimal(super.asNumber(rhsObj).toString());
+        return asFormattedNumber(first.subtract(second));
     }
 }

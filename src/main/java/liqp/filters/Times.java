@@ -1,5 +1,9 @@
 package liqp.filters;
 
+import java.math.BigDecimal;
+
+import static java.math.BigDecimal.ROUND_UNNECESSARY;
+
 public class Times extends Filter {
 
     /*
@@ -22,6 +26,8 @@ public class Times extends Filter {
             return super.asNumber(value).longValue() * super.asNumber(rhsObj).longValue();
         }
 
-        return super.asNumber(value).doubleValue() * super.asNumber(rhsObj).doubleValue();
+        BigDecimal first = new BigDecimal(super.asNumber(value).toString());
+        BigDecimal second = new BigDecimal(super.asNumber(rhsObj).toString());
+        return asFormattedNumber(first.multiply(second));
     }
 }

@@ -3,6 +3,7 @@ package liqp.filters.where;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.TemplateContext;
+import liqp.spi.BasicTypesSupport;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;

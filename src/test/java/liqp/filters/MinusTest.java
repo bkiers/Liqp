@@ -4,8 +4,11 @@ import liqp.Template;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
+
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class MinusTest {
 
@@ -18,6 +21,7 @@ public class MinusTest {
                 {"{{ 8 | minus: 3. }}", "5.0"},
                 {"{{ 8 | minus: 3.0 }}", "5.0"},
                 {"{{ 8 | minus: 2.0 }}", "6.0"},
+                {"{{ '0.3' | minus: 0.1}}", "0.2"}
         };
 
         for (String[] test : tests) {
@@ -128,5 +132,10 @@ public class MinusTest {
         assertThat(Template.parse("{{ \" 5 \" | minus: 2 }}").render(), is((Object)"3"));
         assertThat(Template.parse("{{ \"5\" | minus: \"  2     \" }}").render(), is((Object)"3"));
         assertThat(Template.parse("{{ \"  5\" | minus: \"   2.0\" }}").render(), is((Object)"3.0"));
+    }
+
+    @Test
+    public void testMinusDate() {
+        assertThat(Template.parse("{{ a | minus: 1 }}").render(Collections.singletonMap("a", LocalDateTime.now())), is((Object)"-1"));
     }
 }

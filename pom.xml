@@ -3,7 +3,7 @@
   <groupId>nl.big-o</groupId>
   <artifactId>liqp</artifactId>
   <packaging>jar</packaging>
-  <version>0.7.10-SNAPSHOT</version>
+  <version>0.8.00-alpha1-SNAPSHOT</version>
   <name>Liqp</name>
   <description>A Java implementation of the Liquid templating engine backed up by an ANTLR grammar.</description>
   <url>https://github.com/bkiers/Liqp</url>
@@ -51,7 +51,7 @@
 
     <antlr.version>3.5.1</antlr.version>
     <antlr4.version>4.7.2</antlr4.version>
-    <jackson.version>2.10.0</jackson.version>
+    <jackson.version>2.12.1</jackson.version>
     <jsoup.version>1.11.3</jsoup.version>
     <junit.version>4.13.1</junit.version>
 
@@ -86,9 +86,22 @@
     </dependency>
 
     <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+
+
+    <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
       <version>${jsoup.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ua.co.k</groupId>
+      <artifactId>strftime4j</artifactId>
+      <version>1.0.3</version>
     </dependency>
 
     <dependency>
@@ -141,8 +154,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.8.0</version>
         <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
+          <source>8</source>
+          <target>8</target>
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>

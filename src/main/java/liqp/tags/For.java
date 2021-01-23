@@ -10,7 +10,6 @@ import java.util.Stack;
 
 import liqp.LValue;
 import liqp.TemplateContext;
-import liqp.exceptions.ExceededMaxIterationsException;
 import liqp.nodes.AtomNode;
 import liqp.nodes.BlockNode;
 import liqp.nodes.LNode;
@@ -88,7 +87,7 @@ class For extends Tag {
         int limit = attributes.get(LIMIT);
 
         if (data instanceof Inspectable) {
-            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) data);
+            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, data);
             data = evaluated.toLiquid();
         }
         if (data instanceof Map) {

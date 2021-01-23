@@ -1,11 +1,16 @@
 package liqp.filters.where;
 
+import liqp.LValue;
 import liqp.ParseSettings;
 import liqp.Template;
 import liqp.parser.Flavor;
 import liqp.parser.LiquidSupport;
 import org.junit.Test;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class JekyllWhereImplTest {
 
@@ -457,4 +463,86 @@ public class JekyllWhereImplTest {
         // then
         assertEquals("good2! ", rendered);
     }
+
+    @Test
+    public void testWhereWhenTargetPropertyToTestIsDate() {
+        // Important part of the filter code:
+        //        target = target.to_s
+        //        if property.is_a? String
+        //          return true if property == target
+        //        else
+        //          Array(property).each do |prop| <<--- here
+        //            return true if prop.to_s == target << --- parts are
+        //          end
+        //        end
+
+        // Code of test case to test the behavior:
+        // t = Time.new(2007,11,1,15,25,0, "+09:00")
+        // # target is string representation, source is iterated as collection(and match in "year" part)
+        // pp render({"a" => [{ "time" => t }], "b" => "2007"},
+        // "target is string representation: {{ a | where: 'time', b | map: 'time'}}")
+        // >> "target is string representation: 2007-11-01 15:25:00 +0900"
+
+        ZonedDateTime t = ZonedDateTime.of(
+                LocalDateTime.of(2007, 11, 1, 15, 25, 0)
+                , ZoneId.of("+09:00"));
+
+        Map<String, Object> data = new HashMap<>();
+        Map<Object, Object> aObj = new HashMap<>();
+        aObj.put("time", t);
+        data.put("a", Collections.singletonList(aObj));
+        data.put("b", "2007");
+        String template = "target is string representation: {{ a | where: 'time', b | map: 'time'}}";
+        String res = parse(template).render(data);
+        assertEquals("target is string representation: 2007-11-01 15:25:00 +0900", res);
+
+        t = ZonedDateTime.now();
+        aObj.put("time", t);
+        data.put("b", LocalDate.now().getYear());
+        res = parse(template).render(data);
+        assertTrue(res.contains(String.valueOf(LocalDate.now().getYear())));
+    }
+
+
+    @Test(expected = RuntimeException.class)
+    public void testWhereWhenTargetPropertyToTestIsDateShouldCauseIncompatibleTypes() {
+        ZonedDateTime t = ZonedDateTime.of(
+                LocalDateTime.of(2007, 11, 1, 15, 25, 0)
+                , ZoneId.of("+09:00"));
+
+        Map<String, Object> data = new HashMap<>();
+        Map<Object, Object> aObj = new HashMap<>();
+        aObj.put("time", t);
+        data.put("a", aObj); // <<-- will cause property resolver for temporal type, but none should be
+        data.put("b", "2007");
+        String template = "target is string representation: {{ a | where: 'time', b | map: 'time'}}";
+        parse(template).render(data);
+    }
+
+    @Test
+    public void testWhereWhenSourcePropertyToTestIsDate() {
+
+        // Important part of the filter code:
+        //        target = target.to_s <<--- here
+        //        if property.is_a? String
+        //          return true if property == target <<--- compare string repr of target
+        //        else
+        // .....
+
+        // Code of test case to test the behavior:
+        // pp render({"a" => [{ "time" => t_str }], "b" => t},
+        //      "source is string representation: {{ a | where: 'time', b | map: 'time'}}")
+
+        ZonedDateTime t = ZonedDateTime.of(
+                LocalDateTime.of(2007, 11, 1, 15, 25, 0)
+                , ZoneId.of("+09:00"));
+        String tStr = LValue.CONTINUE.asString(t);
+        Map<String, Object> data = new HashMap<>();
+        data.put("a", Collections.singletonList(Collections.singletonMap("time", tStr)));
+        data.put("b", t);
+        String template = "source is string representation: {{ a | where: 'time', b | map: 'time'}}";
+        String res = parse(template).render(data);
+        assertEquals("source is string representation: 2007-11-01 15:25:00 +0900", res);
+    }
+
 }

@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import java.math.BigDecimal;
+
 public class Modulo extends Filter {
 
     /*
@@ -22,6 +24,8 @@ public class Modulo extends Filter {
             return super.asNumber(value).longValue() % super.asNumber(rhsObj).longValue();
         }
 
-        return super.asNumber(value).doubleValue() % super.asNumber(rhsObj).doubleValue();
+        BigDecimal first = new BigDecimal(super.asNumber(value).toString());
+        BigDecimal second = new BigDecimal(super.asNumber(rhsObj).toString());
+        return asFormattedNumber(first.remainder(second));
     }
 }

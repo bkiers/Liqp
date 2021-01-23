@@ -4,8 +4,12 @@ import liqp.Template;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
+import java.util.Collections;
+
+import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class OutputNodeTest {
 
@@ -82,7 +86,8 @@ public class OutputNodeTest {
                 {"false", "false"},
                 {"nil", ""},
                 {"null", ""},
-                // {"empty", "Object"},
+                {"empty", ""},
+                {"blank", ""},
         };
 
         for (String[] keyword : keywords) {
@@ -93,7 +98,20 @@ public class OutputNodeTest {
             Template template = Template.parse(test);
             String rendered = template.render(json);
 
-            assertThat(rendered, is(expected));
+            String message = test + " --> [" + rendered + "] = [" + expected + "]";
+            assertThat(message, rendered, is(expected));
         }
     }
+
+    @Test
+    public void testDateWithFilter() {
+        // given
+
+        // when
+        String res = Template.parse("{{ a | truncate: 13 }}").render(Collections.singletonMap("a", LocalDateTime.parse("2011-12-03T10:15:30")));
+
+        // then
+        assertEquals("2011-12-03...", res);
+    }
+
 }

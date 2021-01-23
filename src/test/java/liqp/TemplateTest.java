@@ -2,12 +2,13 @@ package liqp;
 
 import liqp.parser.Inspectable;
 import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -126,5 +127,40 @@ public class TemplateTest {
 
         // then
         assertEquals("321", res);
+    }
+
+    static class SampleDateInspectable implements Inspectable {
+        // legacy API: year should be 1900 + year, month is 0-based
+        public Date val = new Date(120, Calendar.DECEMBER, 31);
+    }
+
+    @Test
+    public void testRenderInspectableDateType() {
+        // given
+        Template template = Template.parse("{{ val | date: '%e %b, %Y' }}");
+
+        SampleDateInspectable sample = new SampleDateInspectable();
+
+        // when
+        String res = template.render(sample);
+
+        // then
+        assertEquals("31 Dec, 2020", res);
+    }
+
+    @Test
+    public void testRenderDateType() {
+        // given
+        Template template = Template.parse("{{ val | date: '%e %b, %Y' }}");
+
+        Map<String, Object> sample = new HashMap<>();
+        // legacy API: year should be 1900 + year, month is 0-based
+        sample.put("val", new Date(120, Calendar.DECEMBER, 31));
+
+        // when
+        String res = template.render(sample);
+
+        // then
+        assertEquals("31 Dec, 2020", res);
     }
 }

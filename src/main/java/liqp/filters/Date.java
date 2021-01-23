@@ -1,7 +1,9 @@
 package liqp.filters;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -19,7 +21,7 @@ public class Date extends Filter {
         init();
     }
 
-    private CustomDateFormatSupport typeSupport;
+    private static List<CustomDateFormatSupport> supportedTypes = new ArrayList<>();
 
 
     protected Date() {
@@ -28,7 +30,7 @@ public class Date extends Filter {
 
     protected Date(CustomDateFormatSupport typeSupport) {
         super();
-        this.typeSupport = typeSupport;
+        supportedTypes.add(0, typeSupport);
     }
 
     /*
@@ -140,11 +142,21 @@ public class Date extends Filter {
     }
 
     private boolean isCustomDateType(Object value) {
-        return typeSupport != null && typeSupport.support(value);
+        for (CustomDateFormatSupport el: supportedTypes) {
+            if (el.support(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Long getFromCustomType(Object value) {
-        return typeSupport.getAsSeconds(value);
+        for (CustomDateFormatSupport el: supportedTypes) {
+            if (el.support(value)) {
+                return el.getAsSeconds(value);
+            }
+        }
+        throw new UnsupportedOperationException();
     }
 
     private static void init() {
@@ -295,5 +307,12 @@ public class Date extends Filter {
 
     public static Filter withCustomDateType(CustomDateFormatSupport typeSupport) {
         return new Date(typeSupport);
+    }
+
+    /**
+     * use with caution.
+     */
+    public static void addCustomDateType(CustomDateFormatSupport typeSupport) {
+        supportedTypes.add(0, typeSupport);
     }
 }

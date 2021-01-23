@@ -3,6 +3,7 @@ package liqp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import liqp.parser.Flavor;
+import liqp.spi.SPIHelper;
 
 public class ParseSettings {
 
@@ -62,5 +63,6 @@ public class ParseSettings {
         this.stripSpacesAroundTags = stripSpacesAroundTags;
         this.stripSingleLine = stripSingleLine;
         this.mapper = mapper;
+        SPIHelper.apply(mapper);
     }
 }

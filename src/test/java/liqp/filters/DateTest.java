@@ -2,6 +2,7 @@ package liqp.filters;
 
 import java.util.Locale;
 import liqp.Template;
+import liqp.TemplateContext;
 import liqp.filters.date.CustomDateFormatSupport;
 import liqp.filters.date.StrftimeCompatibleDate;
 import org.antlr.v4.runtime.RecognitionException;
@@ -11,7 +12,7 @@ import org.junit.Test;
 import java.text.SimpleDateFormat;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class DateTest {
 
@@ -92,27 +93,28 @@ public class DateTest {
     @Test
     public void applyOriginalTest() throws Exception {
 
+        TemplateContext context = new TemplateContext();
         final Filter filter = Filter.getFilter("date");
 
-        assertThat(filter.apply(seconds("2006-05-05 10:00:00"), "%B"), is((Object)"May"));
-        assertThat(filter.apply(seconds("2006-06-05 10:00:00"), "%B"), is((Object)"June"));
-        assertThat(filter.apply(seconds("2006-07-05 10:00:00"), "%B"), is((Object)"July"));
+        assertThat(filter.apply(seconds("2006-05-05 10:00:00"), context, "%B"), is((Object)"May"));
+        assertThat(filter.apply(seconds("2006-06-05 10:00:00"), context,"%B"), is((Object)"June"));
+        assertThat(filter.apply(seconds("2006-07-05 10:00:00"), context,"%B"), is((Object)"July"));
 
-        assertThat(filter.apply("2006-05-05 10:00:00", "%B"), is((Object)"May"));
-        assertThat(filter.apply("2006-06-05 10:00:00", "%B"), is((Object)"June"));
-        assertThat(filter.apply("2006-07-05 10:00:00", "%B"), is((Object)"July"));
+        assertThat(filter.apply("2006-05-05 10:00:00", context,"%B"), is((Object)"May"));
+        assertThat(filter.apply("2006-06-05 10:00:00", context,"%B"), is((Object)"June"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context,"%B"), is((Object)"July"));
 
-        assertThat(filter.apply("2006-07-05 10:00:00", ""), is((Object)"2006-07-05 10:00:00"));
-        assertThat(filter.apply("2006-07-05 10:00:00", null), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context,""), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context,null), is((Object)"2006-07-05 10:00:00"));
 
-        assertThat(filter.apply("2006-07-05 10:00:00", "%m/%d/%Y"), is((Object)"07/05/2006"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context,"%m/%d/%Y"), is((Object)"07/05/2006"));
 
-        assertThat(filter.apply("Fri Jul 16 01:00:00 2004", "%m/%d/%Y"), is((Object)"07/16/2004"));
+        assertThat(filter.apply("Fri Jul 16 01:00:00 2004", context,"%m/%d/%Y"), is((Object)"07/16/2004"));
 
-        assertThat(filter.apply(null, "%B"), is((Object)null));
+        assertThat(filter.apply(null, context,"%B"), is((Object)null));
 
-        assertThat(filter.apply(1152098955, "%m/%d/%Y"), is((Object)"07/05/2006"));
-        assertThat(filter.apply("1152098955", "%m/%d/%Y"), is((Object)"07/05/2006"));
+        assertThat(filter.apply(1152098955, context,"%m/%d/%Y"), is((Object)"07/05/2006"));
+        assertThat(filter.apply("1152098955", context,"%m/%d/%Y"), is((Object)"07/05/2006"));
     }
 
     private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
@@ -154,6 +156,7 @@ public class DateTest {
         CustomDate customDate = new CustomDate(1152098955000L);
 
         // then
-        assertThat(Filter.getFilter("date").apply(customDate, "%m/%d/%Y"), is((Object) "07/05/2006"));
+        TemplateContext context = new TemplateContext();
+        assertThat(Filter.getFilter("date").apply(customDate, context, "%m/%d/%Y"), is((Object) "07/05/2006"));
     }
 }

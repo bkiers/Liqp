@@ -1,5 +1,6 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
 import liqp.filters.date.CustomDateFormatSupport;
 import liqp.filters.date.StrftimeCompatibleDate;
 import liqp.filters.date.StrftimeDateFormatter;
@@ -15,13 +16,7 @@ import static liqp.filters.date.StrftimeCompatibleDate.datePatterns;
 
 public class Date extends Filter {
 
-    private static Locale locale = Locale.ENGLISH;
-
     private static List<CustomDateFormatSupport> supportedTypes = new ArrayList<>();
-
-    public static void setLocale(Locale locale) {
-        Date.locale = locale;
-    }
 
     protected Date() {
         super();
@@ -32,8 +27,10 @@ public class Date extends Filter {
         supportedTypes.add(0, typeSupport);
     }
 
+
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
+        Locale locale = context.renderSettings.locale;
 
         try {
             final StrftimeCompatibleDate compatibleDate;

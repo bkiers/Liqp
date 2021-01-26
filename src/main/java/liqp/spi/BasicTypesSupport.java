@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import liqp.filters.Date;
+import liqp.filters.date.CustomDateFormatSupport;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -30,7 +30,7 @@ public abstract class BasicTypesSupport implements TypesSupport {
         typeRegistry.put(clazz.getName(), typeGenerator);
     }
 
-    protected void addCustomDateType(Date.CustomDateFormatSupport<?> typeSupport) {
+    protected void addCustomDateType(CustomDateFormatSupport<?> typeSupport) {
         liqp.filters.Date.addCustomDateType(typeSupport);
     }
 

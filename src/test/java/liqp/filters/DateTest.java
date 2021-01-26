@@ -2,6 +2,8 @@ package liqp.filters;
 
 import java.util.Locale;
 import liqp.Template;
+import liqp.filters.date.CustomDateFormatSupport;
+import liqp.filters.date.StrftimeCompatibleDate;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Before;
 import org.junit.Test;
@@ -134,10 +136,11 @@ public class DateTest {
                 this.time = time;
             }
         }
-        Filter f = Date.withCustomDateType(new Date.CustomDateFormatSupport<CustomDate>() {
+        Filter f = Date.withCustomDateType(new CustomDateFormatSupport<CustomDate>() {
+
             @Override
-            public Long getAsSeconds(CustomDate value) {
-                return value.time;
+            public StrftimeCompatibleDate getValue(CustomDate value) {
+                return new StrftimeCompatibleDate(value.time);
             }
 
             @Override
@@ -148,7 +151,7 @@ public class DateTest {
         Filter.registerFilter(f);
 
         // when
-        CustomDate customDate = new CustomDate(1152098955);
+        CustomDate customDate = new CustomDate(1152098955000L);
 
         // then
         assertThat(Filter.getFilter("date").apply(customDate, "%m/%d/%Y"), is((Object) "07/05/2006"));

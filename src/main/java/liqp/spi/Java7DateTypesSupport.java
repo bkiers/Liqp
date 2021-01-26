@@ -3,6 +3,8 @@ package liqp.spi;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import liqp.filters.date.CustomDateFormatSupport;
+import liqp.filters.date.StrftimeCompatibleDate;
 
 import java.io.IOException;
 import java.util.Date;
@@ -31,10 +33,11 @@ public class Java7DateTypesSupport extends BasicTypesSupport {
         });
         mapper.registerModule(module);
 
-        addCustomDateType(new liqp.filters.Date.CustomDateFormatSupport<Date>() {
+        addCustomDateType(new CustomDateFormatSupport<Date>() {
+
             @Override
-            public Long getAsSeconds(Date value) {
-                return value.getTime() / 1000;
+            public StrftimeCompatibleDate getValue(Date value) {
+                return new StrftimeCompatibleDate(value.getTime());
             }
 
             @Override

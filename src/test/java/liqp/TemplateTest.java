@@ -130,8 +130,10 @@ public class TemplateTest {
     }
 
     static class SampleDateInspectable implements Inspectable {
-        // legacy API: year should be 1900 + year, month is 0-based
-        public Date val = new Date(120, Calendar.DECEMBER, 31);
+        public Date val;
+        public SampleDateInspectable(Date date) {
+            val = date;
+        }
     }
 
     @Test
@@ -139,7 +141,8 @@ public class TemplateTest {
         // given
         Template template = Template.parse("{{ val | date: '%e %b, %Y' }}");
 
-        SampleDateInspectable sample = new SampleDateInspectable();
+        // legacy API: year should be 1900 + year, month is 0-based
+        SampleDateInspectable sample = new SampleDateInspectable(new Date(120, Calendar.DECEMBER, 31));
 
         // when
         String res = template.render(sample);
@@ -163,4 +166,5 @@ public class TemplateTest {
         // then
         assertEquals("31 Dec, 2020", res);
     }
+
 }

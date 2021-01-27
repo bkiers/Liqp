@@ -19,7 +19,7 @@ public class StrftimeCompatibleDateTypeSupportTest {
         // 2020-11-03 16:40:44 Pacific Standard Time
         long currentTime = new Date(120, Calendar.NOVEMBER, 3, 16, 40, 44).getTime();
         long timeWithoutTimeZone = currentTime + TimeZone.getDefault().getOffset(currentTime) - TimeZone.getTimeZone("PST").getOffset(currentTime);
-        Object val = new StrftimeCompatibleDate(timeWithoutTimeZone, TimeZone.getTimeZone("PST"));
+        Object val = new StrftimeCompatibleDate(timeWithoutTimeZone, TimeZone.getTimeZone("PST").getID());
 
         String res = Template.parse("{{ val | date: '%Y-%m-%d %H:%M:%S %Z' }}")
                 .render(Collections.singletonMap("val", val));

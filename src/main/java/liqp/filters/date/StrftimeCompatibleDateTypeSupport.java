@@ -7,9 +7,7 @@ import liqp.spi.BasicTypesSupport;
 import liqp.spi.TypeConvertor;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Map;
-import java.util.TimeZone;
 
 // self-reflection:
 // do not prevent users from use this library internal types as
@@ -22,7 +20,7 @@ public class StrftimeCompatibleDateTypeSupport extends BasicTypesSupport {
         registerType(module, StrftimeCompatibleDate.class, new TypeConvertor<StrftimeCompatibleDate>(){
             @Override
             public void serialize(JsonGenerator gen, StrftimeCompatibleDate val) throws IOException {
-                gen.writeStringField("val", String.valueOf(val.getDate()));
+                gen.writeStringField("val", String.valueOf(val.getTemporal()));
                 gen.writeStringField("zone", String.valueOf(val.getZoneId()));
             }
 
@@ -31,8 +29,7 @@ public class StrftimeCompatibleDateTypeSupport extends BasicTypesSupport {
                 String strVal = (String) node.get("val");
                 long val = Long.parseLong(strVal);
                 String strZone = (String) node.get("zone");
-                TimeZone timeZone = strZone == null ? null : TimeZone.getTimeZone(strZone);
-                return new StrftimeCompatibleDate(val, timeZone);
+                return new StrftimeCompatibleDate(val, strZone);
             }
 
         });

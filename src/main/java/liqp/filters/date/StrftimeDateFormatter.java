@@ -4,6 +4,7 @@ import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -75,81 +76,81 @@ public class StrftimeDateFormatter {
     private void init() {
 
         // %% - Literal ``%'' character
-        LIQUID_TO_JAVA_FORMAT.put('%', new StrftimeFormat(new SimpleDateFormat("%", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('%', new StrftimeFormat(DateTimeFormatter.ofPattern("%", locale)));
 
         // %a - The abbreviated weekday name (``Sun'')
-        LIQUID_TO_JAVA_FORMAT.put('a', new StrftimeFormat(new SimpleDateFormat("EEE", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('a', new StrftimeFormat(DateTimeFormatter.ofPattern("EEE", locale)));
 
         // %A - The  full  weekday  name (``Sunday'')
-        LIQUID_TO_JAVA_FORMAT.put('A', new StrftimeFormat(new SimpleDateFormat("EEEE", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('A', new StrftimeFormat(DateTimeFormatter.ofPattern("EEEE", locale)));
 
         // %b - The abbreviated month name (``Jan'')
-        LIQUID_TO_JAVA_FORMAT.put('b', new StrftimeFormat(new SimpleDateFormat("MMM", locale)));
-        LIQUID_TO_JAVA_FORMAT.put('h', new StrftimeFormat(new SimpleDateFormat("MMM", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('b', new StrftimeFormat(DateTimeFormatter.ofPattern("MMM", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('h', new StrftimeFormat(DateTimeFormatter.ofPattern("MMM", locale)));
 
         // %B - The  full  month  name (``January'')
-        LIQUID_TO_JAVA_FORMAT.put('B', new StrftimeFormat(new SimpleDateFormat("MMMM", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('B', new StrftimeFormat(DateTimeFormatter.ofPattern("MMMM", locale)));
 
         // %c - The preferred local date and time representation
-        LIQUID_TO_JAVA_FORMAT.put('c', new StrftimeFormat(new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('c', new StrftimeFormat(DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss yyyy", locale)));
 
         // %d - Day of the month (01..31)
-        LIQUID_TO_JAVA_FORMAT.put('d', new StrftimeFormat(new SimpleDateFormat("dd", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('d', new StrftimeFormat(DateTimeFormatter.ofPattern("dd", locale)));
 
         // %e - Day of the month (1..31)
-        LIQUID_TO_JAVA_FORMAT.put('e', new StrftimeFormat(new SimpleDateFormat("d", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('e', new StrftimeFormat(DateTimeFormatter.ofPattern("d", locale)));
 
         // %H - Hour of the day, 24-hour clock (00..23)
-        LIQUID_TO_JAVA_FORMAT.put('H', new StrftimeFormat(new SimpleDateFormat("HH", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('H', new StrftimeFormat(DateTimeFormatter.ofPattern("HH", locale)));
 
         // %I - Hour of the day, 12-hour clock (01..12)
-        LIQUID_TO_JAVA_FORMAT.put('I', new StrftimeFormat(new SimpleDateFormat("hh", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('I', new StrftimeFormat(DateTimeFormatter.ofPattern("hh", locale)));
 
         // %j - Day of the year (001..366)
-        LIQUID_TO_JAVA_FORMAT.put('j', new StrftimeFormat(new SimpleDateFormat("DDD", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('j', new StrftimeFormat(DateTimeFormatter.ofPattern("DDD", locale)));
 
         // %k - Hour of the day, 24-hour clock (0..23)
-        LIQUID_TO_JAVA_FORMAT.put('k', new StrftimeFormat(new SimpleDateFormat("H", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('k', new StrftimeFormat(DateTimeFormatter.ofPattern("H", locale)));
 
         // %l - Hour of the day, 12-hour clock (1..12)
-        LIQUID_TO_JAVA_FORMAT.put('l', new StrftimeFormat(new SimpleDateFormat("h", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('l', new StrftimeFormat(DateTimeFormatter.ofPattern("h", locale)));
 
         // %m - Month of the year (01..12)
-        LIQUID_TO_JAVA_FORMAT.put('m', new StrftimeFormat(new SimpleDateFormat("MM", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('m', new StrftimeFormat(DateTimeFormatter.ofPattern("MM", locale)));
 
         // %M - Minute of the hour (00..59)
-        LIQUID_TO_JAVA_FORMAT.put('M', new StrftimeFormat(new SimpleDateFormat("mm", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('M', new StrftimeFormat(DateTimeFormatter.ofPattern("mm", locale)));
 
         // %p - Meridian indicator (``AM''  or  ``PM'')
-        LIQUID_TO_JAVA_FORMAT.put('p', new StrftimeFormat(new SimpleDateFormat("a", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('p', new StrftimeFormat(DateTimeFormatter.ofPattern("a", locale)));
 
         // %S - Second of the minute (00..60)
-        LIQUID_TO_JAVA_FORMAT.put('S', new StrftimeFormat(new SimpleDateFormat("ss", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('S', new StrftimeFormat(DateTimeFormatter.ofPattern("ss", locale)));
 
         // %U - Week  number  of the current year,
         //      starting with the first Sunday as the first
         //      day of the first week (00..53)
-        LIQUID_TO_JAVA_FORMAT.put('U', new StrftimeFormat(new SimpleDateFormat("ww", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('U', new StrftimeFormat(DateTimeFormatter.ofPattern("ww", locale)));
 
         // %W - Week  number  of the current year,
         //      starting with the first Monday as the first
         //      day of the first week (00..53)
-        LIQUID_TO_JAVA_FORMAT.put('W', new StrftimeFormat(new SimpleDateFormat("ww", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('W', new StrftimeFormat(DateTimeFormatter.ofPattern("ww", locale)));
 
         // %w - Day of the week (Sunday is 0, 0..6)
-        LIQUID_TO_JAVA_FORMAT.put('w', new StrftimeFormat(new SimpleDateFormat("F", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('w', new StrftimeFormat(DateTimeFormatter.ofPattern("F", locale)));
 
         // %x - Preferred representation for the date alone, no time
-        LIQUID_TO_JAVA_FORMAT.put('x', new StrftimeFormat(new SimpleDateFormat("MM/dd/yy", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('x', new StrftimeFormat(DateTimeFormatter.ofPattern("MM/dd/yy", locale)));
 
         // %X - Preferred representation for the time alone, no date
-        LIQUID_TO_JAVA_FORMAT.put('X', new StrftimeFormat(new SimpleDateFormat("HH:mm:ss", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('X', new StrftimeFormat(DateTimeFormatter.ofPattern("HH:mm:ss", locale)));
 
         // %y - Year without a century (00..99)
-        LIQUID_TO_JAVA_FORMAT.put('y', new StrftimeFormat(new SimpleDateFormat("yy", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('y', new StrftimeFormat(DateTimeFormatter.ofPattern("yy", locale)));
 
         // %Y - Year with century
-        LIQUID_TO_JAVA_FORMAT.put('Y', new StrftimeFormat(new SimpleDateFormat("yyyy", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('Y', new StrftimeFormat(DateTimeFormatter.ofPattern("yyyy", locale)));
 
         // %Z - Time zone name
         LIQUID_TO_JAVA_FORMAT.put('Z', new StrftimeFormat.TimeZoneNameStrftimeFormat(locale));

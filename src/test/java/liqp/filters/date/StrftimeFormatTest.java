@@ -15,24 +15,24 @@ public class StrftimeFormatTest {
     public void testTimeZoneHourOffsetStrftimeFormat() {
         TimeZoneHourOffsetStrftimeFormat format = new TimeZoneHourOffsetStrftimeFormat(Locale.ENGLISH);
         // New York timezone with winter time, negative offset
-        String val = format.format(new StrftimeCompatibleDate(0, TimeZone.getTimeZone("America/New_York")));
+        String val = format.format(new StrftimeCompatibleDate(0, "America/New_York"));
         assertEquals("-0500", val);
 
         // New York fixed(winter) timezone, negative offset
-        format.format(new StrftimeCompatibleDate(0, TimeZone.getTimeZone("EST")));
+        format.format(new StrftimeCompatibleDate(0, "EST"));
         assertEquals("-0500", val);
 
         // new York timezone with summer time, negative offset
         Date summer1970 = new Date(70, 5, 15);
-        val = format.format(new StrftimeCompatibleDate(summer1970.getTime(), TimeZone.getTimeZone("America/New_York")));
+        val = format.format(new StrftimeCompatibleDate(summer1970.getTime(), "America/New_York"));
         assertEquals("-0400", val);
 
         // Kyiv winter time, positive offset
-        val = format.format(new StrftimeCompatibleDate(0, TimeZone.getTimeZone("EET")));
+        val = format.format(new StrftimeCompatibleDate(0, "EET"));
         assertEquals("+0200", val);
 
         // India time, positive offset with minutes
-        val = format.format(new StrftimeCompatibleDate(0, TimeZone.getTimeZone("IST")));
+        val = format.format(new StrftimeCompatibleDate(0, "IST"));
         assertEquals("+0530", val);
 
         // Impossible case for pre java8 world, as timezones are managed by Calendar,

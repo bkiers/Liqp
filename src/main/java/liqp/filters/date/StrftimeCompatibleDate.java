@@ -2,7 +2,15 @@ package liqp.filters.date;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Locale;
@@ -15,10 +23,16 @@ public class StrftimeCompatibleDate {
     // todo: to be removed
     public static void main(String[] args) throws ParseException {
 
-        SimpleDateFormat sdf = new SimpleDateFormat("Z", Locale.ENGLISH);
-        Date res = sdf.parse("-0500");
-        System.out.println("date: " + res);
-        System.out.println("tz:" + sdf.getTimeZone().getID());
+        DateTimeFormatter TIMESTAMP_PARSER = new DateTimeFormatterBuilder()
+                .parseCaseInsensitive()
+                .append(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SX"))
+                .toFormatter();
+        TemporalAccessor accessor = TIMESTAMP_PARSER.parse("2020-12-15T23:29:59.111Z");
+        System.out.println(accessor);
+//        SimpleDateFormat sdf = new SimpleDateFormat("Z", Locale.ENGLISH);
+//        Date res = sdf.parse("-0500");
+//        System.out.println("date: " + res);
+//        System.out.println("tz:" + sdf.getTimeZone().getID());
 
 //
 //        //
@@ -86,48 +100,56 @@ public class StrftimeCompatibleDate {
     }
 
 
-    private final long date;
+    private final TemporalAccessor temporal;
 
     /**
      * Terrible fact:
      * new Date() - return timezone with taking to account the (default) timezone offset
      * @param milliseconds - the milliseconds since January 1, 1970, 00:00:00 GMT
      */
-    public StrftimeCompatibleDate(long milliseconds, TimeZone timeZone) {
-        this.date = milliseconds;
-        this.zoneId = safeZoneId(timeZone);
+    public StrftimeCompatibleDate(long milliseconds, String timeZone) {
+        this.temporal = Instant.ofEpochMilli(milliseconds);
+        this.zoneId = timeZone;
     }
 
-    private String safeZoneId(TimeZone id) {
-        return id == null ? null : id.getID();
-    }
-
-    public StrftimeCompatibleDate(TimeZone timeZone) {
-        this.zoneId = safeZoneId(timeZone);
-        this.date = 0L;
+    public StrftimeCompatibleDate(String timeZone) {
+        this.zoneId = timeZone;
+        this.temporal = Instant.ofEpochMilli(0);
     }
 
     public StrftimeCompatibleDate() {
         this.zoneId = TimeZone.getDefault().getID();
-        this.date = 0L;
+        this.temporal = Instant.ofEpochMilli(0);;
     }
 
     public StrftimeCompatibleDate(long milliseconds) {
         this.zoneId = TimeZone.getDefault().getID();
-        this.date = milliseconds;
+        this.temporal = Instant.ofEpochMilli(milliseconds);;
     }
     public static StrftimeCompatibleDate parse(String str, Locale locale) {
 
         for(String pattern : datePatterns) {
 
-            SimpleDateFormat parser = new SimpleDateFormat(pattern, locale);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, locale);
 
+            long epochMilli = 0;
+            String zoneId = ZoneId.of("UTC").getId();
             try {
-                Date parse = parser.parse(str);
-                return new StrftimeCompatibleDate(parse.getTime(), parser.getTimeZone());
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(str, formatter);
+                epochMilli = zonedDateTime.toInstant().toEpochMilli();
+                zoneId = zonedDateTime.getZone().getId();
+                return new StrftimeCompatibleDate(epochMilli, zoneId);
+            } catch (DateTimeParseException exception) {
+                // ignore
+                exception.printStackTrace();
             }
-            catch(Exception e) {
-                // Just ignore and try the next pattern in `datePatterns`.
+            try {
+                LocalDateTime localDateTime = LocalDateTime.parse(str, formatter);
+                epochMilli = localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
+                return new StrftimeCompatibleDate(epochMilli, zoneId);
+            } catch (Exception e) {
+                e.printStackTrace();
+                // ignore
             }
         }
 
@@ -135,8 +157,8 @@ public class StrftimeCompatibleDate {
         return null;
     }
 
-    public Long getDate() {
-        return date;
+    public TemporalAccessor getTemporal() {
+        return temporal;
     }
 
     public String getZoneId() {
@@ -147,7 +169,7 @@ public class StrftimeCompatibleDate {
     public String toString() {
         final StringBuilder sb = new StringBuilder("StrftimeCompatibleDate{");
         sb.append("zoneId='").append(zoneId).append('\'');
-        sb.append(", date=").append(date);
+        sb.append(", date=").append(temporal);
         sb.append('}');
         return sb.toString();
     }

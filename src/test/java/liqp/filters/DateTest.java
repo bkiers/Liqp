@@ -96,6 +96,8 @@ public class DateTest {
         TemplateContext context = new TemplateContext();
         final Filter filter = Filter.getFilter("date");
 
+        assertThat(filter.apply("Fri Jul 16 01:00:00 2004", context,"%m/%d/%Y"), is((Object)"07/16/2004"));
+
         assertThat(filter.apply(seconds("2006-05-05 10:00:00"), context, "%B"), is((Object)"May"));
         assertThat(filter.apply(seconds("2006-06-05 10:00:00"), context,"%B"), is((Object)"June"));
         assertThat(filter.apply(seconds("2006-07-05 10:00:00"), context,"%B"), is((Object)"July"));
@@ -108,8 +110,6 @@ public class DateTest {
         assertThat(filter.apply("2006-07-05 10:00:00", context,null), is((Object)"2006-07-05 10:00:00"));
 
         assertThat(filter.apply("2006-07-05 10:00:00", context,"%m/%d/%Y"), is((Object)"07/05/2006"));
-
-        assertThat(filter.apply("Fri Jul 16 01:00:00 2004", context,"%m/%d/%Y"), is((Object)"07/16/2004"));
 
         assertThat(filter.apply(null, context,"%B"), is((Object)null));
 
@@ -170,6 +170,6 @@ public class DateTest {
         Object res = Filter.getFilter("date").apply(val, new TemplateContext(), "%Y-%m-%d %H:%M:%S %z");
 
         // then
-        assertThat((String) res, is("2021-01-27 00:00:00 -0500"));
+        assertThat((String) res, is("2010-10-31 00:00:00 -0500"));
     }
 }

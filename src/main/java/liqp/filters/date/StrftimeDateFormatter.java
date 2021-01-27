@@ -44,21 +44,35 @@ import java.util.Map;
  */
 public class StrftimeDateFormatter {
 
-
-    private static Locale locale = null;
-
-
-    private final static Map<Character, StrftimeFormat> LIQUID_TO_JAVA_FORMAT =
-            new HashMap<>();
-
-    public StrftimeDateFormatter(Locale locale) {
-        if (StrftimeDateFormatter.locale != locale) {
-            StrftimeDateFormatter.locale = locale;
-            init();
+    /**
+     * Underlying SimpleDateFormat are not thread-safe, so lets each thread work with ouw copy!
+     * This became critical, as the only way to get timezone from formatted date in java7 is to
+     * use mutable {@link SimpleDateFormat#parse(String)} method.
+     */
+    private static final ThreadLocal<Map<Locale, StrftimeDateFormatter>> localeMapHolder = new ThreadLocal<Map<Locale, StrftimeDateFormatter>>() {
+        @Override
+        protected Map<Locale, StrftimeDateFormatter> initialValue() {
+            return new HashMap<>();
         }
+    };
+
+    public static StrftimeDateFormatter getInstance(Locale locale) {
+        Map<Locale, StrftimeDateFormatter> localeMap = localeMapHolder.get();
+        if (!localeMap.containsKey(locale)) {
+            localeMap.put(locale, new StrftimeDateFormatter(locale));
+        }
+        return localeMap.get(locale);
     }
 
-    private static void init() {
+    private final Locale locale;
+    private final Map<Character, StrftimeFormat> LIQUID_TO_JAVA_FORMAT = new HashMap<>();
+
+    private StrftimeDateFormatter(Locale locale) {
+        this.locale = locale;
+        init();
+    }
+
+    private void init() {
 
         // %% - Literal ``%'' character
         LIQUID_TO_JAVA_FORMAT.put('%', new StrftimeFormat(new SimpleDateFormat("%", locale)));
@@ -138,7 +152,10 @@ public class StrftimeDateFormatter {
         LIQUID_TO_JAVA_FORMAT.put('Y', new StrftimeFormat(new SimpleDateFormat("yyyy", locale)));
 
         // %Z - Time zone name
-        LIQUID_TO_JAVA_FORMAT.put('Z', new StrftimeFormat(new SimpleDateFormat("z", locale)));
+        LIQUID_TO_JAVA_FORMAT.put('Z', new StrftimeFormat.TimeZoneNameStrftimeFormat(locale));
+
+        LIQUID_TO_JAVA_FORMAT.put('z', new StrftimeFormat.TimeZoneHourOffsetStrftimeFormat(locale));
+
     }
 
     public String format(String format, StrftimeCompatibleDate date) {

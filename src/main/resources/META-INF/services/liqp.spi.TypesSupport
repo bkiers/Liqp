@@ -1,1 +1,2 @@
 liqp.spi.Java7DateTypesSupport
+liqp.filters.date.StrftimeCompatibleDateTypeSupport

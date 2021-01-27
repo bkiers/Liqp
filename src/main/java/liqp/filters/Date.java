@@ -56,7 +56,7 @@ public class Date extends Filter {
                 return value;
             }
 
-            StrftimeDateFormatter formatter = new StrftimeDateFormatter(locale);
+            StrftimeDateFormatter formatter = StrftimeDateFormatter.getInstance(locale);
             return formatter.format(format, compatibleDate);
         }
         catch (Exception e) {

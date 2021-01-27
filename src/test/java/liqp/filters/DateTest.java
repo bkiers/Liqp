@@ -55,7 +55,7 @@ public class DateTest {
                 {"{{" + seconds + " | date: '%X'}}", simpleDateFormat("HH:mm:ss").format(date)},
                 {"{{" + seconds + " | date: 'x=%y'}}", "x=" + simpleDateFormat("yy").format(date)},
                 {"{{" + seconds + " | date: '%Y'}}", simpleDateFormat("yyyy").format(date)},
-                {"{{" + seconds + " | date: '%Z'}}", simpleDateFormat("z").format(date)}
+                {"{{" + seconds + " | date: '%Z'}}", simpleDateFormat("zzzz").format(date)}
         };
 
         for (String[] test : tests) {
@@ -63,7 +63,7 @@ public class DateTest {
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
-            assertThat(rendered, is(test[1]));
+            assertThat("render('" + test[0] + "') = ", rendered, is(test[1]));
         }
     }
 
@@ -158,5 +158,18 @@ public class DateTest {
         // then
         TemplateContext context = new TemplateContext();
         assertThat(Filter.getFilter("date").apply(customDate, context, "%m/%d/%Y"), is((Object) "07/05/2006"));
+    }
+
+    @Test
+    public void testParseWithZoneInfo() {
+        // given
+        String val = "2010-10-31 00:00:00 -0500";
+        // String val = "2021-01-27 00:00:00 EST";
+
+        // when
+        Object res = Filter.getFilter("date").apply(val, new TemplateContext(), "%Y-%m-%d %H:%M:%S %z");
+
+        // then
+        assertThat((String) res, is("2021-01-27 00:00:00 -0500"));
     }
 }

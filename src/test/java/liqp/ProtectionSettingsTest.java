@@ -16,7 +16,7 @@ public class ProtectionSettingsTest {
 
     @Test(expected = RuntimeException.class)
     public void testExceedMaxRenderTimeMillis() {
-        Template.parse("{% for i in (1..10000) %}{{ i }}{% endfor %}")
+        Template.parse("{% for i in (1..100000) %}{{ i }}{% endfor %}")
                 .withProtectionSettings(new ProtectionSettings.Builder().withMaxRenderTimeMillis(1).build())
                 .render();
     }

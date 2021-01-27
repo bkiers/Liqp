@@ -23,6 +23,15 @@ public class StrftimeCompatibleDate {
     // todo: to be removed
     public static void main(String[] args) throws ParseException {
 
+        // https://stackoverflow.com/questions/22463062/how-to-parse-format-dates-with-localdatetime-java-8
+        // https://stackoverflow.com/questions/51083083/java-zoneddatetime-parse-timestring-without-timezone
+        // https://stackoverflow.com/questions/35004123/java8-zoneddatetime-with-datetimeformatter-not-recognizing-the-format
+        // https://stackoverflow.com/questions/13470830/how-to-change-timezone-for-a-java-util-calendar-date
+
+        // https://stackoverflow.com/questions/5422089/date-timezone-conversion-in-java/5422620#comment116507564_5422620
+
+        // https://docs.python.org/3/library/datetime.html#strftime-and-strptime-behavior
+
         DateTimeFormatter TIMESTAMP_PARSER = new DateTimeFormatterBuilder()
                 .parseCaseInsensitive()
                 .append(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SX"))

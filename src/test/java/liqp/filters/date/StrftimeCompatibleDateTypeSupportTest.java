@@ -33,8 +33,14 @@ public class StrftimeCompatibleDateTypeSupportTest {
                 .withLocale(Locale.GERMANY)
                 .build())
                 .render(Collections.singletonMap("val", val));
-        assertEquals("2021-11-03 16:40:44 Pazifische Sommerzeit", res);
 
+        int classVersion = Double.valueOf(System.getProperty("java.class.version")).intValue();
+        // JDK localisation changed text starting 9th java version, its 53 java class version
+        if (classVersion > 52) {
+            assertEquals("2021-11-03 16:40:44 Nordamerikanische Westküsten-Sommerzeit", res);
+        } else {
+            assertEquals("2021-11-03 16:40:44 Pazifische Sommerzeit", res);
+        }
     }
 
 }

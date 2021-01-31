@@ -1,7 +1,9 @@
 package liqp.filters.date;
 
+import java.time.ZonedDateTime;
+
 public interface CustomDateFormatSupport<T> {
-    StrftimeCompatibleDate getValue(T value);
+    ZonedDateTime getValue(T value);
 
     boolean support(Object in);
 }

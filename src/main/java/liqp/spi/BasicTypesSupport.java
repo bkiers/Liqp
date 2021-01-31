@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import liqp.TemplateContext;
 import liqp.filters.date.CustomDateFormatSupport;
 
 import java.io.IOException;
@@ -34,7 +35,7 @@ public abstract class BasicTypesSupport implements TypesSupport {
         liqp.filters.Date.addCustomDateType(typeSupport);
     }
 
-    public static Object restoreObject(Object obj) {
+    public static Object restoreObject(TemplateContext context, Object obj) {
         if (! (obj instanceof Map)) {
             return obj;
         }
@@ -60,7 +61,7 @@ public abstract class BasicTypesSupport implements TypesSupport {
             return obj;
         }
         //noinspection rawtypes
-        return typeConvertor.deserialize((Map)dataMapObj);
+        return typeConvertor.deserialize(context, (Map)dataMapObj);
     }
 
 

@@ -13,7 +13,7 @@ import java.util.TimeZone;
 
 public class RenderSettings {
 
-    public static final RenderSettings EXCEPTIONS_FROM_INCLUDE = new RenderSettings.Builder().withShowExceptionsFromInclude(true).build();
+    public static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
     public enum EvaluateMode {
         LAZY,
@@ -62,7 +62,7 @@ public class RenderSettings {
             this.strictVariables = false;
             this.raiseExceptionsInStrictMode = true;
             this.evaluateMode = EvaluateMode.LAZY;
-            this.locale = Locale.ENGLISH;
+            this.locale = DEFAULT_LOCALE;
         }
 
         public Builder withStrictVariables(boolean strictVariables) {

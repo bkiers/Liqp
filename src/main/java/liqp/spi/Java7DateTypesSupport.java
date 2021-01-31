@@ -3,12 +3,19 @@ package liqp.spi;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import liqp.RenderSettings;
+import liqp.TemplateContext;
 import liqp.filters.date.CustomDateFormatSupport;
 import liqp.filters.date.StrftimeCompatibleDate;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class Java7DateTypesSupport extends BasicTypesSupport {
 
@@ -20,24 +27,40 @@ public class Java7DateTypesSupport extends BasicTypesSupport {
         registerType(module, Date.class, new TypeConvertor<Date>(){
             @Override
             public void serialize(JsonGenerator gen, Date val) throws IOException {
-                gen.writeStringField("val", String.valueOf(val.getTime()));
+                gen.writeNumberField("val", val.getTime());
             }
 
             @Override
-            public Date deserialize(Map node) {
-                String strVal = (String) node.get("val");
-                long val = Long.parseLong(strVal);
+            public Date deserialize(TemplateContext context, Map node) {
+                long val = (Long) node.get("val");
                 return new Date(val);
             }
 
+        });
+
+        registerType(module, Calendar.class, new TypeConvertor<Calendar>() {
+            @Override
+            public void serialize(JsonGenerator gen, Calendar val) throws IOException {
+                gen.writeNumberField("val", val.getTimeInMillis());
+                gen.writeStringField("zone", val.getTimeZone().getID());
+            }
+
+            @Override
+            public Calendar deserialize(TemplateContext context, Map node) {
+                long val = (Long) node.get("val");
+                String zone = (String) node.get("zone");
+                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zone), context.renderSettings.locale);
+                calendar.setTimeInMillis(val);
+                return calendar;
+            }
         });
         mapper.registerModule(module);
 
         addCustomDateType(new CustomDateFormatSupport<Date>() {
 
             @Override
-            public StrftimeCompatibleDate getValue(Date value) {
-                return new StrftimeCompatibleDate(value.getTime());
+            public ZonedDateTime getValue(Date value) {
+                return ZonedDateTime.ofInstant(value.toInstant(), ZoneId.systemDefault());
             }
 
             @Override

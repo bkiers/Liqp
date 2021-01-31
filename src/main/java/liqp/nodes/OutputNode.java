@@ -25,7 +25,7 @@ public class OutputNode implements LNode {
 
         Object value = expression.render(context);
 
-        value = BasicTypesSupport.restoreObject(value);
+        value = BasicTypesSupport.restoreObject(context, value);
 
         for (FilterNode node : filters) {
             value = node.apply(value, context);

@@ -3,7 +3,9 @@ package liqp.filters.date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -11,11 +13,23 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalField;
+import java.time.temporal.TemporalQueries;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
+
+import static java.time.temporal.ChronoField.DAY_OF_MONTH;
+import static java.time.temporal.ChronoField.HOUR_OF_DAY;
+import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
+import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
+import static java.time.temporal.ChronoField.NANO_OF_SECOND;
+import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
+import static java.time.temporal.ChronoField.YEAR;
 
 public class StrftimeCompatibleDate {
     private final String zoneId;
@@ -91,22 +105,6 @@ public class StrftimeCompatibleDate {
 //        System.out.println("tz from empty: " + timeZone);
     }
 
-    /**
-     * In case if anyone interesting about full set
-     * of supported by ruby date patterns:
-     * there no such set as the parsing there happening based on
-     * heuristic algorithms.
-     * This is how it looks like(~3K lines just for date parse):
-     * https://github.com/ruby/ruby/blob/ee102de6d7ec2454dc5da223483737478eb7bcc7/ext/date/date_parse.c
-     */
-    public static Set<String> datePatterns = new HashSet<String>();
-
-    static {
-        datePatterns.add("yyyy-MM-dd HH:mm:ss");
-        datePatterns.add("yyyy-MM-dd HH:mm:ss Z");
-        datePatterns.add("EEE MMM dd hh:mm:ss yyyy");
-        // 2010-10-31 00:00:00 -0500
-    }
 
 
     private final TemporalAccessor temporal;
@@ -135,36 +133,7 @@ public class StrftimeCompatibleDate {
         this.zoneId = TimeZone.getDefault().getID();
         this.temporal = Instant.ofEpochMilli(milliseconds);;
     }
-    public static StrftimeCompatibleDate parse(String str, Locale locale) {
 
-        for(String pattern : datePatterns) {
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern, locale);
-
-            long epochMilli = 0;
-            String zoneId = ZoneId.of("UTC").getId();
-            try {
-                ZonedDateTime zonedDateTime = ZonedDateTime.parse(str, formatter);
-                epochMilli = zonedDateTime.toInstant().toEpochMilli();
-                zoneId = zonedDateTime.getZone().getId();
-                return new StrftimeCompatibleDate(epochMilli, zoneId);
-            } catch (DateTimeParseException exception) {
-                // ignore
-                exception.printStackTrace();
-            }
-            try {
-                LocalDateTime localDateTime = LocalDateTime.parse(str, formatter);
-                epochMilli = localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
-                return new StrftimeCompatibleDate(epochMilli, zoneId);
-            } catch (Exception e) {
-                e.printStackTrace();
-                // ignore
-            }
-        }
-
-        // Could not parse the string into a meaningful date, return null.
-        return null;
-    }
 
     public TemporalAccessor getTemporal() {
         return temporal;

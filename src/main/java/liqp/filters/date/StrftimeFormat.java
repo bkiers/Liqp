@@ -25,19 +25,25 @@ public class StrftimeFormat extends Format {
 
     @Override
     public StringBuffer format(Object inObj, StringBuffer toAppendTo, FieldPosition pos) {
-        StrftimeCompatibleDate obj = verifyType(inObj);
+        ZonedDateTime obj = verifyType(inObj);
+        if (obj == null) {
+            return toAppendTo;
+        }
         if (delegate != null) {
-            String res = delegate.format(obj.getTemporal());
+            String res = delegate.format(obj);
             return toAppendTo.append(res);
         }
         return null;
     }
 
-    protected StrftimeCompatibleDate verifyType(Object inObj) {
-        if (!(inObj instanceof StrftimeCompatibleDate)) {
+    protected ZonedDateTime verifyType(Object inObj) {
+        if (inObj == null) {
+            return null;
+        }
+        if (!(inObj instanceof ZonedDateTime)) {
             throw new IllegalArgumentException("object for formatting should be " + StrftimeCompatibleDate.class.getSimpleName()  + " type");
         }
-        return (StrftimeCompatibleDate) inObj;
+        return (ZonedDateTime) inObj;
     }
 
     @Override
@@ -57,31 +63,16 @@ public class StrftimeFormat extends Format {
 
         @Override
         public StringBuffer format(Object inObj, StringBuffer toAppendTo, FieldPosition pos) {
-            StrftimeCompatibleDate obj = verifyType(inObj);
-            String zoneId = obj.getZoneId();
-            if (zoneId == null) {
+            ZonedDateTime obj = verifyType(inObj);
+            if (obj == null) {
                 return toAppendTo;
             }
-            long offset = obj.getTemporal().get(ChronoField.OFFSET_SECONDS);
+            long offset = obj.get(ChronoField.OFFSET_SECONDS);
             boolean isPositive = offset >= 0;
             long hours = Math.abs(offset / (3600));
             long minutes = Math.abs(offset / (60) % (60));
             String strVal = String.format(locale, "%s%02d%02d", isPositive ? "+" : "-", hours, minutes);
             toAppendTo.append(strVal);
-            return toAppendTo;
-        }
-    }
-
-    /* package */ static class  TimeZoneNameStrftimeFormat extends StrftimeFormat {
-        public TimeZoneNameStrftimeFormat(Locale locale) {
-            this.delegate = DateTimeFormatter.ofPattern("zzzz", locale);
-        }
-
-        @Override
-        public StringBuffer format(Object inObj, StringBuffer toAppendTo, FieldPosition pos) {
-            StrftimeCompatibleDate obj = verifyType(inObj);
-            String val = delegate.format(obj.getTemporal());
-            toAppendTo.append(val);
             return toAppendTo;
         }
     }

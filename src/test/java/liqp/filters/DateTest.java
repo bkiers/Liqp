@@ -1,5 +1,8 @@
 package liqp.filters;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Locale;
 import liqp.Template;
 import liqp.TemplateContext;
@@ -141,8 +144,8 @@ public class DateTest {
         Filter f = Date.withCustomDateType(new CustomDateFormatSupport<CustomDate>() {
 
             @Override
-            public StrftimeCompatibleDate getValue(CustomDate value) {
-                return new StrftimeCompatibleDate(value.time);
+            public ZonedDateTime getValue(CustomDate value) {
+                return ZonedDateTime.ofInstant(Instant.ofEpochMilli(value.time), ZoneOffset.UTC);
             }
 
             @Override

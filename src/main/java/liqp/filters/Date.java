@@ -2,17 +2,22 @@ package liqp.filters;
 
 import liqp.TemplateContext;
 import liqp.filters.date.CustomDateFormatSupport;
+import liqp.filters.date.Parser;
 import liqp.filters.date.StrftimeCompatibleDate;
 import liqp.filters.date.StrftimeDateFormatter;
 
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import static liqp.filters.date.StrftimeCompatibleDate.datePatterns;
+import static liqp.filters.date.Parser.datePatterns;
+
 
 public class Date extends Filter {
 
@@ -33,18 +38,18 @@ public class Date extends Filter {
         Locale locale = context.renderSettings.locale;
 
         try {
-            final StrftimeCompatibleDate compatibleDate;
+            final ZonedDateTime compatibleDate;
 
             if("now".equals(super.asString(value)) || "today".equals(super.asString(value))) {
-                compatibleDate = new StrftimeCompatibleDate();
+                compatibleDate = ZonedDateTime.now();
             } else if (isCustomDateType(value)) {
                 compatibleDate = getFromCustomType(value);
             }
             else if(super.isNumber(value)) {
                 // No need to divide this by 1000, the param is expected to be in seconds already!
-                compatibleDate = new StrftimeCompatibleDate(super.asNumber(value).longValue() * 1000);
+                compatibleDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(super.asNumber(value).longValue() * 1000), ZoneId.systemDefault());
             }  else {
-                compatibleDate = StrftimeCompatibleDate.parse(super.asString(value), locale);
+                compatibleDate = Parser.parse(super.asString(value), locale);
                 if(compatibleDate == null) {
                     return value;
                 }
@@ -73,7 +78,7 @@ public class Date extends Filter {
         return false;
     }
 
-    private StrftimeCompatibleDate getFromCustomType(Object value) {
+    private ZonedDateTime getFromCustomType(Object value) {
         for (CustomDateFormatSupport el: supportedTypes) {
             if (el.support(value)) {
                 return el.getValue(value);

@@ -4,6 +4,7 @@ import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
@@ -153,13 +154,13 @@ public class StrftimeDateFormatter {
         LIQUID_TO_JAVA_FORMAT.put('Y', new StrftimeFormat(DateTimeFormatter.ofPattern("yyyy", locale)));
 
         // %Z - Time zone name
-        LIQUID_TO_JAVA_FORMAT.put('Z', new StrftimeFormat.TimeZoneNameStrftimeFormat(locale));
+        LIQUID_TO_JAVA_FORMAT.put('Z', new StrftimeFormat(DateTimeFormatter.ofPattern("zzzz", locale)));
 
         LIQUID_TO_JAVA_FORMAT.put('z', new StrftimeFormat.TimeZoneHourOffsetStrftimeFormat(locale));
 
     }
 
-    public String format(String format, StrftimeCompatibleDate date) {
+    public String format(String format, ZonedDateTime date) {
 
         StringBuilder builder = new StringBuilder();
 

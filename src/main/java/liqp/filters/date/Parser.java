@@ -71,6 +71,9 @@ public class Parser {
      * the default is taken from `now` with default zone
      */
     public static ZonedDateTime getZonedDateTimeFromTemporalAccessor(TemporalAccessor temporalAccessor) {
+        if (temporalAccessor instanceof ZonedDateTime) {
+            return (ZonedDateTime) temporalAccessor;
+        }
         LocalDateTime now = LocalDateTime.now();
         TemporalField[] copyThese = new TemporalField[]{
                 YEAR,

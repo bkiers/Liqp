@@ -69,8 +69,6 @@ public class Parser {
     /**
      * Follow ruby rules: if some datetime part is missing,
      * the default is taken from `now` with default zone
-     * @param temporalAccessor
-     * @return
      */
     public static ZonedDateTime getZonedDateTimeFromTemporalAccessor(TemporalAccessor temporalAccessor) {
         LocalDateTime now = LocalDateTime.now();

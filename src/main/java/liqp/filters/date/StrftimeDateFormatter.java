@@ -1,12 +1,7 @@
 package liqp.filters.date;
 
-import java.text.FieldPosition;
-import java.text.Format;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -46,19 +41,13 @@ import java.util.Map;
  */
 public class StrftimeDateFormatter {
 
-    /**
-     * Underlying SimpleDateFormat are not thread-safe, so lets each thread work with ouw copy!
-     * This became critical, as the only way to get timezone from formatted date in java7 is to
-     * use mutable {@link SimpleDateFormat#parse(String)} method.
-     */
-    private static final ThreadLocal<Map<Locale, StrftimeDateFormatter>> localeMapHolder = ThreadLocal.withInitial(HashMap::new);
+    private static final Map<Locale, StrftimeDateFormatter> localeMapHolder = new HashMap<>();
 
     public static StrftimeDateFormatter getInstance(Locale locale) {
-        Map<Locale, StrftimeDateFormatter> localeMap = localeMapHolder.get();
-        if (!localeMap.containsKey(locale)) {
-            localeMap.put(locale, new StrftimeDateFormatter(locale));
+        if (!localeMapHolder.containsKey(locale)) {
+            localeMapHolder.put(locale, new StrftimeDateFormatter(locale));
         }
-        return localeMap.get(locale);
+        return localeMapHolder.get(locale);
     }
 
     private final Locale locale;

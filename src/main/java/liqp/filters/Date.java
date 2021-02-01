@@ -12,7 +12,6 @@ import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import static liqp.filters.date.Parser.datePatterns;
 import static liqp.filters.date.Parser.getZonedDateTimeFromTemporalAccessor;

@@ -7,7 +7,6 @@ import java.util.Locale;
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.filters.date.CustomDateFormatSupport;
-import liqp.filters.date.StrftimeCompatibleDate;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Before;
 import org.junit.Test;

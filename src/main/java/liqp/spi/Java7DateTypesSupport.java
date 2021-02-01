@@ -3,17 +3,14 @@ package liqp.spi;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import liqp.RenderSettings;
 import liqp.TemplateContext;
 import liqp.filters.date.CustomDateFormatSupport;
-import liqp.filters.date.StrftimeCompatibleDate;
 
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 

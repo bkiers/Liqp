@@ -4,19 +4,15 @@ import liqp.RenderSettings;
 import liqp.Template;
 import org.junit.Test;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 import static org.junit.Assert.*;
 
-public class StrftimeCompatibleDateTypeSupportTest {
+public class StrftimeDateFormatterTest {
     @Test
     public void testCase() {
         // 2021-11-03 16:40:44 Pacific Standard Time
@@ -42,5 +38,4 @@ public class StrftimeCompatibleDateTypeSupportTest {
             assertEquals("2021-11-03 16:40:44 Pazifische Sommerzeit", res);
         }
     }
-
 }

@@ -3,22 +3,22 @@ package liqp.filters;
 import liqp.TemplateContext;
 import liqp.filters.date.CustomDateFormatSupport;
 import liqp.filters.date.Parser;
-import liqp.filters.date.StrftimeCompatibleDate;
 import liqp.filters.date.StrftimeDateFormatter;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
 import static liqp.filters.date.Parser.datePatterns;
+import static liqp.filters.date.Parser.getZonedDateTimeFromTemporalAccessor;
 
-
+// general liquid info:
+// https://shopify.github.io/liquid/filters/date/
 public class Date extends Filter {
 
     private static List<CustomDateFormatSupport> supportedTypes = new ArrayList<>();
@@ -39,25 +39,26 @@ public class Date extends Filter {
 
         try {
             final ZonedDateTime compatibleDate;
-
-            if("now".equals(super.asString(value)) || "today".equals(super.asString(value))) {
+            if (value instanceof TemporalAccessor) { // this includes all java.time types, including ZonedDateTime itself
+                compatibleDate = getZonedDateTimeFromTemporalAccessor((TemporalAccessor)value);
+            } else if("now".equals(super.asString(value)) || "today".equals(super.asString(value))) {
                 compatibleDate = ZonedDateTime.now();
             } else if (isCustomDateType(value)) {
                 compatibleDate = getFromCustomType(value);
-            }
-            else if(super.isNumber(value)) {
+            } else if(super.isNumber(value)) {
                 // No need to divide this by 1000, the param is expected to be in seconds already!
                 compatibleDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(super.asNumber(value).longValue() * 1000), ZoneId.systemDefault());
-            }  else {
+            } else {
                 compatibleDate = Parser.parse(super.asString(value), locale);
-                if(compatibleDate == null) {
-                    return value;
-                }
+            }
+            if (compatibleDate == null) {
+                return value;
             }
 
             final String format = super.asString(super.get(0, params));
 
             if(format == null || format.trim().isEmpty()) {
+                // todo: verify this
                 return value;
             }
 

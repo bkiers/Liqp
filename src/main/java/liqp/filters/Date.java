@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -120,8 +121,7 @@ public class Date extends Filter {
                     SimpleDateFormat javaFormat = LIQUID_TO_JAVA_FORMAT.get(next);
 
                     if (javaFormat == null) {
-                        // no valid date-format: append the '%' and the 'next'-char
-                        builder.append("%").append(next);
+                        formatNonMappableChars(date, next, builder);
                     }
                     else {
                         builder.append(javaFormat.format(date));
@@ -174,6 +174,9 @@ public class Date extends Filter {
         // %e - Day of the month (1..31)
         LIQUID_TO_JAVA_FORMAT.put('e', new SimpleDateFormat("d", locale));
 
+        // %F - Year, month and day
+        LIQUID_TO_JAVA_FORMAT.put('F', new SimpleDateFormat("yyyy-MM-dd", locale));
+
         // %H - Hour of the day, 24-hour clock (00..23)
         LIQUID_TO_JAVA_FORMAT.put('H', new SimpleDateFormat("HH", locale));
 
@@ -195,11 +198,27 @@ public class Date extends Filter {
         // %M - Minute of the hour (00..59)
         LIQUID_TO_JAVA_FORMAT.put('M', new SimpleDateFormat("mm", locale));
 
+        // %n - Newline character
+        LIQUID_TO_JAVA_FORMAT.put('n', new SimpleDateFormat("\n", locale));
+
         // %p - Meridian indicator (``AM''  or  ``PM'')
         LIQUID_TO_JAVA_FORMAT.put('p', new SimpleDateFormat("a", locale));
+        LIQUID_TO_JAVA_FORMAT.put('P', new SimpleDateFormat("a", locale));
+
+        // %r - Time plus Meridian indicator (``12:00:00 PM'')
+        LIQUID_TO_JAVA_FORMAT.put('r', new SimpleDateFormat("hh:mm:ss a", locale));
+
+        // %R - Time without seconds (``12:00'')
+        LIQUID_TO_JAVA_FORMAT.put('R', new SimpleDateFormat("HH:mm", locale));
 
         // %S - Second of the minute (00..60)
         LIQUID_TO_JAVA_FORMAT.put('S', new SimpleDateFormat("ss", locale));
+
+        // %t - Tab character
+        LIQUID_TO_JAVA_FORMAT.put('t', new SimpleDateFormat("\t", locale));
+
+        // %T - Time with seconds (``12:00:00'')
+        LIQUID_TO_JAVA_FORMAT.put('T', new SimpleDateFormat("HH:mm:ss", locale));
 
         // %U - Week  number  of the current year,
         //      starting with the first Sunday as the first
@@ -210,21 +229,25 @@ public class Date extends Filter {
         //      starting with the first Monday as the first
         //      day of the first week (00..53)
         LIQUID_TO_JAVA_FORMAT.put('W', new SimpleDateFormat("ww", locale));
+        LIQUID_TO_JAVA_FORMAT.put('V', new SimpleDateFormat("ww", locale));
 
         // %w - Day of the week (Sunday is 0, 0..6)
         LIQUID_TO_JAVA_FORMAT.put('w', new SimpleDateFormat("F", locale));
 
         // %x - Preferred representation for the date alone, no time
         LIQUID_TO_JAVA_FORMAT.put('x', new SimpleDateFormat("MM/dd/yy", locale));
+        LIQUID_TO_JAVA_FORMAT.put('D', new SimpleDateFormat("MM/dd/yy", locale));
 
         // %X - Preferred representation for the time alone, no date
         LIQUID_TO_JAVA_FORMAT.put('X', new SimpleDateFormat("HH:mm:ss", locale));
 
         // %y - Year without a century (00..99)
         LIQUID_TO_JAVA_FORMAT.put('y', new SimpleDateFormat("yy", locale));
+        LIQUID_TO_JAVA_FORMAT.put('g', new SimpleDateFormat("yy", locale));
 
         // %Y - Year with century
         LIQUID_TO_JAVA_FORMAT.put('Y', new SimpleDateFormat("yyyy", locale));
+        LIQUID_TO_JAVA_FORMAT.put('G', new SimpleDateFormat("yyyy", locale));
 
         // %Z - Time zone name
         LIQUID_TO_JAVA_FORMAT.put('Z', new SimpleDateFormat("z", locale));
@@ -285,6 +308,30 @@ public class Date extends Filter {
 
         // Could not parse the string into a meaningful date, return null.
         return null;
+    }
+
+    /*
+     * Formats characters with no one-to-one mapping in SimpleDateFormat.
+     */
+    private void formatNonMappableChars(java.util.Date date, Character character, StringBuilder builder) {
+        Calendar calendar = Calendar.getInstance(locale);
+        calendar.setTime(date);
+        switch (character) {
+            case 'C':
+                int year = calendar.get(Calendar.YEAR);
+                builder.append(year / 100);
+                break;
+            case 's':
+                long epochSeconds = calendar.getTimeInMillis() / 1000L;
+                builder.append(epochSeconds);
+                break;
+            case 'u':
+                int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+                builder.append(dayOfWeek - 1);
+                break;
+            default:
+                builder.append("%").append(character);
+        }
     }
 
     public interface CustomDateFormatSupport<T> {

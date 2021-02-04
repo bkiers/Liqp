@@ -52,7 +52,18 @@ public class DateTest {
                 {"{{" + seconds + " | date: '%X'}}", simpleDateFormat("HH:mm:ss").format(date)},
                 {"{{" + seconds + " | date: 'x=%y'}}", "x=" + simpleDateFormat("yy").format(date)},
                 {"{{" + seconds + " | date: '%Y'}}", simpleDateFormat("yyyy").format(date)},
-                {"{{" + seconds + " | date: '%Z'}}", simpleDateFormat("z").format(date)}
+                {"{{" + seconds + " | date: '%Z'}}", simpleDateFormat("z").format(date)},
+                {"{{" + seconds + " | date: '%F'}}", simpleDateFormat("yyyy-MM-dd").format(date)},
+                {"{{" + seconds + " | date: '%n'}}", simpleDateFormat("\n").format(date)},
+                {"{{" + seconds + " | date: '%r'}}", simpleDateFormat("hh:mm:ss a").format(date)},
+                {"{{" + seconds + " | date: '%R'}}", simpleDateFormat("HH:mm").format(date)},
+                {"{{" + seconds + " | date: '%t'}}", simpleDateFormat("\t").format(date)},
+                {"{{" + seconds + " | date: '%T'}}", simpleDateFormat("HH:mm:ss").format(date)},
+                {"{{" + seconds + " | date: '%V'}}", simpleDateFormat("ww").format(date)},
+                {"{{" + seconds + " | date: '%D'}}", simpleDateFormat("MM/dd/yy").format(date)},
+                {"{{" + seconds + " | date: '%g'}}", simpleDateFormat("yy").format(date)},
+                {"{{" + seconds + " | date: '%G'}}", simpleDateFormat("yyyy").format(date)},
+                {"{{" + seconds + " | date: '%P'}}", simpleDateFormat("a").format(date)}
         };
 
         for (String[] test : tests) {
@@ -152,5 +163,20 @@ public class DateTest {
 
         // then
         assertThat(Filter.getFilter("date").apply(customDate, "%m/%d/%Y"), is((Object) "07/05/2006"));
+    }
+
+    @Test
+    public void testNonMappableCharacters() {
+        final int seconds = 946702800;
+
+        final String[] formats = {"%C", "%s", "%u", "%z"};
+        final String[] expected = {"19", "946702800", "5", "%z"};
+
+        int idx = 0;
+        for (String format : formats) {
+            Template template = Template.parse("{{" + seconds + " | date: '" + format + "'}}");
+            String rendered = String.valueOf(template.render());
+            assertThat(rendered, is(expected[idx++]));
+        }
     }
 }

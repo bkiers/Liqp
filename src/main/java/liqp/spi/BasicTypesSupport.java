@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import liqp.TemplateContext;
+import liqp.filters.date.CustomDateFormatRegistry;
 import liqp.filters.date.CustomDateFormatSupport;
 
 import java.io.IOException;
@@ -32,7 +33,7 @@ public abstract class BasicTypesSupport implements TypesSupport {
     }
 
     protected void addCustomDateType(CustomDateFormatSupport<?> typeSupport) {
-        liqp.filters.Date.addCustomDateType(typeSupport);
+        CustomDateFormatRegistry.add(typeSupport);
     }
 
     public static Object restoreObject(TemplateContext context, Object obj) {

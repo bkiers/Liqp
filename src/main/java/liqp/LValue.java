@@ -1,5 +1,6 @@
 package liqp;
 
+import liqp.filters.date.CustomDateFormatRegistry;
 import liqp.nodes.AtomNode;
 
 import java.time.ZonedDateTime;
@@ -162,13 +163,17 @@ public abstract class LValue {
         ZonedDateTime time = ZonedDateTime.now();
         if (value instanceof TemporalAccessor) {
             time = getZonedDateTimeFromTemporalAccessor((TemporalAccessor) value);
+        } else if (CustomDateFormatRegistry.isCustomDateType(value)) {
+            time = CustomDateFormatRegistry.getFromCustomType(value);
         }
         return time;
     }
 
     public static boolean isTemporal(Object value){
         // todo: more cases here
-        return value instanceof TemporalAccessor;
+        boolean isTemporalAccessor = value instanceof TemporalAccessor;
+        boolean isCustomDateType = CustomDateFormatRegistry.isCustomDateType(value);
+        return isTemporalAccessor || isCustomDateType;
     }
 
     /**

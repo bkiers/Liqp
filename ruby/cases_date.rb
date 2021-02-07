@@ -13,6 +13,9 @@ tn = Time.now
 t = Time.new(2007,11,1,15,25,0, "+09:00")
 t_str = t.to_s
 
+# abs filter ignores fact the time is numeric
+assertEqual("0", render({"a" => Time.now}, "{{ a | abs }}"))
+
 if isJekyll
 
   # target is string representation, source is iterated as collection(and so = match in "year" part)

@@ -1,5 +1,6 @@
 package liqp.filters;
 
+import liqp.RenderSettings;
 import liqp.Template;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
@@ -55,6 +56,10 @@ public class AbsTest {
     @Test
     public void ensureDateTypeIsZero() {
         String res = Template.parse("{{ a | abs }}").render(Collections.singletonMap("a", LocalDateTime.now()));
+        assertEquals("0", res);
+
+        RenderSettings eager = new RenderSettings.Builder().withEvaluateMode(RenderSettings.EvaluateMode.EAGER).build();
+        res = Template.parse("{{ a | abs }}").withRenderSettings(eager).render(Collections.singletonMap("a", LocalDateTime.now()));
         assertEquals("0", res);
     }
 }

@@ -39,6 +39,10 @@ import java.util.Map;
  * %Z - Time zone name
  * %% - Literal ``%'' character
  */
+// todo:
+//  http://alanwsmith.com/jekyll-liquid-date-formatting-examples
+//  https://apidock.com/ruby/DateTime/strftime
+// todo: load jackson mappers on demand (first saw inspectable OR eager evaluation)
 public class StrftimeDateFormatter {
 
     private static final Map<Locale, StrftimeDateFormatter> localeMapHolder = new HashMap<>();

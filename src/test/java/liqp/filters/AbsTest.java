@@ -41,7 +41,8 @@ public class AbsTest {
                 {"{{ 17.42 | abs }}", "17.42"},
                 {"{{ -17.42 | abs }}", "17.42"},
                 {"{{ '17.42' | abs }}", "17.42"},
-                {"{{ '-17.42' | abs }}", "17.42"}
+                {"{{ '-17.42' | abs }}", "17.42"},
+                {"{{  '0.2' | plus: '0.1' | abs }}", "0.3"}
         };
 
         for (String[] test : tests) {
@@ -61,5 +62,10 @@ public class AbsTest {
         RenderSettings eager = new RenderSettings.Builder().withEvaluateMode(RenderSettings.EvaluateMode.EAGER).build();
         res = Template.parse("{{ a | abs }}").withRenderSettings(eager).render(Collections.singletonMap("a", LocalDateTime.now()));
         assertEquals("0", res);
+    }
+
+    @Test
+    public void testMathPrecise() {
+
     }
 }

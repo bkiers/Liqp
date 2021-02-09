@@ -16,6 +16,12 @@ t_str = t.to_s
 # abs filter ignores fact the time is numeric
 pp render({"a" => Time.now}, "{{ a | append: 'k' }}")
 assertEqual("0", render({"a" => Time.now}, "{{ a | abs }}"))
+pp render({"a" => Time.now}, "{{ a | minus: 1 }}")
+pp render({ }, "{{  '0.2' | plus: '0.1' | abs }}")
+pp render({ "a" => {"a" => 1, "b" => 2}}, "size of object: {{  a | size }}")
+pp render({"a" => Time.now}, "size of date: {{ a | size }}")
+pp render({ }, "times: {{ '2.1' | times:3 }}")
+pp render({"a" => Time.now}, "times date: {{ a | times:3 }}")
 
 if isJekyll
 

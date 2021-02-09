@@ -1,5 +1,9 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+import liqp.parser.Inspectable;
+import liqp.parser.LiquidSupport;
+
 public class Size extends Filter {
 
     /*
@@ -8,8 +12,16 @@ public class Size extends Filter {
      * Return the size of an array or of an string
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
+        if (value instanceof Inspectable) {
+            LiquidSupport evaluated = context.renderSettings.evaluate(context, (Inspectable) value);
+            value = evaluated.toLiquid();
+        }
+
+        if (isMap(value)) {
+            return asMap(value).size();
+        }
         if (super.isArray(value)) {
             return super.asArray(value).length;
         }

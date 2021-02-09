@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -20,6 +21,7 @@ public class TimesTest {
                 {"{{ 8 | times: '3.0' }}", "24.0"},
                 {"{{ 8 | times: 2.0 }}", "16.0"},
                 {"{{ foo | times: 4 }}", "0"},
+                {"{{ '0.1' | times: 3 }}", "0.3"},
         };
 
         for (String[] test : tests) {
@@ -45,11 +47,12 @@ public class TimesTest {
      * def test_times
      *   assert_template_result "12", "{{ 3 | times:4 }}"
      *   assert_template_result "0", "{{ 'foo' | times:4 }}"
-     *
-     *   # Ruby v1.9.2-rc1, or higher, backwards compatible Float test
-     *   assert_match(/(6\.3)|(6\.(0{13})1)/, Template.parse("{{ '2.1' | times:3 }}").render)
-     *
      *   assert_template_result "6", "{{ '2.1' | times:3 | replace: '.','-' | plus:0}}"
+     *   assert_template_result "7.25", "{{ 0.0725 | times:100 }}"
+     *   assert_template_result "-7.25", '{{ "-0.0725" | times:100 }}'
+     *   assert_template_result "7.25", '{{ "-0.0725" | times: -100 }}'
+     * ???
+     *   assert_template_result "4", "{{ price | times:2 }}", 'price' => NumberLikeThing.new(2)
      * end
      */
     @Test
@@ -59,6 +62,9 @@ public class TimesTest {
 
         assertThat(filter.apply(3L, 4L), is((Object)12L));
         // assert_template_result "0", "{{ 'foo' | times:4 }}" // see: applyTest()
-        assertTrue(String.valueOf(filter.apply(2.1, 3L)).matches("6[.,]30{10,}1"));
+        assertTrue(String.valueOf(filter.apply(2.1, 3L)).matches("6[.,]3"));
+        assertEquals("7.25", filter.apply(0.0725, 100));
+        assertEquals("-7.25", filter.apply(-0.0725, 100));
+        assertEquals("7.25", filter.apply(-0.0725, -100));
     }
 }

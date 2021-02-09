@@ -19,7 +19,6 @@ public class Java8DateTypesSupport extends BasicTypesSupport {
     @Override
     public void configureTypes(ObjectMapper mapper) {
         SimpleModule module = new SimpleModule("liqp java 8 date type support");
-
         // todo: generic way for all java8 temporal types? or just list all
         // todo: check how it plays with com.fasterxml.jackson.datatype:jackson-datatype-jsr310
         registerType(module, ZonedDateTime.class, new TypeConvertor<ZonedDateTime>(){

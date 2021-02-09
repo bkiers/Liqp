@@ -77,6 +77,9 @@ public interface LiquidSupport extends Inspectable {
         }
 
         public static Map<String, Object> objectToMap(TemplateContext context, Object variables) {
+            if (context == null) {
+                throw new RuntimeException("variant of caller function with TemplateContext required here");
+            }
             ObjectMapper mapper = context.parseSettings.mapper;
             ObjectNode value = mapper.convertValue(variables, ObjectNode.class);
             Map<String, Object> convertedValue = mapper.convertValue(value, MAP_TYPE_REF);

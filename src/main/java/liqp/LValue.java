@@ -3,6 +3,7 @@ package liqp;
 import liqp.filters.date.CustomDateFormatRegistry;
 import liqp.nodes.AtomNode;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
@@ -12,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static java.math.BigDecimal.ROUND_UNNECESSARY;
 import static liqp.filters.date.Parser.getZonedDateTimeFromTemporalAccessor;
 
 /**
@@ -241,6 +243,11 @@ public abstract class LValue {
         return str.matches("\\d+") ? Long.valueOf(str) : Double.valueOf(str);
     }
 
+    // mimic ruby's `BigDecimal.to_f` with standard java capabilities
+    // same time provide expected out for java.math.BigDecimal
+    public String asFormattedNumber(BigDecimal bd) {
+        return bd.setScale(Math.max(1, bd.stripTrailingZeros().scale()), ROUND_UNNECESSARY).toPlainString();
+    }
     /**
      * Returns `value` as a String.
      *

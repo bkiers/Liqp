@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import java.math.BigDecimal;
+
 public class Abs extends Filter {
 
     /*
@@ -27,7 +29,7 @@ public class Abs extends Filter {
         }
 
         if (super.isNumber(value) || super.canBeDouble(value)) {
-            return Math.abs(super.asNumber(value).doubleValue());
+            return asFormattedNumber(new BigDecimal(super.asNumber(value).toString()).abs());
         }
 
         return 0;

@@ -17,6 +17,10 @@ public abstract class BasicTypesSupport implements TypesSupport {
     @SuppressWarnings("rawtypes")
     private static final Map<String, TypeConvertor> typeRegistry = new HashMap<>();
 
+    // alternatives?
+    // here's two, witch uses VALUE_EMBEDDED_OBJECT fully:
+    // https://github.com/mongojack/mongojack see: org.mongojack.internal.DateSerializer
+    // https://github.com/michel-kraemer/bson4jackson see: de.undercouch.bson4jackson.serializers.BsonDateSerializer
     protected<T> void registerType(SimpleModule module, final Class<T> clazz, final TypeConvertor<T> typeGenerator) {
         module.addSerializer(new StdSerializer<T>(clazz) {
             @Override

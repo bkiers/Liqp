@@ -7,9 +7,15 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -165,6 +171,61 @@ public class TemplateTest {
 
         // then
         assertEquals("31 Dec, 2020", res);
+    }
+
+    @Test
+    public void testDeepData() {
+        // given
+        Map<String, Object> data = getDeepData();
+        Template template = Template.parse("{{a.b[2].d[3].e}}").withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).withRaiseExceptionsInStrictMode(true).build());
+
+        // when
+        String rendered = template.render(data);
+
+        // then
+        assertEquals("ok", rendered);
+    }
+
+    @Test
+    public void testDeepInspectable() {
+
+        // given
+        Inspectable data = new Inspectable() {
+            public Inspectable a = new Inspectable() {
+                public Object[] b = new Object[]{null, null, new Inspectable() {
+                    public List d = new ArrayList();
+                    {
+                        d.add(new Object()); // 0
+                        d.add(new Object()); // 1
+                        d.add(new Object()); // 2
+                        d.add(new HashMap() {{
+                            put("e", ZonedDateTime.of(LocalDateTime.of(2021, 11, 3, 16, 40, 44), ZoneId.of("America/Los_Angeles")));
+                        }
+                        }); // 3
+                    }
+                }};
+            };
+        };
+        Template template = Template.parse("{{ a.b[2].d[3].e | date: '%Y-%m-%d %H:%M:%S %Z' }}").withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).withRaiseExceptionsInStrictMode(true).build());
+
+        // when
+        String rendered = template.render(data);
+
+        // then
+        assertEquals("2021-11-03 16:40:44 Pacific Daylight Time", rendered);
+    }
+
+    private Map<String, Object> getDeepData() {
+        Map<String, Object> data = new HashMap<>();
+        Map secondIndex = Collections.singletonMap("e", "ok");
+        Object[] d = new Object[]{null, null, null, secondIndex};
+        List<Object> firstIndex = new ArrayList<>();
+        firstIndex.add(new Object()); // 0
+        firstIndex.add(new Object()); // 1
+        firstIndex.add(Collections.singletonMap("d", d)); // 2
+        Map<String, Object> a = Collections.singletonMap("b", firstIndex);
+        data.put("a", a);
+        return data;
     }
 
 }

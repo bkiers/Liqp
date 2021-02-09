@@ -350,7 +350,7 @@ public class Template {
     }
 
     public String render(Inspectable object) {
-        LiquidSupport evaluated = renderSettings.evaluate(parseSettings.mapper, object);
+        LiquidSupport evaluated = renderSettings.evaluate(new TemplateContext(protectionSettings, renderSettings, parseSettings, new HashMap<>()), object);
         Map<String, Object> map = evaluated.toLiquid();
         return render(map);
     }
@@ -467,7 +467,7 @@ public class Template {
                 variables.put(Include.INCLUDES_DIRECTORY_KEY, ((Path) includeDirectory).toAbsolutePath().toString());
             }
         }
-        variables = renderSettings.evaluate(parseSettings.mapper, variables);
+        variables = renderSettings.evaluate(new TemplateContext(protectionSettings, renderSettings, parseSettings, new HashMap<>()), variables);
 
         final NodeVisitor visitor = new NodeVisitor(this.tags, this.filters, this.parseSettings);
         try {

@@ -697,7 +697,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
         node.add(new LookupNode.Hash(index.id2().getText()));
       }
       else {
-        node.add(new LookupNode.Index(visit(index.expr())));
+        node.add(new LookupNode.Index(visit(index.expr()), index.expr().getText()));
       }
     }
 

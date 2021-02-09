@@ -25,7 +25,9 @@ public abstract class BasicTypesSupport implements TypesSupport {
                 gen.writeBooleanField("@supportedTypeMarker", true);
                 gen.writeStringField("@type", clazz.getName());
                 gen.writeFieldName("@data");
+                gen.writeStartObject();
                 typeGenerator.serialize(gen, value);
+                gen.writeEndObject();
                 gen.writeEndObject();
             }
         });

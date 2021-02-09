@@ -1,8 +1,7 @@
 package liqp;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import liqp.misc.LiquidSupportFromInspectable;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
 
@@ -20,25 +19,31 @@ public class RenderSettings {
         EAGER
     }
 
-    public Map<String, Object> evaluate(ObjectMapper mapper, Map<String, Object> variables) {
+
+    /**
+     * If template context is not available yet - it's ok to create new.
+     * This function don't need access to local context variables,
+     * as it operates with parameters.
+     * @param context - value object with RenderSettings, ParseSettings and ProtectionSettings in it.
+     */
+    public Map<String, Object> evaluate(final TemplateContext context, Map<String, Object> variables) {
         if (evaluateMode == EvaluateMode.EAGER) {
-            ObjectNode value = mapper.convertValue(variables, ObjectNode.class);
-            return mapper.convertValue(value, Map.class);
+            return LiquidSupportFromInspectable.objectToMap(context, variables);
         }
         return variables;
     }
 
-    public LiquidSupport evaluate(final ObjectMapper mapper, final Inspectable variable) {
+    /**
+     * If template context is not available yet - it's ok to create new.
+     * This function don't need access to local context variables,
+     * as it operates with parameters.
+     * @param context - value object with RenderSettings, ParseSettings and ProtectionSettings in it.
+     */
+    public LiquidSupport evaluate(final TemplateContext context, final Inspectable variable) {
         if (variable instanceof LiquidSupport) {
             return ((LiquidSupport) variable);
         }
-        return new LiquidSupport() {
-            @Override
-            public Map<String, Object> toLiquid() {
-                ObjectNode value = mapper.convertValue(variable, ObjectNode.class);
-                return mapper.convertValue(value, Map.class);
-            }
-        };
+        return new LiquidSupportFromInspectable(context, variable);
     }
 
     public final boolean strictVariables;

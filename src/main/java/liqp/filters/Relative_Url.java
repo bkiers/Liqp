@@ -20,7 +20,7 @@ public class Relative_Url extends Filter {
         Object configRoot = context.get(root);
 
         if (configRoot instanceof Inspectable) {
-            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) configRoot);
+            LiquidSupport evaluated = context.renderSettings.evaluate(context, (Inspectable) configRoot);
             configRoot = evaluated.toLiquid();
         }
         Object baseUrl = null;

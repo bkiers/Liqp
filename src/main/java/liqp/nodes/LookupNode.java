@@ -96,7 +96,7 @@ public class LookupNode implements LNode {
                 else if(value instanceof java.util.Map || value instanceof Inspectable) {
                     java.util.Map map;
                     if (value instanceof Inspectable) {
-                        LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) value);
+                        LiquidSupport evaluated = context.renderSettings.evaluate(context, (Inspectable) value);
                         map = evaluated.toLiquid();
                     } else {
                         map = (java.util.Map) value;
@@ -135,7 +135,7 @@ public class LookupNode implements LNode {
             if(value instanceof java.util.Map || value instanceof Inspectable) {
                 java.util.Map map;
                 if (value instanceof Inspectable) {
-                    LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) value);
+                    LiquidSupport evaluated = context.renderSettings.evaluate(context, (Inspectable) value);
                     map = evaluated.toLiquid();
                 } else {
                     map = (java.util.Map) value;
@@ -159,10 +159,12 @@ public class LookupNode implements LNode {
     public static class Index implements Indexable {
 
         private final LNode expression;
+        private final String text;
         private Object key = null;
 
-        public Index(LNode expression) {
+        public Index(LNode expression, String text) {
             this.expression = expression;
+            this.text = text;
         }
 
         @Override
@@ -202,7 +204,7 @@ public class LookupNode implements LNode {
         @Override
         public String toString() {
 
-            return String.format("[%s]", key);
+            return String.format("[%s]", text);
         }
     }
 

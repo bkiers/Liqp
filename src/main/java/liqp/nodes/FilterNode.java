@@ -43,10 +43,8 @@ public class FilterNode implements LNode {
             List<Object> paramValues = new ArrayList<Object>();
 
             for (LNode node : params) {
-                paramValues.add(BasicTypesSupport.restoreObject(context, node.render(context)));
+                paramValues.add(node.render(context));
             }
-            value = BasicTypesSupport.restoreObject(context, value);
-
             return filter.apply(value, context, paramValues.toArray(new Object[0]));
         }
         catch (Exception e) {

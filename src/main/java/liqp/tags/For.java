@@ -88,7 +88,7 @@ class For extends Tag {
         int limit = attributes.get(LIMIT);
 
         if (data instanceof Inspectable) {
-            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) data);
+            LiquidSupport evaluated = context.renderSettings.evaluate(context, (Inspectable) data);
             data = evaluated.toLiquid();
         }
         if (data instanceof Map) {

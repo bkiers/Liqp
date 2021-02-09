@@ -1,7 +1,6 @@
 package liqp;
 
 
-import liqp.misc.LiquidSupportFromInspectable;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
 
@@ -28,7 +27,7 @@ public class RenderSettings {
      */
     public Map<String, Object> evaluate(final TemplateContext context, Map<String, Object> variables) {
         if (evaluateMode == EvaluateMode.EAGER) {
-            return LiquidSupportFromInspectable.objectToMap(context, variables);
+            return LiquidSupport.LiquidSupportFromInspectable.objectToMap(context, variables);
         }
         return variables;
     }
@@ -37,13 +36,13 @@ public class RenderSettings {
      * If template context is not available yet - it's ok to create new.
      * This function don't need access to local context variables,
      * as it operates with parameters.
-     * @param context - value object with RenderSettings, ParseSettings and ProtectionSettings in it.
+     * @param context - holder for RenderSettings, ParseSettings and ProtectionSettings in it.
      */
     public LiquidSupport evaluate(final TemplateContext context, final Inspectable variable) {
         if (variable instanceof LiquidSupport) {
             return ((LiquidSupport) variable);
         }
-        return new LiquidSupportFromInspectable(context, variable);
+        return new LiquidSupport.LiquidSupportFromInspectable(context, variable);
     }
 
     public final boolean strictVariables;

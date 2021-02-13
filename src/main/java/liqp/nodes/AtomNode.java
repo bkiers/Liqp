@@ -4,8 +4,18 @@ import liqp.TemplateContext;
 
 public class AtomNode implements LNode {
 
-    public static final AtomNode EMPTY = new AtomNode(new Object());
-    public static final AtomNode BLANK = new AtomNode(new Object());
+    public static final AtomNode EMPTY = new AtomNode(new Object() {
+        @Override
+        public String toString() {
+            return "";
+        }
+    });
+    public static final AtomNode BLANK = new AtomNode(new Object() {
+        @Override
+        public String toString() {
+            return "";
+        }
+    });
 
     private Object value;
 

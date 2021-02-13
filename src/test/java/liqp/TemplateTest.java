@@ -24,6 +24,19 @@ import static org.junit.Assert.assertThat;
 
 public class TemplateTest {
 
+    public static class ComparableBase implements Comparable<ComparableBase> {
+        public final int val;
+
+        public ComparableBase(int val) {
+            this.val = val;
+        }
+
+        @Override
+        public int compareTo(ComparableBase o) {
+            return Integer.compare(val, o.val);
+        }
+    }
+
     static class Foo implements Inspectable {
 
         public String a = "A";

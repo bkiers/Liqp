@@ -336,7 +336,7 @@ public class Template {
         Map<String, Object> map;
 
         try {
-            map = new ObjectMapper().readValue(jsonMap, HashMap.class);
+            map = this.parseSettings.mapper.readValue(jsonMap, HashMap.class);
         }
         catch (Exception e) {
             throw new RuntimeException("invalid json map: '" + jsonMap + "'", e);

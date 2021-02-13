@@ -245,7 +245,7 @@ public abstract class LValue {
 
     // mimic ruby's `BigDecimal.to_f` with standard java capabilities
     // same time provide expected out for java.math.BigDecimal
-    public String asFormattedNumber(BigDecimal bd) {
+    public static String asFormattedNumber(BigDecimal bd) {
         return bd.setScale(Math.max(1, bd.stripTrailingZeros().scale()), ROUND_UNNECESSARY).toPlainString();
     }
     /**

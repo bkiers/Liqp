@@ -3,16 +3,48 @@ lexer grammar LiquidLexer;
 @lexer::members {
   private boolean stripSpacesAroundTags = false;
   private boolean stripSingleLine = false;
+  private java.util.LinkedList<Token> tokens = new java.util.LinkedList<>();
 
   public LiquidLexer(CharStream charStream, boolean stripSpacesAroundTags) {
     this(charStream, stripSpacesAroundTags, false);
   }
 
   public LiquidLexer(CharStream charStream, boolean stripSpacesAroundTags, boolean stripSingleLine) {
-      this(charStream);
-      this.stripSpacesAroundTags = stripSpacesAroundTags;
-      this.stripSingleLine = stripSingleLine;
-    }
+    this(charStream);
+    this.stripSpacesAroundTags = stripSpacesAroundTags;
+    this.stripSingleLine = stripSingleLine;
+  }
+
+  @Override
+  public void emit(Token t) {
+    super.setToken(t);
+    tokens.offer(t);
+  }
+
+  @Override
+  public Token nextToken() {
+    Token next = super.nextToken();
+    return tokens.isEmpty() ? next : tokens.poll();
+  }
+
+  private void handleIdChain(String chain) {
+    String[] ids = chain.split("\\.");
+
+    int start = this.getCharIndex() - chain.getBytes().length;
+
+	for (int i = 0; i < ids.length; i++) {
+	  int stop = start + ids[i].getBytes().length - 1;
+
+      this.emit(new CommonToken(this._tokenFactorySourcePair, Id, DEFAULT_TOKEN_CHANNEL, start, stop));
+
+      if (i < ids.length - 1) {
+        stop += 1;
+        this.emit(new CommonToken(this._tokenFactorySourcePair, Dot, DEFAULT_TOKEN_CHANNEL, stop, stop));
+      }
+
+      start = stop + 1;
+	}
+  }
 }
 
 OutStart
@@ -130,6 +162,10 @@ mode IN_TAG;
   Empty        : 'empty';
   Blank        : 'blank';
   EndId        : 'end' Id;
+
+  IdChain
+   : [a-zA-Z_] [a-zA-Z_0-9]* ( '.' [a-zA-Z_0-9]+ )+ {handleIdChain(getText());} -> skip
+   ;
 
   Id : ( Letter | '_' ) (Letter | '_' | '-' | Digit)*;
 

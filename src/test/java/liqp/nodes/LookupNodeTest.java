@@ -290,5 +290,21 @@ public class LookupNodeTest {
 
         assertThat(Template.parse("hash has {{ hash.size }} elements").render(assigns), is("hash has 4 elements"));
     }
+
+    /*
+     * https://github.com/bkiers/Liqp/issues/209
+     *
+     * data = { 'Data' => { '1' => { 'Value' => 'tobi' }} }
+     * @template = Liquid::Template.parse("hi {{Data.1.Value}}")
+     * puts @template.render(data)
+     * # hi tobi
+     */
+    @Test
+    public void numberAsKeyTest() throws Exception {
+
+        String assigns = "{ \"Data\" : { \"1\" : { \"Value\": \"tobi\" } } }";
+
+        assertThat(Template.parse("hi {{Data.1.Value}}").render(assigns), is("hi tobi"));
+    }
 }
 

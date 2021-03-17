@@ -160,8 +160,6 @@ public abstract class LValue {
     }
 
     public static ZonedDateTime asTemporal(Object value) {
-        // todo: add other temporal support
-        // default
         ZonedDateTime time = ZonedDateTime.now();
         if (value instanceof TemporalAccessor) {
             time = getZonedDateTimeFromTemporalAccessor((TemporalAccessor) value);
@@ -172,7 +170,6 @@ public abstract class LValue {
     }
 
     public static boolean isTemporal(Object value){
-        // todo: more cases here
         boolean isTemporalAccessor = value instanceof TemporalAccessor;
         boolean isCustomDateType = CustomDateFormatRegistry.isCustomDateType(value);
         return isTemporalAccessor || isCustomDateType;

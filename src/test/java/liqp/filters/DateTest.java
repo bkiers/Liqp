@@ -29,9 +29,9 @@ public class DateTest {
     public void applyTest() throws RecognitionException {
 
         final int seconds = 946702800;
-        // for readability
-        final java.util.Date date = new java.util.Date(100, 0, 1, 7, 0, 0 );
-        assertEquals(new java.util.Date(seconds * 1000L), date);
+        // 1st Jan 2000 05:00:00 UTC
+        // (if you are ot UTC, better not to use deprecated Date constructors)
+        final java.util.Date date = new java.util.Date(seconds * 1000L);
 
         String[][] tests = {
                 {"{{" + seconds + " | date: 'mu'}}", "mu"},
@@ -47,8 +47,8 @@ public class DateTest {
                 {"{{" + seconds + " | date: '%H'}}", simpleDateFormat("HH").format(date)},
                 {"{{" + seconds + " | date: '%I'}}", simpleDateFormat("hh").format(date)},
                 {"{{" + seconds + " | date: '%j'}}", simpleDateFormat("DDD").format(date)},
-                {"{{" + seconds + " | date: '%k'}}", " 7"},
-                {"{{" + seconds + " | date: '%l'}}", " 7"},
+                {"{{" + seconds + " | date: '%k'}}", " " + simpleDateFormat("H").format(date)},
+                {"{{" + seconds + " | date: '%l'}}", " " + simpleDateFormat("h").format(date)},
                 {"{{" + seconds + " | date: '%m'}}", simpleDateFormat("MM").format(date)},
                 {"{{" + seconds + " | date: '%M'}}", simpleDateFormat("mm").format(date)},
                 {"{{" + seconds + " | date: '%p'}}", simpleDateFormat("a").format(date)},

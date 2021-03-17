@@ -5,7 +5,7 @@ import liqp.TemplateContext;
 import liqp.filters.date.CustomDateFormatRegistry;
 import liqp.filters.date.CustomDateFormatSupport;
 import liqp.filters.date.Parser;
-import liqp.filters.date.StrftimeDateFormatter;
+import ua.co.k.strftime.StrftimeFormatter;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -55,8 +55,8 @@ public class Date extends Filter {
                 return value;
             }
 
-            StrftimeDateFormatter formatter = StrftimeDateFormatter.getInstance(locale);
-            return formatter.format(format, compatibleDate);
+            StrftimeFormatter formatter = StrftimeFormatter.ofSafePattern(format, locale);
+            return formatter.format(compatibleDate);
         }
         catch (Exception e) {
             return value;

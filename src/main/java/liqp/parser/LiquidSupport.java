@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import liqp.TemplateContext;
 import liqp.spi.BasicTypesSupport;
+import liqp.spi.SPIHelper;
 
 import java.io.IOException;
 import java.util.List;
@@ -81,8 +82,9 @@ public interface LiquidSupport extends Inspectable {
                 throw new RuntimeException("variant of caller function with TemplateContext required here");
             }
             ObjectMapper mapper = context.parseSettings.mapper;
-            ObjectNode value = mapper.convertValue(variables, ObjectNode.class);
-            Map<String, Object> convertedValue = mapper.convertValue(value, MAP_TYPE_REF);
+            ObjectMapper copy = SPIHelper.apply(mapper.copy());
+            ObjectNode value = copy.convertValue(variables, ObjectNode.class);
+            Map<String, Object> convertedValue = copy.convertValue(value, MAP_TYPE_REF);
             visitMap(context, convertedValue);
             return convertedValue;
         }
@@ -94,7 +96,7 @@ public interface LiquidSupport extends Inspectable {
 
         static void visitMap(TemplateContext context, Map<?, ?> map) {
             for (Map.Entry entry: map.entrySet()) {
-                Object value = BasicTypesSupport.restoreObject(context, entry.getValue());
+                Object value = BasicTypesSupport.restoreObject(entry.getValue());
                 visit(context, value);
                 entry.setValue(value);
             }
@@ -102,7 +104,7 @@ public interface LiquidSupport extends Inspectable {
         static void visitList(TemplateContext context, List list) {
             for (int i = 0; i< list.size(); i++) {
                 Object object = list.get(i);
-                Object value = BasicTypesSupport.restoreObject(context, object);
+                Object value = BasicTypesSupport.restoreObject(object);
                 visit(context, value);
                 //noinspection unchecked
                 list.set(i, value);

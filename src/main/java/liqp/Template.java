@@ -1,6 +1,5 @@
 package liqp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.exceptions.LiquidException;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
@@ -8,6 +7,8 @@ import liqp.parser.Flavor;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
 import liqp.parser.v4.NodeVisitor;
+import liqp.spi.BasicTypesSupport;
+import liqp.spi.SPIHelper;
 import liqp.tags.Include;
 import liqp.tags.Tag;
 import liquid.parser.v4.LiquidLexer;
@@ -33,7 +34,7 @@ import java.util.concurrent.*;
  * Also see: https://github.com/Shopify/liquid
  */
 public class Template {
-
+    
     /**
      * The root of the parse tree denoting the Liquid input source.
      */
@@ -455,10 +456,13 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String renderUnguarded(Map<String, Object> variables) {
-        return renderUnguarded(variables, null);
+        return renderUnguarded(variables, null, true);
     }
 
-    public String renderUnguarded(Map<String, Object> variables, TemplateContext parent) {
+    public String renderUnguarded(Map<String, Object> variables, TemplateContext parent, boolean doClearThreadLocal) {
+        if (doClearThreadLocal) {
+            BasicTypesSupport.clearReferences();
+        }
         if (variables.containsKey(Include.INCLUDES_DIRECTORY_KEY)) {
             Object includeDirectory = variables.get(Include.INCLUDES_DIRECTORY_KEY);
             if (includeDirectory instanceof File) {
@@ -498,7 +502,7 @@ public class Template {
      * @return
      */
     public String renderUnguarded(TemplateContext parent) {
-        return renderUnguarded(new HashMap<String, Object>(), parent);
+        return renderUnguarded(new HashMap<String, Object>(), parent, true);
     }
 
     // Use toStringTree()

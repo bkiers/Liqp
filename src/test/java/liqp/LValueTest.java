@@ -10,7 +10,6 @@ public class LValueTest {
     @Test
     public void testIsTemporal() {
         // sorry for side effect, but this is a way the java plugin system works
-        SPIHelper.apply(new ObjectMapper());
         assertTrue(LValue.isTemporal(new java.util.Date(0l)));
     }
 }

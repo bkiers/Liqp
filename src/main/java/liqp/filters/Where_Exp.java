@@ -73,7 +73,7 @@ public class Where_Exp extends Filter {
     }
 
     private boolean matchCondition(TemplateContext context, Object item, String varName, Template expression) {
-        String res = expression.renderUnguarded(Collections.singletonMap(varName, item), context);
+        String res = expression.renderUnguarded(Collections.singletonMap(varName, item), context, false);
         return "true".equals(res);
     }
 }

@@ -11,11 +11,12 @@ public class SPIHelper {
 
     private static volatile List<TypesSupport> typeSupporters;
 
-    public static void apply(ObjectMapper mapper) {
+    public static ObjectMapper apply(ObjectMapper mapper) {
         List<TypesSupport> providers = findProviders();
         for (TypesSupport el: providers) {
             el.configureTypes(mapper);
         }
+        return mapper;
     }
 
     private static List<TypesSupport> findProviders() {

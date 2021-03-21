@@ -20,37 +20,8 @@ public class Java7DateTypesSupport extends BasicTypesSupport {
     public void configureTypes(ObjectMapper mapper) {
         SimpleModule module = new SimpleModule("liqp java 7 date type support");
 
-        // todo: check impl from sql package
-        registerType(module, Date.class, new TypeConvertor<Date>(){
-            @Override
-            public void serialize(JsonGenerator gen, Date val) throws IOException {
-                gen.writeNumberField("val", val.getTime());
-            }
-
-            @Override
-            public Date deserialize(TemplateContext context, Map node) {
-                long val = (Long) node.get("val");
-                return new Date(val);
-            }
-
-        });
-
-        registerType(module, Calendar.class, new TypeConvertor<Calendar>() {
-            @Override
-            public void serialize(JsonGenerator gen, Calendar val) throws IOException {
-                gen.writeNumberField("val", val.getTimeInMillis());
-                gen.writeStringField("zone", val.getTimeZone().getID());
-            }
-
-            @Override
-            public Calendar deserialize(TemplateContext context, Map node) {
-                long val = (Long) node.get("val");
-                String zone = (String) node.get("zone");
-                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zone), context.renderSettings.locale);
-                calendar.setTimeInMillis(val);
-                return calendar;
-            }
-        });
+        registerType(module, Date.class);
+        registerType(module, Calendar.class);
         mapper.registerModule(module);
 
         addCustomDateType(new CustomDateFormatSupport<Date>() {

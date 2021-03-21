@@ -4,45 +4,38 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import liqp.TemplateContext;
 import liqp.filters.date.CustomDateFormatRegistry;
 import liqp.filters.date.CustomDateFormatSupport;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class BasicTypesSupport implements TypesSupport {
 
-    @SuppressWarnings("rawtypes")
-    private static final Map<String, TypeConvertor> typeRegistry = new HashMap<>();
+    private static ThreadLocal<Map<String, Object>> local = ThreadLocal.withInitial(ConcurrentHashMap::new);
 
-    // alternatives?
-    // here's two, witch uses VALUE_EMBEDDED_OBJECT fully:
-    // https://github.com/mongojack/mongojack see: org.mongojack.internal.DateSerializer
-    // https://github.com/michel-kraemer/bson4jackson see: de.undercouch.bson4jackson.serializers.BsonDateSerializer
-    protected<T> void registerType(SimpleModule module, final Class<T> clazz, final TypeConvertor<T> typeGenerator) {
+    
+    protected<T> void registerType(SimpleModule module, final Class<T> clazz) {
+        // we put the ref to object here for restoring it by the ref later
+        // so we will preserve the object in case of eager evaluation
+        // and will put it back when needed
         module.addSerializer(new StdSerializer<T>(clazz) {
             @Override
             public void serialize(T value, JsonGenerator gen, SerializerProvider provider) throws IOException {
                 gen.writeStartObject();
                 gen.writeBooleanField("@supportedTypeMarker", true);
-                gen.writeStringField("@type", clazz.getName());
-                gen.writeFieldName("@data");
-                gen.writeStartObject();
-                typeGenerator.serialize(gen, value);
-                gen.writeEndObject();
+                gen.writeStringField("@ref", createReference(value));
                 gen.writeEndObject();
             }
         });
-        typeRegistry.put(clazz.getName(), typeGenerator);
     }
 
     protected void addCustomDateType(CustomDateFormatSupport<?> typeSupport) {
         CustomDateFormatRegistry.add(typeSupport);
     }
 
-    public static Object restoreObject(TemplateContext context, Object obj) {
+    public static Object restoreObject(Object obj) {
         if (! (obj instanceof Map)) {
             return obj;
         }
@@ -51,25 +44,28 @@ public abstract class BasicTypesSupport implements TypesSupport {
         if (!Boolean.TRUE.equals(mapObj.get("@supportedTypeMarker"))) {
             return obj;
         }
-        Object typeName = mapObj.get("@type");
-        if (!(typeName instanceof String)) {
+        Object ref = mapObj.get("@ref");
+        if (!(ref instanceof String)) {
             // improperly formatted objects will be returned as is
             return obj;
         }
-        //noinspection rawtypes
-        TypeConvertor typeConvertor = typeRegistry.get(typeName);
-        if (typeConvertor == null) {
-            // missing type converted will be treated as error
-            // and cause fallback to returning object as is
-            return obj;
-        }
-        Object dataMapObj = mapObj.get("@data");
-        if (!(dataMapObj instanceof Map)) {
-            return obj;
-        }
-        //noinspection rawtypes
-        return typeConvertor.deserialize(context, (Map)dataMapObj);
+        return getByReference((String) ref);
     }
 
+
+
+    public static String createReference(Object obj) {
+        String key = Thread.currentThread().hashCode() + ":" + System.currentTimeMillis() + ":" + obj.hashCode();
+        local.get().put(key, obj);
+        return key;
+    }
+
+    public static <TT> TT getByReference(String key) {
+        return (TT)local.get().get(key);
+    }
+
+    public static void clearReferences(){
+        local.get().clear();
+    }
 
 }

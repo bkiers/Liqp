@@ -31,8 +31,10 @@ public abstract class BasicTypesSupport implements TypesSupport {
         });
     }
 
-    protected void addCustomDateType(CustomDateFormatSupport<?> typeSupport) {
-        CustomDateFormatRegistry.add(typeSupport);
+    protected void addCustomDateType(CustomDateFormatSupport typeSupport) {
+        if (!CustomDateFormatRegistry.isRegistered(typeSupport)) {
+            CustomDateFormatRegistry.add(typeSupport);
+        }
     }
 
     public static Object restoreObject(Object obj) {

@@ -82,7 +82,7 @@ public interface LiquidSupport extends Inspectable {
                 throw new RuntimeException("variant of caller function with TemplateContext required here");
             }
             ObjectMapper mapper = context.parseSettings.mapper;
-            ObjectMapper copy = SPIHelper.apply(mapper.copy());
+            ObjectMapper copy = SPIHelper.applyTypeReferencing(mapper.copy());
             ObjectNode value = copy.convertValue(variables, ObjectNode.class);
             Map<String, Object> convertedValue = copy.convertValue(value, MAP_TYPE_REF);
             visitMap(context, convertedValue);

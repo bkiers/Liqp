@@ -32,6 +32,9 @@ public class Date extends Filter {
     public Object apply(Object value, TemplateContext context, Object... params) {
         Locale locale = context.renderSettings.locale;
 
+        if (isArray(value) && asArray(value).length ==1) {
+            value = asArray(value)[0];
+        }
         try {
             final ZonedDateTime compatibleDate;
             if ("now".equals(super.asString(value)) || "today".equals(super.asString(value))) {

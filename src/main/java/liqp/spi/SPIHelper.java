@@ -11,13 +11,22 @@ public class SPIHelper {
 
     private static volatile List<TypesSupport> typeSupporters;
 
-    public static ObjectMapper apply(ObjectMapper mapper) {
+    public static ObjectMapper applyTypeReferencing(ObjectMapper mapper) {
         List<TypesSupport> providers = findProviders();
         for (TypesSupport el: providers) {
-            el.configureTypes(mapper);
+            el.configureTypesForReferencing(mapper);
         }
         return mapper;
     }
+
+    public static void applyCustomDateTypes() {
+        List<TypesSupport> providers = findProviders();
+        for (TypesSupport el: providers) {
+            el.configureCustomDateTypes();
+        }
+    }
+    
+    
 
     private static List<TypesSupport> findProviders() {
         if (typeSupporters == null) {

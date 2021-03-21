@@ -13,12 +13,16 @@ public class CustomDateFormatRegistry {
     // might be better storage for this will be tree,
     // so the subtypes will be properly handled
     // and parent type will not override child's one
-    private static List<CustomDateFormatSupport> supportedTypes = new ArrayList<>();
+    private static final List<CustomDateFormatSupport> supportedTypes = new ArrayList<>();
 
     public static void add(CustomDateFormatSupport supportThis) {
         supportedTypes.add(0, supportThis);
     }
 
+
+    public static boolean isRegistered(CustomDateFormatSupport<?> typeSupport) {
+        return supportedTypes.contains(typeSupport);
+    }
 
     public static boolean isCustomDateType(Object value) {
         for (CustomDateFormatSupport el: supportedTypes) {

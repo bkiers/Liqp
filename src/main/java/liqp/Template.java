@@ -34,6 +34,10 @@ import java.util.concurrent.*;
  * Also see: https://github.com/Shopify/liquid
  */
 public class Template {
+
+    static {
+        SPIHelper.applyCustomDateTypes();
+    }
     
     /**
      * The root of the parse tree denoting the Liquid input source.

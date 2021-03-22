@@ -1,8 +1,3 @@
-Things to do before release 8.0.0:
-1) Upgrade documentation and show all new features (and remove this comment)
-2) Decision tree for type picking in Custom date type service
-3) verify ALL known datetime types went properly in Evaluation.EAGER (replace with native objects from "reference in registry" - this will solve problem of object reconstruction?)
-
 # Liqp &nbsp; [![Build Status](https://travis-ci.com/bkiers/Liqp.png)](https://travis-ci.com/bkiers/Liqp) [![Maven Central](https://img.shields.io/maven-central/v/nl.big-o/liqp.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22nl.big-o%22%20AND%20a%3A%22liqp%22)
 
 A Java implementation of the [Liquid templating engine](https://shopify.github.io/liquid) backed

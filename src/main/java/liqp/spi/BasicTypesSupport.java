@@ -63,7 +63,7 @@ public abstract class BasicTypesSupport implements TypesSupport {
     }
 
     public static <TT> TT getByReference(String key) {
-        return (TT)local.get().get(key);
+        return (TT)local.get().remove(key);
     }
 
     public static void clearReferences(){

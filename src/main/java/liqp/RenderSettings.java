@@ -1,7 +1,6 @@
 package liqp;
 
 
-import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
 
 import java.util.Locale;
@@ -38,7 +37,7 @@ public class RenderSettings {
      * as it operates with parameters.
      * @param context - holder for RenderSettings, ParseSettings and ProtectionSettings in it.
      */
-    public LiquidSupport evaluate(final TemplateContext context, final Inspectable variable) {
+    public LiquidSupport evaluate(final TemplateContext context, final Object variable) {
         if (variable instanceof LiquidSupport) {
             return ((LiquidSupport) variable);
         }

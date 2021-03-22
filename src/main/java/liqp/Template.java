@@ -355,7 +355,14 @@ public class Template {
     }
 
     public String render(Inspectable object) {
-        LiquidSupport evaluated = renderSettings.evaluate(new TemplateContext(protectionSettings, renderSettings, parseSettings, new HashMap<>()), object);
+        return renderObject(object);
+    }
+
+    /**
+     * Render the template with given object, treating it same way as {@link Inspectable} instance.
+     */
+    public String renderObject(Object obj) {
+        LiquidSupport evaluated = renderSettings.evaluate(new TemplateContext(protectionSettings, renderSettings, parseSettings, new HashMap<>()), obj);
         Map<String, Object> map = evaluated.toLiquid();
         return render(map);
     }

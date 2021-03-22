@@ -70,9 +70,9 @@ public interface LiquidSupport extends Inspectable {
     class LiquidSupportFromInspectable implements LiquidSupport {
         public static final TypeReference<Map<String, Object>> MAP_TYPE_REF = new TypeReference<Map<String, Object>>() {};
         private final TemplateContext context;
-        private final Inspectable variable;
+        private final Object variable;
 
-        public LiquidSupportFromInspectable(TemplateContext context, Inspectable variable) {
+        public LiquidSupportFromInspectable(TemplateContext context, Object variable) {
             this.variable = variable;
             this.context = context;
         }

@@ -90,7 +90,9 @@ The template variables provided as parameters to `render(...)` can be:
   the 0<sup>th</sup>, 2<sup>nd</sup>, 4<sup>th</sup>, ... indexes must be `String` literals
   denoting the keys. The values can be any `Object`.
 * a `Map<String, Object>`
-* or a JSON string
+* a JSON string
+* any POJO that is marked with special marker interface `liqp.parser.Inspectable`. In this case the object is converted to `java.util.Map` using jackson's mapper, and so all recipes for configuring jackson conversation will work here.
+* any object that extend special interface `liqp.parser.LiquidSupport` and it is designed for lazy field values computing. It's method `LiquidSupport#toLiquid()` is called only if/when the object is going to be rendered. Since `LiquidSupport` extends `Inspectable` simply use same variant of the `render(...)` method.
 
 The following examples are equivalent to the previous Liqp example:
 
@@ -118,6 +120,36 @@ System.out.println(rendered);
 */
 ```
 
+#### Inspectable example
+
+```java
+class MyParams implements Inspectable {
+  public String name = "tobi";
+};
+Template template = Template.parse("hi {{name}}");
+String rendered =template.render(new MyParams());
+System.out.println(rendered);
+/*
+    hi tobi
+*/
+```
+
+#### LiquidSupport example
+```java
+class MyLazy implements LiquidSupport {
+    @Override
+    public Map<String, Object> toLiquid() {
+        return Collections.singletonMap("name", "tobi");
+    }
+};
+Template template = Template.parse("hi {{name}}");
+String rendered = template.render(new MyLazy());
+System.out.println(rendered);
+/*
+    hi tobi
+*/
+```
+
 #### Strict variables example
 
 Strict variables means that value for every key must be provided, otherwise an exception occurs.
@@ -127,6 +159,33 @@ Template template = Template.parse("hi {{name}}")
     .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build());
 String rendered = template.render(); // no value for "name"
 // exception is thrown
+```
+
+#### Eager and Lazy evaluate mode
+There exists two rendering modes: lazy and eager. 
+* In `lazy` mode the template parameters are evaluating on demand and specific properties are read from there only if they are needed. Each filter/tag trying to do its work with its own parameter object, that can be literally anything.
+* In `eager` the entire parameter object is converted into plain data tree structure that are made <strong>only</strong> from maps and lists, so tags/filters do know how to work with these kinds of objects. Special case - temporal objects, they are consumed as is.
+
+By <strong>default</strong>, the `lazy` one is used. This should do the work in most cases. 
+
+Switching mode is possible via providing special `RenderSettings`.
+Example usage of `lazy` mode:
+```java
+RenderSettings renderSettings = new RenderSettings.Builder()
+    .withEvaluateMode(RenderSettings.EvaluateMode.EAGER)
+    .build();
+
+Map<String, Object> in = Collections.singletonMap("a", new Object() {
+    public String val = "tobi";
+});
+
+String res = Template.parse("hi {{a.val}}")
+        .withRenderSettings(renderSettings)
+        .render(in);
+System.out.println(res);
+/*
+    hi tobi
+*/
 ```
 
 ### 2.1 Custom filters

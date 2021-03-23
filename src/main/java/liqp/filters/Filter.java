@@ -31,6 +31,7 @@ public abstract class Filter extends LValue {
 
     private static void addDefaultFilters() {
         registerFilter(new Abs());
+        registerFilter(new Absolute_Url());
         registerFilter(new Append());
         registerFilter(new At_Least());
         registerFilter(new At_Most());

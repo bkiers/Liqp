@@ -6,6 +6,7 @@ import liqp.parser.LiquidSupport;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -13,31 +14,23 @@ import java.util.Map;
  * that will be used as base for building relative url.
  */
 public class Relative_Url extends Filter {
-    public static final String root = "site";
+    public static final String site = "site";
     public static final String baseurl = "baseurl";
     @Override
     public Object apply(Object value, TemplateContext context, Object... params) {
-        Object configRoot = context.get(root);
-
-        if (configRoot instanceof Inspectable) {
-            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) configRoot);
-            configRoot = evaluated.toLiquid();
-        }
-        Object baseUrl = null;
-        if (isMap(configRoot)) {
-            baseUrl = asMap(configRoot).get(baseurl);
-        }
         String valAsString = asString(value);
 
         // fast exit for valid absolute urls
-        try {
-            URI uri = new URI(valAsString);
-            if (uri.getScheme() != null) {
-                return valAsString;
-            }
-        } catch (URISyntaxException ignored) {
+        if (isValidAbsoluteUrl(valAsString)) {
+            return valAsString;
         }
+        Map<String, Object> siteMap = objectToMap(context.get(site), context);
+        String baseUrl = asString(siteMap.get(baseurl));
+        return getRelativeUrl(context, baseUrl, valAsString);
+    }
 
+    protected String getRelativeUrl(TemplateContext context, String baseUrl, String valAsString) {
+        
         if (!valAsString.startsWith("/")) {
             valAsString = "/" + valAsString;
         }
@@ -87,5 +80,30 @@ public class Relative_Url extends Filter {
                 return res;
             }
         }
+    }
+
+    protected Map<String, Object> objectToMap(Object configRoot, TemplateContext context) {
+        if (configRoot instanceof Inspectable) {
+            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) configRoot);
+            configRoot = evaluated.toLiquid();
+        }
+        Map<String, Object> siteMap;
+        if (isMap(configRoot)) {
+            siteMap = asMap(configRoot);
+        } else {
+            siteMap = Collections.emptyMap();
+        }
+        return siteMap;
+    }
+
+    protected boolean isValidAbsoluteUrl(String valAsString) {
+        try {
+            URI uri = new URI(valAsString);
+            if (uri.getScheme() != null) {
+                return true;
+            }
+        } catch (URISyntaxException ignored) {
+        }
+        return false;
     }
 }

@@ -33,6 +33,16 @@
         <role>developer</role>
       </roles>
     </developer>
+    <developer>
+      <name>Vasyl Khrystiuk</name>
+      <email>h6.msangel@gmail.com</email>
+      <id>msangel</id>
+      <url>https://github.com/msangel</url>
+      <timezone>+2</timezone>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
   </developers>
 
   <distributionManagement>

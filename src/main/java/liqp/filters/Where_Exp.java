@@ -2,8 +2,6 @@ package liqp.filters;
 
 import liqp.Template;
 import liqp.TemplateContext;
-import liqp.filters.where.PropertyResolverAdapter;
-import liqp.filters.where.PropertyResolverHelper;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
 
@@ -46,7 +44,7 @@ public class Where_Exp extends Filter {
         }
 
         if (items == null && value instanceof Inspectable) {
-            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) value);
+            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, value);
             value = evaluated.toLiquid();
         }
         if (isMap(value)) {
@@ -73,7 +71,7 @@ public class Where_Exp extends Filter {
     }
 
     private boolean matchCondition(TemplateContext context, Object item, String varName, Template expression) {
-        String res = expression.renderUnguarded(Collections.singletonMap(varName, item), context);
+        String res = expression.renderUnguarded(Collections.singletonMap(varName, item), context, false);
         return "true".equals(res);
     }
 }

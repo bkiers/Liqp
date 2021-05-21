@@ -1,6 +1,5 @@
 package liqp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.exceptions.LiquidException;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
@@ -8,6 +7,8 @@ import liqp.parser.Flavor;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
 import liqp.parser.v4.NodeVisitor;
+import liqp.spi.BasicTypesSupport;
+import liqp.spi.SPIHelper;
 import liqp.tags.Include;
 import liqp.tags.Tag;
 import liquid.parser.v4.LiquidLexer;
@@ -34,6 +35,10 @@ import java.util.concurrent.*;
  */
 public class Template {
 
+    static {
+        SPIHelper.applyCustomDateTypes();
+    }
+    
     /**
      * The root of the parse tree denoting the Liquid input source.
      */
@@ -336,7 +341,7 @@ public class Template {
         Map<String, Object> map;
 
         try {
-            map = new ObjectMapper().readValue(jsonMap, HashMap.class);
+            map = this.parseSettings.mapper.readValue(jsonMap, HashMap.class);
         }
         catch (Exception e) {
             throw new RuntimeException("invalid json map: '" + jsonMap + "'", e);
@@ -350,7 +355,14 @@ public class Template {
     }
 
     public String render(Inspectable object) {
-        LiquidSupport evaluated = renderSettings.evaluate(parseSettings.mapper, object);
+        return renderObject(object);
+    }
+
+    /**
+     * Render the template with given object, treating it same way as {@link Inspectable} instance.
+     */
+    public String renderObject(Object obj) {
+        LiquidSupport evaluated = renderSettings.evaluate(parseSettings.mapper, obj);
         Map<String, Object> map = evaluated.toLiquid();
         return render(map);
     }
@@ -455,10 +467,13 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String renderUnguarded(Map<String, Object> variables) {
-        return renderUnguarded(variables, null);
+        return renderUnguarded(variables, null, true);
     }
 
-    public String renderUnguarded(Map<String, Object> variables, TemplateContext parent) {
+    public String renderUnguarded(Map<String, Object> variables, TemplateContext parent, boolean doClearThreadLocal) {
+        if (doClearThreadLocal) {
+            BasicTypesSupport.clearReferences();
+        }
         if (variables.containsKey(Include.INCLUDES_DIRECTORY_KEY)) {
             Object includeDirectory = variables.get(Include.INCLUDES_DIRECTORY_KEY);
             if (includeDirectory instanceof File) {
@@ -498,7 +513,7 @@ public class Template {
      * @return
      */
     public String renderUnguarded(TemplateContext parent) {
-        return renderUnguarded(new HashMap<String, Object>(), parent);
+        return renderUnguarded(new HashMap<String, Object>(), parent, true);
     }
 
     // Use toStringTree()

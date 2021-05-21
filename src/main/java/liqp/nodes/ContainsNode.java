@@ -27,7 +27,7 @@ public class ContainsNode extends LValue implements LNode {
         Object needle = rhs.render(context);
 
         if (collection instanceof Inspectable) {
-            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) collection);
+            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, collection);
             collection = evaluated.toLiquid();
         }
 
@@ -51,7 +51,7 @@ public class ContainsNode extends LValue implements LNode {
 
     private Object toSingleNumberType(Object needle) {
         if (needle instanceof Number) {
-            needle = new BigDecimal(needle.toString()).stripTrailingZeros();
+            needle = LValue.asFormattedNumber(new BigDecimal(needle.toString()));
         }
         return needle;
     }
@@ -60,7 +60,7 @@ public class ContainsNode extends LValue implements LNode {
         ArrayList<Object> res = new ArrayList<>(asList.size());
         for(Object item: asList) {
             if (item instanceof Number) {
-                res.add(new BigDecimal(item.toString()).stripTrailingZeros());
+                res.add(LValue.asFormattedNumber(new BigDecimal(item.toString())));
             } else {
                 res.add(item);
             }

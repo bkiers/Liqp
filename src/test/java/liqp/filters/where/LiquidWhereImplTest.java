@@ -1,21 +1,24 @@
 package liqp.filters.where;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.ParseSettings;
 import liqp.Template;
 import liqp.parser.Flavor;
-import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class LiquidWhereImplTest {
 
@@ -282,4 +285,27 @@ public class LiquidWhereImplTest {
         assertEquals("good2! ", rendered);
     }
 
+
+    @Test
+    public void testWhereWhenDateTypes() {
+        ZonedDateTime t = ZonedDateTime.of(
+                LocalDateTime.of(2007, 11, 1, 15, 25, 0)
+                , ZoneId.of("+09:00"));
+        Map<String, Object> data = new HashMap<>();
+        data.put("a", Collections.singletonList(Collections.singletonMap("time", t)));
+        data.put("b", t);
+        String template = "where in liquid respect only object equality : {{ a | where: 'time', b | map: 'time'}}";
+        String res = parse(template).render(data);
+        assertEquals("where in liquid respect only object equality : 2007-11-01 15:25:00 +0900", res);
+    }
+
+    @Test
+    public void testWhereWhenDateCompatibleTypes() {
+        Map<String, Object> data = new HashMap<>();
+        data.put("a", Collections.singletonList(Collections.singletonMap("time", new Date(591116242000L))));
+        data.put("b", new Date(591116242000L));
+        String template = "my birthday : {{ a | where: 'time', b | map: 'time' | date: '%Y-%m-%d'}}";
+        String res = parse(template).render(data);
+        assertEquals("my birthday : 1988-09-24", res);
+    }
 }

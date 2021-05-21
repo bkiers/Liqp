@@ -1,13 +1,20 @@
 package liqp;
 
+import liqp.filters.date.CustomDateFormatRegistry;
+import liqp.nodes.AtomNode;
+
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import liqp.nodes.AtomNode;
+import static java.math.BigDecimal.ROUND_UNNECESSARY;
+import static liqp.filters.date.Parser.getZonedDateTimeFromTemporalAccessor;
 
 /**
  * An abstract class the Filter and Tag classes extend.
@@ -30,6 +37,9 @@ public abstract class LValue {
             return "";
         }
     };
+
+    // sample: 2007-11-01 15:25:00 +0900
+    public static DateTimeFormatter rubyDateTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss XX");
 
     /**
      * Returns true iff a and b are equals, where (int) 1 is
@@ -121,7 +131,48 @@ public abstract class LValue {
         if (value instanceof List) {
             return ((List) value).toArray();
         }
+
+        if (isTemporal(value)) {
+            value = asTemporal(value);
+            return temporalAsArray((ZonedDateTime) value);
+        }
+
         return new Object[]{value};
+    }
+
+    // https://apidock.com/ruby/Time/to_a
+    // Returns a ten-element array of values for time:
+    // [sec, min, hour, day, month, year, wday, yday, isdst, zone]
+    // t = Time.now     #=> 2007-11-19 08:36:01 -0600
+    // now = t.to_a     #=> [1, 36, 8, 19, 11, 2007, 1, 323, false, "CST"]
+    public static Object[] temporalAsArray(ZonedDateTime time) {
+        int sec = time.get(ChronoField.SECOND_OF_MINUTE);
+        int min = time.getMinute();
+        int hour = time.getHour();
+        int day = time.getDayOfMonth();
+        int month = time.get(ChronoField.MONTH_OF_YEAR);
+        int year = time.get(ChronoField.YEAR);
+        int wday = time.getDayOfWeek().getValue();
+        int yday = time.get(ChronoField.DAY_OF_YEAR);
+        boolean isdst = time.getZone().getRules().isDaylightSavings(time.toInstant());
+        String zone = time.getZone().getId();
+        return new Object[]{sec, min, hour, day, month, year, wday, yday, isdst, zone};
+    }
+
+    public static ZonedDateTime asTemporal(Object value) {
+        ZonedDateTime time = ZonedDateTime.now();
+        if (value instanceof TemporalAccessor) {
+            time = getZonedDateTimeFromTemporalAccessor((TemporalAccessor) value);
+        } else if (CustomDateFormatRegistry.isCustomDateType(value)) {
+            time = CustomDateFormatRegistry.getFromCustomType(value);
+        }
+        return time;
+    }
+
+    public static boolean isTemporal(Object value){
+        boolean isTemporalAccessor = value instanceof TemporalAccessor;
+        boolean isCustomDateType = CustomDateFormatRegistry.isCustomDateType(value);
+        return isTemporalAccessor || isCustomDateType;
     }
 
     /**
@@ -189,6 +240,11 @@ public abstract class LValue {
         return str.matches("\\d+") ? Long.valueOf(str) : Double.valueOf(str);
     }
 
+    // mimic ruby's `BigDecimal.to_f` with standard java capabilities
+    // same time provide expected out for java.math.BigDecimal
+    public static String asFormattedNumber(BigDecimal bd) {
+        return bd.setScale(Math.max(1, bd.stripTrailingZeros().scale()), ROUND_UNNECESSARY).toPlainString();
+    }
     /**
      * Returns `value` as a String.
      *
@@ -203,7 +259,12 @@ public abstract class LValue {
             return "";
         }
 
-        if (!this.isArray(value)) {
+        if (isTemporal(value)) {
+            ZonedDateTime time = asTemporal(value);
+            return rubyDateTimeFormat.format(time);
+        }
+
+        if (!isArray(value)) {
             return String.valueOf(value);
         }
 

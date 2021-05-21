@@ -1,13 +1,16 @@
 package liqp.nodes;
 
+import liqp.TemplateContext;
+
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import liqp.TemplateContext;
-import liqp.tags.Tag;
-
 import static liqp.LValue.BREAK;
 import static liqp.LValue.CONTINUE;
+import static liqp.LValue.asTemporal;
+import static liqp.LValue.isTemporal;
+import static liqp.LValue.rubyDateTimeFormat;
 
 public class BlockNode implements LNode {
 
@@ -46,25 +49,21 @@ public class BlockNode implements LNode {
 
             if(value == BREAK || value == CONTINUE) {
                 return value;
-            }
-            else if (value instanceof List) {
+            } else if (value instanceof List) {
 
-                List list = (List) value;
+                List<?> list = (List<?>) value;
 
                 for (Object obj : list) {
-                    builder.append(String.valueOf(obj));
+                    builder.append(asString(obj));
                 }
-            }
-            else if (value.getClass().isArray()) {
+            } else if (value.getClass().isArray()) {
 
                 Object[] array = (Object[]) value;
-
                 for (Object obj : array) {
-                    builder.append(String.valueOf(obj));
+                    builder.append(asString(obj));
                 }
-            }
-            else {
-                builder.append(String.valueOf(value));
+            } else {
+                builder.append(asString(value));
             }
 
             if (builder.length() > context.protectionSettings.maxSizeRenderedString) {
@@ -73,5 +72,14 @@ public class BlockNode implements LNode {
         }
 
         return builder.toString();
+    }
+
+    private String asString(Object value) {
+        if (isTemporal(value)) {
+            ZonedDateTime time = asTemporal(value);
+            return rubyDateTimeFormat.format(time);
+        } else {
+            return String.valueOf(value);
+        }
     }
 }

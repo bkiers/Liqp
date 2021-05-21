@@ -20,6 +20,10 @@ def assertEqual(expected, real)
   end
 end
 
+def assertTrue(real)
+  raise "{#{real}} is not true" unless real
+end
+
 def assert_equal(expected, real)
   assertEqual(expected, real)
 end

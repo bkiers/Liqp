@@ -1,7 +1,13 @@
 package liqp.filters;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.Locale;
 import liqp.Template;
+import liqp.TemplateContext;
+import liqp.filters.date.CustomDateFormatSupport;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,7 +15,8 @@ import org.junit.Test;
 import java.text.SimpleDateFormat;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class DateTest {
 
@@ -23,6 +30,8 @@ public class DateTest {
     public void applyTest() throws RecognitionException {
 
         final int seconds = 946702800;
+        // 1st Jan 2000 05:00:00 UTC
+        // (if you are ot UTC, better not to use deprecated Date constructors)
         final java.util.Date date = new java.util.Date(seconds * 1000L);
 
         String[][] tests = {
@@ -33,26 +42,28 @@ public class DateTest {
                 {"{{" + seconds + " | date: '%A'}}", simpleDateFormat("EEEE").format(date)},
                 {"{{" + seconds + " | date: '%b'}}", simpleDateFormat("MMM").format(date)},
                 {"{{" + seconds + " | date: '%B'}}", simpleDateFormat("MMMM").format(date)},
-                {"{{" + seconds + " | date: '%c'}}", simpleDateFormat("EEE MMM dd HH:mm:ss yyyy").format(date)},
+                {"{{" + seconds + " | date: '%c'}}", simpleDateFormat("EEE MMM d HH:mm:ss yyyy").format(date)},
                 {"{{" + seconds + " | date: '%d'}}", simpleDateFormat("dd").format(date)},
                 {"{{" + seconds + " | date: '%e'}}", simpleDateFormat("d").format(date)},
                 {"{{" + seconds + " | date: '%H'}}", simpleDateFormat("HH").format(date)},
                 {"{{" + seconds + " | date: '%I'}}", simpleDateFormat("hh").format(date)},
                 {"{{" + seconds + " | date: '%j'}}", simpleDateFormat("DDD").format(date)},
-                {"{{" + seconds + " | date: '%k'}}", simpleDateFormat("H").format(date)},
-                {"{{" + seconds + " | date: '%l'}}", simpleDateFormat("h").format(date)},
+                {"{{" + seconds + " | date: '%k'}}", " " + simpleDateFormat("H").format(date)},
+                {"{{" + seconds + " | date: '%l'}}", " " + simpleDateFormat("h").format(date)},
                 {"{{" + seconds + " | date: '%m'}}", simpleDateFormat("MM").format(date)},
                 {"{{" + seconds + " | date: '%M'}}", simpleDateFormat("mm").format(date)},
                 {"{{" + seconds + " | date: '%p'}}", simpleDateFormat("a").format(date)},
                 {"{{" + seconds + " | date: '%S'}}", simpleDateFormat("ss").format(date)},
-                {"{{" + seconds + " | date: '%U'}}", simpleDateFormat("ww").format(date)},
-                {"{{" + seconds + " | date: '%W'}}", simpleDateFormat("ww").format(date)},
-                {"{{" + seconds + " | date: '%w'}}", simpleDateFormat("F").format(date)},
+                {"{{" + seconds + " | date: '%U'}}", "00"},
+                {"{{" + seconds + " | date: '%W'}}", "00"},
+                // 	Weekday as a decimal number, where 0 is Sunday and 6 is Saturday.
+                // should be 6
+                {"{{" + seconds + " | date: '%w'}}", "6"},
                 {"{{" + seconds + " | date: '%x'}}", simpleDateFormat("MM/dd/yy").format(date)},
                 {"{{" + seconds + " | date: '%X'}}", simpleDateFormat("HH:mm:ss").format(date)},
                 {"{{" + seconds + " | date: 'x=%y'}}", "x=" + simpleDateFormat("yy").format(date)},
                 {"{{" + seconds + " | date: '%Y'}}", simpleDateFormat("yyyy").format(date)},
-                {"{{" + seconds + " | date: '%Z'}}", simpleDateFormat("z").format(date)}
+                {"{{" + seconds + " | date: '%Z'}}", simpleDateFormat("zzzz").format(date)}
         };
 
         for (String[] test : tests) {
@@ -60,7 +71,7 @@ public class DateTest {
             Template template = Template.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
-            assertThat(rendered, is(test[1]));
+            assertThat("render('" + test[0] + "') = ", rendered, is(test[1]));
         }
     }
 
@@ -90,27 +101,28 @@ public class DateTest {
     @Test
     public void applyOriginalTest() throws Exception {
 
+        TemplateContext context = new TemplateContext();
         final Filter filter = Filter.getFilter("date");
 
-        assertThat(filter.apply(seconds("2006-05-05 10:00:00"), "%B"), is((Object)"May"));
-        assertThat(filter.apply(seconds("2006-06-05 10:00:00"), "%B"), is((Object)"June"));
-        assertThat(filter.apply(seconds("2006-07-05 10:00:00"), "%B"), is((Object)"July"));
+        assertThat(filter.apply("Fri Jul 16 01:00:00 2004", context,"%m/%d/%Y"), is((Object)"07/16/2004"));
 
-        assertThat(filter.apply("2006-05-05 10:00:00", "%B"), is((Object)"May"));
-        assertThat(filter.apply("2006-06-05 10:00:00", "%B"), is((Object)"June"));
-        assertThat(filter.apply("2006-07-05 10:00:00", "%B"), is((Object)"July"));
+        assertThat(filter.apply(seconds("2006-05-05 10:00:00"), context, "%B"), is((Object)"May"));
+        assertThat(filter.apply(seconds("2006-06-05 10:00:00"), context,"%B"), is((Object)"June"));
+        assertThat(filter.apply(seconds("2006-07-05 10:00:00"), context,"%B"), is((Object)"July"));
 
-        assertThat(filter.apply("2006-07-05 10:00:00", ""), is((Object)"2006-07-05 10:00:00"));
-        assertThat(filter.apply("2006-07-05 10:00:00", null), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-05-05 10:00:00", context,"%B"), is((Object)"May"));
+        assertThat(filter.apply("2006-06-05 10:00:00", context,"%B"), is((Object)"June"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context,"%B"), is((Object)"July"));
 
-        assertThat(filter.apply("2006-07-05 10:00:00", "%m/%d/%Y"), is((Object)"07/05/2006"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context,""), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context,null), is((Object)"2006-07-05 10:00:00"));
 
-        assertThat(filter.apply("Fri Jul 16 01:00:00 2004", "%m/%d/%Y"), is((Object)"07/16/2004"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context,"%m/%d/%Y"), is((Object)"07/05/2006"));
 
-        assertThat(filter.apply(null, "%B"), is((Object)null));
+        assertThat(filter.apply(null, context,"%B"), is((Object)null));
 
-        assertThat(filter.apply(1152098955, "%m/%d/%Y"), is((Object)"07/05/2006"));
-        assertThat(filter.apply("1152098955", "%m/%d/%Y"), is((Object)"07/05/2006"));
+        assertThat(filter.apply(1152098955, context,"%m/%d/%Y"), is((Object)"07/05/2006"));
+        assertThat(filter.apply("1152098955", context,"%m/%d/%Y"), is((Object)"07/05/2006"));
     }
 
     private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
@@ -134,10 +146,11 @@ public class DateTest {
                 this.time = time;
             }
         }
-        Filter f = Date.withCustomDateType(new Date.CustomDateFormatSupport<CustomDate>() {
+        Filter f = Date.withCustomDateType(new CustomDateFormatSupport<CustomDate>() {
+
             @Override
-            public Long getAsSeconds(CustomDate value) {
-                return value.time;
+            public ZonedDateTime getValue(CustomDate value) {
+                return ZonedDateTime.ofInstant(Instant.ofEpochMilli(value.time), ZoneOffset.UTC);
             }
 
             @Override
@@ -148,9 +161,36 @@ public class DateTest {
         Filter.registerFilter(f);
 
         // when
-        CustomDate customDate = new CustomDate(1152098955);
+        CustomDate customDate = new CustomDate(1152098955000L);
 
         // then
-        assertThat(Filter.getFilter("date").apply(customDate, "%m/%d/%Y"), is((Object) "07/05/2006"));
+        TemplateContext context = new TemplateContext();
+        assertThat(Filter.getFilter("date").apply(customDate, context, "%m/%d/%Y"), is((Object) "07/05/2006"));
+    }
+
+    @Test
+    public void testParseWithZoneInfo() {
+        // given
+        String val = "2010-10-31 00:00:00 -0500";
+        // String val = "2021-01-27 00:00:00 EST";
+
+        // when
+        Object res = Filter.getFilter("date").apply(val, new TemplateContext(), "%Y-%m-%d %H:%M:%S %z");
+
+        // then
+        assertThat((String) res, is("2010-10-31 00:00:00 -0500"));
+    }
+    
+    
+    @Test
+    public void test171() {
+        java.util.Map<String, Object> values = new HashMap<>();
+        values.put("date_with_t", "2020-01-01T12:30:00");
+        values.put("date_with_space", "2020-01-01 12:30:00");
+
+        Template t = Template.parse("Space: {{ date_with_space | date: '%Y' }} | T: {{ date_with_t | date: '%Y' }}");
+
+        String result = t.render(values);
+        assertEquals("Space: 2020 | T: 2020", result);
     }
 }

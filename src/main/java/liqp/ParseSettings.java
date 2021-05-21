@@ -2,7 +2,9 @@ package liqp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import liqp.parser.Flavor;
+import liqp.spi.SPIHelper;
 
 public class ParseSettings {
 
@@ -24,6 +26,7 @@ public class ParseSettings {
             this.flavor = DEFAULT_FLAVOR;
             this.stripSpacesAroundTags = false;
             this.mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
             mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         }
 

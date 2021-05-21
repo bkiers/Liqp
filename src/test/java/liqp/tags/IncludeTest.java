@@ -9,9 +9,7 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.internal.matchers.ThrowableCauseMatcher;
 import org.junit.rules.ExpectedException;
-import org.hamcrest.Matcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -339,7 +337,7 @@ public class IncludeTest {
         String templateText = "{% assign var = 'variable' %}{% include 'include_read_var' %}";
 
         Template template = Template.parse(templateText, liquid())
-                .withRenderSettings(RenderSettings.EXCEPTIONS_FROM_INCLUDE);
+                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build());
 
         assertEquals("variable", template.render());
 
@@ -352,7 +350,7 @@ public class IncludeTest {
         String templateText = "{% include 'include_create_new_var' %}{{ incl_var }}";
 
         Template template = Template.parse(templateText, liquid())
-                .withRenderSettings(RenderSettings.EXCEPTIONS_FROM_INCLUDE);
+                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build());
 
         assertEquals("incl_var", template.render());
     }
@@ -364,7 +362,7 @@ public class IncludeTest {
         String templateText = "{% assign var = 4 %}{% include 'include_decrement_var_not_interfere' %} ! {{ var }}";
 
         Template template = Template.parse(templateText, liquid())
-                .withRenderSettings(RenderSettings.EXCEPTIONS_FROM_INCLUDE);
+                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build());
 
         assertEquals("-1 ! 4", template.render());
     }
@@ -377,7 +375,7 @@ public class IncludeTest {
         Template template = Template.parse("" +
                 "{% assign var = 'variable' %}" +
                 "{% include include_read_var.liquid %}", jekyll())
-                .withRenderSettings(RenderSettings.EXCEPTIONS_FROM_INCLUDE);
+                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build());
 
         assertEquals("variable", template.render());
 
@@ -395,7 +393,7 @@ public class IncludeTest {
                 +     "{% assign inner = n %}"
                 +     "{% include include_iterations_variables.liquid %}"
                 + "{% endfor %}", jekyll())
-                .withRenderSettings(RenderSettings.EXCEPTIONS_FROM_INCLUDE)
+                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build())
                 .render();
 
 
@@ -426,7 +424,7 @@ public class IncludeTest {
                 + "[{% include 'include_decrement_var' %}]"
                 + "[{% decrement var1 %},{% increment var2 %}]"
                 + "[{{ var1 }}, {{ var2 }}]"
-                + "").withRenderSettings(RenderSettings.EXCEPTIONS_FROM_INCLUDE)
+                + "").withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build())
                 .render();
 
         assertEquals("[-1,0][-2,1][-3,2][-3, 3]", rendered);
@@ -440,7 +438,7 @@ public class IncludeTest {
                 + "{% cycle 1,2,3,4 %}"
                 + "{% include 'include_cycle' %}"
                 + "")
-                .withRenderSettings(RenderSettings.EXCEPTIONS_FROM_INCLUDE)
+                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build())
                 .render();
         assertEquals("1234", rendered);
     }

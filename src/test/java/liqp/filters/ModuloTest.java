@@ -50,4 +50,9 @@ public class ModuloTest {
 
         assertThat(Template.parse("{{ 3 | modulo:2 }}").render(), is((Object)"1"));
     }
+
+    @Test
+    public void testModuloWithFloated() {
+        assertThat(Template.parse("{{ 183.357 | modulo: 12 }}").render(), is((Object)"3.357"));
+    }
 }

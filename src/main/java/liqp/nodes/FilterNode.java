@@ -2,6 +2,7 @@ package liqp.nodes;
 
 import liqp.TemplateContext;
 import liqp.filters.Filter;
+import liqp.spi.BasicTypesSupport;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.util.ArrayList;
@@ -44,8 +45,7 @@ public class FilterNode implements LNode {
             for (LNode node : params) {
                 paramValues.add(node.render(context));
             }
-
-            return filter.apply(value, context, paramValues.toArray(new Object[paramValues.size()]));
+            return filter.apply(value, context, paramValues.toArray(new Object[0]));
         }
         catch (Exception e) {
             throw new RuntimeException("error on line " + line + ", index " + tokenStartIndex + ": " + e.getMessage(), e);

@@ -5,7 +5,6 @@ import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
 
 import java.util.*;
-import java.util.Map;
 
 public class Sort extends Filter {
 
@@ -45,7 +44,7 @@ public class Sort extends Filter {
         for (Object obj : array) {
 
             if (property != null && obj instanceof Inspectable) {
-                LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, (Inspectable) obj);
+                LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, obj);
                 obj = evaluated.toLiquid();
             }
             if(obj instanceof java.util.Map && property != null) {

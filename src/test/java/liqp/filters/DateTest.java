@@ -11,6 +11,7 @@ import liqp.filters.date.CustomDateFormatSupport;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Before;
 import org.junit.Test;
+import ua.co.k.strftime.formatters.HybridFormat;
 
 import java.text.SimpleDateFormat;
 
@@ -48,8 +49,8 @@ public class DateTest {
                 {"{{" + seconds + " | date: '%H'}}", simpleDateFormat("HH").format(date)},
                 {"{{" + seconds + " | date: '%I'}}", simpleDateFormat("hh").format(date)},
                 {"{{" + seconds + " | date: '%j'}}", simpleDateFormat("DDD").format(date)},
-                {"{{" + seconds + " | date: '%k'}}", " " + simpleDateFormat("H").format(date)},
-                {"{{" + seconds + " | date: '%l'}}", " " + simpleDateFormat("h").format(date)},
+                {"{{" + seconds + " | date: '%k'}}", withOptionalPadding(2, ' ', simpleDateFormat("H").format(date))},
+                {"{{" + seconds + " | date: '%l'}}", withOptionalPadding(2, ' ', simpleDateFormat("h").format(date))},
                 {"{{" + seconds + " | date: '%m'}}", simpleDateFormat("MM").format(date)},
                 {"{{" + seconds + " | date: '%M'}}", simpleDateFormat("mm").format(date)},
                 {"{{" + seconds + " | date: '%p'}}", simpleDateFormat("a").format(date)},
@@ -73,6 +74,10 @@ public class DateTest {
 
             assertThat("render('" + test[0] + "') = ", rendered, is(test[1]));
         }
+    }
+
+    private String withOptionalPadding(int count, char padSymbol, String input) {
+        return HybridFormat.padLeft(input, count, padSymbol);
     }
 
     /*

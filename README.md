@@ -11,7 +11,7 @@ Add the dependency:
 
 ```groovy
 dependencies {
-  compile 'nl.big-o:liqp:0.7.9'
+  compile 'nl.big-o:liqp:0.8.0'
 }
 ```
 
@@ -23,7 +23,7 @@ Add the following dependency:
 <dependency>
   <groupId>nl.big-o</groupId>
   <artifactId>liqp</artifactId>
-  <version>0.7.9</version>
+  <version>0.8.0</version>
 </dependency>
 ```
 
@@ -162,11 +162,11 @@ String rendered = template.render(); // no value for "name"
 ```
 
 #### Eager and Lazy evaluate mode
-There exists two rendering modes: lazy and eager. 
+There exists two rendering modes: lazy and eager.
 * In `lazy` mode the template parameters are evaluating on demand and specific properties are read from there only if they are needed. Each filter/tag trying to do its work with its own parameter object, that can be literally anything.
 * In `eager` the entire parameter object is converted into plain data tree structure that are made <strong>only</strong> from maps and lists, so tags/filters do know how to work with these kinds of objects. Special case - temporal objects, they are consumed as is.
 
-By <strong>default</strong>, the `lazy` one is used. This should do the work in most cases. 
+By <strong>default</strong>, the `lazy` one is used. This should do the work in most cases.
 
 Switching mode is possible via providing special `RenderSettings`.
 Example usage of `lazy` mode:
@@ -399,5 +399,3 @@ performed with
 ```
 mvn release:prepare release:perform
 ```
-
-

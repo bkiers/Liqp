@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -42,6 +43,6 @@ public class EscapeTest {
 
         Filter filter = Filter.getFilter("escape");
 
-        assertThat(filter.apply("<strong>"), is((Object)"&lt;strong&gt;"));
+        assertThat(filter.apply("<strong>", new TemplateContext()), is((Object)"&lt;strong&gt;"));
     }
 }

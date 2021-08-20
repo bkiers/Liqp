@@ -19,10 +19,10 @@ public class GtEqNode extends LValue implements LNode {
         Object a = lhs.render(context);
         Object b = rhs.render(context);
         if (isTemporal(a)) {
-            a = asTemporal(a);
+            a = asTemporal(a, context);
         }
         if (isTemporal(b)) {
-            b = asTemporal(b);
+            b = asTemporal(b, context);
         }
 
         if (a instanceof Comparable && a.getClass().isInstance(b)) {

@@ -35,7 +35,7 @@ public class TagTest {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 LNode blockNode = nodes[nodes.length - 1];
-                String blockValue = super.asString(blockNode.render(context));
+                String blockValue = super.asString(blockNode.render(context), context);
                 return blockValue + " " + blockValue;
             }
         });

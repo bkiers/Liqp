@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 public class Escape extends Filter {
 
     /*
@@ -8,9 +10,9 @@ public class Escape extends Filter {
      * escape a string
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        String str = super.asString(value);
+        String str = super.asString(value, context);
 
         return str.replace("&", "&amp;")
                 .replace("<", "&lt;")

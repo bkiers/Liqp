@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -41,12 +42,12 @@ public class Strip_HTMLTest {
      */
     @Test
     public void applyOriginalTest() {
-
+        TemplateContext context = new TemplateContext();
         Filter filter = Filter.getFilter("strip_html");
 
-        assertThat(filter.apply("<div>test</div>"), is((Object)"test"));
-        assertThat(filter.apply("<div id='test'>test</div>"), is((Object)"test"));
-        assertThat(filter.apply("<script type='text/javascript'>document.write('some stuff');</script>"), is((Object)""));
-        assertThat(filter.apply(null), is((Object)""));
+        assertThat(filter.apply("<div>test</div>", context), is((Object)"test"));
+        assertThat(filter.apply("<div id='test'>test</div>", context), is((Object)"test"));
+        assertThat(filter.apply("<script type='text/javascript'>document.write('some stuff');</script>", context), is((Object)""));
+        assertThat(filter.apply(null, context), is((Object)""));
     }
 }

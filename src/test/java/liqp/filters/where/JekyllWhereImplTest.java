@@ -3,6 +3,7 @@ package liqp.filters.where;
 import liqp.LValue;
 import liqp.ParseSettings;
 import liqp.Template;
+import liqp.TemplateContext;
 import liqp.parser.Flavor;
 import liqp.parser.LiquidSupport;
 import org.junit.Test;
@@ -536,7 +537,7 @@ public class JekyllWhereImplTest {
         ZonedDateTime t = ZonedDateTime.of(
                 LocalDateTime.of(2007, 11, 1, 15, 25, 0)
                 , ZoneId.of("+09:00"));
-        String tStr = LValue.CONTINUE.asString(t);
+        String tStr = LValue.CONTINUE.asString(t, new TemplateContext());
         Map<String, Object> data = new HashMap<>();
         data.put("a", Collections.singletonList(Collections.singletonMap("time", tStr)));
         data.put("b", t);

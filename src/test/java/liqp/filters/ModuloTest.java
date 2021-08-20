@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -31,12 +32,14 @@ public class ModuloTest {
 
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid1() {
-        Filter.getFilter("modulo").apply(1);
+        TemplateContext context = new TemplateContext();
+        Filter.getFilter("modulo").apply(1, context);
     }
 
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid2() {
-        Filter.getFilter("modulo").apply(1, 2, 3);
+        TemplateContext context = new TemplateContext();
+        Filter.getFilter("modulo").apply(1, context, 2, 3);
     }
 
 

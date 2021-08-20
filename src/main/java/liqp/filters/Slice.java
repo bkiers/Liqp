@@ -1,11 +1,13 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 import java.util.Arrays;
 
 public class Slice extends Filter {
 
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         super.checkParams(params,1, 2);
 
@@ -20,11 +22,11 @@ public class Slice extends Filter {
         int totalLength;
 
         if (super.isArray(value)) {
-            array = super.asArray(value);
+            array = super.asArray(value, context);
             totalLength = array.length;
         }
         else {
-            string = super.asString(value);
+            string = super.asString(value, context);
             totalLength = string.length();
         }
 

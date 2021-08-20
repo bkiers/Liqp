@@ -28,8 +28,8 @@ class Cycle extends Tag {
         // The group-name is either the first token-expression, or if that is
         // null (indicating there is no name), give it the name as stringified parameters
         String groupName = nodes[0] == null ?
-                super.asString(elements) :
-                super.asString(nodes[0].render(context));
+                super.asString(elements, context) :
+                super.asString(nodes[0].render(context), context);
 
         Map<String, Object> cycleRegistry = context.getRegistry(TemplateContext.REGISTRY_CYCLE);
 

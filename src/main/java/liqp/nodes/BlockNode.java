@@ -54,16 +54,16 @@ public class BlockNode implements LNode {
                 List<?> list = (List<?>) value;
 
                 for (Object obj : list) {
-                    builder.append(asString(obj));
+                    builder.append(asString(obj, context));
                 }
             } else if (value.getClass().isArray()) {
 
                 Object[] array = (Object[]) value;
                 for (Object obj : array) {
-                    builder.append(asString(obj));
+                    builder.append(asString(obj, context));
                 }
             } else {
-                builder.append(asString(value));
+                builder.append(asString(value, context));
             }
 
             if (builder.length() > context.protectionSettings.maxSizeRenderedString) {
@@ -74,9 +74,9 @@ public class BlockNode implements LNode {
         return builder.toString();
     }
 
-    private String asString(Object value) {
+    private String asString(Object value, TemplateContext context) {
         if (isTemporal(value)) {
-            ZonedDateTime time = asTemporal(value);
+            ZonedDateTime time = asTemporal(value, context);
             return rubyDateTimeFormat.format(time);
         } else {
             return String.valueOf(value);

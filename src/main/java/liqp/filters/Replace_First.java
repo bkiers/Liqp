@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,9 +13,9 @@ public class Replace_First extends Filter {
      * Replace the first occurrences of a string with another
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        String original = super.asString(value);
+        String original = super.asString(value, context);
 
         Object needle = super.get(0, params);
         String replacement = "";
@@ -30,7 +32,7 @@ public class Replace_First extends Filter {
                 throw new RuntimeException("invalid replacement: " + needle);
             }
 
-            replacement = super.asString(super.get(1, params));
+            replacement = super.asString(super.get(1, params), context);
         }
 
         return original.replaceFirst(Pattern.quote(String.valueOf(needle)),

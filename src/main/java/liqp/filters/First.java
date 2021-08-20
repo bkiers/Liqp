@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 public class First extends Filter {
 
     /*
@@ -8,9 +10,9 @@ public class First extends Filter {
      * Get the first element of the passed in array
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        Object[] array = super.asArray(value);
+        Object[] array = super.asArray(value, context);
 
         return array.length == 0 ? null : array[0];
     }

@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -42,10 +43,10 @@ public class Remove_FirstTest {
      */
     @Test
     public void applyOriginalTest() {
-
+        TemplateContext context = new TemplateContext();
         Filter filter = Filter.getFilter("remove_first");
 
-        assertThat(filter.apply("a a a a", "a "), is((Object)"a a a"));
+        assertThat(filter.apply("a a a a", context, "a "), is((Object)"a a a"));
         assertThat(Template.parse("{{ 'a a a a' | remove_first: 'a ' }}").render(), is((Object)"a a a"));
     }
 }

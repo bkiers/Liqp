@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 public class Upcase extends Filter {
 
     /*
@@ -8,8 +10,8 @@ public class Upcase extends Filter {
      * convert a input string to UPCASE
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        return super.asString(value).toUpperCase();
+        return super.asString(value, context).toUpperCase();
     }
 }

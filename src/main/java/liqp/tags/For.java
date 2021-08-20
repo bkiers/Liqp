@@ -59,7 +59,7 @@ class For extends Tag {
         // range, `for i in (4..item.length)`.
         boolean array = super.asBoolean(nodes[0].render(context));
 
-        String id = super.asString(nodes[1].render(context));
+        String id = super.asString(nodes[1].render(context), context);
         String tagName = id + "-" + nodes[5].render(context);
         boolean reversed = super.asBoolean(nodes[6].render(context));
 
@@ -93,7 +93,7 @@ class For extends Tag {
         if (data instanceof Map) {
             data = mapAsArray((Map) data);
         }
-        Object[] array = super.asArray(data);
+        Object[] array = super.asArray(data, context);
 
         LNode block = tokens[3];
         LNode blockIfEmptyOrNull = tokens[4];
@@ -191,13 +191,13 @@ class For extends Tag {
 
             if(super.isArray(value)) {
 
-                Object[] arr = super.asArray(value);
+                Object[] arr = super.asArray(value, context);
 
                 for (Object obj : arr) {
                     builder.append(String.valueOf(obj));
                 }
             } else {
-                builder.append(super.asString(value));
+                builder.append(super.asString(value, context));
             }
         }
         return isBreak;
@@ -275,9 +275,9 @@ class For extends Tag {
         for (int i = fromIndex; i < tokens.length; i++) {
 
             LNode token = tokens[i];
-            Object[] attribute = super.asArray(token.render(context));
+            Object[] attribute = super.asArray(token.render(context), context);
             // offset:continue
-            if (OFFSET.equals(super.asString(attribute[0])) && attribute[1] == LValue.CONTINUE) {
+            if (OFFSET.equals(super.asString(attribute[0], context)) && attribute[1] == LValue.CONTINUE) {
                 //      offsets = context.registers[:for] ||= {}
                 //      from = if @from == :continue
                 //        offsets[@name].to_i
@@ -288,7 +288,7 @@ class For extends Tag {
                 attributes.put(OFFSET, offsets.get(tagName));
             } else {
                 try {
-                    attributes.put(super.asString(attribute[0]), super.asNumber(attribute[1]).intValue());
+                    attributes.put(super.asString(attribute[0], context), super.asNumber(attribute[1]).intValue());
                 }
                 catch (Exception e) {
                     /* just ignore incorrect attributes */

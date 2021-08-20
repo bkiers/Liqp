@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 public class Append extends Filter {
 
     /*
@@ -8,8 +10,8 @@ public class Append extends Filter {
      * add one string to another
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        return super.asString(value) + super.asString(super.get(0, params));
+        return super.asString(value, context) + super.asString(super.get(0, params), context);
     }
 }

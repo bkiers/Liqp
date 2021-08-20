@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 public class Strip_Newlines extends Filter {
 
     /*
@@ -8,8 +10,8 @@ public class Strip_Newlines extends Filter {
      * Remove all newlines from the string
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        return super.asString(value).replaceAll("[\r\n]++", "");
+        return super.asString(value, context).replaceAll("[\r\n]++", "");
     }
 }

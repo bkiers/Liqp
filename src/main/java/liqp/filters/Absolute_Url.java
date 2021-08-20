@@ -27,16 +27,16 @@ public class Absolute_Url extends Relative_Url {
 
     @Override
     public Object apply(Object value, TemplateContext context, Object... params) {
-        String valAsString = asString(value);
+        String valAsString = asString(value, context);
         if (isValidAbsoluteUrl(valAsString)) {
             return valAsString;
         }
         Object configRoot = context.get(site);
         Map<String, Object> siteMap = objectToMap(configRoot, context);
-        String baseUrl = asString(siteMap.get(baseurl));
+        String baseUrl = asString(siteMap.get(baseurl), context);
         Object siteConfig = siteMap.get(config);
         Map<String, Object> configs = objectToMap(siteConfig, context);
-        String siteUrl = asString(configs.get(url));
+        String siteUrl = asString(configs.get(url), context);
         String relativeUrl = getRelativeUrl(context, baseUrl, valAsString);
         if("".equals(siteUrl)) {
             return relativeUrl;

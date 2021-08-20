@@ -2,7 +2,6 @@ package liqp.filters.date;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -49,7 +48,7 @@ public class Parser {
         datePatterns.add("EEE MMM dd hh:mm:ss yyyy");
     }
 
-    public static ZonedDateTime parse(String str, Locale locale) {
+    public static ZonedDateTime parse(String str, Locale locale, ZoneId defaultZone) {
 
         for(String pattern : datePatterns) {
             try {
@@ -60,7 +59,7 @@ public class Parser {
                         .toFormatter(locale);
 
                 TemporalAccessor temporalAccessor = timeFormatter.parse(str);
-                return getZonedDateTimeFromTemporalAccessor(temporalAccessor);
+                return getZonedDateTimeFromTemporalAccessor(temporalAccessor, defaultZone);
             } catch (Exception e) {
                 // ignore
             }
@@ -74,7 +73,7 @@ public class Parser {
      * Follow ruby rules: if some datetime part is missing,
      * the default is taken from `now` with default zone
      */
-    public static ZonedDateTime getZonedDateTimeFromTemporalAccessor(TemporalAccessor temporalAccessor) {
+    public static ZonedDateTime getZonedDateTimeFromTemporalAccessor(TemporalAccessor temporalAccessor, ZoneId defaultZone) {
         if (temporalAccessor instanceof ZonedDateTime) {
             return (ZonedDateTime) temporalAccessor;
         }
@@ -96,7 +95,7 @@ public class Parser {
 
         ZoneId zoneId = temporalAccessor.query(TemporalQueries.zone());
         if (zoneId == null) {
-            zoneId = ZoneId.systemDefault();
+            zoneId = defaultZone;
         }
 
         return now.atZone(zoneId);

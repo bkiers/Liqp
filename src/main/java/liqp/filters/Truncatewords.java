@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 public class Truncatewords extends Filter {
 
     /*
@@ -8,13 +10,13 @@ public class Truncatewords extends Filter {
      * Truncate a string down to x words
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         if (value == null) {
             return "";
         }
 
-        String text = super.asString(value);
+        String text = super.asString(value, context);
         String[] words = text.split("\\s++");
         int length = 15;
         String truncateString = "...";
@@ -24,7 +26,7 @@ public class Truncatewords extends Filter {
         }
 
         if (params.length >= 2) {
-            truncateString = super.asString(super.get(1, params));
+            truncateString = super.asString(super.get(1, params), context);
         }
 
         if (length >= words.length) {

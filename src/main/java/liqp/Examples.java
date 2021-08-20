@@ -50,9 +50,9 @@ public class Examples {
         // first register your custom filter
         Filter.registerFilter(new Filter("b"){
             @Override
-            public Object apply(Object value, Object... params) {
+            public Object apply(Object value, TemplateContext context, Object... params) {
                 // create a string from the  value
-                String text = super.asString(value);
+                String text = super.asString(value, context);
 
                 // replace and return *...* with <strong>...</strong>
                 return text.replaceAll("\\*(\\w(.*?\\w)?)\\*", "<strong>$1</strong>");
@@ -70,13 +70,13 @@ public class Examples {
         // first register your custom filter
         Filter.registerFilter(new Filter("repeat"){
             @Override
-            public Object apply(Object value, Object... params) {
+            public Object apply(Object value, TemplateContext context, Object... params) {
 
                 // check if an optional parameter is provided
                 int times = params.length == 0 ? 1 : super.asNumber(params[0]).intValue();
 
                 // get the text of the value
-                String text = super.asString(value);
+                String text = super.asString(value, context);
 
                 StringBuilder builder = new StringBuilder();
 
@@ -98,9 +98,9 @@ public class Examples {
 
         Filter.registerFilter(new Filter("sum"){
             @Override
-            public Object apply(Object value, Object... params) {
+            public Object apply(Object value, TemplateContext context, Object... params) {
 
-                Object[] numbers = super.asArray(value);
+                Object[] numbers = super.asArray(value, context);
 
                 double sum = 0;
 
@@ -129,7 +129,7 @@ public class Examples {
                 StringBuilder builder = new StringBuilder();
 
                 while(n-- > 0) {
-                    builder.append(super.asString(block.render(context)));
+                    builder.append(super.asString(block.render(context), context));
                 }
 
                 return builder.toString();
@@ -159,7 +159,7 @@ public class Examples {
                 StringBuilder builder = new StringBuilder();
 
                 while(n-- > 0) {
-                    builder.append(super.asString(block.render(context)));
+                    builder.append(super.asString(block.render(context), context));
                 }
 
                 return builder.toString();
@@ -175,9 +175,9 @@ public class Examples {
 
         Template template = Template.parse("{{ numbers | sum }}").with(new Filter("sum"){
             @Override
-            public Object apply(Object value, Object... params) {
+            public Object apply(Object value, TemplateContext context, Object... params) {
 
-                Object[] numbers = super.asArray(value);
+                Object[] numbers = super.asArray(value, context);
 
                 double sum = 0;
 

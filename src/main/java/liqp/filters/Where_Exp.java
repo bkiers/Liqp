@@ -40,7 +40,7 @@ public class Where_Exp extends Filter {
     public Object apply(Object value, TemplateContext context, Object... params) {
         Object[] items = null;
         if (isArray(value)) {
-            items = asArray(value);
+            items = asArray(value, context);
         }
 
         if (items == null && value instanceof Inspectable) {
@@ -55,8 +55,8 @@ public class Where_Exp extends Filter {
         if (items == null) {
             return value;
         }
-        String varName = asString(params[0]);
-        String strExpression = asString(params[1]);
+        String varName = asString(params[0], context);
+        String strExpression = asString(params[1], context);
 
         Template expression = Template.parse("{{ " + strExpression + " }}", context.parseSettings)
                 .withRenderSettings(context.renderSettings);

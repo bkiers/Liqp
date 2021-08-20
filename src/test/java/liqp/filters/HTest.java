@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -11,7 +12,6 @@ public class HTest {
 
     @Test
     public void applyTest() throws RecognitionException {
-
         String json = "{ \"n\" : [1,2,3,4,5] }";
 
         String[][] tests = {
@@ -42,6 +42,6 @@ public class HTest {
 
         Filter filter = Filter.getFilter("h");
 
-        assertThat(filter.apply("<strong>"), is((Object)"&lt;strong&gt;"));
+        assertThat(filter.apply("<strong>", new TemplateContext()), is((Object)"&lt;strong&gt;"));
     }
 }

@@ -101,7 +101,12 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
       expressions.add(visitOther_tag_block(ctx.other_tag_block()));
     }
 
-    return new TagNode(tags.get(ctx.Id().getText()), expressions.toArray(new LNode[expressions.size()]));
+    Tag tag = tags.get(ctx.Id().getText());
+    if (tag == null) {
+      throw new RuntimeException("The tag '" + ctx.Id().getText() + "' is not registered.");
+    }
+
+    return new TagNode(tag, expressions.toArray(new LNode[expressions.size()]));
   }
 
   // custom_tag_block

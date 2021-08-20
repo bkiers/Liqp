@@ -1,6 +1,8 @@
 package liqp;
 
+import liqp.nodes.LNode;
 import liqp.parser.Inspectable;
+import liqp.tags.Tag;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -226,6 +228,27 @@ public class TemplateTest {
 
         // then
         assertEquals("2021-11-03 16:40:44 Pacific Daylight Time", rendered);
+    }
+
+    @Test
+    public void testCustomTagRegistration() {
+        Template template = Template.parse("{% custom_tag %}")
+            .with(new Tag("custom_tag") {
+                @Override
+                public Object render(TemplateContext context, LNode... nodes) {
+                    return "xxx";
+                }
+            });
+        assertEquals("xxx", template.render());
+    }
+
+    @Test
+    public void testCustomTagMissingErrorReporting() {
+        try {
+            Template.parse("{% custom_tag %}");
+        } catch (Exception e) {
+            assertEquals("The tag 'custom_tag' is not registered.", e.getMessage());
+        }
     }
 
     private Map<String, Object> getDeepData() {

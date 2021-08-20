@@ -4,10 +4,16 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+
+import liqp.ParseSettings;
+import liqp.ProtectionSettings;
+import liqp.RenderSettings;
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.filters.date.CustomDateFormatSupport;
+import liqp.parser.Flavor;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Before;
 import org.junit.Test;
@@ -128,6 +134,12 @@ public class DateTest {
 
         assertThat(filter.apply(1152098955, context,"%m/%d/%Y"), is((Object)"07/05/2006"));
         assertThat(filter.apply("1152098955", context,"%m/%d/%Y"), is((Object)"07/05/2006"));
+        TemplateContext anotherZone = new TemplateContext(new ProtectionSettings.Builder().build(),
+                new RenderSettings.Builder().withDefaultTimeZone(ZoneOffset.UTC).build(),
+                new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build(),
+                new LinkedHashMap<>());
+        assertThat(filter.apply("1152098955", anotherZone,"%H"), is((Object)"11"));
+        assertThat(filter.apply(1152098955, anotherZone,"%H"), is((Object)"11"));
     }
 
     private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);

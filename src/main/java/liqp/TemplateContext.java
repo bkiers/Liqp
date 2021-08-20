@@ -31,7 +31,7 @@ public class TemplateContext {
         this(new ProtectionSettings.Builder().build(),
                 new RenderSettings.Builder().build(),
                 new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build(),
-                new LinkedHashMap<String, Object>());
+                new LinkedHashMap<>());
     }
 
     @Deprecated // Use `TemplateContext(protectionSettings, renderSettings, parseSettings, variables)` instead

@@ -4,10 +4,10 @@ package liqp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.parser.LiquidSupport;
 
+import java.time.ZoneId;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.TimeZone;
 
 public class RenderSettings {
 
@@ -48,7 +48,7 @@ public class RenderSettings {
     public final boolean raiseExceptionsInStrictMode;
     public final EvaluateMode evaluateMode;
     public final Locale locale;
-    public final TimeZone defaultTimeZone;
+    public final ZoneId defaultTimeZone;
 
     public static class Builder {
 
@@ -57,7 +57,7 @@ public class RenderSettings {
         boolean raiseExceptionsInStrictMode;
         EvaluateMode evaluateMode;
         Locale locale;
-        TimeZone defaultTimeZone;
+        ZoneId defaultTimeZone;
 
 
         public Builder() {
@@ -101,17 +101,20 @@ public class RenderSettings {
          * @param defaultTimeZone - value or <code>null<code/>
          * @return
          */
-        public Builder withDefaultTimeZone(TimeZone defaultTimeZone) {
+        public Builder withDefaultTimeZone(ZoneId defaultTimeZone) {
             this.defaultTimeZone = defaultTimeZone;
             return this;
         }
 
         public RenderSettings build() {
+            if (this.defaultTimeZone == null) {
+                this.defaultTimeZone = ZoneId.systemDefault();
+            }
             return new RenderSettings(this.strictVariables, this.showExceptionsFromInclude, this.raiseExceptionsInStrictMode, this.evaluateMode, this.locale, this.defaultTimeZone);
         }
     }
 
-    private RenderSettings(boolean strictVariables, boolean showExceptionsFromInclude, boolean raiseExceptionsInStrictMode, EvaluateMode evaluateMode, Locale locale, TimeZone defaultTimeZone) {
+    private RenderSettings(boolean strictVariables, boolean showExceptionsFromInclude, boolean raiseExceptionsInStrictMode, EvaluateMode evaluateMode, Locale locale, ZoneId defaultTimeZone) {
         this.strictVariables = strictVariables;
         this.showExceptionsFromInclude = showExceptionsFromInclude;
         this.raiseExceptionsInStrictMode = raiseExceptionsInStrictMode;

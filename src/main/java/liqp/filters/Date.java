@@ -43,7 +43,7 @@ public class Date extends Filter {
                 compatibleDate = LValue.asTemporal(value);
             } else if(super.isNumber(value)) {
                 // No need to divide this by 1000, the param is expected to be in seconds already!
-                compatibleDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(super.asNumber(value).longValue() * 1000), ZoneId.systemDefault());
+                compatibleDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(super.asNumber(value).longValue() * 1000), context.renderSettings.defaultTimeZone);
             } else {
                 compatibleDate = Parser.parse(super.asString(value), locale);
             }

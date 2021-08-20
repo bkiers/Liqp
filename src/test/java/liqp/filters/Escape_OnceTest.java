@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -43,9 +44,10 @@ public class Escape_OnceTest {
 
         final Filter filter = Filter.getFilter("escape_once");
 
-        assertThat(filter.apply(Filter.getFilter("escape").apply("<strong>")), is((Object)"&lt;strong&gt;"));
+        TemplateContext context = new TemplateContext();
+        assertThat(filter.apply(Filter.getFilter("escape").apply("<strong>", context)), is((Object)"&lt;strong&gt;"));
 
         // the same test:
-        assertThat(filter.apply("&lt;strong&gt;"), is((Object)"&lt;strong&gt;"));
+        assertThat(filter.apply("&lt;strong&gt;", context), is((Object)"&lt;strong&gt;"));
     }
 }

@@ -2,6 +2,7 @@ package liqp.filters;
 
 import java.util.regex.Pattern;
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -40,12 +41,13 @@ public class SplitTest {
      */
     @Test
     public void applyOriginalTest() {
-
+        TemplateContext context = new TemplateContext();
+        
         final Filter filter = Filter.getFilter("split");
 
-        assertThat(filter.apply("12~34", "~"), is((Object)new String[]{"12", "34"}));
-        assertThat(filter.apply("A? ~ ~ ~ ,Z", "~ ~ ~"), is((Object)new String[]{"A? ", " ,Z"}));
-        assertThat(filter.apply("A?Z", "~"), is((Object)new String[]{"A?Z"}));
-        assertThat(filter.apply("AxZ", Pattern.compile("x")), is((Object)new String[]{"A", "Z"}));
+        assertThat(filter.apply("12~34", context, "~"), is((Object)new String[]{"12", "34"}));
+        assertThat(filter.apply("A? ~ ~ ~ ,Z", context, "~ ~ ~"), is((Object)new String[]{"A? ", " ,Z"}));
+        assertThat(filter.apply("A?Z", context, "~"), is((Object)new String[]{"A?Z"}));
+        assertThat(filter.apply("AxZ", context, Pattern.compile("x")), is((Object)new String[]{"A", "Z"}));
     }
 }

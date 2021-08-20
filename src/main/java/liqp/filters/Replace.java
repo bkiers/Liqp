@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 public class Replace extends Filter {
 
     /*
@@ -8,9 +10,9 @@ public class Replace extends Filter {
      * Replace occurrences of a string with another
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        String original = super.asString(value);
+        String original = super.asString(value, context);
 
         Object needle = super.get(0, params);
         String replacement = "";
@@ -27,7 +29,7 @@ public class Replace extends Filter {
                 throw new RuntimeException("invalid replacement: " + needle);
             }
 
-            replacement = super.asString(super.get(1, params));
+            replacement = super.asString(super.get(1, params), context);
         }
 
         return original.replace(String.valueOf(needle), String.valueOf(replacement));

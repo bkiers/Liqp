@@ -36,14 +36,14 @@ public class ContainsNode extends LValue implements LNode {
         }
 
         if(super.isArray(collection)) {
-            Object[] array = super.asArray(collection);
+            Object[] array = super.asArray(collection, context);
             List<Object> finalCollection = toSingleNumberType(Arrays.asList(array));
             needle = toSingleNumberType(needle);
             return finalCollection.contains(needle);
         }
 
         if(super.isString(collection)) {
-            return super.asString(collection).contains(super.asString(needle));
+            return super.asString(collection, context).contains(super.asString(needle, context));
         }
 
         return false;

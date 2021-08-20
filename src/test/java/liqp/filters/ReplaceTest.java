@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -47,9 +48,9 @@ public class ReplaceTest {
      */
     @Test
     public void applyOriginalTest() {
-
+        TemplateContext context = new TemplateContext();
         Filter filter = Filter.getFilter("replace");
 
-        assertThat(filter.apply("a a a a", "a", "b"), is((Object)"b b b b"));
+        assertThat(filter.apply("a a a a", context, "a", "b"), is((Object)"b b b b"));
     }
 }

@@ -11,7 +11,7 @@ class Capture extends Tag {
     @Override
     public Object render(TemplateContext context, LNode... nodes) {
 
-        String id = super.asString(nodes[0].render(context));
+        String id = super.asString(nodes[0].render(context), context);
 
         LNode block = nodes[1];
 

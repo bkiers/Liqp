@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -38,10 +39,10 @@ public class LastTest {
      */
     @Test
     public void applyOriginalTest() {
-
+        TemplateContext context = new TemplateContext();
         Filter filter = Filter.getFilter("last");
 
-        assertThat(filter.apply(new Integer[]{1, 2, 3}), is((Object)3));
-        assertThat(filter.apply(new Integer[]{}), is((Object)null));
+        assertThat(filter.apply(new Integer[]{1, 2, 3}, context), is((Object)3));
+        assertThat(filter.apply(new Integer[]{}, context), is((Object)null));
     }
 }

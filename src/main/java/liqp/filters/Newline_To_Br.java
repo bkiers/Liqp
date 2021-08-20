@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 public class Newline_To_Br extends Filter {
 
     /*
@@ -8,8 +10,8 @@ public class Newline_To_Br extends Filter {
      * Add <br /> tags in front of all newlines in input string
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        return super.asString(value).replaceAll("[\n]", "<br />\n");
+        return super.asString(value, context).replaceAll("[\n]", "<br />\n");
     }
 }

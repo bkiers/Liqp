@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -36,10 +37,10 @@ public class UpcaseTest {
      */
     @Test
     public void applyOriginalTest() {
-
+        TemplateContext context = new TemplateContext();
         final Filter filter = Filter.getFilter("upcase");
 
-        assertThat(filter.apply("Testing"), is((Object)"TESTING"));
-        assertThat(filter.apply(null), is((Object)""));
+        assertThat(filter.apply("Testing", context), is((Object)"TESTING"));
+        assertThat(filter.apply(null, context), is((Object)""));
     }
 }

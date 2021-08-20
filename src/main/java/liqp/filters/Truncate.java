@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 public class Truncate extends Filter {
 
     /*
@@ -8,13 +10,13 @@ public class Truncate extends Filter {
      * Truncate a string down to x characters
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         if (value == null) {
             return "";
         }
 
-        String text = super.asString(value);
+        String text = super.asString(value, context);
         int length = 50;
         String truncateString = "...";
 
@@ -23,7 +25,7 @@ public class Truncate extends Filter {
         }
 
         if (params.length >= 2) {
-            truncateString = super.asString(super.get(1, params));
+            truncateString = super.asString(super.get(1, params), context);
         }
 
         // If the entire string fits untruncated, return the string.

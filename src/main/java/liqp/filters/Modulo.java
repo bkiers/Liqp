@@ -1,5 +1,8 @@
 package liqp.filters;
 
+import liqp.Template;
+import liqp.TemplateContext;
+
 import java.math.BigDecimal;
 
 public class Modulo extends Filter {
@@ -10,7 +13,7 @@ public class Modulo extends Filter {
      * modulus
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         if(value == null) {
             value = 0L;

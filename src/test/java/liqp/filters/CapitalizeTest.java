@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -35,7 +36,8 @@ public class CapitalizeTest {
 
         Filter filter = Filter.getFilter("capitalize");
 
-        assertThat(filter.apply("testing"), is((Object)"Testing"));
-        assertThat(filter.apply(null), is((Object)""));
+        TemplateContext context = new TemplateContext();
+        assertThat(filter.apply("testing", context), is((Object)"Testing"));
+        assertThat(filter.apply(null, context), is((Object)""));
     }
 }

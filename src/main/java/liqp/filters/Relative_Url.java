@@ -18,14 +18,14 @@ public class Relative_Url extends Filter {
     public static final String baseurl = "baseurl";
     @Override
     public Object apply(Object value, TemplateContext context, Object... params) {
-        String valAsString = asString(value);
+        String valAsString = asString(value, context);
 
         // fast exit for valid absolute urls
         if (isValidAbsoluteUrl(valAsString)) {
             return valAsString;
         }
         Map<String, Object> siteMap = objectToMap(context.get(site), context);
-        String baseUrl = asString(siteMap.get(baseurl));
+        String baseUrl = asString(siteMap.get(baseurl), context);
         return getRelativeUrl(context, baseUrl, valAsString);
     }
 
@@ -34,7 +34,7 @@ public class Relative_Url extends Filter {
         if (!valAsString.startsWith("/")) {
             valAsString = "/" + valAsString;
         }
-        String baseUrlString = asString(baseUrl);
+        String baseUrlString = asString(baseUrl, context);
         if (baseUrlString.isEmpty()) {
             return valAsString;
         } else {

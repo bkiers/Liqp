@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -38,8 +39,8 @@ public class DowncaseTest {
     public void applyOriginalTest() {
 
         final Filter filter = Filter.getFilter("downcase");
-
-        assertThat(filter.apply("Testing"), is((Object)"testing"));
-        assertThat(filter.apply(null), is((Object)""));
+        TemplateContext templateContext = new TemplateContext();
+        assertThat(filter.apply("Testing", templateContext), is((Object)"testing"));
+        assertThat(filter.apply(null, templateContext), is((Object)""));
     }
 }

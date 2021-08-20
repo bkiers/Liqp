@@ -32,7 +32,7 @@ public class Decrement extends Tag {
     public Object render(TemplateContext context, LNode... nodes) {
 
         Long value = INITIAL;
-        String variable = super.asString(nodes[0].render(context));
+        String variable = super.asString(nodes[0].render(context), context);
 
         Map<String, Object> environmentMap = context.getEnvironmentMap();
         if (environmentMap.containsKey(variable)) {

@@ -23,11 +23,11 @@ public class Size extends Filter {
             return asMap(value).size();
         }
         if (super.isArray(value)) {
-            return super.asArray(value).length;
+            return super.asArray(value, context).length;
         }
 
         if (super.isString(value)) {
-            return super.asString(value).length();
+            return super.asString(value, context).length();
         }
 
         if (super.isNumber(value)) {

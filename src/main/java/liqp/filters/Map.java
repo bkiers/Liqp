@@ -23,9 +23,9 @@ public class Map extends Filter {
 
         List<Object> list = new ArrayList<Object>();
 
-        Object[] array = super.asArray(value);
+        Object[] array = super.asArray(value, context);
 
-        String key = super.asString(super.get(0, params));
+        String key = super.asString(super.get(0, params), context);
 
         for (Object obj : array) {
 

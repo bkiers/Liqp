@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 import java.util.regex.Pattern;
 
 public class Remove_First extends Filter {
@@ -10,9 +12,9 @@ public class Remove_First extends Filter {
      * remove the first occurrences of a substring
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        String original = super.asString(value);
+        String original = super.asString(value, context);
 
         Object needle = super.get(0, params);
 

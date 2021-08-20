@@ -2,6 +2,7 @@ package liqp.filters;
 
 import liqp.ParseSettings;
 import liqp.Template;
+import liqp.TemplateContext;
 import liqp.parser.Flavor;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
@@ -19,8 +20,8 @@ public class FilterTest {
 
         Filter.registerFilter(new Filter("textilize") {
             @Override
-            public Object apply(Object value, Object... params) {
-                String s = super.asString(value).trim();
+            public Object apply(Object value, TemplateContext context, Object... params) {
+                String s = super.asString(value, context).trim();
                 return "<b>" + s.substring(1, s.length() - 1) + "</b>";
             }
         });

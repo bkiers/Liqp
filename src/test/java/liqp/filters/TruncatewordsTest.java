@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -46,13 +47,13 @@ public class TruncatewordsTest {
      */
     @Test
     public void applyOriginalTest() {
-
+        TemplateContext context = new TemplateContext();
         final Filter filter = Filter.getFilter("truncatewords");
 
-        assertThat(filter.apply("one two three", 4), is((Object)"one two three"));
-        assertThat(filter.apply("one two three", 2), is((Object)"one two..."));
-        assertThat(filter.apply("one two three", 3), is((Object)"one two three"));
-        assertThat(filter.apply("Two small (13&#8221; x 5.5&#8221; x 10&#8221; high) baskets fit inside one large basket (13&#8221; x 16&#8221; x 10.5&#8221; high) with cover.", 15),
+        assertThat(filter.apply("one two three", context, 4), is((Object)"one two three"));
+        assertThat(filter.apply("one two three", context,  2), is((Object)"one two..."));
+        assertThat(filter.apply("one two three", context, 3), is((Object)"one two three"));
+        assertThat(filter.apply("Two small (13&#8221; x 5.5&#8221; x 10&#8221; high) baskets fit inside one large basket (13&#8221; x 16&#8221; x 10.5&#8221; high) with cover.", context, 15),
                 is((Object)"Two small (13&#8221; x 5.5&#8221; x 10&#8221; high) baskets fit inside one large basket (13&#8221;..."));
     }
 }

@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -42,9 +43,9 @@ public class RemoveTest {
      */
     @Test
     public void applyOriginalTest() {
-
+        TemplateContext context = new TemplateContext();
         Filter filter = Filter.getFilter("remove");
 
-        assertThat(filter.apply("a a a a", "a"), is((Object)"   "));
+        assertThat(filter.apply("a a a a", context, "a"), is((Object)"   "));
     }
 }

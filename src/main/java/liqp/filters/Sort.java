@@ -25,8 +25,8 @@ public class Sort extends Filter {
             throw new RuntimeException("cannot sort: " + value);
         }
 
-        Object[] array = super.asArray(value);
-        String property = params.length == 0 ? null : super.asString(params[0]);
+        Object[] array = super.asArray(value, context);
+        String property = params.length == 0 ? null : super.asString(params[0], context);
 
         List<Comparable> list = asComparableList(context, array, property);
 

@@ -15,7 +15,7 @@ public class Include extends Tag {
     public Object render(TemplateContext context, LNode... nodes) {
 
         try {
-            String includeResource = super.asString(nodes[0].render(context));
+            String includeResource = super.asString(nodes[0].render(context), context);
             String extension = DEFAULT_EXTENSION;
             if(includeResource.indexOf('.') > 0) {
                 extension = "";

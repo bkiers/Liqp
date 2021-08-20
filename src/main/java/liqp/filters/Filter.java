@@ -126,8 +126,10 @@ public abstract class Filter extends LValue {
      * @param params
      *         the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
      *
+     * @deprecated use {@link #apply(Object, TemplateContext, Object...)}
      * @return the result of the filter.
      */
+    @Deprecated
     public Object apply(Object value, Object... params) {
 
         // Default "no-op" filter.

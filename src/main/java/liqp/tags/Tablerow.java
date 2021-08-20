@@ -49,8 +49,8 @@ class Tablerow extends Tag {
     @Override
     public Object render(TemplateContext context, LNode... nodes) {
 
-        String valueName = super.asString(nodes[0].render(context));
-        Object[] collection = super.asArray(nodes[1].render(context));
+        String valueName = super.asString(nodes[0].render(context), context);
+        Object[] collection = super.asArray(nodes[1].render(context), context);
         LNode block = nodes[2];
         Map<String, Integer> attributes = getAttributes(collection, 3, context, nodes);
 
@@ -93,7 +93,7 @@ class Tablerow extends Tag {
                 }
 
                 builder.append("<td class=\"col").append(c).append("\">");
-                builder.append(super.asString(block.render(nestedContext)));
+                builder.append(super.asString(block.render(nestedContext), context));
                 builder.append("</td>");
 
                 if(c == cols || i == total - 1) {
@@ -120,10 +120,10 @@ class Tablerow extends Tag {
 
         for (int i = fromIndex; i < tokens.length; i++) {
 
-            Object[] attribute = super.asArray(tokens[i].render(context));
+            Object[] attribute = super.asArray(tokens[i].render(context), context);
 
             try {
-                attributes.put(super.asString(attribute[0]), super.asNumber(attribute[1]).intValue());
+                attributes.put(super.asString(attribute[0], context), super.asNumber(attribute[1]).intValue());
             }
             catch (Exception e) {
                 /* just ignore incorrect attributes */

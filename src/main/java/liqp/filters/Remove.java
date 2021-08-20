@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 public class Remove extends Filter {
 
     /*
@@ -8,9 +10,9 @@ public class Remove extends Filter {
      * remove a substring
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        String original = super.asString(value);
+        String original = super.asString(value, context);
 
         Object needle = super.get(0, params);
 

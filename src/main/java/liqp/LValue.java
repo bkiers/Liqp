@@ -118,7 +118,7 @@ public abstract class LValue {
      * @return this value as an array.
      */
     @SuppressWarnings("unchecked")
-    public Object[] asArray(Object value) {
+    public Object[] asArray(Object value, TemplateContext context) {
 
         if(value == null) {
             return new Object[]{};
@@ -133,7 +133,7 @@ public abstract class LValue {
         }
 
         if (isTemporal(value)) {
-            value = asTemporal(value);
+            value = asTemporal(value, context);
             return temporalAsArray((ZonedDateTime) value);
         }
 
@@ -159,10 +159,10 @@ public abstract class LValue {
         return new Object[]{sec, min, hour, day, month, year, wday, yday, isdst, zone};
     }
 
-    public static ZonedDateTime asTemporal(Object value) {
+    public static ZonedDateTime asTemporal(Object value, TemplateContext context) {
         ZonedDateTime time = ZonedDateTime.now();
         if (value instanceof TemporalAccessor) {
-            time = getZonedDateTimeFromTemporalAccessor((TemporalAccessor) value);
+            time = getZonedDateTimeFromTemporalAccessor((TemporalAccessor) value, context.renderSettings.defaultTimeZone);
         } else if (CustomDateFormatRegistry.isCustomDateType(value)) {
             time = CustomDateFormatRegistry.getFromCustomType(value);
         }
@@ -176,7 +176,7 @@ public abstract class LValue {
     }
 
     /**
-     * Usually we need array representation of items, so the {@link #asArray(Object)} do the work well.
+     * Usually we need array representation of items, so the {@link #asArray(Object, TemplateContext)} do the work well.
      * But occasionally we need introspect the object (usually `Map`) as array.
      * So this function do so.
      *
@@ -253,14 +253,14 @@ public abstract class LValue {
      *
      * @return `value` as a String.
      */
-    public String asString(Object value) {
+    public String asString(Object value, TemplateContext context) {
 
         if (value == null) {
             return "";
         }
 
         if (isTemporal(value)) {
-            ZonedDateTime time = asTemporal(value);
+            ZonedDateTime time = asTemporal(value, context);
             return rubyDateTimeFormat.format(time);
         }
 
@@ -268,12 +268,12 @@ public abstract class LValue {
             return String.valueOf(value);
         }
 
-        Object[] array = this.asArray(value);
+        Object[] array = this.asArray(value, context);
 
         StringBuilder builder = new StringBuilder();
 
         for (Object obj : array) {
-            builder.append(this.asString(obj));
+            builder.append(this.asString(obj, context));
         }
 
         return builder.toString();
@@ -350,11 +350,11 @@ public abstract class LValue {
         return value != null && value instanceof CharSequence;
     }
 
-    public boolean isTruthy(Object value) {
-        return !this.isFalsy(value);
+    public boolean isTruthy(Object value, TemplateContext context) {
+        return !this.isFalsy(value, context);
     }
 
-    public boolean isFalsy(Object value) {
+    public boolean isFalsy(Object value, TemplateContext context) {
 
         if (value == null)
             return true;
@@ -365,7 +365,7 @@ public abstract class LValue {
         if (value instanceof CharSequence && ((CharSequence) value).length() == 0)
             return true;
 
-        if (this.isArray(value) && this.asArray(value).length == 0)
+        if (this.isArray(value) && this.asArray(value, context).length == 0)
             return true;
 
         if ((value instanceof Map) && ((Map) value).isEmpty())

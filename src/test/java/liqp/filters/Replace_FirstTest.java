@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -47,10 +48,10 @@ public class Replace_FirstTest {
      */
     @Test
     public void applyOriginalTest() {
-
+        TemplateContext context = new TemplateContext();
         Filter filter = Filter.getFilter("replace_first");
 
-        assertThat(filter.apply("a a a a", "a", "b"), is((Object)"b a a a"));
+        assertThat(filter.apply("a a a a", context, "a", "b"), is((Object)"b a a a"));
         assertThat(Template.parse("{{ 'a a a a' | replace_first: 'a', 'b' }}").render(), is("b a a a"));
     }
 }

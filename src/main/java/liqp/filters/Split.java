@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 import java.util.regex.Pattern;
 
 public class Split extends Filter {
@@ -12,11 +14,11 @@ public class Split extends Filter {
      * E.g. {{ "a~b" | split:'~' | first }} #=> 'a'
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        String original = super.asString(value);
+        String original = super.asString(value, context);
 
-        String delimiter = super.asString(super.get(0, params));
+        String delimiter = super.asString(super.get(0, params), context);
 
         return original.split("(?<!^)" + Pattern.quote(delimiter));
     }

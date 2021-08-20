@@ -1,17 +1,19 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 import java.util.*;
 
 public class Sort_Natural extends Filter {
 
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         if (!super.isArray(value)) {
             return value;
         }
 
-        Object[] array = super.asArray(value);
+        Object[] array = super.asArray(value, context);
         List<Object> list = new ArrayList<Object>(Arrays.asList(array));
 
         Collections.sort(list, new Comparator() {

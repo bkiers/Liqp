@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 public class Capitalize extends Filter {
 
     /*
@@ -8,9 +10,9 @@ public class Capitalize extends Filter {
      * capitalize words in the input sentence
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        String original = super.asString(value);
+        String original = super.asString(value, context);
 
         if (original.isEmpty()) {
             return original;

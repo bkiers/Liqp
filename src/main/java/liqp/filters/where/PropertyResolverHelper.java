@@ -22,7 +22,7 @@ public class PropertyResolverHelper {
             @Override
             public Object getItemProperty(TemplateContext context, Object input, Object property) {
                 LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, input);
-                return evaluated.toLiquid().get(lValue.asString(property));
+                return evaluated.toLiquid().get(lValue.asString(property, context));
             }
 
             @Override

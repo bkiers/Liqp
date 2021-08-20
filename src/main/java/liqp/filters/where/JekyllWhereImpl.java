@@ -111,7 +111,7 @@ public class JekyllWhereImpl extends WhereImpl {
             return input;
         }
         Object property = params[0];
-        if (isFalsy(property)) {
+        if (isFalsy(property, context)) {
             return input;
         }
 
@@ -148,14 +148,14 @@ public class JekyllWhereImpl extends WhereImpl {
         List res = new ArrayList();
         for (Object item : inputColl) {
             Object itemProperty = itemProperty(item, property);
-            if (comparePropertyVsTarget(itemProperty, value)) {
+            if (comparePropertyVsTarget(itemProperty, value, context)) {
                 res.add(item);
             }
         }
         return res.toArray(new Object[res.size()]);
     }
 
-    private boolean comparePropertyVsTarget(Object itemProperty, Object target) {
+    private boolean comparePropertyVsTarget(Object itemProperty, Object target, TemplateContext context) {
         if (target == null) {
             return itemProperty == null;
         }
@@ -163,13 +163,13 @@ public class JekyllWhereImpl extends WhereImpl {
             return "".equals(itemProperty) || "".equals(joinedArray(itemProperty));
         }
 
-        String strTarget = asString(target);
+        String strTarget = asString(target, context);
         if (isString(itemProperty)) {
             return strTarget.equals(itemProperty);
         } else {
-            Object[] objects = asArray(itemProperty);
+            Object[] objects = asArray(itemProperty, context);
             for (Object prop : objects) {
-                if (asString(prop).equals(strTarget)) {
+                if (asString(prop, context).equals(strTarget)) {
                     return true;
                 }
             }
@@ -183,9 +183,9 @@ public class JekyllWhereImpl extends WhereImpl {
         if (itemProperty instanceof Map) {
             objects = mapAsArray((Map) itemProperty);
         } else {
-            objects = asArray(itemProperty);
+            objects = asArray(itemProperty, context);
         }
-        return asString(objects);
+        return asString(objects, context);
     }
 
 

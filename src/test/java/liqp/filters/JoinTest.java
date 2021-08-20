@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.Template;
+import liqp.TemplateContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -38,10 +39,10 @@ public class JoinTest {
      */
     @Test
     public void applyOriginalTest() {
-
+        TemplateContext context = new TemplateContext();
         Filter filter = Filter.getFilter("join");
 
-        assertThat(filter.apply(new Integer[]{1,2,3,4}), is((Object)"1 2 3 4"));
-        assertThat(filter.apply(new Integer[]{1,2,3,4}, " - "), is((Object)"1 - 2 - 3 - 4"));
+        assertThat(filter.apply(new Integer[]{1,2,3,4}, context), is((Object)"1 2 3 4"));
+        assertThat(filter.apply(new Integer[]{1,2,3,4}, context, " - "), is((Object)"1 - 2 - 3 - 4"));
     }
 }

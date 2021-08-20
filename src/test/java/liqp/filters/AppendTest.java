@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
@@ -83,5 +84,25 @@ public class AppendTest {
 
         res = Template.parse("{{ a | append: '!' }}").withRenderSettings(eager).render(data);
         assertEquals("2007-11-01 15:25:00 +0900!", res);
+    }
+
+    @Test
+    public void testAppendToDateTypeWithDefaultTimezoneSet() {
+        LocalDateTime time = LocalDateTime.of(2020, 1,1,12,59, 59, 999);
+        Map<String, Object> data = Collections.singletonMap("a", time);
+
+        // -5 here (uses fixed offset as don't want to play with DST)
+        ZoneId defaultTimeZone = ZoneId.ofOffset("UTC", ZoneOffset.ofHours(-5));
+        
+        RenderSettings renderSettings = new RenderSettings.Builder().withDefaultTimeZone(defaultTimeZone).build();
+        
+        // is -0500 here
+        String res = Template.parse("{{ '!' | append: a }}").withRenderSettings(renderSettings).render(data);
+        assertEquals("!2020-01-01 12:59:59 -0500", res);
+
+        // is -0500 here
+        res = Template.parse("{{ a | append: '!' }}").withRenderSettings(renderSettings).render(data);
+        assertEquals("2020-01-01 12:59:59 -0500!", res);
+
     }
 }

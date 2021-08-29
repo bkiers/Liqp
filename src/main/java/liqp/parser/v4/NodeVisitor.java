@@ -457,8 +457,12 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   @Override
   public FilterNode visitFilter(FilterContext ctx) {
 
-    FilterNode node = new FilterNode(ctx, filters.get(ctx.Id().getText()));
+    Filter filter = filters.get(ctx.Id().getText());
+    if (filter == null) {
+      throw new RuntimeException("The filter '" + ctx.Id().getText() + "' is not registered.");
+    }
 
+    FilterNode node = new FilterNode(ctx, filter);
     if (ctx.params() != null) {
       for (Param_exprContext child : ctx.params().param_expr()) {
         node.add(visit(child));

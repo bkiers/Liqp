@@ -1,5 +1,6 @@
 package liqp;
 
+import liqp.filters.Filter;
 import liqp.nodes.LNode;
 import liqp.parser.Inspectable;
 import liqp.tags.Tag;
@@ -248,6 +249,29 @@ public class TemplateTest {
             Template.parse("{% custom_tag %}");
         } catch (Exception e) {
             assertEquals("The tag 'custom_tag' is not registered.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testCustomFilterRegistration() {
+        Template template = Template.parse("{{ name | custom_to_upper }}")
+            .with(new Filter("custom_to_upper") {
+                @Override
+                public Object apply(Object value, TemplateContext context, Object... params) {
+                    return ((String)value).toUpperCase();
+                }
+            });
+        Map<String,Object> variables = new HashMap<>();
+        variables.put("name", "i should be uppercase");
+        assertEquals("I SHOULD BE UPPERCASE", template.render(variables));
+    }
+
+    @Test
+    public void testCustomFilterMissingErrorReporting() {
+        try {
+            Template.parse("{% custom_filter %}");
+        } catch (Exception e) {
+            assertEquals("The filter 'custom_filter' is not registered.", e.getMessage());
         }
     }
 

@@ -11,7 +11,7 @@ Add the dependency:
 
 ```groovy
 dependencies {
-  compile 'nl.big-o:liqp:0.8.0'
+  compile 'nl.big-o:liqp:0.8.2'
 }
 ```
 
@@ -23,7 +23,7 @@ Add the following dependency:
 <dependency>
   <groupId>nl.big-o</groupId>
   <artifactId>liqp</artifactId>
-  <version>0.8.0</version>
+  <version>0.8.2</version>
 </dependency>
 ```
 
@@ -397,5 +397,30 @@ Release process into the [Central Repository](http://central.sonatype.org) is
 performed with
 
 ```
-mvn release:prepare release:perform
+ mvn release:clean release:prepare release:perform -P ossrh-release
 ```
+Make sure having in `~/.m2/settings.xml` this config(with your values):
+```xml
+<settings>
+<servers>
+  <server>
+    <id>ossrh</id>
+    <username>MY_OSSRH_USERNAME</username>
+    <password>MY_OSSRH_PASSWORD</password>
+  </server>
+</servers>
+  <profiles>
+    <profile>
+      <id>ossrh-release</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties>
+        <gpg.executable>gpg2</gpg.executable>
+        <gpg.passphrase>GPG_PRIVATE_KEY_PASSWORD</gpg.passphrase>
+      </properties>
+    </profile>
+  </profiles>
+</settings>
+```
+After executing this go to https://oss.sonatype.org/index.html#stagingRepositories, ensure all is OK, after you can "Close" the staging for promoting to the realease and after do "Release".

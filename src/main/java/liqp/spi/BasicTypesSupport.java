@@ -13,7 +13,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class BasicTypesSupport implements TypesSupport {
 
-    private static ThreadLocal<Map<String, Object>> local = ThreadLocal.withInitial(ConcurrentHashMap::new);
+    private static ThreadLocal<Map<String, Object>> local = new ThreadLocal<Map<String, Object>>(){
+        @Override
+        protected Map<String, Object> initialValue() {
+            return new ConcurrentHashMap<>();
+        }
+    };
 
     
     protected<T> void registerType(SimpleModule module, final Class<T> clazz) {

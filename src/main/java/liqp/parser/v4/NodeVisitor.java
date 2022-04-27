@@ -40,6 +40,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
       throw new IllegalArgumentException("parseSettings == null");
 
     this.tags = tags;
+
     this.filters = filters;
     this.parseSettings = parseSettings;
   }
@@ -90,6 +91,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  ;
   @Override
   public LNode visitOther_tag(Other_tagContext ctx) {
+    String blockId = ctx.BlockId().getText();
 
     List<LNode> expressions = new ArrayList<LNode>();
 
@@ -97,31 +99,32 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
       expressions.add(new AtomNode(ctx.other_tag_parameters().getText()));
     }
 
-    if (ctx.other_tag_block() != null) {
-      expressions.add(visitOther_tag_block(ctx.other_tag_block()));
-    }
-
-    Tag tag = tags.get(ctx.Id().getText());
-    if (tag == null) {
-      throw new RuntimeException("The tag '" + ctx.Id().getText() + "' is not registered.");
-    }
-
-    return new TagNode(tag, expressions.toArray(new LNode[expressions.size()]));
-  }
-
-  // custom_tag_block
-  //  : atom+? tagStart EndId TagEnd
-  //  ;
-  @Override
-  public BlockNode visitOther_tag_block(Other_tag_blockContext ctx) {
-
     BlockNode node = new BlockNode(isRootBlock);
 
     for (AtomContext child : ctx.atom()) {
       node.add(visit(child));
     }
 
-    return node;
+    Tag tag = tags.get(blockId);
+    if (tag == null) {
+      throw new RuntimeException("The tag '" + blockId + "' is not registered.");
+    }
+
+    expressions.add(node);
+
+    return new TagNode(tag, expressions.toArray(new LNode[expressions.size()]));
+  }
+
+  @Override
+  public LNode visitSimple_tag(Simple_tagContext ctx) {
+
+    List<LNode> expressions = new ArrayList<LNode>();
+
+    if (ctx.other_tag_parameters() != null) {
+      expressions.add(new AtomNode(ctx.other_tag_parameters().getText()));
+    }
+
+    return new TagNode(tags.get(ctx.SimpleTagId().getText()), expressions.toArray(new LNode[expressions.size()]));
   }
 
   // raw_tag

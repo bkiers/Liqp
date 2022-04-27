@@ -2,6 +2,7 @@ package liqp.nodes;
 
 import liqp.Template;
 import liqp.TemplateContext;
+import liqp.tags.Block;
 import liqp.tags.Tag;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
@@ -20,7 +21,7 @@ public class BlockNodeTest {
     @Test
     public void customTagTest() throws RecognitionException {
 
-        Tag.registerTag(new Tag("testtag"){
+        Tag.registerTag(new Block("testtag"){
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 return null;

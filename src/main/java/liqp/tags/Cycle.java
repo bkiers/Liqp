@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-class Cycle extends Tag {
+class Cycle extends Block {
 
     /*
      * Cycle is usually used within a loop to alternate

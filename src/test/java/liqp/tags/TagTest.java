@@ -10,10 +10,30 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class TagTest {
+    @Test
+    public void testNestedCustomTagsAndBlocks() {
+        Tag.registerTag(new Block("block") {
+            @Override
+            public Object render(TemplateContext context, LNode... nodes) {
+                String data = (nodes.length >= 2 ? nodes[1].render(context) : nodes[0].render(context)).toString();
+
+                return "blk[" + data + "]";
+            }
+        });
+
+        Tag.registerTag(new Tag("simple") {
+            @Override
+            public Object render(TemplateContext context, LNode... nodes) {
+                return "(sim)";
+            }
+        });
+        String templateString = "{% block %}a{% simple %}b{% block %}c{% endblock %}d{% endblock %}";
+        Template template = Template.parse(templateString);
+        assertThat("blk[a(sim)bblk[c]d]", is(template.render()));
+    }
 
     @Test
     public void testCustomTag() throws RecognitionException {
-
         Tag.registerTag(new Tag("twice") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
@@ -31,7 +51,7 @@ public class TagTest {
     @Test
     public void testCustomTagBlock() throws RecognitionException {
 
-        Tag.registerTag(new Tag("twice") {
+        Tag.registerTag(new Block("twice") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 LNode blockNode = nodes[nodes.length - 1];

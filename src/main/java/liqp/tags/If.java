@@ -3,7 +3,7 @@ package liqp.tags;
 import liqp.TemplateContext;
 import liqp.nodes.LNode;
 
-class If extends Tag {
+class If extends Block {
 
     /*
      * Standard if/else block

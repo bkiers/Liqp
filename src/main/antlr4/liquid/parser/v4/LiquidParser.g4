@@ -1,10 +1,6 @@
 parser grammar LiquidParser;
 
-options {
-  tokenVocab=LiquidLexer;
-}
-
-@members {
+@parser::members {
     private boolean isLiquid = true;
 
     private boolean isLiquid(){
@@ -20,6 +16,17 @@ options {
         this.isLiquid = isLiquid;
     }
 
+    public void reportTokenError(String message, Token token) {
+        notifyErrorListeners(token, message + ": '" + token.getText() + "'", null);
+    }
+
+    public void reportTokenError(String message) {
+        notifyErrorListeners(message);
+    }
+}
+
+options {
+  tokenVocab=LiquidLexer;
 }
 
 parse
@@ -50,22 +57,38 @@ tag
  | include_tag
  | continue_tag
  | other_tag
- ;
-
-other_tag
- : tagStart Id other_tag_parameters? TagEnd other_tag_block?
+ | simple_tag
  ;
 
 continue_tag
- : tagStart Continue TagEnd
+ : TagStart Continue TagEnd
  ;
 
-other_tag_block
- : atom*? tagStart EndId TagEnd
- ;
+other_tag
+  : TagStart BlockId other_tag_parameters? TagEnd atom*? TagStart EndBlockId TagEnd
+  | error_other_tag
+  ;
+
+error_other_tag
+  : TagStart BlockId other_tag_parameters? TagEnd atom*? TagStart MisMatchedEndBlockId TagEnd {
+    reportTokenError("Mismatched End Tag", _localctx.MisMatchedEndBlockId().getSymbol());
+  }
+  | TagStart BlockId other_tag_parameters? TagEnd atom*? TagStart InvalidEndBlockId TagEnd {
+     reportTokenError("Invalid End Tag", _localctx.InvalidEndBlockId().getSymbol());
+  }
+  | TagStart BlockId other_tag_parameters? TagEnd atom*? { reportTokenError("Missing End Tag"); }
+  | TagStart InvalidTagId other_tag_parameters? TagEnd {
+    reportTokenError("Invalid Tag", _localctx.InvalidTagId().getSymbol());
+  }
+  | TagStart InvalidEndTag { reportTokenError("Invalid Empty Tag"); }
+  ;
+
+simple_tag
+  : TagStart SimpleTagId other_tag_parameters? TagEnd
+  ;
 
 raw_tag
- : tagStart RawStart raw_body RawEnd TagEnd
+ : TagStart RawStart raw_body RawEnd TagEnd
  ;
 
 raw_body
@@ -73,39 +96,39 @@ raw_body
  ;
 
 comment_tag
- : tagStart CommentStart TagEnd .*? tagStart CommentEnd TagEnd
+ : TagStart CommentStart TagEnd .*? TagStart CommentEnd TagEnd
  ;
 
 other_than_tag_start
- : ~( TagStart | TagStart2 )*
+ : ~( TagStart )*
  ;
 
 if_tag
- : tagStart IfStart expr TagEnd block elsif_tag* else_tag? tagStart IfEnd TagEnd
+ : TagStart IfStart expr TagEnd block elsif_tag* else_tag? TagStart IfEnd TagEnd
  ;
 
 elsif_tag
- : tagStart Elsif expr TagEnd block
+ : TagStart Elsif expr TagEnd block
  ;
 
 else_tag
- : tagStart Else TagEnd block
+ : TagStart Else TagEnd block
  ;
 
 unless_tag
- : tagStart UnlessStart expr TagEnd block else_tag? tagStart UnlessEnd TagEnd
+ : TagStart UnlessStart expr TagEnd block else_tag? TagStart UnlessEnd TagEnd
  ;
 
 case_tag
- : tagStart CaseStart expr TagEnd other? when_tag+ else_tag? tagStart CaseEnd TagEnd
+ : TagStart CaseStart expr TagEnd other? when_tag+ else_tag? TagStart CaseEnd TagEnd
  ;
 
 when_tag
- : tagStart When term ((Or | Comma) term)* TagEnd block
+ : TagStart When term ((Or | Comma) term)* TagEnd block
  ;
 
 cycle_tag
- : tagStart Cycle cycle_group expr (Comma expr)* TagEnd
+ : TagStart Cycle cycle_group expr (Comma expr)* TagEnd
  ;
 
 cycle_group
@@ -118,19 +141,19 @@ for_tag
  ;
 
 for_array
- : tagStart ForStart Id In lookup Reversed? for_attribute* TagEnd
+ : TagStart ForStart Id In lookup Reversed? for_attribute* TagEnd
    for_block
-   tagStart ForEnd TagEnd
+   TagStart ForEnd TagEnd
  ;
 
 for_range
- : tagStart ForStart Id In OPar from=expr DotDot to=expr CPar Reversed? for_attribute* TagEnd
+ : TagStart ForStart Id In OPar from=expr DotDot to=expr CPar Reversed? for_attribute* TagEnd
    block
-   tagStart ForEnd TagEnd
+   TagStart ForEnd TagEnd
  ;
 
 for_block
- : a=block (tagStart Else TagEnd b=block)?
+ : a=block (TagStart Else TagEnd b=block)?
  ;
 
 for_attribute
@@ -145,17 +168,17 @@ attribute
  ;
 
 table_tag
- : tagStart TableStart Id In lookup attribute* TagEnd block tagStart TableEnd TagEnd
+ : TagStart TableStart Id In lookup attribute* TagEnd block TagStart TableEnd TagEnd
  ;
 
 capture_tag
- : tagStart CaptureStart Id TagEnd block tagStart CaptureEnd TagEnd  #capture_tag_Id
- | tagStart CaptureStart Str TagEnd block tagStart CaptureEnd TagEnd #capture_tag_Str
+ : TagStart CaptureStart Id TagEnd block TagStart CaptureEnd TagEnd  #capture_tag_Id
+ | TagStart CaptureStart Str TagEnd block TagStart CaptureEnd TagEnd #capture_tag_Str
  ;
 
 include_tag
- : {isLiquid()}? tagStart liquid=Include expr (With Str)? TagEnd
- | {isJekyll()}? tagStart jekyll=Include file_name_or_output (jekyll_include_params)* TagEnd
+ : {isLiquid()}? TagStart liquid=Include expr (With Str)? TagEnd
+ | {isJekyll()}? TagStart jekyll=Include file_name_or_output (jekyll_include_params)* TagEnd
  ;
 
 // only valid for Flavor.JEKYLL
@@ -187,7 +210,7 @@ param_expr
  ;
 
 assignment
- : tagStart Assign Id EqSign expr filter* TagEnd
+ : TagStart Assign Id EqSign expr filter* TagEnd
  ;
 
 expr
@@ -250,7 +273,9 @@ id
  | Offset
  | Continue
  | Reversed
- | EndId
+ | BlockId
+ | EndBlockId
+ | SimpleTagId
  ;
 
 id2
@@ -276,11 +301,6 @@ other_than_tag_end
 
 filename
  : ( . )+?
- ;
-
-tagStart
- : TagStart
- | TagStart2
  ;
 
 outStart

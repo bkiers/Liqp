@@ -33,6 +33,7 @@ public class DateTest {
         Filter.registerFilter(new Date());
     }
 
+    // NOTE: you have to put your machine in US/Eastern time for this test to pass
     @Test
     public void applyTest() throws RecognitionException {
 

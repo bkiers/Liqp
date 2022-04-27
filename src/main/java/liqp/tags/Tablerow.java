@@ -8,8 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-
-class Tablerow extends Tag {
+class Tablerow extends Block {
 
     private static final String COLS = "cols";
     private static final String LIMIT = "limit";

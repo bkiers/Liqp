@@ -61,12 +61,12 @@ public abstract class Tag extends LValue {
     }
 
     /**
-     * Retrieves a filter with a specific name.
+     * Retrieves a tag with a specific name.
      *
      * @param name
-     *         the name of the filter to retrieve.
+     *         the name of the tag to retrieve.
      *
-     * @return a filter with a specific name.
+     * @return a tag with a specific name.
      */
     public static Tag getTag(String name) {
 

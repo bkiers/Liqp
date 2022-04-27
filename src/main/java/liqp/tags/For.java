@@ -23,7 +23,7 @@ import liqp.parser.LiquidSupport;
  * https://shopify.dev/docs/themes/liquid/reference/objects/for-loops
  *
  */
-class For extends Tag {
+class For extends Block {
 
     private static final String OFFSET = "offset";
     private static final String LIMIT = "limit";

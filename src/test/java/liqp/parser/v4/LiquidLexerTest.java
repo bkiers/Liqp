@@ -1,5 +1,7 @@
 package liqp.parser.v4;
 
+import java.util.HashSet;
+import java.util.Set;
 import liquid.parser.v4.LiquidLexer;
 import org.antlr.v4.runtime.*;
 import org.junit.Test;
@@ -9,7 +11,6 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 public class LiquidLexerTest {
 
@@ -72,15 +73,54 @@ public class LiquidLexerTest {
     //   OutStart2 : '{{' -> pushMode(IN_TAG);
     @Test
     public void testOutStart2() {
-        assertThat(tokenise("{%{{").get(1).getType(), is(LiquidLexer.OutStart2));
-        assertThat(tokenise("{{{{").get(1).getType(), is(LiquidLexer.OutStart2));
+        assertThat(tokenise("{% include {{").get(4).getType(), is(LiquidLexer.OutStart2));
+        assertThat(tokenise("{{ with {{").get(4).getType(), is(LiquidLexer.OutStart2));
     }
 
-    //   TagStart2 : '{%' -> pushMode(IN_TAG);
     @Test
-    public void testTagStart2() {
-        assertThat(tokenise("{%{%").get(1).getType(), is(LiquidLexer.TagStart2));
-        assertThat(tokenise("{{{%").get(1).getType(), is(LiquidLexer.TagStart2));
+    public void testInvalidEndCustomTag() {
+        HashSet<String> blocks = new HashSet<>();
+        blocks.add("one");
+        assertThat(tokenise("{%one%}{%endbad%}", blocks, new HashSet<String>()).get(4).getType(), is(LiquidLexer.InvalidEndBlockId));
+    }
+
+    @Test
+    public void testInvalidCustomBlock() {
+        HashSet<String> blocks = new HashSet<>();
+        blocks.add("one");
+        List<Token> tokens = tokenise("{%other%}{%endother%}", blocks, new HashSet<String>());
+
+        assertThat(tokens.get(1).getType(), is(LiquidLexer.InvalidTagId));
+        assertThat(tokens.get(4).getType(), is(LiquidLexer.InvalidEndBlockId));
+    }
+
+    @Test
+    public void testInvalidCustomBlockEnd() {
+        HashSet<String> blocks = new HashSet<>();
+        blocks.add("one");
+        List<Token> tokens = tokenise("{%other%}{%endone%}", blocks, new HashSet<String>());
+
+        assertThat(tokens.get(1).getType(), is(LiquidLexer.InvalidTagId));
+        assertThat(tokens.get(4).getType(), is(LiquidLexer.InvalidEndBlockId));
+    }
+
+    @Test
+    public void testMismatchedEndCustomTag() {
+        HashSet<String> blocks = new HashSet<>();
+        blocks.add("one");
+        blocks.add("bad");
+        assertThat(tokenise("{%one%}{%endbad%}", blocks, new HashSet<String>()).get(4).getType(), is(LiquidLexer.MisMatchedEndBlockId));
+    }
+
+    @Test
+    public void testInvalidEndTag() {
+        List<Token> tagTokens = tokenise("{%%}");
+        assertThat(tagTokens.get(0).getType(), is(LiquidLexer.TagStart));
+        assertThat(tagTokens.get(1).getType(), is(LiquidLexer.InvalidEndTag));
+
+        List<Token> outTokens = tokenise("{%}}");
+        assertThat(outTokens.get(0).getType(), is(LiquidLexer.TagStart));
+        assertThat(outTokens.get(1).getType(), is(LiquidLexer.InvalidEndTag));
     }
 
     //   OutEnd
@@ -92,10 +132,10 @@ public class LiquidLexerTest {
     @Test
     public void testOutEnd() {
 
-        assertThat(tokenise("{%}}").get(1).getType(), is(LiquidLexer.OutEnd));
+        assertThat(tokenise("{%if}}").get(2).getType(), is(LiquidLexer.OutEnd));
         assertThat(tokenise("{{}}").get(1).getType(), is(LiquidLexer.OutEnd));
 
-        assertThat(tokenise("{%--}}").get(1).getType(), is(LiquidLexer.OutEnd));
+        assertThat(tokenise("{%-if-}}").get(2).getType(), is(LiquidLexer.OutEnd));
         assertThat(tokenise("{{--}}").get(1).getType(), is(LiquidLexer.OutEnd));
 
         // Trailing spaces
@@ -120,10 +160,10 @@ public class LiquidLexerTest {
     @Test
     public void testTagEnd() {
 
-        assertThat(tokenise("{%%}").get(1).getType(), is(LiquidLexer.TagEnd));
+        assertThat(tokenise("{%if%}").get(2).getType(), is(LiquidLexer.TagEnd));
         assertThat(tokenise("{{%}").get(1).getType(), is(LiquidLexer.TagEnd));
 
-        assertThat(tokenise("{%--%}").get(1).getType(), is(LiquidLexer.TagEnd));
+        assertThat(tokenise("{%-if-%}").get(2).getType(), is(LiquidLexer.TagEnd));
         assertThat(tokenise("{{--%}").get(1).getType(), is(LiquidLexer.TagEnd));
 
         // Trailing spaces
@@ -281,25 +321,25 @@ public class LiquidLexerTest {
     //   CaptureStart : 'capture';
     @Test
     public void testCaptureStart() {
-        assertThat(tokenise("{{capture").get(1).getType(), is(LiquidLexer.CaptureStart));
+        assertThat(tokenise("{%capture").get(1).getType(), is(LiquidLexer.CaptureStart));
     }
 
     //   CaptureEnd   : 'endcapture';
     @Test
     public void testCaptureEnd() {
-        assertThat(tokenise("{{endcapture").get(1).getType(), is(LiquidLexer.CaptureEnd));
+        assertThat(tokenise("{%endcapture").get(1).getType(), is(LiquidLexer.CaptureEnd));
     }
 
     //   CommentStart : 'comment';
     @Test
     public void testCommentStart() {
-        assertThat(tokenise("{{comment").get(1).getType(), is(LiquidLexer.CommentStart));
+        assertThat(tokenise("{%comment").get(1).getType(), is(LiquidLexer.CommentStart));
     }
 
     //   CommentEnd   : 'endcomment';
     @Test
     public void testCommentEnd() {
-        assertThat(tokenise("{{endcomment").get(1).getType(), is(LiquidLexer.CommentEnd));
+        assertThat(tokenise("{%endcomment").get(1).getType(), is(LiquidLexer.CommentEnd));
     }
 
     //   RawStart     : 'raw' WhitespaceChar* '%}' -> pushMode(IN_RAW);
@@ -312,37 +352,37 @@ public class LiquidLexerTest {
     //   IfStart      : 'if';
     @Test
     public void testIfStart() {
-        assertThat(tokenise("{{if").get(1).getType(), is(LiquidLexer.IfStart));
+        assertThat(tokenise("{%if").get(1).getType(), is(LiquidLexer.IfStart));
     }
 
     //   Elsif        : 'elsif';
     @Test
     public void testElsif() {
-        assertThat(tokenise("{{elsif").get(1).getType(), is(LiquidLexer.Elsif));
+        assertThat(tokenise("{%elsif").get(1).getType(), is(LiquidLexer.Elsif));
     }
 
     //   IfEnd        : 'endif';
     @Test
     public void testIfEnd() {
-        assertThat(tokenise("{{endif").get(1).getType(), is(LiquidLexer.IfEnd));
+        assertThat(tokenise("{%endif").get(1).getType(), is(LiquidLexer.IfEnd));
     }
 
     //   UnlessStart  : 'unless';
     @Test
     public void testUnlessStart() {
-        assertThat(tokenise("{{unless").get(1).getType(), is(LiquidLexer.UnlessStart));
+        assertThat(tokenise("{%unless").get(1).getType(), is(LiquidLexer.UnlessStart));
     }
 
     //   UnlessEnd    : 'endunless';
     @Test
     public void testUnlessEnd() {
-        assertThat(tokenise("{{endunless").get(1).getType(), is(LiquidLexer.UnlessEnd));
+        assertThat(tokenise("{%endunless").get(1).getType(), is(LiquidLexer.UnlessEnd));
     }
 
     //   Else         : 'else';
     @Test
     public void testElse() {
-        assertThat(tokenise("{{else").get(1).getType(), is(LiquidLexer.Else));
+        assertThat(tokenise("{%else").get(1).getType(), is(LiquidLexer.Else));
     }
 
     //   Contains     : 'contains';
@@ -354,37 +394,37 @@ public class LiquidLexerTest {
     //   CaseStart    : 'case';
     @Test
     public void testCaseStart() {
-        assertThat(tokenise("{{case").get(1).getType(), is(LiquidLexer.CaseStart));
+        assertThat(tokenise("{%case").get(1).getType(), is(LiquidLexer.CaseStart));
     }
 
     //   CaseEnd      : 'endcase';
     @Test
     public void testCaseEnd() {
-        assertThat(tokenise("{{endcase").get(1).getType(), is(LiquidLexer.CaseEnd));
+        assertThat(tokenise("{%endcase").get(1).getType(), is(LiquidLexer.CaseEnd));
     }
 
     //   When         : 'when';
     @Test
     public void testWhen() {
-        assertThat(tokenise("{{when").get(1).getType(), is(LiquidLexer.When));
+        assertThat(tokenise("{%when").get(1).getType(), is(LiquidLexer.When));
     }
 
     //   Cycle        : 'cycle';
     @Test
     public void testCycle() {
-        assertThat(tokenise("{{cycle").get(1).getType(), is(LiquidLexer.Cycle));
+        assertThat(tokenise("{%cycle").get(1).getType(), is(LiquidLexer.Cycle));
     }
 
     //   ForStart     : 'for';
     @Test
     public void testForStart() {
-        assertThat(tokenise("{{for").get(1).getType(), is(LiquidLexer.ForStart));
+        assertThat(tokenise("{%for").get(1).getType(), is(LiquidLexer.ForStart));
     }
 
     //   ForEnd       : 'endfor';
     @Test
     public void testForEnd() {
-        assertThat(tokenise("{{endfor").get(1).getType(), is(LiquidLexer.ForEnd));
+        assertThat(tokenise("{%endfor").get(1).getType(), is(LiquidLexer.ForEnd));
     }
 
     //   In           : 'in';
@@ -408,19 +448,19 @@ public class LiquidLexerTest {
     //   TableStart   : 'tablerow';
     @Test
     public void testTableStart() {
-        assertThat(tokenise("{{tablerow").get(1).getType(), is(LiquidLexer.TableStart));
+        assertThat(tokenise("{%tablerow").get(1).getType(), is(LiquidLexer.TableStart));
     }
 
     //   TableEnd     : 'endtablerow';
     @Test
     public void testTableEnd() {
-        assertThat(tokenise("{{endtablerow").get(1).getType(), is(LiquidLexer.TableEnd));
+        assertThat(tokenise("{%endtablerow").get(1).getType(), is(LiquidLexer.TableEnd));
     }
 
     //   Assign       : 'assign';
     @Test
     public void testAssign() {
-        assertThat(tokenise("{{assign").get(1).getType(), is(LiquidLexer.Assign));
+        assertThat(tokenise("{%assign").get(1).getType(), is(LiquidLexer.Assign));
     }
 
     //   True         : 'true';
@@ -444,7 +484,7 @@ public class LiquidLexerTest {
     //   Include      : 'include';
     @Test
     public void testInclude() {
-        assertThat(tokenise("{{include").get(1).getType(), is(LiquidLexer.Include));
+        assertThat(tokenise("{%include").get(1).getType(), is(LiquidLexer.Include));
     }
 
     //   With         : 'with';
@@ -465,17 +505,38 @@ public class LiquidLexerTest {
         assertThat(tokenise("{{blank").get(1).getType(), is(LiquidLexer.Blank));
     }
 
-
-    //   EndId        : 'end' Id;
     @Test
-    public void testEndId() {
-        assertThat(tokenise("{{endfoo").get(1).getType(), is(LiquidLexer.EndId));
+    public void testInvalidEndBlockId() {
+        // with no registered tags, this is not a valid end blockId
+        assertThat(tokenise("{%endfoo").get(1).getType(), is(LiquidLexer.InvalidEndBlockId));
     }
 
-    //   Id : ( Letter | '_' ) (Letter | '_' | '-' | Digit)*;
+    @Test
+    public void testBlockId() {
+        HashSet<String> tags = new HashSet<>();
+        tags.add("simple");
+        HashSet<String> blocks = new HashSet<>();
+        blocks.add("block");
+
+        List<Token>tokens = tokenise("{%block%}{%simple%}{%endblock%}", blocks, tags);
+        assertThat(tokens.get(1).getType(), is(LiquidLexer.BlockId));
+
+        assertThat(tokens.get(4).getType(), is(LiquidLexer.SimpleTagId));
+        assertThat(tokens.get(7).getType(), is(LiquidLexer.EndBlockId));
+
+        List<Token>tokens2 = tokenise("{%if stuff = \"hi\"%}{%endif%}");
+        assertThat(tokens2.get(1).getType(), is(LiquidLexer.IfStart));
+
+        assertThat(tokens2.get(3).getType(), is(LiquidLexer.Id));
+        assertThat(tokens2.get(10).getType(), is(LiquidLexer.IfEnd));
+    }
+
+    //   Id : ( Letter | '_' | Digit ) (Letter | '_' | '-' | Digit)*;
     @Test
     public void testId() {
         assertThat(tokenise("{{fubar").get(1).getType(), is(LiquidLexer.Id));
+        // ruby liquid identifiers can start with a number
+        assertThat(tokenise("{{3ubar").get(1).getType(), is(LiquidLexer.Id));
     }
 
     // mode IN_RAW;
@@ -508,12 +569,19 @@ public class LiquidLexerTest {
     }
 
     private static List<Token> tokenise(String source) {
-        return tokenise(source, false, true);
+        return tokenise(source, new HashSet<String>(), new HashSet<String>());
+    }
+
+    private static List<Token> tokenise(String source, Set<String> blocks, Set<String> tags) {
+        return tokenise(source, false, true, blocks, tags);
     }
 
     private static List<Token> tokenise(String source, boolean stripSpacesAroundTags, boolean discardEof) {
+        return tokenise(source, stripSpacesAroundTags, discardEof, new HashSet<String>(), new HashSet<String>());
+    }
 
-        CommonTokenStream tokenStream = commonTokenStream(source, stripSpacesAroundTags);
+    private static List<Token> tokenise(String source, boolean stripSpacesAroundTags, boolean discardEof, Set<String> blocks, Set<String> tags) {
+        CommonTokenStream tokenStream = commonTokenStream(source, stripSpacesAroundTags, blocks, tags);
         tokenStream.fill();
         List<Token> tokens = tokenStream.getTokens();
 
@@ -528,8 +596,21 @@ public class LiquidLexerTest {
         return commonTokenStream(source, false);
     }
 
-    static CommonTokenStream commonTokenStream(String source, boolean stripSpacesAroundTags) {
+    static CommonTokenStream commonTokenStream(String source, boolean stripSpacesAroundTags, Set<String> blocks, Set<String> tags) {
 
+        LiquidLexer lexer = new LiquidLexer(CharStreams.fromString(source), stripSpacesAroundTags, blocks, tags);
+
+        lexer.addErrorListener(new BaseErrorListener(){
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        return new CommonTokenStream(lexer);
+    }
+
+    static CommonTokenStream commonTokenStream(String source, boolean stripSpacesAroundTags) {
         LiquidLexer lexer = new LiquidLexer(CharStreams.fromString(source), stripSpacesAroundTags);
 
         lexer.addErrorListener(new BaseErrorListener(){

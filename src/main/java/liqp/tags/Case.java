@@ -5,7 +5,7 @@ import liqp.TemplateContext;
 import liqp.nodes.BlockNode;
 import liqp.nodes.LNode;
 
-class Case extends Tag {
+class Case extends Block {
 
     /*
      * Block tag, its the standard case...when block

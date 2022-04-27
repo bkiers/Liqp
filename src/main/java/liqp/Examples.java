@@ -1,8 +1,10 @@
 package liqp;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
+import liqp.tags.Block;
 import liqp.tags.Tag;
 import java.util.HashMap;
 import java.util.Map;
@@ -119,7 +121,7 @@ public class Examples {
 
     private static void customLoopTag() {
 
-        Tag.registerTag(new Tag("loop"){
+        Tag.registerTag(new Block("loop"){
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
 
@@ -146,10 +148,9 @@ public class Examples {
     }
 
     public static void instanceTag() {
-
         String source = "{% loop 5 %}looping!\n{% endloop %}";
-
-        Template template = Template.parse(source).with(new Tag("loop"){
+        List<Tag> tags = new ArrayList<>();
+        tags.add(new Block("loop"){
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
 
@@ -166,6 +167,8 @@ public class Examples {
             }
         });
 
+        Template template = Template.parse(source, tags, new ArrayList<Filter>());
+
         String rendered = template.render();
 
         System.out.println(rendered);
@@ -173,7 +176,8 @@ public class Examples {
 
     public static void instanceFilter() {
 
-        Template template = Template.parse("{{ numbers | sum }}").with(new Filter("sum"){
+        List<Filter> filters = new ArrayList<>();
+        filters.add(new Filter("sum"){
             @Override
             public Object apply(Object value, TemplateContext context, Object... params) {
 
@@ -188,6 +192,8 @@ public class Examples {
                 return sum;
             }
         });
+
+        Template template = Template.parse("{{ numbers | sum }}", new ArrayList<Tag>(), filters);
 
         String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
         System.out.println(rendered);

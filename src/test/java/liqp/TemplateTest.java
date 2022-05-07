@@ -1,9 +1,10 @@
 package liqp;
 
+import liqp.filters.Filter;
+import liqp.blocks.Block;
+import liqp.tags.Tag;
 import liqp.nodes.LNode;
 import liqp.parser.Inspectable;
-import liqp.tags.Block;
-import liqp.tags.Tag;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -19,6 +20,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -238,6 +240,66 @@ public class TemplateTest {
         } catch (Exception e) {
             assertEquals("parser error \"Invalid Tag: 'custom_tag'\" on line 1, index 3", e.getMessage());
         }
+    }
+    
+    @Test
+    public void testWithCustomTag() {
+        // given
+        Template template = Template.parse("{% custom_tag %}", new ParseSettings.Builder()
+                .with(new Tag("custom_tag") {
+                    @Override
+                    public Object render(TemplateContext context, LNode... nodes) {
+                        return "xxx";
+                    }
+                })
+                .build());
+        
+        // then
+        assertEquals("xxx", template.render());
+    }
+
+    @Test
+    public void testWithCustomBlock() {
+        // given
+        Template template = Template.parse("{% custom_uppercase_block %} some text {% endcustom_uppercase_block %}", new ParseSettings.Builder()
+                .with(new Block("custom_uppercase_block") {
+                    @Override
+                    public Object render(TemplateContext context, LNode... nodes) {
+                        LNode block = nodes[0];
+                        Object res = block.render(context);
+                        if (res != null) {
+                            return res.toString().toUpperCase(Locale.US);
+                        }
+                        return null;
+                    }
+                })
+                .build());
+
+        // then
+        assertEquals(" SOME TEXT ", template.render());
+    }
+
+    @Test
+    public void testWithCustomFilter() {
+        // given
+        Template template = Template.parse("{{ numbers | sum }}", new ParseSettings.Builder()
+                .with(new Filter("sum"){
+                    @Override
+                    public Object apply(Object value, TemplateContext context, Object... params) {
+                        Object[] numbers = super.asArray(value, context);
+                        double sum = 0;
+                        for(Object obj : numbers) {
+                            sum += super.asNumber(obj).doubleValue();
+                        }
+                        return sum;
+                    }
+                })
+                .build());
+
+        String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
+
+        // then
+        assertEquals("15.0", rendered);
     }
 
     private Map<String, Object> getDeepData() {

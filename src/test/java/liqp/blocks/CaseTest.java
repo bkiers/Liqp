@@ -1,4 +1,4 @@
-package liqp.tags;
+package liqp.blocks;
 
 import liqp.Template;
 import liqp.exceptions.LiquidException;

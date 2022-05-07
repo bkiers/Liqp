@@ -1,4 +1,4 @@
-package liqp.tags;
+package liqp.blocks;
 
 import liqp.Template;
 import org.antlr.v4.runtime.RecognitionException;

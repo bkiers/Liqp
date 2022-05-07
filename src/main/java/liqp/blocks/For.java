@@ -1,4 +1,4 @@
-package liqp.tags;
+package liqp.blocks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import liqp.LValue;
 import liqp.TemplateContext;
 import liqp.nodes.AtomNode;
 import liqp.nodes.BlockNode;
@@ -23,7 +22,7 @@ import liqp.parser.LiquidSupport;
  * https://shopify.dev/docs/themes/liquid/reference/objects/for-loops
  *
  */
-class For extends Block {
+public class For extends Block {
 
     private static final String OFFSET = "offset";
     private static final String LIMIT = "limit";
@@ -178,12 +177,12 @@ class For extends Block {
                 continue;
             }
 
-            if(value == LValue.CONTINUE) {
+            if(value == CONTINUE) {
                 // break from this inner loop: equals continue outer loop!
                 break;
             }
 
-            if(value == LValue.BREAK) {
+            if(value == BREAK) {
                 // break from inner loop
                 isBreak = true;
                 break;
@@ -277,7 +276,7 @@ class For extends Block {
             LNode token = tokens[i];
             Object[] attribute = super.asArray(token.render(context), context);
             // offset:continue
-            if (OFFSET.equals(super.asString(attribute[0], context)) && attribute[1] == LValue.CONTINUE) {
+            if (OFFSET.equals(super.asString(attribute[0], context)) && attribute[1] == CONTINUE) {
                 //      offsets = context.registers[:for] ||= {}
                 //      from = if @from == :continue
                 //        offsets[@name].to_i

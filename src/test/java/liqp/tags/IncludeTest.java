@@ -4,6 +4,7 @@ import liqp.*;
 import liqp.exceptions.LiquidException;
 import liqp.exceptions.VariableNotExistException;
 import liqp.filters.Filter;
+import liqp.tags.Include;
 import liqp.parser.Flavor;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Before;

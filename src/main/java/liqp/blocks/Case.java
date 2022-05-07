@@ -1,11 +1,10 @@
-package liqp.tags;
+package liqp.blocks;
 
-import liqp.LValue;
 import liqp.TemplateContext;
 import liqp.nodes.BlockNode;
 import liqp.nodes.LNode;
 
-class Case extends Block {
+public class Case extends Block {
 
     /*
      * Block tag, its the standard case...when block
@@ -39,7 +38,7 @@ class Case extends Block {
 
                     Object whenExpressionValue = node.render(context);
 
-                    if (LValue.areEqual(condition, whenExpressionValue)) {
+                    if (areEqual(condition, whenExpressionValue)) {
                         hit = true;
                     }
 

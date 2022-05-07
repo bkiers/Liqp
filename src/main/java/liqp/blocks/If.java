@@ -1,9 +1,9 @@
-package liqp.tags;
+package liqp.blocks;
 
 import liqp.TemplateContext;
 import liqp.nodes.LNode;
 
-class If extends Block {
+public class If extends Block {
 
     /*
      * Standard if/else block

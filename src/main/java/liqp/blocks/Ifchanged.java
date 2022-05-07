@@ -1,4 +1,4 @@
-package liqp.tags;
+package liqp.blocks;
 
 import liqp.TemplateContext;
 import liqp.nodes.LNode;

@@ -3,8 +3,12 @@ package liqp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import liqp.filters.Filter;
 import liqp.parser.Flavor;
-import liqp.spi.SPIHelper;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ParseSettings {
 
@@ -14,6 +18,8 @@ public class ParseSettings {
     public final boolean stripSpacesAroundTags;
     public final boolean stripSingleLine;
     public final ObjectMapper mapper;
+    public final List<Insertion> insertions;
+    public final List<Filter> filters;
 
     public static class Builder {
 
@@ -21,6 +27,9 @@ public class ParseSettings {
         boolean stripSpacesAroundTags;
         boolean stripSingleLine;
         ObjectMapper mapper;
+        List<Insertion> insertions = new ArrayList<>();
+        List<Filter> filters = new ArrayList<>();
+        
 
         public Builder() {
             this.flavor = DEFAULT_FLAVOR;
@@ -54,16 +63,28 @@ public class ParseSettings {
             this.mapper = mapper;
             return this;
         }
+        
+        public Builder with(Insertion insertion) {
+            this.insertions.add(insertion);
+            return this;
+        }
+        
+        public Builder with(Filter filter) {
+            filters.add(filter);
+            return this;
+        }
 
         public ParseSettings build() {
-            return new ParseSettings(this.flavor, this.stripSpacesAroundTags, this.stripSingleLine, this.mapper);
+            return new ParseSettings(this.flavor, this.stripSpacesAroundTags, this.stripSingleLine, this.mapper, this.insertions, this.filters);
         }
     }
 
-    private ParseSettings(Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine, ObjectMapper mapper) {
+    private ParseSettings(Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine, ObjectMapper mapper, List<Insertion> insertions, List<Filter> filters) {
         this.flavor = flavor;
         this.stripSpacesAroundTags = stripSpacesAroundTags;
         this.stripSingleLine = stripSingleLine;
         this.mapper = mapper;
+        this.insertions = Collections.unmodifiableList(insertions);
+        this.filters = Collections.unmodifiableList(filters);
     }
 }

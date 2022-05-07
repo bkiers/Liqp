@@ -1,53 +1,14 @@
 package liqp.tags;
 
-import liqp.LValue;
-import liqp.TemplateContext;
-import liqp.nodes.LNode;
-
-import java.util.HashMap;
-import java.util.Map;
+import liqp.Insertion;
 
 /**
  * Tags are used for the logic in a template.
  */
-public abstract class Tag extends LValue {
+public abstract class Tag extends Insertion {
 
-    /**
-     * A map holding all tags.
-     */
-    private static final Map<String, Tag> TAGS = new HashMap<String, Tag>();
-
-    static {
-        // Register all standard tags.
-        registerTag(new Assign());
-        registerTag(new Break());
-        registerTag(new Capture());
-        registerTag(new Case());
-        registerTag(new Comment());
-        registerTag(new Continue());
-        registerTag(new Cycle());
-        registerTag(new Decrement());
-        registerTag(new For());
-        registerTag(new If());
-        registerTag(new Ifchanged());
-        registerTag(new Include());
-        registerTag(new Increment());
-        registerTag(new Raw());
-        registerTag(new Tablerow());
-        registerTag(new Unless());
-    }
-
-    /**
-     * The name of this tag.
-     */
-    public final String name;
-
-    /**
-     * Used for all package protected tags in the liqp.tags-package
-     * whose name is their class name lower cased.
-     */
     protected Tag() {
-        this.name = this.getClass().getSimpleName().toLowerCase();
+        super();
     }
 
     /**
@@ -57,8 +18,17 @@ public abstract class Tag extends LValue {
      *         the name of the tag.
      */
     public Tag(String name) {
-        this.name = name;
+        super(name);
     }
+
+    /**
+     * Variant of {@link #registerInsertion(Insertion)} with strict limitation to {@link Tag} subtype.
+     * For clear API and backward compatibility.
+     */
+    public static void registerTag(Tag tag) {
+        registerInsertion(tag);
+    }
+
 
     /**
      * Retrieves a tag with a specific name.
@@ -68,9 +38,9 @@ public abstract class Tag extends LValue {
      *
      * @return a tag with a specific name.
      */
-    public static Tag getTag(String name) {
+    public static Insertion getTag(String name) {
 
-        Tag tag = TAGS.get(name);
+        Insertion tag = getInsertions().get(name);
 
         if (tag == null) {
             throw new RuntimeException("unknown tag: " + name);
@@ -78,38 +48,5 @@ public abstract class Tag extends LValue {
 
         return tag;
     }
-
-    /**
-     * Returns all default tags.
-     *
-     * @return all default tags.
-     */
-    public static Map<String, Tag> getTags() {
-        return new HashMap<String, Tag>(TAGS);
-    }
-
-    /**
-     * Registers a new tag.
-     *
-     * @param tag
-     *         the tag to be registered.
-     */
-    public static void registerTag(Tag tag) {
-        TAGS.put(tag.name, tag);
-    }
-
-    /**
-     * Renders this tag.
-     *
-     * @param context
-     *         the context (variables) with which this
-     *         node should be rendered.
-     * @param nodes
-     *         the nodes of this tag is created with. See
-     *         the file `src/grammar/LiquidWalker.g` to see
-     *         how each of the tags is created.
-     *
-     * @return an Object denoting the rendered AST.
-     */
-    public abstract Object render(TemplateContext context, LNode... nodes);
+    
 }

@@ -11,9 +11,8 @@ import liqp.parser.LiquidSupport;
 import liqp.parser.v4.NodeVisitor;
 import liqp.spi.BasicTypesSupport;
 import liqp.spi.SPIHelper;
-import liqp.tags.Block;
+import liqp.blocks.Block;
 import liqp.tags.Include;
-import liqp.tags.Tag;
 import liquid.parser.v4.LiquidLexer;
 import liquid.parser.v4.LiquidParser;
 import org.antlr.v4.runtime.*;
@@ -48,9 +47,9 @@ public class Template {
     private final ParseTree root;
 
     /**
-     * This instance's tags.
+     * This instance's insertions.
      */
-    private final Map<String, Tag> tags;
+    private final Map<String, Insertion> insertions;
 
     /**
      * This instance's filters.
@@ -73,19 +72,24 @@ public class Template {
      * Creates a new Template instance from a given input.
      *  @param input
      *         the file holding the Liquid source.
-     * @param tags
-     *         the tags this instance will make use of.
+     * @param insertions
+     *         the insertions this instance will make use of.
      * @param filters
      *         the filters this instance will make use of.
      */
-    private Template(String input, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings) {
-
-        this.tags = tags;
+    private Template(String input, Map<String, Insertion> insertions, Map<String, Filter> filters, ParseSettings parseSettings) {
+        this.insertions = insertions;
         this.filters = filters;
+        for(Filter f: parseSettings.filters) {
+            this.filters.put(f.name, f);
+        }
         this.parseSettings = parseSettings;
 
         // split tags and blocks
-        List<Set<String>> tagsAndBlocks = partitionBlocksAndTags(tags);
+        for(Insertion i: parseSettings.insertions) {
+            this.insertions.put(i.name, i);
+        }
+        List<Set<String>> tagsAndBlocks = partitionBlocksAndTags(insertions);
         Set<String> blockNames = tagsAndBlocks.get(0);
         Set<String> tagNames = tagsAndBlocks.get(1);
 
@@ -103,14 +107,20 @@ public class Template {
         }
     }
 
-    private Template(InputStream input, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings) {
+    private Template(InputStream input, Map<String, Insertion> insertions, Map<String, Filter> filters, ParseSettings parseSettings) {
 
-        this.tags = tags;
+        this.insertions = insertions;
         this.filters = filters;
+        for(Filter f: parseSettings.filters) {
+            this.filters.put(f.name, f);
+        }
         this.parseSettings = parseSettings;
 
         // split tags and blocks
-        List<Set<String>> tagsAndBlocks = partitionBlocksAndTags(tags);
+        for(Insertion i: parseSettings.insertions) {
+            this.insertions.put(i.name, i);
+        }
+        List<Set<String>> tagsAndBlocks = partitionBlocksAndTags(insertions);
         Set<String> blockNames = tagsAndBlocks.get(0);
         Set<String> tagNames = tagsAndBlocks.get(1);
 
@@ -127,33 +137,13 @@ public class Template {
             throw new RuntimeException("could not parse input: " + input, e);
         }
     }
-
-    // main private constructor
-    private Template (CharStream stream, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings) {
-        this.tags = tags;
-        this.filters = filters;
-        this.parseSettings = parseSettings;
-
-        // split tags and blocks
-        List<Set<String>> tagsAndBlocks = partitionBlocksAndTags(tags);
-        Set<String> blockNames = tagsAndBlocks.get(0);
-        Set<String> tagNames = tagsAndBlocks.get(1);
-
-        try {
-            this.templateSize = stream.size();
-            LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine, blockNames, tagNames);
-            root = parse(lexer);
-        } catch (LiquidException e) {
-            throw e;
-        }
-    }
-
+    
     /**
      * Creates a new Template instance from a given input.
      *  @param input
      *         the file holding the Liquid source.
-     * @param tags
-     *         the tags this instance will make use of.
+     * @param insertions
+     *         the insertions this instance will make use of.
      * @param filters
      *         the filters this instance will make use of.
      * @param parseSettings
@@ -161,10 +151,10 @@ public class Template {
      * @param renderSettings
      *         the renderSettings this instance will make use of.
      */
-    private Template(String input, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings,
-        RenderSettings renderSettings) {
+    private Template(String input, Map<String, Insertion> insertions, Map<String, Filter> filters, ParseSettings parseSettings,
+                     RenderSettings renderSettings) {
 
-        this(input, tags, filters, parseSettings);
+        this(input, insertions, filters, parseSettings);
         this.renderSettings = renderSettings;
     }
 
@@ -174,14 +164,20 @@ public class Template {
      * @param file
      *         the file holding the Liquid source.
      */
-    private Template(File file, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings) throws IOException {
-        this.tags = tags;
+    private Template(File file, Map<String, Insertion> insertions, Map<String, Filter> filters, ParseSettings parseSettings) throws IOException {
+        this.insertions = insertions;
         this.filters = filters;
+        for(Filter f: parseSettings.filters) {
+            this.filters.put(f.name, f);
+        }
         this.parseSettings = parseSettings;
         CharStream stream = CharStreams.fromFileName(file.getAbsolutePath());
 
         // split tags and blocks
-        List<Set<String>> tagsAndBlocks = partitionBlocksAndTags(tags);
+        for(Insertion i: parseSettings.insertions) {
+            this.insertions.put(i.name, i);
+        }
+        List<Set<String>> tagsAndBlocks = partitionBlocksAndTags(insertions);
         Set<String> blockNames = tagsAndBlocks.get(0);
         Set<String> tagNames = tagsAndBlocks.get(1);
 
@@ -195,12 +191,12 @@ public class Template {
         }
     }
 
-    private static List<Set<String>> partitionBlocksAndTags(Map<String, Tag> tags) {
+    private static List<Set<String>> partitionBlocksAndTags(Map<String, Insertion> tags) {
         Set<String> blockNames = new HashSet<>();
         Set<String> tagNames = new HashSet<>();
 
         for (String name : tags.keySet()) {
-            Tag t = tags.get(name);
+            Insertion t = tags.get(name);
             if (t instanceof Block) {
                 blockNames.add(name);
             } else {
@@ -218,8 +214,8 @@ public class Template {
      *
      * @param file
      *         the file holding the Liquid source.
-     * @param tags
-     *         the tags this instance will make use of.
+     * @param insertions
+     *         the insertions this instance will make use of.
      * @param filters
      *         the filters this instance will make use of.
      * @param parseSettings
@@ -227,10 +223,10 @@ public class Template {
      * @param renderSettings
      *         the renderSettings this instance will make use of.
      */
-    private Template(File file, Map<String, Tag> tags, Map<String, Filter> filters, ParseSettings parseSettings,
-        RenderSettings renderSettings) throws IOException {
+    private Template(File file, Map<String, Insertion> insertions, Map<String, Filter> filters, ParseSettings parseSettings,
+                     RenderSettings renderSettings) throws IOException {
 
-        this(file, tags, filters, parseSettings);
+        this(file, insertions, filters, parseSettings);
         this.renderSettings = renderSettings;
     }
 
@@ -286,25 +282,25 @@ public class Template {
      * @return a new Template instance from a given input string.
      */
     public static Template parse(String input) {
-        return new Template(input, Tag.getTags(), Filter.getFilters(ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
+        return new Template(input, Insertion.getInsertions(), Filter.getFilters(ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
     }
 
   /**
    * Returns a new Template instance from a given input string with a specified set of
-   * tags and filters
+   * insertions and filters
    *
    * @param input
    *         the input string holding the Liquid source.
-   * @param tags
-   *         the list of tags to use when parsing and rendering the template
+   * @param insertions
+   *         the list of insertions to use when parsing and rendering the template
    * @param filters
    *         the list of filters to use when parsing and rendering the template
    *
    * @return a new Template instance from a given input string.
    */
-    public static Template parse(String input, List<Tag> tags, List<Filter> filters) {
+    public static Template parse(String input, List<Insertion> insertions, List<Filter> filters) {
 
-        return parse(input, tags, filters, new ParseSettings.Builder().build(), new RenderSettings.Builder().build());
+        return parse(input, insertions, filters, new ParseSettings.Builder().build(), new RenderSettings.Builder().build());
     }
 
     /**
@@ -316,31 +312,31 @@ public class Template {
      * @return a new Template instance from a given input file.
      */
     public static Template parse(File file) throws IOException {
-        return new Template(file, Tag.getTags(), Filter.getFilters(ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
+        return new Template(file, Insertion.getInsertions(), Filter.getFilters(ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
     }
 
     public static Template parse(File file, ParseSettings settings) throws IOException {
-        return new Template(file, Tag.getTags(), Filter.getFilters(settings.flavor), settings);
+        return new Template(file, Insertion.getInsertions(), Filter.getFilters(settings.flavor), settings);
     }
 
     public static Template parse(String input, ParseSettings settings) {
-        return new Template(input, Tag.getTags(), Filter.getFilters(settings.flavor), settings);
+        return new Template(input, Insertion.getInsertions(), Filter.getFilters(settings.flavor), settings);
     }
 
     public static Template parse(File file, ParseSettings parseSettings, RenderSettings renderSettings) throws IOException {
-        return new Template(file, Tag.getTags(), Filter.getFilters(parseSettings.flavor), parseSettings, renderSettings);
+        return new Template(file, Insertion.getInsertions(), Filter.getFilters(parseSettings.flavor), parseSettings, renderSettings);
     }
 
     public static Template parse(String  template, ParseSettings parseSettings, RenderSettings renderSettings) {
-        return new Template(template, Tag.getTags(), Filter.getFilters(parseSettings.flavor), parseSettings, renderSettings);
+        return new Template(template, Insertion.getInsertions(), Filter.getFilters(parseSettings.flavor), parseSettings, renderSettings);
     }
 
     public static Template parse(InputStream input) {
-        return new Template(input, Tag.getTags(), Filter.getFilters(ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
+        return new Template(input, Insertion.getInsertions(), Filter.getFilters(ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
     }
 
     public static Template parse(InputStream input, ParseSettings settings) {
-        return new Template(input, Tag.getTags(), Filter.getFilters(settings.flavor), settings);
+        return new Template(input, Insertion.getInsertions(), Filter.getFilters(settings.flavor), settings);
     }
 
     @Deprecated // Use `parse(file, settings)` instead
@@ -355,9 +351,9 @@ public class Template {
         return parse(input, settings);
     }
 
-    public static Template parse(String input, List<Tag> tags, List<Filter> filters, ParseSettings parseSettings, RenderSettings renderSettings) {
-      Map<String, Tag> tagMap = new HashMap<>();
-      for (Tag tag : tags) {
+    public static Template parse(String input, List<Insertion> insertions, List<Filter> filters, ParseSettings parseSettings, RenderSettings renderSettings) {
+      Map<String, Insertion> tagMap = new HashMap<>();
+      for (Insertion tag : insertions) {
         tagMap.put(tag.name, tag);
       }
 
@@ -380,7 +376,7 @@ public class Template {
     }
 
     /**
-     * Sometimes the custom tags needs to return some extra-data, that is not rendarable.
+     * Sometimes the custom insertions needs to return some extra-data, that is not rendarable.
      * Best way to allow this and keeping existing
      * simplicity(when the result is a string) is: provide holder with container for that data.
      * Best container is current templateContext, and it is set into this holder during creation.
@@ -561,7 +557,7 @@ public class Template {
         }
         variables = renderSettings.evaluate(parseSettings.mapper, variables);
 
-        final NodeVisitor visitor = new NodeVisitor(this.tags, this.filters, this.parseSettings);
+        final NodeVisitor visitor = new NodeVisitor(this.insertions, this.filters, this.parseSettings);
         try {
             LNode node = visitor.visit(root);
             if (parent == null) {

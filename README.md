@@ -199,9 +199,9 @@ You can do that as follows:
 // first register your custom filter
 Filter.registerFilter(new Filter("b"){
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
         // create a string from the  value
-        String text = super.asString(value);
+        String text = super.asString(value, context);
 
         // replace and return *...* with <strong>...</strong>
         return text.replaceAll("\\*(\\w(.*?\\w)?)\\*", "<strong>$1</strong>");
@@ -222,10 +222,10 @@ And to use an optional parameter in your filter, do something like this:
 // first register your custom filter
 Filter.registerFilter(new Filter("repeat"){
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         // get the text of the value
-        String text = super.asString(value);
+        String text = super.asString(value, context);
 
         // check if an optional parameter is provided
         int times = params.length == 0 ? 1 : super.asNumber(params[0]).intValue();
@@ -254,9 +254,9 @@ You can use an array (or list) as well, and can also return a numerical value:
 ```java
 Filter.registerFilter(new Filter("sum"){
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        Object[] numbers = super.asArray(value);
+        Object[] numbers = super.asArray(value, context);
 
         double sum = 0;
 
@@ -277,27 +277,47 @@ System.out.println(rendered);
 ```
 In short, override one of the `apply()` methods of the `Filter` class to create your own custom filter behaviour.
 
-### 2.2 Custom tags
 
-Let's say you would like to create a tag that makes it easy to loop for a fixed amount of times,
+
+### 2.2 Tags and blocks
+Both blocks and tags are kinds of insertions. Literally: `Block extends Insertion` and `Tag extends Insertion`. Class `Insertion` used as basic abstraction for parser. 
+Let's define the difference between tags and blocks. 
+
+#### Tags
+Tag is simple insertion in the template that will be processed and the result of it will be replaced in output, if any. Example is `include` tag: 
+```liquid
+See these data: {% include data.liquid %}
+```
+Another example is `assign` tag: 
+```liquid
+{% assign name='Joe' %}
+Hello {{name}}!
+```
+It has no input but still is an insertion.
+
+#### Blocks
+Block is a kind of insertions that wraps some text and/or other blocks or tags and perform some operations on the given input. Blocks have opening and closing tags. Example of block is `if`:
+```liquid
+{% if user %} Hello {{ user.name }} {% endif %}"
+```
+where `{% if user %}` is opening tag and `{% endif %}` is closing one. The `user` in this sample is just a parameter for given block.
+
+#### Custom Tags and Blocks
+Let's say you would like to create a block that makes it easy to loop for a fixed amount of times,
 executing a block of Liquid code.
 
-Here's a way to create, and use, such a custom `loop` tag:
+Here's a way to create, and use, such a custom `loop` block:
 
 ```java
-Tag.registerTag(new Tag("loop"){
+Block.registerBlock(new Block("loop"){
     @Override
-    public Object render(Map<String, Object> context, LNode... nodes) {
-
+    public Object render(TemplateContext context, LNode... nodes) {
         int n = super.asNumber(nodes[0].render(context)).intValue();
         LNode block = nodes[1];
-
         StringBuilder builder = new StringBuilder();
-
         while(n-- > 0) {
-            builder.append(super.asString(block.render(context)));
+            builder.append(super.asString(block.render(context), context));
         }
-
         return builder.toString();
     }
 });
@@ -313,48 +333,65 @@ System.out.println(rendered);
     looping!
 */
 ```
+Note: `Block.registerBlock` is just a fluent shortcut for `Insertion.registerInsertion`.
+For registering custom Tags there exists equivalent `Tags.registerTag` function (that also wraps `Insertion.registerInsertion`). 
 
-Note that both `Tag.registerTag(Tag)` and `Filer.registerFilter(Filter)` will add
-tags and filters per JVM instance. If you want templates to use specific filters,
-create your `Template` instance as follows:
+Note that all of:
+ * `Insertion.registerInsertion(Insertion)`
+ * `Block.registerBlock(Block)`
+ * `Tag.registerTag(Tag)`
+ * `Filer.registerFilter(Filter)` 
+
+will add tags, blocks and filters per JVM instance. If you want templates to use specific filters, create your `Template` instance as follows:
 
 ```java
-Template.parse(source)
-        .with(filter);
 
-Template.parse(source)
-        .with(tag);
+
+Template.parse(source, new ParseSettings.Builder()
+                .with(tag)
+                .build());
+
+Template.parse(source, new ParseSettings.Builder()
+                .with(block)
+                .build());
+
+Template.parse(source, new ParseSettings.Builder()
+                .with(filter)
+                .build());
 
 // Or combine them:
-Template.parse(source)
-        .with(filter)
-        .with(tag);
+Template.parse(source, new ParseSettings.Builder()
+                .with(filter)
+                .with(tag)
+                .build());
 ```
 
 For example, using the `sum` filter for just 1 template, would look like this:
 
 ```java
-Template template = Template.parse("{{ numbers | sum }}").with(new Filter("sum"){
-    @Override
-    public Object apply(Object value, Object... params) {
+Template template = Template.parse("{{ numbers | sum }}", new ParseSettings.Builder()
+                .with(new Filter("sum"){
+                    @Override
+                    public Object apply(Object value, TemplateContext context, Object... params) {
 
-        Object[] numbers = super.asArray(value);
-        double sum = 0;
+                        Object[] numbers = super.asArray(value, context);
+                        double sum = 0;
 
-        for(Object obj : numbers) {
-            sum += super.asNumber(obj).doubleValue();
-        }
+                        for(Object obj : numbers) {
+                            sum += super.asNumber(obj).doubleValue();
+                        }
 
-        return sum;
-    }
-});
+                        return sum;
+                    }
+                }).build());
 
-String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
-System.out.println(rendered);
+        String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
+        System.out.println(rendered);
 /*
     15.0
 */
 ```
+Also note that `ParseSettings` object have unmodifiable fields and so can be shared across templates without side effects.
 
 ### 2.3 Guards
 

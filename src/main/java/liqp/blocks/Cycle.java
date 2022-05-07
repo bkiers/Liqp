@@ -1,4 +1,4 @@
-package liqp.tags;
+package liqp.blocks;
 
 import liqp.TemplateContext;
 import liqp.nodes.LNode;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-class Cycle extends Block {
+public class Cycle extends Block {
 
     /*
      * Cycle is usually used within a loop to alternate

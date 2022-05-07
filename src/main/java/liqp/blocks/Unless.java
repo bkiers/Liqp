@@ -1,9 +1,9 @@
-package liqp.tags;
+package liqp.blocks;
 
 import liqp.TemplateContext;
 import liqp.nodes.LNode;
 
-class Unless extends Block {
+public class Unless extends Block {
 
     /*
      * Mirror of if statement

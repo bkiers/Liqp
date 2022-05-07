@@ -1,4 +1,4 @@
-package liqp.tags;
+package liqp.blocks;
 
 import static java.util.Collections.singletonMap;
 import static org.hamcrest.CoreMatchers.is;

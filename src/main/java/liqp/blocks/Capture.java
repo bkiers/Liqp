@@ -1,9 +1,9 @@
-package liqp.tags;
+package liqp.blocks;
 
 import liqp.TemplateContext;
 import liqp.nodes.LNode;
 
-class Capture extends Block {
+public class Capture extends Block {
 
     /*
      * Block tag that captures text into a variable

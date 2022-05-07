@@ -1,18 +1,27 @@
-package liqp.tags;
+package liqp;
 
+import liqp.Insertion;
+import liqp.ParseSettings;
 import liqp.Template;
 import liqp.TemplateContext;
+import liqp.filters.Filter;
+import liqp.blocks.Block;
 import liqp.nodes.LNode;
+import liqp.tags.Tag;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-public class TagTest {
+public class InsertionTest {
     @Test
     public void testNestedCustomTagsAndBlocks() {
-        Tag.registerTag(new Block("block") {
+        Block.registerBlock(new Block("block") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 String data = (nodes.length >= 2 ? nodes[1].render(context) : nodes[0].render(context)).toString();
@@ -29,6 +38,31 @@ public class TagTest {
         });
         String templateString = "{% block %}a{% simple %}b{% block %}c{% endblock %}d{% endblock %}";
         Template template = Template.parse(templateString);
+        assertThat("blk[a(sim)bblk[c]d]", is(template.render()));
+    }
+
+    @Test
+    public void testNestedCustomTagsAndBlocksAsOneCollection() {
+        List<Insertion> insertions = new ArrayList<>();
+        insertions.add(new Block("block") {
+            @Override
+            public Object render(TemplateContext context, LNode... nodes) {
+                String data = (nodes.length >= 2 ? nodes[1].render(context) : nodes[0].render(context)).toString();
+
+                return "blk[" + data + "]";
+            }
+        });
+
+        insertions.add(new Tag("simple") {
+            @Override
+            public Object render(TemplateContext context, LNode... nodes) {
+                return "(sim)";
+            }
+        });
+
+        String templateString = "{% block %}a{% simple %}b{% block %}c{% endblock %}d{% endblock %}";
+        
+        Template template = Template.parse(templateString, insertions, new ArrayList<>(Filter.getFilters(ParseSettings.DEFAULT_FLAVOR).values()));
         assertThat("blk[a(sim)bblk[c]d]", is(template.render()));
     }
 
@@ -51,7 +85,7 @@ public class TagTest {
     @Test
     public void testCustomTagBlock() throws RecognitionException {
 
-        Tag.registerTag(new Block("twice") {
+        Block.registerBlock(new Block("twice") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 LNode blockNode = nodes[nodes.length - 1];
@@ -151,5 +185,18 @@ public class TagTest {
 
         String text = "this shouldnt see any transformation either but has multiple lines\n as you can clearly see here ...";
         assertThat(Template.parse(text).render(), is(text));
+    }
+
+    @Test
+    public void testCustomTagRegistration() {
+        Template template = Template.parse("{% custom_tag %}", new ParseSettings.Builder()
+                        .with(new Tag("custom_tag") {
+                            @Override
+                            public Object render(TemplateContext context, LNode... nodes) {
+                                return "xxx";
+                            }
+                        })
+                        .build());
+        assertEquals("xxx", template.render());
     }
 }

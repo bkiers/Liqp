@@ -1,4 +1,4 @@
-package liqp.tags;
+package liqp.blocks;
 
 import liqp.TemplateContext;
 import liqp.nodes.LNode;
@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-class Tablerow extends Block {
+public class Tablerow extends Block {
 
     private static final String COLS = "cols";
     private static final String LIMIT = "limit";

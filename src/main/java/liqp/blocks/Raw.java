@@ -1,9 +1,9 @@
-package liqp.tags;
+package liqp.blocks;
 
 import liqp.TemplateContext;
 import liqp.nodes.LNode;
 
-class Raw extends Block {
+public class Raw extends Block {
 
     /*
      * temporarily disable tag processing to avoid syntax conflicts.

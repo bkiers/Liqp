@@ -1,9 +1,9 @@
-package liqp.tags;
+package liqp.blocks;
 
 import liqp.TemplateContext;
 import liqp.nodes.LNode;
 
-class Comment extends Block {
+public class Comment extends Block {
 
     /*
      * Block tag, comments out the text in the block

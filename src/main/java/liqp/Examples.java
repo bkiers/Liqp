@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import liqp.filters.Filter;
 import liqp.nodes.LNode;
-import liqp.tags.Block;
+import liqp.blocks.Block;
 import liqp.tags.Tag;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * A class holding some examples of how to use Liqp.
@@ -119,9 +120,9 @@ public class Examples {
         System.out.println(rendered);
     }
 
-    private static void customLoopTag() {
+    private static void customLoopBlock() {
 
-        Tag.registerTag(new Block("loop"){
+        Block.registerBlock(new Block("loop"){
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
 
@@ -147,10 +148,10 @@ public class Examples {
         System.out.println(rendered);
     }
 
-    public static void instanceTag() {
+    public static void instanceBlock() {
         String source = "{% loop 5 %}looping!\n{% endloop %}";
-        List<Tag> tags = new ArrayList<>();
-        tags.add(new Block("loop"){
+        List<Insertion> blocks = new ArrayList<>();
+        blocks.add(new Block("loop"){
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
 
@@ -167,7 +168,7 @@ public class Examples {
             }
         });
 
-        Template template = Template.parse(source, tags, new ArrayList<Filter>());
+        Template template = Template.parse(source, blocks, new ArrayList<Filter>());
 
         String rendered = template.render();
 
@@ -193,7 +194,7 @@ public class Examples {
             }
         });
 
-        Template template = Template.parse("{{ numbers | sum }}", new ArrayList<Tag>(), filters);
+        Template template = Template.parse("{{ numbers | sum }}", new ArrayList<>(), filters);
 
         String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
         System.out.println(rendered);
@@ -207,6 +208,40 @@ public class Examples {
         } catch (RuntimeException ex) {
             System.out.println("Caught an exception for strict variables");
         }
+    }
+    
+    public static void customRandomTag() {
+        Tag.registerTag(new Tag("rand") {
+            private final Random rand = new Random();
+            @Override
+            public Object render(TemplateContext context, LNode... nodes) {
+                return rand.nextInt(10)+1;
+            }
+        });
+        Template template = Template.parse("{% rand %}");
+        String rendered = template.render();
+        System.out.println(rendered);
+    }
+    
+    public static void customFilter() {
+        Template template = Template.parse("{{ numbers | sum }}", new ParseSettings.Builder()
+                .with(new Filter("sum"){
+                    @Override
+                    public Object apply(Object value, TemplateContext context, Object... params) {
+
+                        Object[] numbers = super.asArray(value, context);
+                        double sum = 0;
+
+                        for(Object obj : numbers) {
+                            sum += super.asNumber(obj).doubleValue();
+                        }
+
+                        return sum;
+                    }
+                }).build());
+
+        String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
+        System.out.println(rendered);
     }
 
     public static void main(String[] args) throws Exception {
@@ -225,17 +260,23 @@ public class Examples {
         System.out.println("\n=== demoCustomSumFilter() ===");
         demoCustomSumFilter();
 
-        System.out.println("\n=== customLoopTag() ===");
-        customLoopTag();
+        System.out.println("\n=== customLoopBlock() ===");
+        customLoopBlock();
 
-        System.out.println("\n=== instanceTag() ===");
-        instanceTag();
+        System.out.println("\n=== instanceBlock() ===");
+        instanceBlock();
 
         System.out.println("\n=== instanceFilter() ===");
         instanceFilter();
 
         System.out.println("\n=== demoStrictVariables() ===");
         demoStrictVariables();
+
+        System.out.println("\n=== customRandomTag() ===");
+        customRandomTag();
+
+        System.out.println("\n=== customFilter() ===");
+        customFilter();
 
         System.out.println("Done!");
     }

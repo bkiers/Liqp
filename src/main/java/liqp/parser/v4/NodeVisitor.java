@@ -104,7 +104,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
 
     Insertion insertion = insertions.get(blockId);
     if (insertion == null) {
-      throw new RuntimeException("The insertion '" + blockId + "' is not registered.");
+      throw new RuntimeException("The tag/block '" + blockId + "' is not registered.");
     }
 
     expressions.add(node);

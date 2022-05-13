@@ -3,7 +3,7 @@
   <groupId>nl.big-o</groupId>
   <artifactId>liqp</artifactId>
   <packaging>jar</packaging>
-  <version>0.8.4-SNAPSHOT</version>
+  <version>0.8.3.1-SNAPSHOT</version>
   <name>Liqp</name>
   <description>A Java implementation of the Liquid templating engine backed up by an ANTLR grammar.</description>
   <url>https://github.com/bkiers/Liqp</url>
@@ -61,8 +61,9 @@
 
     <antlr.version>3.5.1</antlr.version>
     <antlr4.version>4.7.2</antlr4.version>
-    <jackson.version>2.12.1</jackson.version>
-    <jsoup.version>1.14.2</jsoup.version>
+    <jackson.databind.version>2.13.2.2</jackson.databind.version>
+    <jackson.version>2.13.2</jackson.version>
+    <jsoup.version>1.14.3</jsoup.version>
     <junit.version>4.13.1</junit.version>
 
     <main.class />
@@ -92,7 +93,7 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>${jackson.version}</version>
+      <version>${jackson.databind.version}</version>
     </dependency>
 
     <dependency>

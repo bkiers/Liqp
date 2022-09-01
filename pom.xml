@@ -63,7 +63,7 @@
     <antlr4.version>4.7.2</antlr4.version>
     <jackson.databind.version>2.13.2.2</jackson.databind.version>
     <jackson.version>2.13.2</jackson.version>
-    <jsoup.version>1.14.3</jsoup.version>
+    <jsoup.version>1.15.3</jsoup.version>
     <junit.version>4.13.1</junit.version>
 
     <main.class />

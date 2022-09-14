@@ -11,7 +11,7 @@ Add the dependency:
 
 ```groovy
 dependencies {
-  compile 'nl.big-o:liqp:0.8.3.1'
+  compile 'nl.big-o:liqp:0.8.3.2'
 }
 ```
 
@@ -23,7 +23,7 @@ Add the following dependency:
 <dependency>
   <groupId>nl.big-o</groupId>
   <artifactId>liqp</artifactId>
-  <version>0.8.3.1</version>
+  <version>0.8.3.2</version>
 </dependency>
 ```
 

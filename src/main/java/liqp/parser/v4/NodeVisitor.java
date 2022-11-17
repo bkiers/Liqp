@@ -5,16 +5,18 @@ import liqp.ParseSettings;
 import liqp.exceptions.LiquidException;
 import liqp.filters.Filter;
 import liqp.Insertion;
-import liqp.nodes.BlockNode;
 import liqp.nodes.*;
 import liqp.parser.Flavor;
 import liquid.parser.v4.LiquidParserBaseVisitor;
+import liquid.parser.v4.LiquidParser.Jekyll_include_paramsContext;
+
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static liquid.parser.v4.LiquidParser.*;
 
@@ -379,17 +381,26 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   // ;
   @Override
   public LNode visitInclude_tag(Include_tagContext ctx) {
-    if (ctx.jekyll!=null) {
-      return new InsertionNode(insertions.get("include"), visit(ctx.file_name_or_output()));
+    if (ctx.jekyll != null) {
+      Stream<? extends LNode> stream = Stream.concat( //
+          Stream.of(visit(ctx.file_name_or_output())), //
+          ctx.jekyll_include_params().stream().map(this::visitJekyll_include_params) //
+      );
+
+      return new InsertionNode(insertions.get("include"), stream.toArray((n) -> new LNode[n]));
     } else if (ctx.liquid != null) {
       if (ctx.Str() != null) {
         return new InsertionNode(insertions.get("include"), visit(ctx.expr()), new AtomNode(strip(ctx.Str().getText())));
       } else {
         return new InsertionNode(insertions.get("include"), visit(ctx.expr()));
       }
-
     }
     throw new LiquidException("Unknown syntax of `Include` tag", ctx);
+  }
+
+  @Override
+  public LNode visitJekyll_include_params(Jekyll_include_paramsContext ctx) {
+    return new KeyValueNode(ctx.id().getText(), visit(ctx.expr()));
   }
 
   // file_name_or_output

@@ -52,7 +52,7 @@ public class Slice extends Filter {
         }
 
         return array == null ?
-                string.substring(offset, offset + length) :
+                string == null ? "" : string.substring(offset, offset + length) :
                 Arrays.copyOfRange(array, offset, offset + length);
     }
 }

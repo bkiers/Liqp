@@ -585,7 +585,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  ;
   @Override
   public LNode visitTerm_DoubleNum(Term_DoubleNumContext ctx) {
-    return new AtomNode(new Double(ctx.DoubleNum().getText()));
+    return new AtomNode(Double.valueOf(ctx.DoubleNum().getText()));
   }
 
   // term
@@ -595,7 +595,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  ;
   @Override
   public LNode visitTerm_LongNum(Term_LongNumContext ctx) {
-    return new AtomNode(new Long(ctx.LongNum().getText()));
+    return new AtomNode(Long.valueOf(ctx.LongNum().getText()));
   }
 
   // term

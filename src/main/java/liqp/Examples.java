@@ -1,14 +1,13 @@
 package liqp;
 
-import java.util.ArrayList;
-import java.util.List;
-import liqp.filters.Filter;
-import liqp.nodes.LNode;
-import liqp.blocks.Block;
-import liqp.tags.Tag;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import liqp.blocks.Block;
+import liqp.filters.Filter;
+import liqp.nodes.LNode;
+import liqp.tags.Tag;
 
 /**
  * A class holding some examples of how to use Liqp.
@@ -16,34 +15,36 @@ import java.util.Random;
 public class Examples {
 
     private static void demoGuards() {
-
-        ProtectionSettings protectionSettings = new ProtectionSettings.Builder()
-                .withMaxSizeRenderedString(300)
-                .withMaxIterations(15)
-                .withMaxRenderTimeMillis(100L)
-                .withMaxTemplateSizeBytes(100)
+        ProtectionSettings protectionSettings = new ProtectionSettings.Builder() //
+                .withMaxSizeRenderedString(300) //
+                .withMaxIterations(15) //
+                .withMaxRenderTimeMillis(100L) //
+                .withMaxTemplateSizeBytes(100) //
                 .build();
 
-        String rendered = Template.parse("{% for i in (1..10) %}{{ text }}{% endfor %}")
-                .withProtectionSettings(protectionSettings)
-                .render("{\"text\": \"abcdefghijklmnopqrstuvwxyz\"}");
+        TemplateParser parser = new TemplateParser.Builder() //
+                .withProtectionSettings(protectionSettings) //
+                .build();
+
+        String rendered = parser.parse("{% for i in (1..10) %}{{ text }}{% endfor %}").render(
+                "{\"text\": \"abcdefghijklmnopqrstuvwxyz\"}");
 
         System.out.println(rendered);
     }
 
     private static void demoSimple() {
 
-        Template template = Template.parse("hi {{name}}");
+        Template template = TemplateParser.DEFAULT.parse("hi {{name}}");
         String rendered = template.render("name", "tobi");
         System.out.println(rendered);
 
-        template = Template.parse("hi {{name}}");
+        template = TemplateParser.DEFAULT.parse("hi {{name}}");
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("name", "tobi");
         rendered = template.render(map);
         System.out.println(rendered);
 
-        template = Template.parse("hi {{name}}");
+        template = TemplateParser.DEFAULT.parse("hi {{name}}");
         rendered = template.render("{\"name\" : \"tobi\"}");
         System.out.println(rendered);
     }
@@ -51,27 +52,28 @@ public class Examples {
     private static void demoCustomStrongFilter() {
 
         // first register your custom filter
-        Filter.registerFilter(new Filter("b"){
+        ParseSettings parseSettings = new ParseSettings.Builder().with(new Filter("b") {
             @Override
             public Object apply(Object value, TemplateContext context, Object... params) {
-                // create a string from the  value
+                // create a string from the value
                 String text = super.asString(value, context);
 
                 // replace and return *...* with <strong>...</strong>
                 return text.replaceAll("\\*(\\w(.*?\\w)?)\\*", "<strong>$1</strong>");
             }
-        });
+        }).build();
+
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
 
         // use your filter
-        Template template = Template.parse("{{ wiki | b }}");
+        Template template = parser.parse("{{ wiki | b }}");
         String rendered = template.render("{\"wiki\" : \"Some *bold* text *in here*.\"}");
         System.out.println(rendered);
     }
 
     private static void demoCustomRepeatFilter() {
-
-        // first register your custom filter
-        Filter.registerFilter(new Filter("repeat"){
+        // Register your custom filter via ParseSettings
+        ParseSettings parseSettings = new ParseSettings.Builder().with(new Filter("repeat") {
             @Override
             public Object apply(Object value, TemplateContext context, Object... params) {
 
@@ -83,23 +85,24 @@ public class Examples {
 
                 StringBuilder builder = new StringBuilder();
 
-                while(times-- > 0) {
+                while (times-- > 0) {
                     builder.append(text);
                 }
 
                 return builder.toString();
             }
-        });
+        }).build();
+
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
 
         // use your filter
-        Template template = Template.parse("{{ 'a' | repeat }}\n{{ 'b' | repeat:5 }}");
+        Template template = parser.parse("{{ 'a' | repeat }}\n{{ 'b' | repeat:5 }}");
         String rendered = template.render();
         System.out.println(rendered);
     }
 
     private static void demoCustomSumFilter() {
-
-        Filter.registerFilter(new Filter("sum"){
+        ParseSettings parseSettings = new ParseSettings.Builder().with(new Filter("sum") {
             @Override
             public Object apply(Object value, TemplateContext context, Object... params) {
 
@@ -107,22 +110,23 @@ public class Examples {
 
                 double sum = 0;
 
-                for(Object obj : numbers) {
+                for (Object obj : numbers) {
                     sum += super.asNumber(obj).doubleValue();
                 }
 
                 return sum;
             }
-        });
+        }).build();
 
-        Template template = Template.parse("{{ numbers | sum }}");
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
+
+        Template template = parser.parse("{{ numbers | sum }}");
         String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
         System.out.println(rendered);
     }
 
     private static void customLoopBlock() {
-
-        Block.registerBlock(new Block("loop"){
+        ParseSettings parseSettings = new ParseSettings.Builder().with(new Block("loop") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
 
@@ -131,44 +135,19 @@ public class Examples {
 
                 StringBuilder builder = new StringBuilder();
 
-                while(n-- > 0) {
+                while (n-- > 0) {
                     builder.append(super.asString(block.render(context), context));
                 }
 
                 return builder.toString();
             }
-        });
+        }).build();
+
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
 
         String source = "{% loop 5 %}looping!\n{% endloop %}";
 
-        Template template = Template.parse(source);
-
-        String rendered = template.render();
-
-        System.out.println(rendered);
-    }
-
-    public static void instanceBlock() {
-        String source = "{% loop 5 %}looping!\n{% endloop %}";
-        List<Insertion> blocks = new ArrayList<>();
-        blocks.add(new Block("loop"){
-            @Override
-            public Object render(TemplateContext context, LNode... nodes) {
-
-                int n = super.asNumber(nodes[0].render(context)).intValue();
-                LNode block = nodes[1];
-
-                StringBuilder builder = new StringBuilder();
-
-                while(n-- > 0) {
-                    builder.append(super.asString(block.render(context), context));
-                }
-
-                return builder.toString();
-            }
-        });
-
-        Template template = Template.parse(source, blocks, new ArrayList<Filter>());
+        Template template = parser.parse(source);
 
         String rendered = template.render();
 
@@ -176,9 +155,7 @@ public class Examples {
     }
 
     public static void instanceFilter() {
-
-        List<Filter> filters = new ArrayList<>();
-        filters.add(new Filter("sum"){
+        ParseSettings parseSettings = new ParseSettings.Builder().with(new Filter("sum") {
             @Override
             public Object apply(Object value, TemplateContext context, Object... params) {
 
@@ -186,15 +163,17 @@ public class Examples {
 
                 double sum = 0;
 
-                for(Object obj : numbers) {
+                for (Object obj : numbers) {
                     sum += super.asNumber(obj).doubleValue();
                 }
 
                 return sum;
             }
-        });
+        }).build();
 
-        Template template = Template.parse("{{ numbers | sum }}", new ArrayList<>(), filters);
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
+
+        Template template = parser.parse("{{ numbers | sum }}");
 
         String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
         System.out.println(rendered);
@@ -202,43 +181,55 @@ public class Examples {
 
     public static void demoStrictVariables() {
         try {
-            Template.parse("{{mu}}")
-                    .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build())
-                    .render();
+            TemplateParser parser = new TemplateParser.Builder() //
+                    .withRenderSettings(new RenderSettings.Builder() //
+                            .withStrictVariables(true) //
+                            .withRaiseExceptionsInStrictMode(true) //
+                            .build()) //
+                    .build();
+
+            parser.parse("{{mu}}").render();
         } catch (RuntimeException ex) {
             System.out.println("Caught an exception for strict variables");
         }
     }
-    
+
     public static void customRandomTag() {
-        Tag.registerTag(new Tag("rand") {
+        ParseSettings parseSettings = new ParseSettings.Builder().with(new Tag("rand") {
             private final Random rand = new Random();
+
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
-                return rand.nextInt(10)+1;
+                return rand.nextInt(10) + 1;
             }
-        });
-        Template template = Template.parse("{% rand %}");
+        }).build();
+
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
+
+        Template template = parser.parse("{% rand %}");
         String rendered = template.render();
         System.out.println(rendered);
     }
-    
+
     public static void customFilter() {
-        Template template = Template.parse("{{ numbers | sum }}", new ParseSettings.Builder()
-                .with(new Filter("sum"){
-                    @Override
-                    public Object apply(Object value, TemplateContext context, Object... params) {
+        ParseSettings parseSettings = new ParseSettings.Builder().with(new Filter("sum") {
+            @Override
+            public Object apply(Object value, TemplateContext context, Object... params) {
 
-                        Object[] numbers = super.asArray(value, context);
-                        double sum = 0;
+                Object[] numbers = super.asArray(value, context);
+                double sum = 0;
 
-                        for(Object obj : numbers) {
-                            sum += super.asNumber(obj).doubleValue();
-                        }
+                for (Object obj : numbers) {
+                    sum += super.asNumber(obj).doubleValue();
+                }
 
-                        return sum;
-                    }
-                }).build());
+                return sum;
+            }
+        }).build();
+
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
+
+        Template template = parser.parse("{{ numbers | sum }}");
 
         String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
         System.out.println(rendered);
@@ -260,11 +251,11 @@ public class Examples {
         System.out.println("\n=== demoCustomSumFilter() ===");
         demoCustomSumFilter();
 
+        System.out.println("\n=== demoGuards() ===");
+        demoGuards();
+
         System.out.println("\n=== customLoopBlock() ===");
         customLoopBlock();
-
-        System.out.println("\n=== instanceBlock() ===");
-        instanceBlock();
 
         System.out.println("\n=== instanceFilter() ===");
         instanceFilter();

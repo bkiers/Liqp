@@ -50,11 +50,11 @@ public class LookupNode implements LNode {
             value = index.get(value, context);
         }
 
-        if(value == null && context.renderSettings.strictVariables) {
+        if(value == null && context.getRenderSettings().strictVariables) {
             RuntimeException e = new VariableNotExistException(getVariableName());
             context.addError(e);
 
-            if (context.renderSettings.raiseExceptionsInStrictMode) {
+            if (context.getRenderSettings().raiseExceptionsInStrictMode) {
                 throw e;
             }
         }

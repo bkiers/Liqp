@@ -1,24 +1,5 @@
 package liqp;
 
-import java.util.HashSet;
-import java.util.Set;
-import liqp.exceptions.LiquidException;
-import liqp.filters.Filter;
-import liqp.nodes.LNode;
-import liqp.parser.Flavor;
-import liqp.parser.Inspectable;
-import liqp.parser.LiquidSupport;
-import liqp.parser.v4.NodeVisitor;
-import liqp.spi.BasicTypesSupport;
-import liqp.spi.SPIHelper;
-import liqp.blocks.Block;
-import liqp.tags.Include;
-import liquid.parser.v4.LiquidLexer;
-import liquid.parser.v4.LiquidParser;
-import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.runtime.tree.ParseTree;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,16 +8,44 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.tree.ParseTree;
+
+import liqp.exceptions.LiquidException;
+import liqp.filters.Filter;
+import liqp.filters.Filters;
+import liqp.nodes.LNode;
+import liqp.parser.Flavor;
+import liqp.parser.Inspectable;
+import liqp.parser.LiquidSupport;
+import liqp.parser.v4.NodeVisitor;
+import liqp.spi.BasicTypesSupport;
+import liqp.spi.SPIHelper;
+import liqp.tags.Include;
+import liquid.parser.v4.LiquidLexer;
+import liquid.parser.v4.LiquidParser;
 
 /**
- * The main class of this library. Use one of its static
- * <code>parse(...)</code> to get a hold of a reference.
+ * The main class of this library. Use one of its static <code>parse(...)</code> to get a hold of a
+ * reference.
  * <p/>
  * Also see: https://github.com/Shopify/liquid
  */
 public class Template {
-
     static {
         SPIHelper.applyCustomDateTypes();
     }
@@ -49,195 +58,194 @@ public class Template {
     /**
      * This instance's insertions.
      */
-    private final Map<String, Insertion> insertions;
+    private final Insertions insertions;
 
     /**
      * This instance's filters.
      */
-    private final Map<String, Filter> filters;
+    private final Filters filters;
 
     private final long templateSize;
 
-    private ProtectionSettings protectionSettings = new ProtectionSettings.Builder().build();
+    @Deprecated
+    protected ProtectionSettings protectionSettings = ProtectionSettings.DEFAULT;
 
-    private RenderSettings renderSettings = new RenderSettings.Builder().build();
+    @Deprecated
+    protected RenderSettings renderSettings = RenderSettings.DEFAULT;
 
-    private final ParseSettings parseSettings;
+    @Deprecated
+    protected final ParseSettings parseSettings;
 
     private TemplateContext templateContext = null;
 
     private ContextHolder contextHolder;
 
+    private TemplateParser templateParser = null;
+    
+    static final class BuiltTemplate extends Template {
+        BuiltTemplate(TemplateParser parser, File file) throws IOException {
+            super(file, parser);
+        }
+
+        BuiltTemplate(TemplateParser parser, String input) {
+            super(input, parser);
+        }
+
+        BuiltTemplate(TemplateParser parser, InputStream input) throws IOException {
+            super(input, parser);
+        }
+
+        @Deprecated
+        @Override
+        public Template withProtectionSettings(ProtectionSettings settings) {
+            throw new UnsupportedOperationException("Already configured by " + TemplateParser.class
+                    .getName());
+        }
+
+        @Deprecated
+        @Override
+        public Template withRenderSettings(RenderSettings settings) {
+            throw new UnsupportedOperationException("Already configured by " + TemplateParser.class
+                    .getName());
+        }
+        
+        @Override
+        public ProtectionSettings getProtectionSettings() {
+            return getTemplateParser().getProtectionSettings();
+        }
+
+        @Override
+        public RenderSettings getRenderSettings() {
+            return getTemplateParser().getRenderSettings();
+        }
+        
+        @Override
+        public ParseSettings getParseSettings() {
+            return getTemplateParser().getParseSettings();
+        }
+    }
+
     /**
      * Creates a new Template instance from a given input.
-     *  @param input
-     *         the file holding the Liquid source.
+     * 
+     * @param input
+     *            the file holding the Liquid source.
      * @param insertions
-     *         the insertions this instance will make use of.
+     *            the insertions this instance will make use of.
      * @param filters
-     *         the filters this instance will make use of.
+     *            the filters this instance will make use of.
      */
-    private Template(String input, Map<String, Insertion> insertions, Map<String, Filter> filters, ParseSettings parseSettings) {
-        this.insertions = insertions;
-        this.filters = filters;
-        for(Filter f: parseSettings.filters) {
-            this.filters.put(f.name, f);
-        }
+    private Template(String input, Insertions insertions, Filters filters, ParseSettings parseSettings) {
+        this.insertions = insertions.mergeWith(parseSettings.insertions);
+        this.filters = filters.mergeWith(parseSettings.filters);
         this.parseSettings = parseSettings;
 
-        // split tags and blocks
-        for(Insertion i: parseSettings.insertions) {
-            this.insertions.put(i.name, i);
-        }
-        List<Set<String>> tagsAndBlocks = partitionBlocksAndTags(insertions);
-        Set<String> blockNames = tagsAndBlocks.get(0);
-        Set<String> tagNames = tagsAndBlocks.get(1);
+        Set<String> blockNames = this.insertions.getBlockNames();
+        Set<String> tagNames = this.insertions.getTagNames();
 
         CharStream stream = CharStreams.fromString(input);
         this.templateSize = stream.size();
-        LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine, blockNames, tagNames);
+        LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags,
+                parseSettings.stripSingleLine, blockNames, tagNames);
         try {
             root = parse(lexer);
-        }
-        catch (LiquidException e) {
+        } catch (LiquidException e) {
             throw e;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("could not parse input: " + input, e);
         }
     }
 
-    private Template(InputStream input, Map<String, Insertion> insertions, Map<String, Filter> filters, ParseSettings parseSettings) {
-
-        this.insertions = insertions;
-        this.filters = filters;
-        for(Filter f: parseSettings.filters) {
-            this.filters.put(f.name, f);
-        }
+    @Deprecated
+    private Template(InputStream input, Insertions insertions, Filters filters,
+            ParseSettings parseSettings) {
+        this.insertions = insertions.mergeWith(parseSettings.insertions);
+        this.filters = filters.mergeWith(parseSettings.filters);
         this.parseSettings = parseSettings;
 
-        // split tags and blocks
-        for(Insertion i: parseSettings.insertions) {
-            this.insertions.put(i.name, i);
-        }
-        List<Set<String>> tagsAndBlocks = partitionBlocksAndTags(insertions);
-        Set<String> blockNames = tagsAndBlocks.get(0);
-        Set<String> tagNames = tagsAndBlocks.get(1);
+        Set<String> blockNames = this.insertions.getBlockNames();
+        Set<String> tagNames = this.insertions.getTagNames();
 
         try {
             CharStream stream = CharStreams.fromStream(input);
             this.templateSize = stream.size();
-            LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine, blockNames, tagNames);
+            LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags,
+                    parseSettings.stripSingleLine, blockNames, tagNames);
             root = parse(lexer);
-        }
-        catch (LiquidException e) {
+        } catch (LiquidException e) {
             throw e;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("could not parse input: " + input, e);
         }
     }
     
-    /**
-     * Creates a new Template instance from a given input.
-     *  @param input
-     *         the file holding the Liquid source.
-     * @param insertions
-     *         the insertions this instance will make use of.
-     * @param filters
-     *         the filters this instance will make use of.
-     * @param parseSettings
-     *         the parseSettings this instance will make use of.
-     * @param renderSettings
-     *         the renderSettings this instance will make use of.
-     */
-    private Template(String input, Map<String, Insertion> insertions, Map<String, Filter> filters, ParseSettings parseSettings,
-                     RenderSettings renderSettings) {
-
+    @Deprecated
+    private Template(String input, Insertions insertions, Filters filters, ParseSettings parseSettings,
+            RenderSettings renderSettings) {
         this(input, insertions, filters, parseSettings);
         this.renderSettings = renderSettings;
     }
 
-   /**
-     * Creates a new Template instance from a given file.
-     *
-     * @param file
-     *         the file holding the Liquid source.
-     */
-    private Template(File file, Map<String, Insertion> insertions, Map<String, Filter> filters, ParseSettings parseSettings) throws IOException {
-        this.insertions = insertions;
-        this.filters = filters;
-        for(Filter f: parseSettings.filters) {
-            this.filters.put(f.name, f);
-        }
-        this.parseSettings = parseSettings;
-        CharStream stream = CharStreams.fromFileName(file.getAbsolutePath());
-
-        // split tags and blocks
-        for(Insertion i: parseSettings.insertions) {
-            this.insertions.put(i.name, i);
-        }
-        List<Set<String>> tagsAndBlocks = partitionBlocksAndTags(insertions);
-        Set<String> blockNames = tagsAndBlocks.get(0);
-        Set<String> tagNames = tagsAndBlocks.get(1);
-
-        try {
-            this.templateSize = stream.size();
-            LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags, parseSettings.stripSingleLine, blockNames, tagNames);
-            root = parse(lexer);
-        }
-        catch (Exception e) {
-            throw new RuntimeException("could not parse input from " + file, e);
-        }
-    }
-
-    private static List<Set<String>> partitionBlocksAndTags(Map<String, Insertion> tags) {
-        Set<String> blockNames = new HashSet<>();
-        Set<String> tagNames = new HashSet<>();
-
-        for (String name : tags.keySet()) {
-            Insertion t = tags.get(name);
-            if (t instanceof Block) {
-                blockNames.add(name);
-            } else {
-                tagNames.add(name);
-            }
-        }
-        ArrayList<Set<String>> returnList = new ArrayList<>();
-        returnList.add(blockNames);
-        returnList.add(tagNames);
-        return returnList;
-    }
-
     /**
      * Creates a new Template instance from a given file.
      *
      * @param file
-     *         the file holding the Liquid source.
-     * @param insertions
-     *         the insertions this instance will make use of.
-     * @param filters
-     *         the filters this instance will make use of.
-     * @param parseSettings
-     *         the parseSettings this instance will make use of.
-     * @param renderSettings
-     *         the renderSettings this instance will make use of.
+     *            the file holding the Liquid source.
      */
-    private Template(File file, Map<String, Insertion> insertions, Map<String, Filter> filters, ParseSettings parseSettings,
-                     RenderSettings renderSettings) throws IOException {
+    private Template(File file, Insertions insertions, Filters filters, ParseSettings parseSettings)
+            throws IOException {
+        this.insertions = insertions.mergeWith(parseSettings.insertions);
+        this.filters = filters.mergeWith(parseSettings.filters);
+        this.parseSettings = parseSettings;
+        CharStream stream = CharStreams.fromFileName(file.getAbsolutePath());
 
-        this(file, insertions, filters, parseSettings);
-        this.renderSettings = renderSettings;
+        Set<String> blockNames = this.insertions.getBlockNames();
+        Set<String> tagNames = this.insertions.getTagNames();
+
+        try {
+            this.templateSize = stream.size();
+            LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags,
+                    parseSettings.stripSingleLine, blockNames, tagNames);
+            root = parse(lexer);
+        } catch (Exception e) {
+            throw new RuntimeException("could not parse input from " + file, e);
+        }
+    }
+    
+    // TemplateParser constructor
+    Template(InputStream input, TemplateParser parser) {
+        this(input, parser.getParseSettings().flavor.getInsertions(), parser.getParseSettings().flavor
+                .getFilters(), parser.getParseSettings());
+        this.renderSettings = parser.getRenderSettings();
+        this.templateParser = parser;
+    }
+
+    // TemplateParser constructor
+    Template(String input, TemplateParser parser) {
+        this(input, parser.getParseSettings().flavor.getInsertions(), parser.getParseSettings().flavor
+                .getFilters(), parser.getParseSettings());
+        this.renderSettings = parser.getRenderSettings();
+        this.templateParser = parser;
+    }
+
+    // TemplateParser constructor
+    Template(File file, TemplateParser parser) throws IOException {
+        this(file, parser.getParseSettings().flavor.getInsertions(), parser.getParseSettings().flavor.getFilters(),
+                parser.getParseSettings());
+        this.renderSettings = parser.getRenderSettings();
+        this.templateParser = parser;
     }
 
     private ParseTree parse(LiquidLexer lexer) {
 
         lexer.removeErrorListeners();
 
-        lexer.addErrorListener(new BaseErrorListener(){
+        lexer.addErrorListener(new BaseErrorListener() {
             @Override
-            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                throw new LiquidException(String.format("lexer error \"%s\" on line %s, index %s", msg, line, charPositionInLine), line, charPositionInLine, e);
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
+                    int charPositionInLine, String msg, RecognitionException e) {
+                throw new LiquidException(String.format("lexer error \"%s\" on line %s, index %s", msg,
+                        line, charPositionInLine), line, charPositionInLine, e);
             }
         });
 
@@ -246,10 +254,12 @@ public class Template {
 
         parser.removeErrorListeners();
 
-        parser.addErrorListener(new BaseErrorListener(){
+        parser.addErrorListener(new BaseErrorListener() {
             @Override
-            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                throw new LiquidException(String.format("parser error \"%s\" on line %s, index %s", msg, line, charPositionInLine), line, charPositionInLine, e);
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
+                    int charPositionInLine, String msg, RecognitionException e) {
+                throw new LiquidException(String.format("parser error \"%s\" on line %s, index %s", msg,
+                        line, charPositionInLine), line, charPositionInLine, e);
             }
         });
 
@@ -275,68 +285,194 @@ public class Template {
 
     /**
      * Returns a new Template instance from a given input string.
+     * 
+     * Important: This method may have undesired side-effects from globally defined insertions and
+     * filters. Please use {@link TemplateParser} instead.
      *
      * @param input
-     *         the input string holding the Liquid source.
+     *            the input string holding the Liquid source.
      *
      * @return a new Template instance from a given input string.
+     * @deprecated use {@link TemplateParser#parse(String)}
      */
+    @Deprecated
     public static Template parse(String input) {
-        return new Template(input, Insertion.getInsertions(), Filter.getFilters(ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
+        return new Template(input, Insertion.getCurrentInsertions(), getCurrentFilters(
+                ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
     }
 
-  /**
-   * Returns a new Template instance from a given input string with a specified set of
-   * insertions and filters
-   *
-   * @param input
-   *         the input string holding the Liquid source.
-   * @param insertions
-   *         the list of insertions to use when parsing and rendering the template
-   * @param filters
-   *         the list of filters to use when parsing and rendering the template
-   *
-   * @return a new Template instance from a given input string.
-   */
+    /**
+     * Returns a new Template instance from a given input string with a specified set of insertions and
+     * filters.
+     * 
+     * Important: This method may have undesired side-effects from globally defined insertions and
+     * filters. Please use {@link TemplateParser} instead.
+     *
+     * @param input
+     *            the input string holding the Liquid source.
+     * @param insertions
+     *            the list of insertions to use when parsing and rendering the template
+     * @param filters
+     *            the list of filters to use when parsing and rendering the template
+     *
+     * @return a new Template instance from a given input string.
+     * @deprecated use {@link TemplateParser#parse(String)}
+     */
+    @Deprecated
     public static Template parse(String input, List<Insertion> insertions, List<Filter> filters) {
-
-        return parse(input, insertions, filters, new ParseSettings.Builder().build(), new RenderSettings.Builder().build());
+        return parse(input, insertions, filters, new ParseSettings.Builder().build(),
+                RenderSettings.DEFAULT);
     }
 
     /**
      * Returns a new Template instance from a given input file.
+     * 
+     * Important: This method may have undesired side-effects from globally defined insertions and
+     * filters. Please use {@link TemplateParser} instead.
      *
      * @param file
-     *         the input file holding the Liquid source.
+     *            the input file holding the Liquid source.
      *
-     * @return a new Template instance from a given input file.
+     * @return a new Template instance from a given input file. * @throws IOException on error.
+     * @throws IOException
+     *             on error.
+     * @deprecated use {@link TemplateParser#parse(File)}
      */
+    @Deprecated
     public static Template parse(File file) throws IOException {
-        return new Template(file, Insertion.getInsertions(), Filter.getFilters(ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
+        return new Template(file, Insertion.getCurrentInsertions(), getCurrentFilters(
+                ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
     }
 
+    /**
+     * Returns a new Template instance from a given input file.
+     * 
+     * Important: This method may have undesired side-effects from globally defined insertions and
+     * filters. Please use {@link TemplateParser} instead.
+     *
+     * @param file
+     *            the input file holding the Liquid source.
+     * @param settings
+     *            the parse settings.
+     * @return a new Template instance from a given input file.
+     * @throws IOException
+     *             on error.
+     * @deprecated use {@link TemplateParser#parse(File)}
+     */
+    @Deprecated
     public static Template parse(File file, ParseSettings settings) throws IOException {
-        return new Template(file, Insertion.getInsertions(), Filter.getFilters(settings.flavor), settings);
+        return new Template(file, Insertion.getCurrentInsertions(), getCurrentFilters(settings.flavor),
+                settings);
     }
 
+    /**
+     * Returns a new Template instance from a given input string.
+     * 
+     * Important: This method may have undesired side-effects from globally defined insertions and
+     * filters. Please use {@link TemplateParser} instead.
+     *
+     * @param input
+     *            the input string holding the Liquid source.
+     * @param settings
+     *            the parse settings.
+     * @return a new Template instance from a given input file.
+     * @deprecated use {@link TemplateParser#parse(String)}
+     */
+    @Deprecated
     public static Template parse(String input, ParseSettings settings) {
-        return new Template(input, Insertion.getInsertions(), Filter.getFilters(settings.flavor), settings);
+        return new Template(input, Insertion.getCurrentInsertions(), getCurrentFilters(settings.flavor),
+                settings);
     }
 
-    public static Template parse(File file, ParseSettings parseSettings, RenderSettings renderSettings) throws IOException {
-        return new Template(file, Insertion.getInsertions(), Filter.getFilters(parseSettings.flavor), parseSettings, renderSettings);
+    /**
+     * Returns a new Template instance from a given input file.
+     * 
+     * Important: This method may have undesired side-effects from globally defined insertions and
+     * filters. Please use {@link TemplateParser} instead.
+     *
+     * @param file
+     *            the input file holding the Liquid source.
+     * @param parseSettings
+     *            the parse settings.
+     * @param renderSettings
+     *            the render settings.
+     * @return a new Template instance from a given input file.
+     * @throws IOException
+     *             on error.
+     * @deprecated use {@link TemplateParser#parse(File)}
+     */
+    @Deprecated
+    public static Template parse(File file, ParseSettings parseSettings, RenderSettings renderSettings)
+            throws IOException {
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(
+                new ParseSettings.Builder()//
+                        .with(parseSettings) //
+                        .withInsertions(Insertion.getCurrentInsertions().values()) //
+                        .withFilters(getCurrentFilters(parseSettings.flavor).values()) //
+                        .build()) //
+                .withRenderSettings(renderSettings).build();
+
+        return new Template(file, parser);
     }
 
-    public static Template parse(String  template, ParseSettings parseSettings, RenderSettings renderSettings) {
-        return new Template(template, Insertion.getInsertions(), Filter.getFilters(parseSettings.flavor), parseSettings, renderSettings);
+    /**
+     * Returns a new Template instance from a given input string.
+     * 
+     * Important: This method may have undesired side-effects from globally defined insertions and
+     * filters. Please use {@link TemplateParser} instead.
+     *
+     * @param input
+     *            the input string holding the Liquid source.
+     * @param parseSettings
+     *            the parse settings.
+     * @param renderSettings
+     *            the render settings.
+     * @return a new Template instance from a given input file.
+     * @deprecated use {@link TemplateParser#parse(String)}
+     */
+    @Deprecated
+    public static Template parse(String input, ParseSettings parseSettings,
+            RenderSettings renderSettings) {
+        return new Template(input, Insertion.getCurrentInsertions(), getCurrentFilters(
+                parseSettings.flavor), parseSettings, renderSettings);
     }
 
+    /**
+     * Returns a new Template instance from a given input stream.
+     * 
+     * Important: This method may have undesired side-effects from globally defined insertions and
+     * filters. Please use {@link TemplateParser} instead. Additionally, {@link IOException}s are
+     * converted to {@link RuntimeException}.
+     *
+     * @param input
+     *            the input stream holding the Liquid source.
+     * @return a new Template instance from a given input file.
+     * @deprecated use {@link TemplateParser#parse(InputStream)}
+     */
+    @Deprecated
     public static Template parse(InputStream input) {
-        return new Template(input, Insertion.getInsertions(), Filter.getFilters(ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
+        return new Template(input, Insertion.getCurrentInsertions(), getCurrentFilters(
+                ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
     }
 
+    /**
+     * Returns a new Template instance from a given input stream.
+     * 
+     * Important: This method may have undesired side-effects from globally defined insertions and
+     * filters. Please use {@link TemplateParser} instead. Additionally, {@link IOException}s are
+     * converted to {@link RuntimeException}.
+     *
+     * @param input
+     *            the input stream holding the Liquid source.
+     * @param settings
+     *            the parse settings.
+     * @return a new Template instance from a given input file.
+     * @deprecated use {@link TemplateParser#parse(InputStream)}
+     */
+    @Deprecated
     public static Template parse(InputStream input, ParseSettings settings) {
-        return new Template(input, Insertion.getInsertions(), Filter.getFilters(settings.flavor), settings);
+        return new Template(input, Insertion.getCurrentInsertions(), getCurrentFilters(settings.flavor),
+                settings);
     }
 
     @Deprecated // Use `parse(file, settings)` instead
@@ -351,60 +487,99 @@ public class Template {
         return parse(input, settings);
     }
 
-    public static Template parse(String input, List<Insertion> insertions, List<Filter> filters, ParseSettings parseSettings, RenderSettings renderSettings) {
-      Map<String, Insertion> tagMap = new HashMap<>();
-      for (Insertion tag : insertions) {
-        tagMap.put(tag.name, tag);
-      }
-
-      Map<String, Filter> filterMap = new HashMap<>();
-      for (Filter filter: filters) {
-        filterMap.put(filter.name, filter);
-      }
-
-      return new Template(input, tagMap, filterMap, parseSettings, renderSettings);
+    /**
+     * Returns a new Template instance from a given input string.
+     * 
+     * Important: This method may have undesired side-effects from globally defined insertions and
+     * filters. Please use {@link TemplateParser} instead.
+     *
+     * @param input
+     *            the input string holding the Liquid source.
+     * @param insertions
+     *            a list of additional {@link Insertion}s
+     * @param filters
+     *            a list of additional {@link Filter}s
+     * @param parseSettings
+     *            the parse settings.
+     * @param renderSettings
+     *            the parse settings.
+     * @return a new Template instance from a given input file.
+     * @deprecated use {@link TemplateParser#parse(InputStream)}
+     */
+    @Deprecated
+    public static Template parse(String input, List<Insertion> insertions, List<Filter> filters,
+            ParseSettings parseSettings, RenderSettings renderSettings) {
+        return new Template(input, Insertions.of(insertions), Filters.of(filters), parseSettings,
+                renderSettings);
     }
 
-    public Template withProtectionSettings(ProtectionSettings protectionSettings) {
-        this.protectionSettings = protectionSettings;
-        return this;
-    }
-
-    public Template withRenderSettings(RenderSettings renderSettings) {
-        this.renderSettings = renderSettings;
+    /**
+     * Updates this template instance with the given {@link ProtectionSettings}.
+     * 
+     * This method will fail with an {@link UnsupportedOperationException} exception if this instance has
+     * been created from a {@link TemplateParser}.
+     * 
+     * @param settings
+     *            The protection settings.
+     * @return This instance.
+     * @deprecated use {@link TemplateParser}
+     */
+    @Deprecated
+    public Template withProtectionSettings(ProtectionSettings settings) {
+        this.protectionSettings = settings;
         return this;
     }
 
     /**
-     * Sometimes the custom insertions needs to return some extra-data, that is not rendarable.
-     * Best way to allow this and keeping existing
-     * simplicity(when the result is a string) is: provide holder with container for that data.
-     * Best container is current templateContext, and it is set into this holder during creation.
+     * Updates this template instance with the given {@link RenderSettings}.
+     * 
+     * This method will fail with an {@link UnsupportedOperationException} exception if this instance has
+     * been created from a {@link TemplateParser}.
+     * 
+     * @param settings
+     *            The render settings.
+     * @return This instance.
+     * @deprecated use {@link TemplateParser}
+     */
+    @Deprecated
+    public Template withRenderSettings(RenderSettings settings) throws UnsupportedOperationException {
+        this.renderSettings = settings;
+        return this;
+    }
+
+    /**
+     * Sometimes the custom insertions needs to return some extra-data, that is not rendarable. Best way
+     * to allow this and keeping existing simplicity(when the result is a string) is: provide holder with
+     * container for that data. Best container is current templateContext, and it is set into this holder
+     * during creation.
      */
     public static class ContextHolder {
         private TemplateContext context;
+
         private void setContext(TemplateContext context) {
             this.context = context;
         }
+
         public TemplateContext getContext() {
             return context;
         }
     }
+
     public Template withContextHolder(ContextHolder holder) {
         this.contextHolder = holder;
         return this;
     }
 
     public List<RuntimeException> errors() {
-        return this.templateContext == null ? new ArrayList<RuntimeException>() : this.templateContext.errors();
+        return this.templateContext == null ? new ArrayList<RuntimeException>() : this.templateContext
+                .errors();
     }
 
     /**
      * Renders the template.
      *
      * @param jsonMap
-     *         a JSON-map denoting the (possibly nested)
-     *         variables that can be used in this Template.
+     *            a JSON-map denoting the (possibly nested) variables that can be used in this Template.
      *
      * @return a string denoting the rendered template.
      */
@@ -415,8 +590,7 @@ public class Template {
 
         try {
             map = this.parseSettings.mapper.readValue(jsonMap, HashMap.class);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("invalid json map: '" + jsonMap + "'", e);
         }
 
@@ -444,17 +618,14 @@ public class Template {
      * Renders the template.
      *
      * @param key
-     *         a key
+     *            a key
      * @param value
-     *         the value belonging to the key
+     *            the value belonging to the key
      * @param keyValues
-     *         an array denoting key-value pairs where the
-     *         uneven numbers (even indexes) should be Strings.
-     *         If the length of this array is uneven, the last
-     *         key (without the value) gets `null` attached to
-     *         it. Note that a call to this method with a single
-     *         String as parameter, will be handled by
-     *         `render(String jsonMap)` instead.
+     *            an array denoting key-value pairs where the uneven numbers (even indexes) should be
+     *            Strings. If the length of this array is uneven, the last key (without the value) gets
+     *            `null` attached to it. Note that a call to this method with a single String as
+     *            parameter, will be handled by `render(String jsonMap)` instead.
      *
      * @return a string denoting the rendered template.
      */
@@ -480,31 +651,33 @@ public class Template {
      * Renders the template.
      *
      * @param variables
-     *         a Map denoting the (possibly nested)
-     *         variables that can be used in this
-     *         Template.
+     *            a Map denoting the (possibly nested) variables that can be used in this Template.
      *
      * @return a string denoting the rendered template.
      */
     public String render(final Map<String, Object> variables) {
 
-        if (this.protectionSettings.isRenderTimeLimited()) {
+        if (this.getProtectionSettings().isRenderTimeLimited()) {
             return render(variables, Executors.newSingleThreadExecutor(), true);
         } else {
-            if (this.templateSize > this.protectionSettings.maxTemplateSizeBytes) {
-                throw new RuntimeException("template exceeds " + this.protectionSettings.maxTemplateSizeBytes + " bytes");
+            if (this.templateSize > this.getProtectionSettings().maxTemplateSizeBytes) {
+                throw new RuntimeException("template exceeds " +
+                        this.protectionSettings.maxTemplateSizeBytes + " bytes");
             }
             return renderUnguarded(variables);
         }
     }
 
-    public String render(final Map<String, Object> variables, ExecutorService executorService, boolean shutdown) {
+    public String render(final Map<String, Object> variables, ExecutorService executorService,
+            boolean shutdown) {
 
-        if (this.templateSize > this.protectionSettings.maxTemplateSizeBytes) {
-            throw new RuntimeException("template exceeds " + this.protectionSettings.maxTemplateSizeBytes + " bytes");
+        if (this.templateSize > this.getProtectionSettings().maxTemplateSizeBytes) {
+            throw new RuntimeException("template exceeds " +
+                    this.protectionSettings.maxTemplateSizeBytes + " bytes");
         }
 
         Callable<String> task = new Callable<String>() {
+            @Override
             public String call() {
                 return renderUnguarded(variables);
             }
@@ -512,16 +685,13 @@ public class Template {
 
         try {
             Future<String> future = executorService.submit(task);
-            return future.get(this.protectionSettings.maxRenderTimeMillis, TimeUnit.MILLISECONDS);
-        }
-        catch (TimeoutException e) {
+            return future.get(this.getProtectionSettings().maxRenderTimeMillis, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException e) {
             throw new RuntimeException("exceeded the max amount of time (" +
-                    this.protectionSettings.maxRenderTimeMillis + " ms.)");
-        }
-        catch (Throwable t) {
+                    this.getProtectionSettings().maxRenderTimeMillis + " ms.)");
+        } catch (Throwable t) {
             throw new RuntimeException("Oops, something unexpected happened: ", t);
-        }
-        finally {
+        } finally {
             if (shutdown) {
                 executorService.shutdown();
             }
@@ -529,13 +699,11 @@ public class Template {
     }
 
     /**
-     * Renders the template without guards provided by protection settings. This method has about 300x times
-     * better performance than plain render.
+     * Renders the template without guards provided by protection settings. This method has about 300x
+     * times better performance than plain render.
      *
      * @param variables
-     *         a Map denoting the (possibly nested)
-     *         variables that can be used in this
-     *         Template.
+     *            a Map denoting the (possibly nested) variables that can be used in this Template.
      *
      * @return a string denoting the rendered template.
      */
@@ -543,16 +711,20 @@ public class Template {
         return renderUnguarded(variables, null, true);
     }
 
-    public String renderUnguarded(Map<String, Object> variables, TemplateContext parent, boolean doClearThreadLocal) {
+    @SuppressWarnings("deprecation")
+    public String renderUnguarded(Map<String, Object> variables, TemplateContext parent,
+            boolean doClearThreadLocal) {
         if (doClearThreadLocal) {
             BasicTypesSupport.clearReferences();
         }
         if (variables.containsKey(Include.INCLUDES_DIRECTORY_KEY)) {
             Object includeDirectory = variables.get(Include.INCLUDES_DIRECTORY_KEY);
             if (includeDirectory instanceof File) {
-                variables.put(Include.INCLUDES_DIRECTORY_KEY, ((File) includeDirectory).getAbsolutePath());
+                variables.put(Include.INCLUDES_DIRECTORY_KEY, ((File) includeDirectory)
+                        .getAbsolutePath());
             } else if (includeDirectory instanceof Path) {
-                variables.put(Include.INCLUDES_DIRECTORY_KEY, ((Path) includeDirectory).toAbsolutePath().toString());
+                variables.put(Include.INCLUDES_DIRECTORY_KEY, ((Path) includeDirectory).toAbsolutePath()
+                        .toString());
             }
         }
         variables = renderSettings.evaluate(parseSettings.mapper, variables);
@@ -561,7 +733,12 @@ public class Template {
         try {
             LNode node = visitor.visit(root);
             if (parent == null) {
-                this.templateContext = new TemplateContext(protectionSettings, renderSettings, parseSettings, variables);
+                if (templateParser == null) {
+                    this.templateContext = new TemplateContext(getProtectionSettings(),
+                            getRenderSettings(), getParseSettings(), variables);
+                } else {
+                    this.templateContext = new TemplateContext(templateParser, variables);
+                }
             } else {
                 this.templateContext = new TemplateContext(parent, variables);
             }
@@ -570,8 +747,7 @@ public class Template {
             }
             Object rendered = node.render(this.templateContext);
             return rendered == null ? "" : String.valueOf(rendered);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             if (e instanceof RuntimeException) {
                 throw e;
             } else {
@@ -582,8 +758,9 @@ public class Template {
 
     /**
      * Renders the template using parent context
-     * @param parent
-     * @return
+     * 
+     * @param parent The parent context.
+     * @return a string denoting the rendered template.
      */
     public String renderUnguarded(TemplateContext parent) {
         return renderUnguarded(new HashMap<String, Object>(), parent, true);
@@ -596,11 +773,9 @@ public class Template {
     }
 
     /**
-     * Returns a string representation of the parse tree of the parsed
-     * input source.
+     * Returns a string representation of the parse tree of the parsed input source.
      *
-     * @return a string representation of the parse tree of the parsed
-     *         input source.
+     * @return a string representation of the parse tree of the parsed input source.
      */
     public String toStringTree() {
 
@@ -612,16 +787,16 @@ public class Template {
     }
 
     /**
-     * Walks a (sub) tree of the root of the input source and builds
-     * a string representation of the structure of the parse tree.
+     * Walks a (sub) tree of the root of the input source and builds a string representation of the
+     * structure of the parse tree.
      * <p/>
-     * Note that line breaks and multiple white space characters are
-     * trimmed to a single white space character.
+     * Note that line breaks and multiple white space characters are trimmed to a single white space
+     * character.
      *
      * @param tree
-     *         the (sub) tree.
+     *            the (sub) tree.
      * @param builder
-     *         the StringBuilder to fill.
+     *            the StringBuilder to fill.
      */
     private void walk(ParseTree tree, StringBuilder builder) {
 
@@ -637,8 +812,7 @@ public class Template {
 
             if (childStack.isEmpty()) {
                 childListStack.remove(childListStack.size() - 1);
-            }
-            else {
+            } else {
                 tree = childStack.remove(0);
 
                 String indent = "";
@@ -650,17 +824,19 @@ public class Template {
                 String tokenName = tree.getClass().getSimpleName().replaceAll("Context$", "");
                 String tokenText = tree.getText().replaceAll("\\s+", " ");
 
-                builder.append(indent)
-                        .append(childStack.isEmpty() ? "'- " : "|- ")
-                        .append(tokenName)
-                        .append(tree.getChildCount() == 0 ? "='" + tokenText + "'" : "")
-                        .append("\n");
+                builder.append(indent).append(childStack.isEmpty() ? "'- " : "|- ").append(tokenName)
+                        .append(tree.getChildCount() == 0 ? "='" + tokenText + "'" : "").append("\n");
 
                 if (tree.getChildCount() > 0) {
                     childListStack.add(new ArrayList<ParseTree>(children(tree)));
                 }
             }
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private static Filters getCurrentFilters(Flavor flavor) {
+        return Filter.getCurrentFilters(flavor);
     }
 
     private static List<ParseTree> children(ParseTree parent) {
@@ -674,7 +850,8 @@ public class Template {
         return children;
     }
 
-    private void putStringKey(boolean convertValueToMap, String key, Object value, Map<String, Object> map) {
+    private void putStringKey(boolean convertValueToMap, String key, Object value,
+            Map<String, Object> map) {
 
         if (key == null) {
             throw new RuntimeException("key cannot be null");
@@ -688,5 +865,21 @@ public class Template {
         } else {
             map.put(key, value);
         }
+    }
+    
+    public ProtectionSettings getProtectionSettings() {
+        return protectionSettings;
+    }
+
+    public RenderSettings getRenderSettings() {
+        return renderSettings;
+    }
+    
+    public ParseSettings getParseSettings() {
+        return parseSettings;
+    }
+    
+    TemplateParser getTemplateParser() {
+        return templateParser;
     }
 }

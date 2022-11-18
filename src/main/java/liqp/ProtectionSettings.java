@@ -3,6 +3,7 @@ package liqp;
 import liqp.exceptions.ExceededMaxIterationsException;
 
 public class ProtectionSettings {
+    public static final ProtectionSettings DEFAULT = new ProtectionSettings.Builder().build();
 
     public final int maxIterations;
     public final int maxSizeRenderedString;

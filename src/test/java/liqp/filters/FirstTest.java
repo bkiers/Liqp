@@ -1,19 +1,21 @@
 package liqp.filters;
 
-import liqp.Template;
-import liqp.TemplateContext;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
 
 public class FirstTest {
 
     @Test
     public void applyTest() throws RecognitionException {
 
-        Template template = Template.parse("{{values | first}}");
+        Template template = TemplateParser.DEFAULT.parse("{{values | first}}");
 
         String rendered = String.valueOf(template.render("{\"values\" : [\"Mu\", \"foo\", \"bar\"]}"));
 
@@ -22,7 +24,7 @@ public class FirstTest {
     
     @Test
     public void applyObjectTest() {
-    	Template template = Template.parse("{%- assign product = values | first -%}{{product.title}} {{product.price}}");
+    	Template template = TemplateParser.DEFAULT.parse("{%- assign product = values | first -%}{{product.title}} {{product.price}}");
 
         String rendered = String.valueOf(template.render("{\"values\" : [{ \"title\": \"Product 1\", \"price\": 1299 }, { \"title\": \"Product 2\", \"price\": 2999 }]}"));
 
@@ -40,7 +42,7 @@ public class FirstTest {
     @Test
     public void applyOriginalTest() {
 
-        Filter filter = Filter.getFilter("first");
+        Filter filter = Filters.COMMON_FILTERS.get("first");
 
         TemplateContext context = new TemplateContext();
         assertThat(filter.apply(new Integer[]{1, 2, 3}, context), is((Object)1));

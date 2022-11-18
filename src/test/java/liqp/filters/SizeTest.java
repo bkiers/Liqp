@@ -1,16 +1,18 @@
 package liqp.filters;
 
-import liqp.Template;
-import liqp.TemplateContext;
-import liqp.parser.Inspectable;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Collections;
 import java.util.HashMap;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
+import liqp.parser.Inspectable;
 
 public class SizeTest {
 
@@ -30,7 +32,7 @@ public class SizeTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render(json));
 
             assertThat(rendered, is(test[1]));
@@ -47,7 +49,7 @@ public class SizeTest {
     @Test
     public void applyOriginalTest() {
 
-        final Filter filter = Filter.getFilter("size");
+        final Filter filter = Filters.COMMON_FILTERS.get("size");
         TemplateContext context = new TemplateContext();
 
         assertThat(filter.apply(new Integer[]{1, 2, 3}, context), is( 3));

@@ -1,16 +1,18 @@
 package liqp.filters;
 
-import liqp.RenderSettings;
-import liqp.Template;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
+import liqp.RenderSettings;
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class AbsTest {
 
@@ -47,7 +49,7 @@ public class AbsTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -56,11 +58,13 @@ public class AbsTest {
 
     @Test
     public void ensureDateTypeIsZero() {
-        String res = Template.parse("{{ a | abs }}").render(Collections.singletonMap("a", LocalDateTime.now()));
+        String res = TemplateParser.DEFAULT.parse("{{ a | abs }}").render(Collections.singletonMap("a", LocalDateTime.now()));
         assertEquals("0", res);
 
         RenderSettings eager = new RenderSettings.Builder().withEvaluateMode(RenderSettings.EvaluateMode.EAGER).build();
-        res = Template.parse("{{ a | abs }}").withRenderSettings(eager).render(Collections.singletonMap("a", LocalDateTime.now()));
+        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(eager).build();
+        
+        res = parser.parse("{{ a | abs }}").render(Collections.singletonMap("a", LocalDateTime.now()));
         assertEquals("0", res);
     }
 

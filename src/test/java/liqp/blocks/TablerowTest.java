@@ -1,11 +1,13 @@
 package liqp.blocks;
 
-import liqp.Template;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class TablerowTest {
 
@@ -304,7 +306,7 @@ public class TablerowTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render(json));
             assertThat(rendered, is(test[1]));
         }
@@ -326,12 +328,12 @@ public class TablerowTest {
     public void htmlTableTest() throws RecognitionException {
 
         assertThat(
-                Template.parse("{% tablerow n in numbers cols:3%} {{n}} {% endtablerow %}")
+                TemplateParser.DEFAULT.parse("{% tablerow n in numbers cols:3%} {{n}} {% endtablerow %}")
                         .render("{ \"numbers\":[1,2,3,4,5,6] }"),
                 is("<tr class=\"row1\">\n<td class=\"col1\"> 1 </td><td class=\"col2\"> 2 </td><td class=\"col3\"> 3 </td></tr>\n<tr class=\"row2\"><td class=\"col1\"> 4 </td><td class=\"col2\"> 5 </td><td class=\"col3\"> 6 </td></tr>\n"));
 
         assertThat(
-                Template.parse("{% tablerow n in numbers cols:3%} {{n}} {% endtablerow %}")
+                TemplateParser.DEFAULT.parse("{% tablerow n in numbers cols:3%} {{n}} {% endtablerow %}")
                         .render("{ \"numbers\":[] }"),
                 is("<tr class=\"row1\">\n</tr>\n"));
     }
@@ -348,7 +350,7 @@ public class TablerowTest {
     public void htmlTableWithDifferentColsTest() throws RecognitionException {
 
         assertThat(
-                Template.parse("{% tablerow n in numbers cols:5%} {{n}} {% endtablerow %}")
+                TemplateParser.DEFAULT.parse("{% tablerow n in numbers cols:5%} {{n}} {% endtablerow %}")
                         .render("{ \"numbers\":[1,2,3,4,5,6] }"),
                 is("<tr class=\"row1\">\n<td class=\"col1\"> 1 </td><td class=\"col2\"> 2 </td><td class=\"col3\"> 3 </td><td class=\"col4\"> 4 </td><td class=\"col5\"> 5 </td></tr>\n<tr class=\"row2\"><td class=\"col1\"> 6 </td></tr>\n"));
     }
@@ -364,7 +366,7 @@ public class TablerowTest {
     public void htmlColCounterTest() throws RecognitionException {
 
         assertThat(
-                Template.parse("{% tablerow n in numbers cols:2%}{{tablerowloop.col}}{% endtablerow %}")
+                TemplateParser.DEFAULT.parse("{% tablerow n in numbers cols:2%}{{tablerowloop.col}}{% endtablerow %}")
                         .render("{ \"numbers\":[1,2,3,4,5,6] }"),
                 is("<tr class=\"row1\">\n<td class=\"col1\">1</td><td class=\"col2\">2</td></tr>\n<tr class=\"row2\"><td class=\"col1\">1</td><td class=\"col2\">2</td></tr>\n<tr class=\"row3\"><td class=\"col1\">1</td><td class=\"col2\">2</td></tr>\n"));
     }
@@ -384,12 +386,12 @@ public class TablerowTest {
     public void quotedFragmentTest() throws RecognitionException {
 
         assertThat(
-                Template.parse("{% tablerow n in collections.frontpage cols:3%} {{n}} {% endtablerow %}")
+                TemplateParser.DEFAULT.parse("{% tablerow n in collections.frontpage cols:3%} {{n}} {% endtablerow %}")
                         .render("{ \"collections\" : { \"frontpage\" : [1,2,3,4,5,6] } }"),
                 is("<tr class=\"row1\">\n<td class=\"col1\"> 1 </td><td class=\"col2\"> 2 </td><td class=\"col3\"> 3 </td></tr>\n<tr class=\"row2\"><td class=\"col1\"> 4 </td><td class=\"col2\"> 5 </td><td class=\"col3\"> 6 </td></tr>\n"));
 
         assertThat(
-                Template.parse("{% tablerow n in collections['frontpage'] cols:3%} {{n}} {% endtablerow %}")
+                TemplateParser.DEFAULT.parse("{% tablerow n in collections['frontpage'] cols:3%} {{n}} {% endtablerow %}")
                         .render("{ \"collections\" : { \"frontpage\" : [1,2,3,4,5,6] } }"),
                 is("<tr class=\"row1\">\n<td class=\"col1\"> 1 </td><td class=\"col2\"> 2 </td><td class=\"col3\"> 3 </td></tr>\n<tr class=\"row2\"><td class=\"col1\"> 4 </td><td class=\"col2\"> 5 </td><td class=\"col3\"> 6 </td></tr>\n"));
     }
@@ -405,7 +407,7 @@ public class TablerowTest {
     public void enumerableDropTest() throws RecognitionException {
 
         assertThat(
-                Template.parse("{% tablerow n in numbers cols:3%} {{n}} {% endtablerow %}")
+                TemplateParser.DEFAULT.parse("{% tablerow n in numbers cols:3%} {{n}} {% endtablerow %}")
                         .render("{ \"numbers\" : [1,2,3,4,5,6] }"),
                 is("<tr class=\"row1\">\n<td class=\"col1\"> 1 </td><td class=\"col2\"> 2 </td><td class=\"col3\"> 3 </td></tr>\n<tr class=\"row2\"><td class=\"col1\"> 4 </td><td class=\"col2\"> 5 </td><td class=\"col3\"> 6 </td></tr>\n"));
     }
@@ -421,7 +423,7 @@ public class TablerowTest {
     public void offsetAndLimitTest() throws RecognitionException {
 
         assertThat(
-                Template.parse("{% tablerow n in numbers cols:3 offset:1 limit:6%} {{n}} {% endtablerow %}")
+                TemplateParser.DEFAULT.parse("{% tablerow n in numbers cols:3 offset:1 limit:6%} {{n}} {% endtablerow %}")
                         .render("{ \"numbers\" : [0,1,2,3,4,5,6] }"),
                 is("<tr class=\"row1\">\n<td class=\"col1\"> 1 </td><td class=\"col2\"> 2 </td><td class=\"col3\"> 3 </td></tr>\n<tr class=\"row2\"><td class=\"col1\"> 4 </td><td class=\"col2\"> 5 </td><td class=\"col3\"> 6 </td></tr>\n"));
     }
@@ -433,12 +435,12 @@ public class TablerowTest {
      */
     @Test
     public void testBlankStringNotIterable() {
-        assertThat(Template.parse("{% tablerow char in characters cols:3 %}I WILL NOT BE OUTPUT{% endtablerow %}").render(), is("<tr class=\"row1\">\n</tr>\n"));
+        assertThat(TemplateParser.DEFAULT.parse("{% tablerow char in characters cols:3 %}I WILL NOT BE OUTPUT{% endtablerow %}").render(), is("<tr class=\"row1\">\n</tr>\n"));
     }
 
     @Test
     public void testVariableScopeShouldNotAffect() {
-        assertThat(Template.parse("{% for item in array %}{% tablerow item in array%}{{ item.id }}{% endtablerow %}-->[{{ item.id }}]<--\n{% endfor %}")
+        assertThat(TemplateParser.DEFAULT.parse("{% for item in array %}{% tablerow item in array%}{{ item.id }}{% endtablerow %}-->[{{ item.id }}]<--\n{% endfor %}")
                 .render("{ \"array\" : [{\"id\" : \"id1\"},{\"id\" : \"id2\"}] }"),
                 is("<tr class=\"row1\">\n" +
                 "<td class=\"col1\">id1</td><td class=\"col2\">id2</td></tr>\n" +
@@ -450,7 +452,7 @@ public class TablerowTest {
 
     @Test
     public void testVariableShouldNotBeVisibleAfterTag() {
-        assertThat(Template.parse("{% tablerow item in array%}{{ item.id }}{% endtablerow %}{{ item.id }}")
+        assertThat(TemplateParser.DEFAULT.parse("{% tablerow item in array%}{{ item.id }}{% endtablerow %}{{ item.id }}")
                 .render("{ \"array\" : [{\"id\" : \"id1\"},{\"id\" : \"id2\"}] }"),
                 is("<tr class=\"row1\">\n" +
                         "<td class=\"col1\">id1</td><td class=\"col2\">id2</td></tr>\n"));

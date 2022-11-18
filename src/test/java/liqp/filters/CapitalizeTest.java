@@ -1,12 +1,14 @@
 package liqp.filters;
 
-import liqp.Template;
-import liqp.TemplateContext;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
 
 public class CapitalizeTest {
 
@@ -21,7 +23,7 @@ public class CapitalizeTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -34,7 +36,7 @@ public class CapitalizeTest {
     @Test
     public void applyOriginalTest() {
 
-        Filter filter = Filter.getFilter("capitalize");
+        Filter filter = Filters.COMMON_FILTERS.get("capitalize");
 
         TemplateContext context = new TemplateContext();
         assertThat(filter.apply("testing", context), is((Object)"Testing"));

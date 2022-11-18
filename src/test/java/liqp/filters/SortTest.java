@@ -1,17 +1,19 @@
 package liqp.filters;
 
-import liqp.Template;
-import liqp.TemplateContext;
-import liqp.parser.Inspectable;
-import liqp.parser.LiquidSupport;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
+import liqp.parser.Inspectable;
+import liqp.parser.LiquidSupport;
 
 public class SortTest {
 
@@ -36,7 +38,7 @@ public class SortTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render(json));
 
             assertThat(rendered, is(test[1]));
@@ -52,7 +54,7 @@ public class SortTest {
     @Test
     public void applyOriginalTest() {
 
-        Filter filter = Filter.getFilter("sort");
+        Filter filter = Filters.COMMON_FILTERS.get("sort");
 
         assertThat(filter.apply(new Integer[]{4,3,2,1}, context), is((Object)new Integer[]{1,2,3,4}));
 
@@ -93,7 +95,7 @@ public class SortTest {
 
     @Test
     public void testInspectable() {
-        Filter filter = Filter.getFilter("sort");
+        Filter filter = Filters.COMMON_FILTERS.get("sort");
 
         Inspectable[] unsortedIns = new Inspectable[]{
                 new Pojo(4), new Pojo(3), new Pojo(2), new Pojo(1)
@@ -125,7 +127,7 @@ public class SortTest {
 
     @Test
     public void testLiquidSupport() {
-        Filter filter = Filter.getFilter("sort");
+        Filter filter = Filters.COMMON_FILTERS.get("sort");
 
         Inspectable[] unsortedIns = new Inspectable[]{
                 new PojoWithSupport(4), new PojoWithSupport(3), new PojoWithSupport(2), new PojoWithSupport(1)

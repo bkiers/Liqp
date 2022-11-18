@@ -2,6 +2,7 @@ package liqp.filters;
 
 import liqp.ParseSettings;
 import liqp.Template;
+import liqp.TemplateParser;
 import liqp.parser.Flavor;
 import liqp.parser.Inspectable;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class Relative_UrlTest {
      */
     @Test
     public void testProduceARelativeURLFromAPageURL() {
-        String res = Template.parse("{{ '/about/my_favorite_page/' | relative_url }}", jekyll())
+        String res = jekyllParser().parse("{{ '/about/my_favorite_page/' | relative_url }}")
                 .render(getData("/base"));
         assertEquals("/base/about/my_favorite_page/", res);
     }
@@ -34,7 +35,7 @@ public class Relative_UrlTest {
      */
     @Test
     public void testEnsureTheLeadingSlashBetweenBaseurlAndInput() {
-        String res = Template.parse("{{ 'about/my_favorite_page/' | relative_url }}", jekyll())
+        String res = jekyllParser().parse("{{ 'about/my_favorite_page/' | relative_url }}")
                 .render(getData("/base"));
         assertEquals("/base/about/my_favorite_page/", res);
     }
@@ -48,14 +49,14 @@ public class Relative_UrlTest {
      */
     @Test
     public void testEnsureTheLeadingSlashForTheBaseurl() {
-        String res = Template.parse("{{ 'about/my_favorite_page/' | relative_url }}", jekyll())
+        String res = jekyllParser().parse("{{ 'about/my_favorite_page/' | relative_url }}")
                 .render(getData("base"));
         assertEquals("/base/about/my_favorite_page/", res);
     }
 
     @Test
     public void testNormalizeInternationalURLs() {
-        String res = Template.parse("{{ '错误.html' | relative_url }}", jekyll())
+        String res = jekyllParser().parse("{{ '错误.html' | relative_url }}")
                 .render(getData("/base"));
         assertEquals("/base/%E9%94%99%E8%AF%AF.html", res);
     }
@@ -73,7 +74,7 @@ public class Relative_UrlTest {
      */
     @Test
     public void testBeOkWithANilBaseurl() {
-        String res = Template.parse("{{ 'about/my_favorite_page/' | relative_url }}", jekyll())
+        String res = jekyllParser().parse("{{ 'about/my_favorite_page/' | relative_url }}")
                 .render(Collections.singletonMap("baseurl", null));
         assertEquals("/about/my_favorite_page/", res);
     }
@@ -90,7 +91,7 @@ public class Relative_UrlTest {
      */
     @Test
     public void testShouldNotPrependAForwardSlashIfInputIsEmpty() {
-        String res = Template.parse("{{ '' | relative_url }}", jekyll())
+        String res = jekyllParser().parse("{{ '' | relative_url }}")
                 .render(getData("/base"));
         assertEquals("/base", res);
     }
@@ -107,7 +108,7 @@ public class Relative_UrlTest {
      */
     @Test
     public void testShouldNotPrependAForwardSlashIfBaseurlEndsWithASingleOne() {
-        String res = Template.parse("{{ '/css/main.css' | relative_url }}", jekyll())
+        String res = jekyllParser().parse("{{ '/css/main.css' | relative_url }}")
                 .render(getData("/base/"));
         assertEquals("/base/css/main.css", res);
     }
@@ -124,7 +125,7 @@ public class Relative_UrlTest {
      */
     @Test
     public void testShouldNotReturnValidURIIfBaseurlEndsWithMultipleOnes() {
-        String res = Template.parse("{{ '/css/main.css' | relative_url }}", jekyll())
+        String res = jekyllParser().parse("{{ '/css/main.css' | relative_url }}")
                 .render(getData("/base//"));
         assertEquals("/base/css/main.css", res);
     }
@@ -140,7 +141,7 @@ public class Relative_UrlTest {
      */
     @Test
     public void testNotPrependAForwardSlashIfBothInputAndBaseurlAreSimplySlashes() {
-        String res = Template.parse("{{ '/' | relative_url }}", jekyll())
+        String res = Flavor.JEKYLL.defaultParser().parse("{{ '/' | relative_url }}")
                 .render(getData("/"));
         assertEquals("/", res);
     }
@@ -160,7 +161,7 @@ public class Relative_UrlTest {
             public final String baseurl = "/baseurl/";
         });
 
-        String res = Template.parse("{{ '/my-page.html' | relative_url }}", jekyll())
+        String res = jekyllParser().parse("{{ '/my-page.html' | relative_url }}")
                 .render(data);
         assertEquals("/baseurl/my-page.html", res);
     }
@@ -172,7 +173,7 @@ public class Relative_UrlTest {
      */
     @Test
     public void testShouldTransformProtocolRelativeUrl() {
-        String res = Template.parse("{{ '//example.com/' | relative_url }}", jekyll())
+        String res = jekyllParser().parse("{{ '//example.com/' | relative_url }}")
                 .render(getData("/base"));
         assertEquals("/base/example.com/", res);
     }
@@ -185,7 +186,7 @@ public class Relative_UrlTest {
      */
     @Test
     public void testShouldNotModifyAnAbsoluteUrlWithScheme() {
-        String res = Template.parse("{{ 'file:///file.html' | relative_url }}", jekyll())
+        String res = jekyllParser().parse("{{ 'file:///file.html' | relative_url }}")
                 .render(getData("/base"));
         assertEquals("file:///file.html", res);
     }
@@ -198,14 +199,14 @@ public class Relative_UrlTest {
      */
     @Test
     public void testShouldNotNormalizeAbsoluteInternationalURLs() {
-        String res = Template.parse("{{ 'https://example.com/错误' | relative_url }}", jekyll())
+        String res = jekyllParser().parse("{{ 'https://example.com/错误' | relative_url }}")
                 .render(getData("/base"));
         assertEquals("https://example.com/错误", res);
     }
 
     @Test
     public void testWithFullyFeaturedUrl() {
-        String res = Template.parse("{{ '/some/path?with=extra&parameters=true#anchorhere' | relative_url }}", jekyll())
+        String res = jekyllParser().parse("{{ '/some/path?with=extra&parameters=true#anchorhere' | relative_url }}")
                 .render(getData("/base"));
         assertEquals("/base/some/path?with=extra&parameters=true#anchorhere", res);
     }
@@ -217,6 +218,10 @@ public class Relative_UrlTest {
     }
 
     private ParseSettings jekyll() {
-        return new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build();
+        return Flavor.JEKYLL.defaultParseSettings();
+    }
+
+    private TemplateParser jekyllParser() {
+        return new TemplateParser.Builder().withParseSettings(jekyll()).build();
     }
 }

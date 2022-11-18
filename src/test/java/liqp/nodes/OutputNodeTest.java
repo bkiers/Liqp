@@ -1,15 +1,17 @@
 package liqp.nodes;
 
-import liqp.Template;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
+import static junit.framework.TestCase.assertEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class OutputNodeTest {
 
@@ -23,7 +25,7 @@ public class OutputNodeTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render("{\"X\" : \"mu\"}"));
 
             assertThat(rendered, is(test[1]));
@@ -72,7 +74,7 @@ public class OutputNodeTest {
             String test = "{{" + keyword + "}}";
             String expected = keyword + "_" + Integer.toString(keyword.length());
             String json = "{\"" + keyword + "\" : \"" + expected + "\" }";
-            Template template = Template.parse(test);
+            Template template = TemplateParser.DEFAULT.parse(test);
             String rendered = template.render(json);
 
             assertThat(rendered + "=" + expected, rendered, is(expected));
@@ -95,7 +97,7 @@ public class OutputNodeTest {
             String test = "{{" + keyword[0] + "}}";
             String expected = keyword[1];
             String json = "{\"" + keyword[0] + "\" : \"bad\" }";
-            Template template = Template.parse(test);
+            Template template = TemplateParser.DEFAULT.parse(test);
             String rendered = template.render(json);
 
             String message = test + " --> [" + rendered + "] = [" + expected + "]";
@@ -108,7 +110,7 @@ public class OutputNodeTest {
         // given
 
         // when
-        String res = Template.parse("{{ a | truncate: 13 }}").render(Collections.singletonMap("a", LocalDateTime.parse("2011-12-03T10:15:30")));
+        String res = TemplateParser.DEFAULT.parse("{{ a | truncate: 13 }}").render(Collections.singletonMap("a", LocalDateTime.parse("2011-12-03T10:15:30")));
 
         // then
         assertEquals("2011-12-03...", res);

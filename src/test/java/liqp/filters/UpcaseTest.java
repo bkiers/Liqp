@@ -1,12 +1,14 @@
 package liqp.filters;
 
-import liqp.Template;
-import liqp.TemplateContext;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
 
 public class UpcaseTest {
 
@@ -22,7 +24,7 @@ public class UpcaseTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -38,7 +40,7 @@ public class UpcaseTest {
     @Test
     public void applyOriginalTest() {
         TemplateContext context = new TemplateContext();
-        final Filter filter = Filter.getFilter("upcase");
+        final Filter filter = Filters.COMMON_FILTERS.get("upcase");
 
         assertThat(filter.apply("Testing", context), is((Object)"TESTING"));
         assertThat(filter.apply(null, context), is((Object)""));

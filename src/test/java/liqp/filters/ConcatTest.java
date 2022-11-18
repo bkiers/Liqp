@@ -1,10 +1,12 @@
 package liqp.filters;
 
-import liqp.Template;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
+import org.junit.Test;
+
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class ConcatTest {
 
@@ -27,7 +29,7 @@ public class ConcatTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render(test[2]));
 
             assertThat(rendered, is(test[1]));
@@ -36,13 +38,13 @@ public class ConcatTest {
 
     @Test(expected = RuntimeException.class)
     public void applyTestParamNotArray() {
-        Template template = Template.parse("{{ a | concat: c }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ a | concat: c }}");
         template.render("{ \"a\": [1, 2], \"b\": [3, 4], \"c\": \"FOO\" }");
     }
 
     @Test(expected = RuntimeException.class)
     public void applyTestNoParam() {
-        Template template = Template.parse("{{ a | concat }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ a | concat }}");
         template.render("{ \"a\": [1, 2], \"b\": [3, 4], \"c\": \"FOO\" }");
     }
 }

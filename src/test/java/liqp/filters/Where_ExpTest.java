@@ -1,14 +1,14 @@
 package liqp.filters;
 
-import liqp.ParseSettings;
-import liqp.Template;
-import liqp.parser.Flavor;
-import org.junit.Test;
+import static java.util.Collections.singletonMap;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
-import static java.util.Collections.singletonMap;
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+import liqp.Template;
+import liqp.parser.Flavor;
 
 public class Where_ExpTest {
 
@@ -29,7 +29,7 @@ public class Where_ExpTest {
         Map<String, Object> data = singletonMap("var", (Object) "some string");
 
         // when
-        String res = Template.parse("{{ var | where_exp: \"la\", \"le\" }}", jekyll())
+        String res = Flavor.JEKYLL.defaultParser().parse("{{ var | where_exp: \"la\", \"le\" }}")
                 .render(data);
 
         // then
@@ -323,15 +323,6 @@ public class Where_ExpTest {
     }
 
     public Template parse(String template) {
-        return Template.parse(template, jekyll());
+        return Flavor.JEKYLL.defaultParser().parse(template);
     }
-    public ParseSettings jekyll() {
-        return new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build();
-    }
-
-    public ParseSettings liquid() {
-        return new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build();
-    }
-
-
 }

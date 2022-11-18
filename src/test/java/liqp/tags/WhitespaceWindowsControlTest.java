@@ -1,12 +1,14 @@
 package liqp.tags;
 
-import liqp.ParseSettings;
-import liqp.Template;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.ParseSettings;
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class WhitespaceWindowsControlTest {
 
@@ -14,7 +16,7 @@ public class WhitespaceWindowsControlTest {
     public void noStrip() throws RecognitionException {
 
         String source = "a  \r\n  {% assign letter = 'b' %}  \r\n{{ letter }}\r\n  c";
-        Template template = Template.parse(source);
+        Template template = TemplateParser.DEFAULT.parse(source);
         String rendered = String.valueOf(template.render().replace(' ', '.'));
 
         assertThat(rendered, is("a..\r\n....\r\nb\r\n..c"));
@@ -24,7 +26,7 @@ public class WhitespaceWindowsControlTest {
     public void oneLhsStrip() throws RecognitionException {
 
         String source = "a  \r\n  {%- assign letter = 'b' %}  \r\n{{ letter }}\r\n  c";
-        Template template = Template.parse(source);
+        Template template = TemplateParser.DEFAULT.parse(source);
         String rendered = String.valueOf(template.render().replace(' ', '.'));
 
         assertThat(rendered, is("a..\r\nb\r\n..c"));
@@ -34,7 +36,7 @@ public class WhitespaceWindowsControlTest {
     public void oneRhsStrip() throws RecognitionException {
 
         String source = "a  \r\n  {% assign letter = 'b' -%}  \r\n{{ letter }}\r\n  c";
-        Template template = Template.parse(source);
+        Template template = TemplateParser.DEFAULT.parse(source);
         String rendered = String.valueOf(template.render().replace(' ', '.'));
 
         assertThat(rendered, is("a..\r\n..b\r\n..c"));
@@ -44,7 +46,7 @@ public class WhitespaceWindowsControlTest {
     public void oneBothStrip() throws RecognitionException {
 
         String source = "a  \r\n  {%- assign letter = 'b' -%}  \r\n{{ letter }}\r\n  c";
-        Template template = Template.parse(source);
+        Template template = TemplateParser.DEFAULT.parse(source);
         String rendered = String.valueOf(template.render().replace(' ', '.'));
 
         assertThat(rendered, is("ab\r\n..c"));
@@ -54,7 +56,7 @@ public class WhitespaceWindowsControlTest {
     public void twoLhsStrip() throws RecognitionException {
 
         String source = "a  \r\n  {%- assign letter = 'b' %}  \r\n{{- letter }}\r\n  c";
-        Template template = Template.parse(source);
+        Template template = TemplateParser.DEFAULT.parse(source);
         String rendered = String.valueOf(template.render().replace(' ', '.'));
 
         assertThat(rendered, is("ab\r\n..c"));
@@ -64,7 +66,7 @@ public class WhitespaceWindowsControlTest {
     public void twoRhsStrip() throws RecognitionException {
 
         String source = "a  \r\n  {% assign letter = 'b' -%}  \r\n{{ letter -}}\r\n  c";
-        Template template = Template.parse(source);
+        Template template = TemplateParser.DEFAULT.parse(source);
         String rendered = String.valueOf(template.render().replace(' ', '.'));
 
         assertThat(rendered, is("a..\r\n..bc"));
@@ -74,7 +76,7 @@ public class WhitespaceWindowsControlTest {
     public void allStrip() throws RecognitionException {
 
         String source = "a  \r\n  {%- assign letter = 'b' -%}  \r\n{{- letter -}}\r\n  c";
-        Template template = Template.parse(source);
+        Template template = TemplateParser.DEFAULT.parse(source);
         String rendered = String.valueOf(template.render().replace(' ', '.'));
 
         assertThat(rendered, is("abc"));
@@ -85,7 +87,10 @@ public class WhitespaceWindowsControlTest {
 
         String source = "a  \r\n  {% assign letter = 'b' %}  \r\n{{ letter }}\r\n  c";
         ParseSettings settings = new ParseSettings.Builder().withStripSpaceAroundTags(true).build();
-        Template template = Template.parse(source, settings);
+        
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(settings).build();
+        
+        Template template = parser.parse(source);
         String rendered = String.valueOf(template.render().replace(' ', '.'));
 
         assertThat(rendered, is("abc"));

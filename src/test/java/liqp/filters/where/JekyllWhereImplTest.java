@@ -1,12 +1,7 @@
 package liqp.filters.where;
 
-import liqp.LValue;
-import liqp.ParseSettings;
-import liqp.Template;
-import liqp.TemplateContext;
-import liqp.parser.Flavor;
-import liqp.parser.LiquidSupport;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,14 +13,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
+import liqp.LValue;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.parser.Flavor;
+import liqp.parser.LiquidSupport;
 
 public class JekyllWhereImplTest {
-
-
     private Template parse(String input) {
-        return Template.parse(input, new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build());
+        return Flavor.JEKYLL.defaultParser().parse(input);
     }
 
     public static class ObjectEntry {

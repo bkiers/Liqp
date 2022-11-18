@@ -1,11 +1,13 @@
 package liqp.blocks;
 
-import liqp.Template;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class RawTest {
 
@@ -19,7 +21,7 @@ public class RawTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -35,7 +37,7 @@ public class RawTest {
     @Test
     public void tag_in_rawTest() throws RecognitionException {
 
-        assertThat(Template.parse("{% raw %}{% comment %} test {% endcomment %}{% endraw %}").render(),
+        assertThat(TemplateParser.DEFAULT.parse("{% raw %}{% comment %} test {% endcomment %}{% endraw %}").render(),
                 is("{% comment %} test {% endcomment %}"));
     }
 
@@ -48,7 +50,7 @@ public class RawTest {
     @Test
     public void output_in_rawTest() throws RecognitionException {
 
-        assertThat(Template.parse("{% raw %}{{ test }}{% endraw %}").render(),
+        assertThat(TemplateParser.DEFAULT.parse("{% raw %}{{ test }}{% endraw %}").render(),
                 is("{{ test }}"));
     }
 }

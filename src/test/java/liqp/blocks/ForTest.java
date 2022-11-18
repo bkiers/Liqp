@@ -14,6 +14,7 @@ import java.util.Map;
 import liqp.RenderSettings;
 import liqp.Template;
 import liqp.TemplateContext;
+import liqp.TemplateParser;
 import liqp.parser.Inspectable;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Assert;
@@ -58,7 +59,7 @@ public class ForTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render(json));
 
             assertThat(test[0] + "=" + test[1], rendered, is(test[1]));
@@ -91,10 +92,10 @@ public class ForTest {
     @Test
     public void forTest() throws RecognitionException {
 
-        assertThat(Template.parse("{%for item in array%} yo {%endfor%}").render("{\"array\":[1,2,3,4]}"), is(" yo  yo  yo  yo "));
-        assertThat(Template.parse("{%for item in array%}yo{%endfor%}").render("{\"array\":[1,2]}"), is("yoyo"));
-        assertThat(Template.parse("{%for item in array%} yo {%endfor%}").render("{\"array\":[1]}"), is(" yo "));
-        assertThat(Template.parse("{%for item in array%}{%endfor%}").render("{\"array\":[1,2]}"), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%} yo {%endfor%}").render("{\"array\":[1,2,3,4]}"), is(" yo  yo  yo  yo "));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%}yo{%endfor%}").render("{\"array\":[1,2]}"), is("yoyo"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%} yo {%endfor%}").render("{\"array\":[1]}"), is(" yo "));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%}{%endfor%}").render("{\"array\":[1,2]}"), is(""));
         assertTemplateResult("\n"
                 + "  yo\n"
                 + "\n"
@@ -122,7 +123,7 @@ public class ForTest {
      *     assert_template_result(' 1  2  3 ', '{%for item in (1..3) %} {{item}} {%endfor%}')
      *
      *     assert_raises(Liquid::ArgumentError) do
-     *       Template.parse('{% for i in (a..2) %}{% endfor %}').render!("a" => [1, 2])
+     *       TemplateParser.DEFAULT.parse('{% for i in (a..2) %}{% endfor %}').render!("a" => [1, 2])
      *     end
      *
      *     assert_template_result(' 0  1  2  3 ', '{% for item in (a..3) %} {{item}} {% endfor %}', "a" => "invalid integer")
@@ -133,7 +134,7 @@ public class ForTest {
         assertTemplateResult(" 1  2  3 ", "{%for item in (1..3) %} {{item}} {%endfor%}");
 
         try{
-            Template.parse("{% for i in (a..2) %}{% endfor %}").render("{\"a\" : [1, 2]}");
+            TemplateParser.DEFAULT.parse("{% for i in (a..2) %}{% endfor %}").render("{\"a\" : [1, 2]}");
             fail();
         } catch (Exception e) { }
 
@@ -189,12 +190,12 @@ public class ForTest {
     @Test
     public void forWithVariableTest() throws RecognitionException {
 
-        assertThat(Template.parse("{%for item in array%} {{item}} {%endfor%}").render("{\"array\":[1,2,3]}"), is(" 1  2  3 "));
-        assertThat(Template.parse("{%for item in array%}{{item}}{%endfor%}").render("{\"array\":[1,2,3]}"), is("123"));
-        assertThat(Template.parse("{% for item in array %}{{item}}{% endfor %}").render("{\"array\":[1,2,3]}"), is("123"));
-        assertThat(Template.parse("{%for item in array%}{{item}}{%endfor%}").render("{\"array\":[\"a\",\"b\",\"c\",\"d\"]}"), is("abcd"));
-        assertThat(Template.parse("{%for item in array%}{{item}}{%endfor%}").render("{\"array\":[\"a\",\" \",\"b\",\" \",\"c\"]}"), is("a b c"));
-        assertThat(Template.parse("{%for item in array%}{{item}}{%endfor%}").render("{\"array\":[\"a\",\"\",\"b\",\"\",\"c\"]}"), is("abc"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%} {{item}} {%endfor%}").render("{\"array\":[1,2,3]}"), is(" 1  2  3 "));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%}{{item}}{%endfor%}").render("{\"array\":[1,2,3]}"), is("123"));
+        assertThat(TemplateParser.DEFAULT.parse("{% for item in array %}{{item}}{% endfor %}").render("{\"array\":[1,2,3]}"), is("123"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%}{{item}}{%endfor%}").render("{\"array\":[\"a\",\"b\",\"c\",\"d\"]}"), is("abcd"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%}{{item}}{%endfor%}").render("{\"array\":[\"a\",\" \",\"b\",\" \",\"c\"]}"), is("a b c"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%}{{item}}{%endfor%}").render("{\"array\":[\"a\",\"\",\"b\",\"\",\"c\"]}"), is("abc"));
     }
 
     /*
@@ -216,13 +217,13 @@ public class ForTest {
 
         final String assigns = "{\"array\":[1,2,3]}";
 
-        assertThat(Template.parse("{%for item in array%} {{forloop.index}}/{{forloop.length}} {%endfor%}").render(assigns), is(" 1/3  2/3  3/3 "));
-        assertThat(Template.parse("{%for item in array%} {{forloop.index}} {%endfor%}").render(assigns), is(" 1  2  3 "));
-        assertThat(Template.parse("{%for item in array%} {{forloop.index0}} {%endfor%}").render(assigns), is(" 0  1  2 "));
-        assertThat(Template.parse("{%for item in array%} {{forloop.rindex0}} {%endfor%}").render(assigns), is(" 2  1  0 "));
-        assertThat(Template.parse("{%for item in array%} {{forloop.rindex}} {%endfor%}").render(assigns), is(" 3  2  1 "));
-        assertThat(Template.parse("{%for item in array%} {{forloop.first}} {%endfor%}").render(assigns), is(" true  false  false "));
-        assertThat(Template.parse("{%for item in array%} {{forloop.last}} {%endfor%}").render(assigns), is(" false  false  true "));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%} {{forloop.index}}/{{forloop.length}} {%endfor%}").render(assigns), is(" 1/3  2/3  3/3 "));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%} {{forloop.index}} {%endfor%}").render(assigns), is(" 1  2  3 "));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%} {{forloop.index0}} {%endfor%}").render(assigns), is(" 0  1  2 "));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%} {{forloop.rindex0}} {%endfor%}").render(assigns), is(" 2  1  0 "));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%} {{forloop.rindex}} {%endfor%}").render(assigns), is(" 3  2  1 "));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%} {{forloop.first}} {%endfor%}").render(assigns), is(" true  false  false "));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%} {{forloop.last}} {%endfor%}").render(assigns), is(" false  false  true "));
     }
 
     /*
@@ -238,7 +239,7 @@ public class ForTest {
 
         final String assigns = "{\"array\":[1,2,3]}";
 
-        assertThat(Template.parse("{%for item in array%}{% if forloop.first %}+{% else %}-{% endif %}{%endfor%}").render(assigns), is("+--"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%}{% if forloop.first %}+{% else %}-{% endif %}{%endfor%}").render(assigns), is("+--"));
     }
 
     /*
@@ -251,9 +252,9 @@ public class ForTest {
     @Test
     public void forElseTest() throws RecognitionException {
 
-        assertThat(Template.parse("{%for item in array%}+{%else%}-{%endfor%}").render("{\"array\":[1,2,3]}"), is("+++"));
-        assertThat(Template.parse("{%for item in array%}+{%else%}-{%endfor%}").render("{\"array\":[]}"), is("-"));
-        assertThat(Template.parse("{%for item in array%}+{%else%}-{%endfor%}").render("{\"array\":null}"), is("-"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%}+{%else%}-{%endfor%}").render("{\"array\":[1,2,3]}"), is("+++"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%}+{%else%}-{%endfor%}").render("{\"array\":[]}"), is("-"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%}+{%else%}-{%endfor%}").render("{\"array\":null}"), is("-"));
     }
 
     /*
@@ -270,10 +271,10 @@ public class ForTest {
 
         final String assigns = "{\"array\":[1,2,3,4,5,6,7,8,9,0]}";
 
-        assertThat(Template.parse("{%for i in array limit:2 %}{{ i }}{%endfor%}").render(assigns), is("12"));
-        assertThat(Template.parse("{%for i in array limit:4 %}{{ i }}{%endfor%}").render(assigns), is("1234"));
-        assertThat(Template.parse("{%for i in array limit:4 offset:2 %}{{ i }}{%endfor%}").render(assigns), is("3456"));
-        assertThat(Template.parse("{%for i in array limit: 4 offset: 2 %}{{ i }}{%endfor%}").render(assigns), is("3456"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for i in array limit:2 %}{{ i }}{%endfor%}").render(assigns), is("12"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for i in array limit:4 %}{{ i }}{%endfor%}").render(assigns), is("1234"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for i in array limit:4 offset:2 %}{{ i }}{%endfor%}").render(assigns), is("3456"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for i in array limit: 4 offset: 2 %}{{ i }}{%endfor%}").render(assigns), is("3456"));
     }
 
     /*
@@ -290,7 +291,7 @@ public class ForTest {
 
         final String assigns = "{ \"array\":[1,2,3,4,5,6,7,8,9,0], \"limit\":2, \"offset\":2 }";
 
-        assertThat(Template.parse("{%for i in array limit: limit offset: offset %}{{ i }}{%endfor%}").render(assigns), is("34"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for i in array limit: limit offset: offset %}{{ i }}{%endfor%}").render(assigns), is("34"));
     }
 
     /*
@@ -304,7 +305,7 @@ public class ForTest {
 
         final String assigns = "{ \"array\":[[1,2], [3,4], [5,6]] }";
 
-        assertThat(Template.parse("{%for item in array%}{%for i in item%}{{ i }}{%endfor%}{%endfor%}").render(assigns), is("123456"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for item in array%}{%for i in item%}{{ i }}{%endfor%}{%endfor%}").render(assigns), is("123456"));
     }
 
     /*
@@ -318,7 +319,7 @@ public class ForTest {
 
         final String assigns = "{ \"array\":[1,2,3,4,5,6,7,8,9,0] }";
 
-        assertThat(Template.parse("{%for i in array offset:7 %}{{ i }}{%endfor%}").render(assigns), is("890"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for i in array offset:7 %}{{ i }}{%endfor%}").render(assigns), is("890"));
     }
 
     /*
@@ -358,7 +359,7 @@ public class ForTest {
                 "next\n" +
                 "789";
 
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
     }
 
     /*
@@ -398,7 +399,7 @@ public class ForTest {
                 "next\n" +
                 "7";
 
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
     }
 
     /*
@@ -438,7 +439,7 @@ public class ForTest {
                 "next\n" +
                 "7890";
 
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
     }
 
     /*
@@ -473,7 +474,7 @@ public class ForTest {
                 "456\n" +
                 "next\n";
 
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
     }
 
     /*
@@ -524,19 +525,19 @@ public class ForTest {
 
         String markup = "{% for i in array.items %}{% break %}{% endfor %}";
         String expected = "";
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
 
         markup = "{% for i in array.items %}{{ i }}{% break %}{% endfor %}";
         expected = "1";
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
 
         markup = "{% for i in array.items %}{% break %}{{ i }}{% endfor %}";
         expected = "";
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
 
         markup = "{% for i in array.items %}{{ i }}{% if i > 3 %}{% break %}{% endif %}{% endfor %}";
         expected = "1234";
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
 
         assigns = "{ \"array\":[[1,2],[3,4],[5,6]] }";
 
@@ -549,13 +550,13 @@ public class ForTest {
                 "{% endfor %}" +
                 "{% endfor %}";
         expected = "3456";
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
 
         assigns = "{ \"array\": { \"items\":[1,2,3,4,5] } }";
 
         markup = "{% for i in array.items %}{% if i == 9999 %}{% break %}{% endif %}{{ i }}{% endfor %}";
         expected = "12345";
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
     }
 
     /*
@@ -609,23 +610,23 @@ public class ForTest {
 
         String markup = "{% for i in array.items %}{% continue %}{% endfor %}";
         String expected = "";
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
 
         markup = "{% for i in array.items %}{{ i }}{% continue %}{% endfor %}";
         expected = "12345";
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
 
         markup = "{% for i in array.items %}{% continue %}{{ i }}{% endfor %}";
         expected = "";
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
 
         markup = "{% for i in array.items %}{% if i > 3 %}{% continue %}{% endif %}{{ i }}{% endfor %}";
         expected = "123";
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
 
         markup = "{% for i in array.items %}{% if i == 3 %}{% continue %}{% else %}{{ i }}{% endif %}{% endfor %}";
         expected = "1245";
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
 
         assigns = "{ \"array\":[[1,2],[3,4],[5,6]] }";
 
@@ -638,13 +639,13 @@ public class ForTest {
                 "{% endfor %}" +
                 "{% endfor %}";
         expected = "23456";
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
 
         assigns = "{ \"array\": { \"items\":[1,2,3,4,5] } }";
 
         markup = "{% for i in array.items %}{% if i == 9999 %}{% continue %}{% endif %}{{ i }}{% endfor %}";
         expected = "12345";
-        assertThat(Template.parse(markup).render(assigns), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(markup).render(assigns), is(expected));
     }
 
     /*
@@ -680,11 +681,11 @@ public class ForTest {
 
         String json = "{ \"string\":\"test string\" }";
 
-        assertThat(Template.parse("{%for val in string%}{{val}}{%endfor%}").render(json), is("test string"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for val in string%}{{val}}{%endfor%}").render(json), is("test string"));
 
-        assertThat(Template.parse("{%for val in string limit:1%}{{val}}{%endfor%}").render(json), is("test string"));
+        assertThat(TemplateParser.DEFAULT.parse("{%for val in string limit:1%}{{val}}{%endfor%}").render(json), is("test string"));
 
-        assertThat(Template.parse("{%for val in string%}" +
+        assertThat(TemplateParser.DEFAULT.parse("{%for val in string%}" +
                 "{{forloop.name}}-" +
                 "{{forloop.index}}-" +
                 "{{forloop.length}}-" +
@@ -744,7 +745,7 @@ public class ForTest {
         String json = "{ \"X\": [ { \"Y\":\"foo\"}, \"test string\" ] }";
 
         // extra `name` testjson = "{ \"string\":\"test string\" }";
-        String rendered = Template.parse("{% for x in X[0].Y %}{{forloop.name}}-{{x}}{%endfor%}").render(json);
+        String rendered = TemplateParser.DEFAULT.parse("{% for x in X[0].Y %}{{forloop.name}}-{{x}}{%endfor%}").render(json);
         // when
 
         // then
@@ -759,7 +760,7 @@ public class ForTest {
     @Test
     public void blankStringNotIterableTest() throws RecognitionException {
         assertTemplateResult("", "{% for char in characters %}I WILL NOT BE OUTPUT{% endfor %}", singletonMap("characters", ""));
-        assertThat(Template.parse("{% for char in characters %}I WILL NOT BE OUTPUT{% endfor %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% for char in characters %}I WILL NOT BE OUTPUT{% endfor %}").render(), is(""));
     }
 
 
@@ -777,7 +778,7 @@ public class ForTest {
      * {% endfor %}`
      * HEREDOC
      *
-     * @template = Liquid::Template.parse(template)
+     * @template = Liquid::TemplateParser.DEFAULT.parse(template)
      * rendered = @template.render('chars' => %w[a b c])
      *
      * puts(rendered)
@@ -825,11 +826,11 @@ public class ForTest {
                 "  \n" +
                 "`";
 
-        assertThat(Template.parse(template).render(variables), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(template).render(variables), is(expected));
     }
 
     /*
-     * @template = Liquid::Template.parse("{% for item in hash %}{{ item[0] }} is {{ item[1] }};{% endfor %}")
+     * @template = Liquid::TemplateParser.DEFAULT.parse("{% for item in hash %}{{ item[0] }} is {{ item[1] }};{% endfor %}")
      *
      * puts @template.render('hash' => {'a' => 'AAA', 'b' => 'BBB'})
      */
@@ -842,7 +843,7 @@ public class ForTest {
         String template = "{% for item in hash %}{{ item[0] }} is {{ item[1] }};{% endfor %}";
 
         String expected = "a is AAA;b is BBB;";
-        String rendered = Template.parse(template).render(hash);
+        String rendered = TemplateParser.DEFAULT.parse(template).render(hash);
 
         Assert.assertThat(rendered, is(expected));
     }
@@ -856,7 +857,7 @@ public class ForTest {
         String template = "{{ x | first | map: 'rating' }}";
 
         // when
-        String rendered = Template.parse(template).render(hash);
+        String rendered = TemplateParser.DEFAULT.parse(template).render(hash);
 
         // then
         assertEquals("4.5", rendered);
@@ -869,15 +870,15 @@ public class ForTest {
         final String markup = "{%for i in array.items limit:9 %}{%endfor%}{%for i in array.items offset:continue %}{{i}}{%endfor%}" +
                 "{{ continue }}";
 
-        String rendered = Template.parse(markup).render(assigns);
+        String rendered = TemplateParser.DEFAULT.parse(markup).render(assigns);
         assertEquals("0", rendered);
     }
 
     @Test
     public void testReversedSimple() {
-        assertEquals("987654321", Template.parse("{%for i in (1..9) reversed %}{{i}}{%endfor%}").render());
-        assertEquals("121:120:", Template.parse("{%for i in (116..121) reversed offset: 4 %}{{i}}:{%endfor%}").render());
-        assertEquals("", Template.parse("{%for i in (121..116) reversed offset: 4 %}{{i}}:{%endfor%}").render());
+        assertEquals("987654321", TemplateParser.DEFAULT.parse("{%for i in (1..9) reversed %}{{i}}{%endfor%}").render());
+        assertEquals("121:120:", TemplateParser.DEFAULT.parse("{%for i in (116..121) reversed offset: 4 %}{{i}}:{%endfor%}").render());
+        assertEquals("", TemplateParser.DEFAULT.parse("{%for i in (121..116) reversed offset: 4 %}{{i}}:{%endfor%}").render());
     }
 
     /*
@@ -885,7 +886,7 @@ public class ForTest {
      *     context = Context.new(ErrorDrop.new)
      *
      *     assert_raises(StandardError) do
-     *       Liquid::Template.parse('{% for i in (1..2) %}{{ standard_error }}{% endfor %}').render!(context)
+     *       Liquid::TemplateParser.DEFAULT.parse('{% for i in (1..2) %}{{ standard_error }}{% endfor %}').render!(context)
      *     end
      *
      *     assert context.registers[:for_stack].empty?
@@ -895,9 +896,11 @@ public class ForTest {
     public void test_for_cleans_up_registers() {
         Template.ContextHolder holder = new Template.ContextHolder();
         try {
-            Template.parse("{% for i in (1..2) %}{{ standard_error }}{% endfor %}")
+            TemplateParser parser = new TemplateParser.Builder().withRenderSettings(
+                    new RenderSettings.Builder().withStrictVariables(true).build()).build();
+            
+            parser.parse("{% for i in (1..2) %}{{ standard_error }}{% endfor %}")
                     .withContextHolder(holder)
-                    .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build())
                     .render();
             fail();
         } catch (Exception e) {
@@ -909,13 +912,13 @@ public class ForTest {
 
 
     public void assertTemplateResult(String expected, String template) {
-        assertThat(Template.parse(template).render(), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(template).render(), is(expected));
     }
 
     public void assertTemplateResult(String expected, String template, Map data) {
-        assertThat(Template.parse(template).render(data), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(template).render(data), is(expected));
     }
     public void assertTemplateResult(String expected, String template, String data) {
-        assertThat(Template.parse(template).render(data), is(expected));
+        assertThat(TemplateParser.DEFAULT.parse(template).render(data), is(expected));
     }
 }

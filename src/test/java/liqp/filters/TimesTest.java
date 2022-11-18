@@ -1,13 +1,15 @@
 package liqp.filters;
 
-import liqp.Template;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class TimesTest {
 
@@ -26,7 +28,7 @@ public class TimesTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -35,12 +37,12 @@ public class TimesTest {
 
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid1() {
-        Filter.getFilter("times").apply(1);
+        Filters.COMMON_FILTERS.get("times").apply(1);
     }
 
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid2() {
-        Filter.getFilter("times").apply(1, 2, 3);
+        Filters.COMMON_FILTERS.get("times").apply(1, 2, 3);
     }
 
     /*
@@ -58,7 +60,7 @@ public class TimesTest {
     @Test
     public void applyOriginalTest() {
 
-        Filter filter = Filter.getFilter("times");
+        Filter filter = Filters.COMMON_FILTERS.get("times");
 
         assertThat(filter.apply(3L, 4L), is((Object)12L));
         // assert_template_result "0", "{{ 'foo' | times:4 }}" // see: applyTest()

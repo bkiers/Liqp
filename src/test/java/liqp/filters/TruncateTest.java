@@ -1,12 +1,14 @@
 package liqp.filters;
 
-import liqp.Template;
-import liqp.TemplateContext;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
 
 public class TruncateTest {
 
@@ -29,7 +31,7 @@ public class TruncateTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render(json));
 
             assertThat(rendered, is(test[1]));
@@ -47,7 +49,7 @@ public class TruncateTest {
     @Test
     public void applyOriginalTest() {
         TemplateContext context = new TemplateContext();
-        final Filter filter = Filter.getFilter("truncate");
+        final Filter filter = Filters.COMMON_FILTERS.get("truncate");
 
         assertThat(filter.apply("1234567890", context, 7), is((Object)"1234..."));
         assertThat(filter.apply("1234567890", context, 20), is((Object)"1234567890"));

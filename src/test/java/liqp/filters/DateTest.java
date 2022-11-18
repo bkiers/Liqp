@@ -1,5 +1,10 @@
 package liqp.filters;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -7,30 +12,28 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Before;
+import org.junit.Test;
+
 import liqp.ParseSettings;
 import liqp.ProtectionSettings;
 import liqp.RenderSettings;
 import liqp.Template;
 import liqp.TemplateContext;
+import liqp.TemplateParser;
 import liqp.filters.date.CustomDateFormatSupport;
 import liqp.parser.Flavor;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Before;
-import org.junit.Test;
 import ua.co.k.strftime.formatters.HybridFormat;
 
-import java.text.SimpleDateFormat;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-
 public class DateTest {
+    
+    private ParseSettings dateFilterSetting = null;
 
     @Before
     public void init() {
         // reset
-        Filter.registerFilter(new Date());
+        dateFilterSetting = new ParseSettings.Builder().with(new Date()).build();
     }
 
     // NOTE: you have to put your machine in US/Eastern time for this test to pass
@@ -76,7 +79,7 @@ public class DateTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat("render('" + test[0] + "') = ", rendered, is(test[1]));
@@ -114,7 +117,7 @@ public class DateTest {
     public void applyOriginalTest() throws Exception {
 
         TemplateContext context = new TemplateContext();
-        final Filter filter = Filter.getFilter("date");
+        final Filter filter = dateFilterSetting.filters.get("date");
 
         assertThat(filter.apply("Fri Jul 16 01:00:00 2004", context,"%m/%d/%Y"), is((Object)"07/16/2004"));
 
@@ -176,14 +179,16 @@ public class DateTest {
                 return CustomDate.class.isInstance(in);
             }
         });
-        Filter.registerFilter(f);
+
+        ParseSettings parseSettings = new ParseSettings.Builder().with(f).build();
 
         // when
         CustomDate customDate = new CustomDate(1152098955000L);
 
         // then
         TemplateContext context = new TemplateContext();
-        assertThat(Filter.getFilter("date").apply(customDate, context, "%m/%d/%Y"), is((Object) "07/05/2006"));
+        assertThat(parseSettings.filters.get("date").apply(customDate, context, "%m/%d/%Y"), is(
+                (Object) "07/05/2006"));
     }
 
     @Test
@@ -193,7 +198,8 @@ public class DateTest {
         // String val = "2021-01-27 00:00:00 EST";
 
         // when
-        Object res = Filter.getFilter("date").apply(val, new TemplateContext(), "%Y-%m-%d %H:%M:%S %z");
+        Object res = dateFilterSetting.filters.get("date").apply(val, new TemplateContext(),
+                "%Y-%m-%d %H:%M:%S %z");
 
         // then
         assertThat((String) res, is("2010-10-31 00:00:00 -0500"));
@@ -206,7 +212,7 @@ public class DateTest {
         values.put("date_with_t", "2020-01-01T12:30:00");
         values.put("date_with_space", "2020-01-01 12:30:00");
 
-        Template t = Template.parse("Space: {{ date_with_space | date: '%Y' }} | T: {{ date_with_t | date: '%Y' }}");
+        Template t = TemplateParser.DEFAULT.parse("Space: {{ date_with_space | date: '%Y' }} | T: {{ date_with_t | date: '%Y' }}");
 
         String result = t.render(values);
         assertEquals("Space: 2020 | T: 2020", result);

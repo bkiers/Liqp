@@ -46,6 +46,8 @@ public class Parser {
         datePatterns.add("yyyy-MM-dd HH:mm:ss z");
         datePatterns.add("yyyy-MM-dd'T'HH:mm:ss z");
         datePatterns.add("EEE MMM dd hh:mm:ss yyyy");
+        datePatterns.add("yyyy-MM-dd");
+        datePatterns.add("dd-MM-yyyy");
     }
 
     public static ZonedDateTime parse(String str, Locale locale, ZoneId defaultZone) {

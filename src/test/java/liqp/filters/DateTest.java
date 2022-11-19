@@ -15,6 +15,7 @@ import liqp.TemplateContext;
 import liqp.filters.date.CustomDateFormatSupport;
 import liqp.parser.Flavor;
 import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import ua.co.k.strftime.formatters.HybridFormat;
@@ -210,5 +211,12 @@ public class DateTest {
 
         String result = t.render(values);
         assertEquals("Space: 2020 | T: 2020", result);
+    }
+
+    @Test
+    public void test240() {
+        assertEquals("10-13", Template.parse("{{ \"2022-10-13 12:06:04\" | date: \"%m-%e\" }}").render());
+        assertEquals("10-13", Template.parse("{{ \"2022-10-13\" | date: \"%m-%e\" }}").render());
+        assertEquals("10-13", Template.parse("{{ \"13-10-2022\" | date: \"%m-%e\" }}").render());
     }
 }

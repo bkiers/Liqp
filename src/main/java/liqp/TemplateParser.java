@@ -3,6 +3,9 @@ package liqp;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
+
+import org.antlr.v4.runtime.CharStreams;
 
 import liqp.parser.Flavor;
 
@@ -68,15 +71,19 @@ public class TemplateParser {
     }
 
     public Template parse(File file) throws IOException {
-        return new Template.BuiltTemplate(this, file);
+        return new Template.BuiltTemplate(this, CharStreams.fromPath(file.toPath()));
     }
 
     public Template parse(String input) {
-        return new Template.BuiltTemplate(this, input);
+        return new Template.BuiltTemplate(this, CharStreams.fromString(input));
     }
 
     public Template parse(InputStream input) throws IOException {
-        return new Template.BuiltTemplate(this, input);
+        return new Template.BuiltTemplate(this, CharStreams.fromStream(input));
+    }
+
+    public Template parse(Reader reader) throws IOException {
+        return new Template.BuiltTemplate(this, CharStreams.fromReader(reader));
     }
 
     public ParseSettings getParseSettings() {

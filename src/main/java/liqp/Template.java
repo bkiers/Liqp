@@ -81,18 +81,10 @@ public class Template {
     private ContextHolder contextHolder;
 
     private TemplateParser templateParser = null;
-    
+
     static final class BuiltTemplate extends Template {
-        BuiltTemplate(TemplateParser parser, File file) throws IOException {
-            super(file, parser);
-        }
-
-        BuiltTemplate(TemplateParser parser, String input) {
-            super(input, parser);
-        }
-
-        BuiltTemplate(TemplateParser parser, InputStream input) throws IOException {
-            super(input, parser);
+        BuiltTemplate(TemplateParser parser, CharStream charStream) {
+            super(parser, charStream);
         }
 
         @Deprecated
@@ -108,7 +100,7 @@ public class Template {
             throw new UnsupportedOperationException("Already configured by " + TemplateParser.class
                     .getName());
         }
-        
+
         @Override
         public ProtectionSettings getProtectionSettings() {
             return getTemplateParser().getProtectionSettings();
@@ -118,7 +110,7 @@ public class Template {
         public RenderSettings getRenderSettings() {
             return getTemplateParser().getRenderSettings();
         }
-        
+
         @Override
         public ParseSettings getParseSettings() {
             return getTemplateParser().getParseSettings();
@@ -136,28 +128,10 @@ public class Template {
      *            the filters this instance will make use of.
      */
     private Template(String input, Insertions insertions, Filters filters, ParseSettings parseSettings) {
-        this.insertions = insertions.mergeWith(parseSettings.insertions);
-        this.filters = filters.mergeWith(parseSettings.filters);
-        this.parseSettings = parseSettings;
-
-        Set<String> blockNames = this.insertions.getBlockNames();
-        Set<String> tagNames = this.insertions.getTagNames();
-
-        CharStream stream = CharStreams.fromString(input);
-        this.templateSize = stream.size();
-        LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags,
-                parseSettings.stripSingleLine, blockNames, tagNames);
-        try {
-            root = parse(lexer);
-        } catch (LiquidException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException("could not parse input: " + input, e);
-        }
+        this(CharStreams.fromString(input, input), insertions, filters, parseSettings);
     }
 
-    @Deprecated
-    private Template(InputStream input, Insertions insertions, Filters filters,
+    private Template(CharStream stream, Insertions insertions, Filters filters,
             ParseSettings parseSettings) {
         this.insertions = insertions.mergeWith(parseSettings.insertions);
         this.filters = filters.mergeWith(parseSettings.filters);
@@ -166,19 +140,24 @@ public class Template {
         Set<String> blockNames = this.insertions.getBlockNames();
         Set<String> tagNames = this.insertions.getTagNames();
 
+        this.templateSize = stream.size();
+        LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags,
+                parseSettings.stripSingleLine, blockNames, tagNames);
         try {
-            CharStream stream = CharStreams.fromStream(input);
-            this.templateSize = stream.size();
-            LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags,
-                    parseSettings.stripSingleLine, blockNames, tagNames);
             root = parse(lexer);
         } catch (LiquidException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("could not parse input: " + input, e);
+            throw new RuntimeException("could not parse input: " + stream.getSourceName(), e);
         }
     }
-    
+
+    @Deprecated
+    private Template(InputStream input, Insertions insertions, Filters filters,
+            ParseSettings parseSettings) {
+        this(fromStream(input), insertions, filters, parseSettings);
+    }
+
     @Deprecated
     private Template(String input, Insertions insertions, Filters filters, ParseSettings parseSettings,
             RenderSettings renderSettings) {
@@ -194,46 +173,31 @@ public class Template {
      */
     private Template(File file, Insertions insertions, Filters filters, ParseSettings parseSettings)
             throws IOException {
-        this.insertions = insertions.mergeWith(parseSettings.insertions);
-        this.filters = filters.mergeWith(parseSettings.filters);
-        this.parseSettings = parseSettings;
-        CharStream stream = CharStreams.fromFileName(file.getAbsolutePath());
+        this(fromFile(file), insertions, filters, parseSettings);
+    }
 
-        Set<String> blockNames = this.insertions.getBlockNames();
-        Set<String> tagNames = this.insertions.getTagNames();
+    // TemplateParser constructor
+    Template(TemplateParser parser, CharStream input) {
+        this(input, parser.getParseSettings().flavor.getInsertions(), parser.getParseSettings().flavor
+                .getFilters(), parser.getParseSettings());
+        this.renderSettings = parser.getRenderSettings();
+        this.templateParser = parser;
+    }
 
+    private static CharStream fromStream(InputStream in) {
         try {
-            this.templateSize = stream.size();
-            LiquidLexer lexer = new LiquidLexer(stream, parseSettings.stripSpacesAroundTags,
-                    parseSettings.stripSingleLine, blockNames, tagNames);
-            root = parse(lexer);
-        } catch (Exception e) {
-            throw new RuntimeException("could not parse input from " + file, e);
+            return CharStreams.fromStream(in);
+        } catch (IOException e) {
+            throw new RuntimeException("could not parse input: " + in, e);
         }
     }
-    
-    // TemplateParser constructor
-    Template(InputStream input, TemplateParser parser) {
-        this(input, parser.getParseSettings().flavor.getInsertions(), parser.getParseSettings().flavor
-                .getFilters(), parser.getParseSettings());
-        this.renderSettings = parser.getRenderSettings();
-        this.templateParser = parser;
-    }
 
-    // TemplateParser constructor
-    Template(String input, TemplateParser parser) {
-        this(input, parser.getParseSettings().flavor.getInsertions(), parser.getParseSettings().flavor
-                .getFilters(), parser.getParseSettings());
-        this.renderSettings = parser.getRenderSettings();
-        this.templateParser = parser;
-    }
-
-    // TemplateParser constructor
-    Template(File file, TemplateParser parser) throws IOException {
-        this(file, parser.getParseSettings().flavor.getInsertions(), parser.getParseSettings().flavor.getFilters(),
-                parser.getParseSettings());
-        this.renderSettings = parser.getRenderSettings();
-        this.templateParser = parser;
+    private static CharStream fromFile(File path) {
+        try {
+            return CharStreams.fromFileName(path.getAbsolutePath());
+        } catch (IOException e) {
+            throw new RuntimeException("could not parse input: " + path, e);
+        }
     }
 
     private ParseTree parse(LiquidLexer lexer) {
@@ -412,7 +376,7 @@ public class Template {
                         .build()) //
                 .withRenderSettings(renderSettings).build();
 
-        return new Template(file, parser);
+        return new Template(parser, fromFile(file));
     }
 
     /**
@@ -687,8 +651,8 @@ public class Template {
             Future<String> future = executorService.submit(task);
             return future.get(this.getProtectionSettings().maxRenderTimeMillis, TimeUnit.MILLISECONDS);
         } catch (TimeoutException e) {
-            throw new RuntimeException("exceeded the max amount of time (" +
-                    this.getProtectionSettings().maxRenderTimeMillis + " ms.)");
+            throw new RuntimeException("exceeded the max amount of time (" + this
+                    .getProtectionSettings().maxRenderTimeMillis + " ms.)");
         } catch (Throwable t) {
             throw new RuntimeException("Oops, something unexpected happened: ", t);
         } finally {
@@ -759,7 +723,8 @@ public class Template {
     /**
      * Renders the template using parent context
      * 
-     * @param parent The parent context.
+     * @param parent
+     *            The parent context.
      * @return a string denoting the rendered template.
      */
     public String renderUnguarded(TemplateContext parent) {
@@ -866,7 +831,7 @@ public class Template {
             map.put(key, value);
         }
     }
-    
+
     public ProtectionSettings getProtectionSettings() {
         return protectionSettings;
     }
@@ -874,11 +839,11 @@ public class Template {
     public RenderSettings getRenderSettings() {
         return renderSettings;
     }
-    
+
     public ParseSettings getParseSettings() {
         return parseSettings;
     }
-    
+
     TemplateParser getTemplateParser() {
         return templateParser;
     }

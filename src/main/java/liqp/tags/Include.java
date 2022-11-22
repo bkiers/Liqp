@@ -1,10 +1,13 @@
 package liqp.tags;
 
-import java.io.File;
-
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.nodes.LNode;
+import liqp.parser.Flavor;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Include extends Tag {
 
@@ -39,12 +42,22 @@ public class Include extends Tag {
                 template = context.getParser().parse(includeResourceFile);
             }
 
-            // check if there's a optional "with expression"
             if (nodes.length > 1) {
-                Object value = nodes[1].render(context);
-                context.put(includeResource, value);
+                if (context.parseSettings.flavor != Flavor.JEKYLL) {
+                    // check if there's a optional "with expression"
+                    Object value = nodes[1].render(context);
+                    context.put(includeResource, value);
+              } else {
+                    // Jekyll-style variable assignments
+                    Map<String, Object> variables = new HashMap<String, Object>();
+                    for (int i = 1, n = nodes.length; i < n; i++) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> var = (Map<String, Object>) nodes[i].render(context);
+                        variables.putAll(var);
+                    }
+                    return template.renderUnguarded(variables, context, true);
+              }
             }
-
             return template.renderUnguarded(context);
 
         } catch (Exception e) {

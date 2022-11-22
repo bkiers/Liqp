@@ -85,6 +85,21 @@ public class IncludeTest {
         assertEquals("TEST", res);
     }
 
+    @Test
+    public void testIncludeWithExpression() {
+        Template template = Template.parse("{% include include_read_var var=otherVar %}", jekyll());
+        String res = template.render("{ \"otherVar\" : \"TEST\"}");
+        assertEquals("TEST", res);
+    }
+
+    @Test
+    public void testIncludeWithMultipleExpressions() {
+      Template template = Template.parse(
+          "{% include include_read_var foo=bar var=otherVar var=\"var\" var=yetAnotherVar %}", jekyll());
+      String res = template.render("{ \"otherVar\" : \"TEST\", \"yetAnotherVar\": \"ANOTHER\"}");
+      assertEquals("ANOTHER", res);
+    }
+
     @Test(expected = LiquidException.class)
     public void renderWithShouldThrowExceptionInJekyll() throws RecognitionException {
 

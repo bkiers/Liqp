@@ -217,4 +217,11 @@ public class DateTest {
         String result = t.render(values);
         assertEquals("Space: 2020 | T: 2020", result);
     }
+
+    @Test
+    public void test240() {
+        assertEquals("10-13", Template.parse("{{ \"2022-10-13 12:06:04\" | date: \"%m-%e\" }}").render());
+        assertEquals("10-13", Template.parse("{{ \"2022-10-13\" | date: \"%m-%e\" }}").render());
+        assertEquals("10-13", Template.parse("{{ \"13-10-2022\" | date: \"%m-%e\" }}").render());
+    }
 }

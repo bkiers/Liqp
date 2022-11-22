@@ -1,21 +1,5 @@
 package liqp.parser.v4;
 
-import static liquid.parser.v4.LiquidParser.And;
-import static liquid.parser.v4.LiquidParser.Eq;
-import static liquid.parser.v4.LiquidParser.Gt;
-import static liquid.parser.v4.LiquidParser.GtEq;
-import static liquid.parser.v4.LiquidParser.Lt;
-import static liquid.parser.v4.LiquidParser.LtEq;
-import static liquid.parser.v4.LiquidParser.NEq;
-import static liquid.parser.v4.LiquidParser.Or;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.TerminalNode;
-
 import liqp.Insertion;
 import liqp.Insertions;
 import liqp.LValue;
@@ -23,80 +7,18 @@ import liqp.ParseSettings;
 import liqp.exceptions.LiquidException;
 import liqp.filters.Filter;
 import liqp.filters.Filters;
-import liqp.nodes.AndNode;
-import liqp.nodes.AtomNode;
-import liqp.nodes.AttributeNode;
-import liqp.nodes.BlockNode;
-import liqp.nodes.ContainsNode;
-import liqp.nodes.EqNode;
-import liqp.nodes.FilterNode;
-import liqp.nodes.GtEqNode;
-import liqp.nodes.GtNode;
-import liqp.nodes.InsertionNode;
-import liqp.nodes.KeyValueNode;
-import liqp.nodes.LNode;
-import liqp.nodes.LookupNode;
-import liqp.nodes.LtEqNode;
-import liqp.nodes.LtNode;
-import liqp.nodes.NEqNode;
-import liqp.nodes.OrNode;
-import liqp.nodes.OutputNode;
+import liqp.nodes.*;
 import liqp.parser.Flavor;
-import liquid.parser.v4.LiquidParser.AssignmentContext;
-import liquid.parser.v4.LiquidParser.AtomContext;
-import liquid.parser.v4.LiquidParser.Atom_othersContext;
-import liquid.parser.v4.LiquidParser.AttributeContext;
-import liquid.parser.v4.LiquidParser.BlockContext;
-import liquid.parser.v4.LiquidParser.Capture_tag_IdContext;
-import liquid.parser.v4.LiquidParser.Capture_tag_StrContext;
-import liquid.parser.v4.LiquidParser.Case_tagContext;
-import liquid.parser.v4.LiquidParser.Comment_tagContext;
-import liquid.parser.v4.LiquidParser.Continue_tagContext;
-import liquid.parser.v4.LiquidParser.Cycle_tagContext;
-import liquid.parser.v4.LiquidParser.Elsif_tagContext;
-import liquid.parser.v4.LiquidParser.ExprContext;
-import liquid.parser.v4.LiquidParser.Expr_containsContext;
-import liquid.parser.v4.LiquidParser.Expr_eqContext;
-import liquid.parser.v4.LiquidParser.Expr_logicContext;
-import liquid.parser.v4.LiquidParser.Expr_relContext;
-import liquid.parser.v4.LiquidParser.Expr_termContext;
-import liquid.parser.v4.LiquidParser.FilenameContext;
-import liquid.parser.v4.LiquidParser.FilterContext;
-import liquid.parser.v4.LiquidParser.For_arrayContext;
-import liquid.parser.v4.LiquidParser.For_attributeContext;
-import liquid.parser.v4.LiquidParser.For_rangeContext;
-import liquid.parser.v4.LiquidParser.If_tagContext;
-import liquid.parser.v4.LiquidParser.Include_tagContext;
-import liquid.parser.v4.LiquidParser.IndexContext;
-import liquid.parser.v4.LiquidParser.Jekyll_include_filenameContext;
-import liquid.parser.v4.LiquidParser.Jekyll_include_outputContext;
-import liquid.parser.v4.LiquidParser.Lookup_IdContext;
-import liquid.parser.v4.LiquidParser.Lookup_StrContext;
-import liquid.parser.v4.LiquidParser.Lookup_emptyContext;
-import liquid.parser.v4.LiquidParser.Lookup_id_indexesContext;
-import liquid.parser.v4.LiquidParser.Other_tagContext;
-import liquid.parser.v4.LiquidParser.OutputContext;
-import liquid.parser.v4.LiquidParser.Param_exprContext;
-import liquid.parser.v4.LiquidParser.Param_expr_exprContext;
-import liquid.parser.v4.LiquidParser.Param_expr_key_valueContext;
-import liquid.parser.v4.LiquidParser.ParseContext;
-import liquid.parser.v4.LiquidParser.Raw_tagContext;
-import liquid.parser.v4.LiquidParser.Simple_tagContext;
-import liquid.parser.v4.LiquidParser.Table_tagContext;
-import liquid.parser.v4.LiquidParser.TermContext;
-import liquid.parser.v4.LiquidParser.Term_BlankContext;
-import liquid.parser.v4.LiquidParser.Term_DoubleNumContext;
-import liquid.parser.v4.LiquidParser.Term_EmptyContext;
-import liquid.parser.v4.LiquidParser.Term_FalseContext;
-import liquid.parser.v4.LiquidParser.Term_LongNumContext;
-import liquid.parser.v4.LiquidParser.Term_NilContext;
-import liquid.parser.v4.LiquidParser.Term_StrContext;
-import liquid.parser.v4.LiquidParser.Term_TrueContext;
-import liquid.parser.v4.LiquidParser.Term_exprContext;
-import liquid.parser.v4.LiquidParser.Term_lookupContext;
-import liquid.parser.v4.LiquidParser.Unless_tagContext;
-import liquid.parser.v4.LiquidParser.When_tagContext;
 import liquid.parser.v4.LiquidParserBaseVisitor;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
+import static liquid.parser.v4.LiquidParser.*;
 
 public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
 
@@ -463,17 +385,26 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   // ;
   @Override
   public LNode visitInclude_tag(Include_tagContext ctx) {
-    if (ctx.jekyll!=null) {
-      return new InsertionNode(insertions.get("include"), visit(ctx.file_name_or_output()));
+    if (ctx.jekyll != null) {
+      Stream<? extends LNode> stream = Stream.concat( //
+          Stream.of(visit(ctx.file_name_or_output())), //
+          ctx.jekyll_include_params().stream().map(this::visitJekyll_include_params) //
+      );
+
+      return new InsertionNode(insertions.get("include"), stream.toArray((n) -> new LNode[n]));
     } else if (ctx.liquid != null) {
       if (ctx.Str() != null) {
         return new InsertionNode(insertions.get("include"), visit(ctx.expr()), new AtomNode(strip(ctx.Str().getText())));
       } else {
         return new InsertionNode(insertions.get("include"), visit(ctx.expr()));
       }
-
     }
     throw new LiquidException("Unknown syntax of `Include` tag", ctx);
+  }
+
+  @Override
+  public LNode visitJekyll_include_params(Jekyll_include_paramsContext ctx) {
+    return new KeyValueNode(ctx.id().getText(), visit(ctx.expr()));
   }
 
   // file_name_or_output

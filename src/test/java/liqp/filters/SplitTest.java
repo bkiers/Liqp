@@ -22,6 +22,9 @@ public class SplitTest {
                 {"{{ 'a-b-c' | split:'' }}", "a-b-c"},
                 {"{{ 'a-b-c' | split:'?' }}", "a-b-c"},
                 {"{{ 'a-b-c' | split:nil }}", "a-b-c"},
+                {"{{ '' | split:'-' }}", ""},
+                {"{{ '' | split: '' }}", ""},
+                {"{% assign items = \"\" | split: \"\" %}{% for item in items %}FAIL{{ item }}{% endfor %}", ""},
         };
 
         for (String[] test : tests) {

@@ -72,8 +72,11 @@ public final class Filters {
 
     static Filters JEKYLL_EXTRA_FILTERS = Filters.of( //
             new Normalize_Whitespace(), //
+            new Pop(), //
             new Push(), //
             new Relative_Url(), //
+            new Shift(), //
+            new Unshift(), //
             new Where_Exp() //
     );
 

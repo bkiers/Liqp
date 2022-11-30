@@ -121,6 +121,8 @@ public class DateTest {
 
         assertThat(filter.apply("Fri Jul 16 01:00:00 2004", context,"%m/%d/%Y"), is((Object)"07/16/2004"));
 
+        assertThat(filter.apply("Fri Jul 16 01:00 2004", context,"%m/%d/%Y"), is((Object)"07/16/2004"));
+
         assertThat(filter.apply(seconds("2006-05-05 10:00:00"), context, "%B"), is((Object)"May"));
         assertThat(filter.apply(seconds("2006-06-05 10:00:00"), context,"%B"), is((Object)"June"));
         assertThat(filter.apply(seconds("2006-07-05 10:00:00"), context,"%B"), is((Object)"July"));

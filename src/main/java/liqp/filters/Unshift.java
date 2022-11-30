@@ -7,12 +7,12 @@ import liqp.TemplateContext;
 
 /**
  * Jekyll-specific filter for array manipulation: Return a new array with the given item added to the
- * end.  If the filtered value is not an array, it is returned unmodified.
+ * beginning. If the filtered value is not an array, it is returned unmodified.
  * 
  * @author Christian Kohlschütter
  * @see <a href="https://jekyllrb.com/docs/liquid/filters/">Jekyll Liquid Filters</a>
  */
-public class Push extends Filter {
+public class Unshift extends Filter {
 
     @Override
     public Object apply(Object value, TemplateContext context, Object... params) {
@@ -27,8 +27,8 @@ public class Push extends Filter {
         List<?> valueList = asList(value, context);
         List<?> paramList = asList(params, context);
         List<? super Object> list = new ArrayList<>(valueList.size() + paramList.size());
-        list.addAll(valueList);
         list.addAll(paramList);
+        list.addAll(valueList);
 
         return list;
     }

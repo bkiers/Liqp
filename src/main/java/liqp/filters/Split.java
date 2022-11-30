@@ -17,9 +17,14 @@ public class Split extends Filter {
     public Object apply(Object value, TemplateContext context, Object... params) {
 
         String original = super.asString(value, context);
+        if (original.isEmpty()) {
+            return new String[0];
+        }
 
         String delimiter = super.asString(super.get(0, params), context);
 
-        return original.split("(?<!^)" + Pattern.quote(delimiter));
+        String[] val = original.split("(?<!^)" + Pattern.quote(delimiter));
+
+        return val;
     }
 }

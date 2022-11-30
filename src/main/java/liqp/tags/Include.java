@@ -42,24 +42,26 @@ public class Include extends Tag {
                 template = context.getParser().parse(includeResourceFile);
             }
 
+            Map<String, Object> variables = new HashMap<String, Object>();
+
             if (nodes.length > 1) {
                 if (context.parseSettings.flavor != Flavor.JEKYLL) {
                     // check if there's a optional "with expression"
                     Object value = nodes[1].render(context);
                     context.put(includeResource, value);
-              } else {
+                } else {
                     // Jekyll-style variable assignments
-                    Map<String, Object> variables = new HashMap<String, Object>();
+                    Map<String, Object> includeMap = new HashMap<>();
+                    variables.put("include", includeMap);
                     for (int i = 1, n = nodes.length; i < n; i++) {
                         @SuppressWarnings("unchecked")
                         Map<String, Object> var = (Map<String, Object>) nodes[i].render(context);
-                        variables.putAll(var);
+                        includeMap.putAll(var);
                     }
-                    return template.renderUnguarded(variables, context, true);
-              }
+                }
             }
-            return template.renderUnguarded(context);
 
+            return template.renderUnguarded(variables, context, true);
         } catch (Exception e) {
             if (context.renderSettings.showExceptionsFromInclude) {
                 throw new RuntimeException("problem with evaluating include", e);

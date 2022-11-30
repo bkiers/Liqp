@@ -87,7 +87,7 @@ public class IncludeTest {
 
     @Test
     public void testIncludeWithExpression() {
-        Template template = Template.parse("{% include include_read_var var=otherVar %}", jekyll());
+        Template template = Template.parse("{% include include_read_include_var var=otherVar %}", jekyll());
         String res = template.render("{ \"otherVar\" : \"TEST\"}");
         assertEquals("TEST", res);
     }
@@ -95,7 +95,7 @@ public class IncludeTest {
     @Test
     public void testIncludeWithMultipleExpressions() {
       Template template = Template.parse(
-          "{% include include_read_var foo=bar var=otherVar var=\"var\" var=yetAnotherVar %}", jekyll());
+          "{% include include_read_include_var foo=bar var=otherVar var=\"var\" var=yetAnotherVar %}", jekyll());
       String res = template.render("{ \"otherVar\" : \"TEST\", \"yetAnotherVar\": \"ANOTHER\"}");
       assertEquals("ANOTHER", res);
     }

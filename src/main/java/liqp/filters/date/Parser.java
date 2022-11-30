@@ -46,6 +46,17 @@ public class Parser {
         datePatterns.add("yyyy-MM-dd HH:mm:ss z");
         datePatterns.add("yyyy-MM-dd'T'HH:mm:ss z");
         datePatterns.add("EEE MMM dd hh:mm:ss yyyy");
+
+        datePatterns.add("yyyy-MM-dd HH:mm");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm");
+        datePatterns.add("yyyy-MM-dd HH:mm Z");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm Z");
+        datePatterns.add("yyyy-MM-dd HH:mm X");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm X");
+        datePatterns.add("yyyy-MM-dd HH:mm z");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm z");
+        datePatterns.add("EEE MMM dd hh:mm yyyy");
+
         datePatterns.add("yyyy-MM-dd");
         datePatterns.add("dd-MM-yyyy");
     }

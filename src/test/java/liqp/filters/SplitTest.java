@@ -1,13 +1,16 @@
 package liqp.filters;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.regex.Pattern;
-import liqp.Template;
-import liqp.TemplateContext;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
 
 public class SplitTest {
 
@@ -23,7 +26,7 @@ public class SplitTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -43,7 +46,7 @@ public class SplitTest {
     public void applyOriginalTest() {
         TemplateContext context = new TemplateContext();
         
-        final Filter filter = Filter.getFilter("split");
+        final Filter filter = Filters.COMMON_FILTERS.get("split");
 
         assertThat(filter.apply("12~34", context, "~"), is((Object)new String[]{"12", "34"}));
         assertThat(filter.apply("A? ~ ~ ~ ,Z", context, "~ ~ ~"), is((Object)new String[]{"A? ", " ,Z"}));

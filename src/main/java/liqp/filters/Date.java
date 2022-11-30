@@ -30,7 +30,7 @@ public class Date extends Filter {
 
     @Override
     public Object apply(Object value, TemplateContext context, Object... params) {
-        Locale locale = context.renderSettings.locale;
+        Locale locale = context.getRenderSettings().locale;
 
         if (isArray(value) && asArray(value, context).length ==1) {
             value = asArray(value, context)[0];

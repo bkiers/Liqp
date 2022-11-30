@@ -1,11 +1,13 @@
 package liqp.filters;
 
-import liqp.Template;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class PlusTest {
 
@@ -22,7 +24,7 @@ public class PlusTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -31,12 +33,12 @@ public class PlusTest {
 
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid1() {
-        Filter.getFilter("plus").apply(1);
+        Filters.COMMON_FILTERS.get("plus").apply(1);
     }
 
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid2() {
-        Filter.getFilter("plus").apply(1, 2, 3);
+        Filters.COMMON_FILTERS.get("plus").apply(1, 2, 3);
     }
 
     /*
@@ -48,7 +50,7 @@ public class PlusTest {
     @Test
     public void applyOriginalTest() {
 
-        assertThat(Template.parse("{{ 1 | plus:1 }}").render(), is((Object)"2"));
-        assertThat(Template.parse("{{ '1' | plus:'1.0' }}").render(), is((Object)"2.0"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ 1 | plus:1 }}").render(), is((Object)"2"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ '1' | plus:'1.0' }}").render(), is((Object)"2.0"));
     }
 }

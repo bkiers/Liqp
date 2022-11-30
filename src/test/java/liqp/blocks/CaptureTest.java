@@ -1,6 +1,7 @@
 package liqp.blocks;
 
 import liqp.Template;
+import liqp.TemplateParser;
 import liqp.exceptions.LiquidException;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
@@ -20,7 +21,7 @@ public class CaptureTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -34,8 +35,7 @@ public class CaptureTest {
      */
     @Test
     public void capturesBlockContentInVariableTest() throws RecognitionException {
-
-        assertThat(Template.parse("{% capture 'var' %}test string{% endcapture %}{{var}}").render(), is("test string"));
+        assertThat(TemplateParser.DEFAULT.parse("{% capture 'var' %}test string{% endcapture %}{{var}}").render(), is("test string"));
     }
 
     /*
@@ -67,7 +67,7 @@ public class CaptureTest {
                 "{% endif %}\n" +
                 "{{var}}";
 
-        assertThat(Template.parse(source).render().replaceAll("\\s", ""), is("test-string"));
+        assertThat(TemplateParser.DEFAULT.parse(source).render().replaceAll("\\s", ""), is("test-string"));
     }
 
     /*
@@ -97,7 +97,7 @@ public class CaptureTest {
                 "{% endfor %}\n" +
                 "{{ first }}-{{ second }}";
 
-        assertThat(Template.parse(source).render().replaceAll("\\s", ""), is("3-3"));
+        assertThat(TemplateParser.DEFAULT.parse(source).render().replaceAll("\\s", ""), is("3-3"));
     }
 
     /*
@@ -114,7 +114,7 @@ public class CaptureTest {
         String assigns = "{ \"var\" : \"content\" }";
 
         assertThat(
-                Template.parse("{{ var2 }}{% capture var2 %}{{ var }} foo {% endcapture %}{{ var2 }}{{ var2 }}")
+                TemplateParser.DEFAULT.parse("{{ var2 }}{% capture var2 %}{{ var }} foo {% endcapture %}{{ var2 }}{{ var2 }}")
                         .render(assigns),
                 is("content foo content foo "));
     }
@@ -131,6 +131,6 @@ public class CaptureTest {
     @Test(expected=LiquidException.class)
     public void capture_detects_bad_syntaxTest() throws Exception {
 
-        Template.parse("{{ var2 }}{% capture %}{{ var }} foo {% endcapture %}{{ var2 }}{{ var2 }}");
+        TemplateParser.DEFAULT.parse("{{ var2 }}{% capture %}{{ var }} foo {% endcapture %}{{ var2 }}{{ var2 }}");
     }
 }

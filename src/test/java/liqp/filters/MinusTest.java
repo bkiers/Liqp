@@ -1,14 +1,16 @@
 package liqp.filters;
 
-import liqp.Template;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class MinusTest {
 
@@ -26,7 +28,7 @@ public class MinusTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -35,12 +37,12 @@ public class MinusTest {
 
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid1() {
-        Filter.getFilter("minus").apply(1);
+        Filters.COMMON_FILTERS.get("minus").apply(1);
     }
 
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid2() {
-        Filter.getFilter("minus").apply(1, 2, 3);
+        Filters.COMMON_FILTERS.get("minus").apply(1, 2, 3);
     }
 
     /*
@@ -52,8 +54,8 @@ public class MinusTest {
     @Test
     public void applyOriginalTest() {
 
-        assertThat(Template.parse("{{ input | minus:operand }}").render("{\"input\":5, \"operand\":1}"), is((Object)"4"));
-        assertThat(Template.parse("{{ '4.3' | minus:'2' }}").render(), is((Object)"2.3"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ input | minus:operand }}").render("{\"input\":5, \"operand\":1}"), is((Object)"4"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ '4.3' | minus:'2' }}").render(), is((Object)"2.3"));
     }
 
     /*
@@ -73,7 +75,7 @@ public class MinusTest {
             ]
 
             sources.each { |source|
-              @template = Liquid::Template.parse(source)
+              @template = Liquid::TemplateParser.DEFAULT.parse(source)
               result = @template.render({})
               printf("result: '%s'\n", result)
             }
@@ -91,12 +93,12 @@ public class MinusTest {
     */
     @Test
     public void bug110() {
-        assertThat(Template.parse("{{ 5 | minus: 2 }}").render(), is((Object)"3"));
-        assertThat(Template.parse("{{ 5.0 | minus: 2 }}").render(), is((Object)"3.0"));
-        assertThat(Template.parse("{{ \"5\" | minus: 2 }}").render(), is((Object)"3"));
-        assertThat(Template.parse("{{ \"5\" | minus: 2.0 }}").render(), is((Object)"3.0"));
-        assertThat(Template.parse("{{ \"5\" | minus: \"2\" }}").render(), is((Object)"3"));
-        assertThat(Template.parse("{{ \"5\" | minus: \"2.0\" }}").render(), is((Object)"3.0"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ 5 | minus: 2 }}").render(), is((Object)"3"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ 5.0 | minus: 2 }}").render(), is((Object)"3.0"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ \"5\" | minus: 2 }}").render(), is((Object)"3"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ \"5\" | minus: 2.0 }}").render(), is((Object)"3.0"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ \"5\" | minus: \"2\" }}").render(), is((Object)"3"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ \"5\" | minus: \"2.0\" }}").render(), is((Object)"3.0"));
     }
 
     /*
@@ -113,7 +115,7 @@ public class MinusTest {
             ]
 
             sources.each { |source|
-              @template = Liquid::Template.parse(source)
+              @template = Liquid::TemplateParser.DEFAULT.parse(source)
               result = @template.render({})
               printf("result: '%s'\n", result)
             }
@@ -129,13 +131,13 @@ public class MinusTest {
     */
     @Test
     public void bug115() {
-        assertThat(Template.parse("{{ \" 5 \" | minus: 2 }}").render(), is((Object)"3"));
-        assertThat(Template.parse("{{ \"5\" | minus: \"  2     \" }}").render(), is((Object)"3"));
-        assertThat(Template.parse("{{ \"  5\" | minus: \"   2.0\" }}").render(), is((Object)"3.0"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ \" 5 \" | minus: 2 }}").render(), is((Object)"3"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ \"5\" | minus: \"  2     \" }}").render(), is((Object)"3"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ \"  5\" | minus: \"   2.0\" }}").render(), is((Object)"3.0"));
     }
 
     @Test
     public void testMinusDate() {
-        assertThat(Template.parse("{{ a | minus: 1 }}").render(Collections.singletonMap("a", LocalDateTime.now())), is((Object)"-1"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ a | minus: 1 }}").render(Collections.singletonMap("a", LocalDateTime.now())), is((Object)"-1"));
     }
 }

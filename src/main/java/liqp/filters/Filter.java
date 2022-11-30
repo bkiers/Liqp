@@ -1,21 +1,21 @@
 package liqp.filters;
 
-import liqp.LValue;
-import liqp.TemplateContext;
-import liqp.parser.Flavor;
+import static liqp.ParseSettings.DEFAULT_FLAVOR;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
-import static liqp.ParseSettings.DEFAULT_FLAVOR;
+import liqp.LValue;
+import liqp.ParseSettings;
+import liqp.TemplateContext;
+import liqp.parser.Flavor;
 
 /**
- * Output markup takes filters. Filters are simple methods. The first
- * parameter is always the output of the left side of the filter. The
- * return value of the filter will be the new left value when the next
- * filter is run. When there are no more filters, the template will
- * receive the resulting string.
+ * Output markup takes filters. Filters are simple methods. The first parameter is always the output of
+ * the left side of the filter. The return value of the filter will be the new left value when the next
+ * filter is run. When there are no more filters, the template will receive the resulting string.
  * <p/>
  * -- https://github.com/Shopify/liquid/wiki/Liquid-for-Designers
  */
@@ -28,71 +28,18 @@ public abstract class Filter extends LValue {
 
     private static final Map<String, Filter> JEKYLL_FILTERS = new HashMap<>();
 
+    private static Filters CURRENT_COMMON_FILTERS = null;
+    private static Filters CURRENT_JEKYLL_FILTERS = null;
 
     private static void addDefaultFilters() {
-        registerFilter(new Abs());
-        registerFilter(new Absolute_Url());
-        registerFilter(new Append());
-        registerFilter(new At_Least());
-        registerFilter(new At_Most());
-        registerFilter(new Capitalize());
-        registerFilter(new Ceil());
-        registerFilter(new Compact());
-        registerFilter(new Concat());
-        registerFilter(new Date());
-        registerFilter(new Default());
-        registerFilter(new Divided_By());
-        registerFilter(new Downcase());
-        registerFilter(new Escape());
-        registerFilter(new Escape_Once());
-        registerFilter(new First());
-        registerFilter(new Floor());
-        registerFilter(new H());
-        registerFilter(new Join());
-        registerFilter(new Last());
-        registerFilter(new Lstrip());
-        registerFilter(new liqp.filters.Map());
-        registerFilter(new Minus());
-        registerFilter(new Modulo());
-        registerFilter(new Newline_To_Br());
-        registerFilter(new Plus());
-        registerFilter(new Prepend());
-        registerFilter(new Remove());
-        registerFilter(new Remove_First());
-        registerFilter(new Replace());
-        registerFilter(new Replace_First());
-        registerFilter(new Reverse());
-        registerFilter(new Round());
-        registerFilter(new Rstrip());
-        registerFilter(new Size());
-        registerFilter(new Slice());
-        registerFilter(new Sort());
-        registerFilter(new Sort_Natural());
-        registerFilter(new Split());
-        registerFilter(new Strip());
-        registerFilter(new Strip_HTML());
-        registerFilter(new Strip_Newlines());
-        registerFilter(new Times());
-        registerFilter(new Truncate());
-        registerFilter(new Truncatewords());
-        registerFilter(new Uniq());
-        registerFilter(new Upcase());
-        registerFilter(new Url_Decode());
-        registerFilter(new Url_Encode());
-
-        Filter nWSFilter = new Normalize_Whitespace();
-        JEKYLL_FILTERS.put(nWSFilter.name, nWSFilter);
-        Filter whereExp = new Where_Exp();
-        JEKYLL_FILTERS.put(whereExp.name, whereExp);
-        Filter relativeUrl = new Relative_Url();
-        JEKYLL_FILTERS.put(relativeUrl.name, relativeUrl);
-
-        registerFilter(new Where());
+        COMMON_FILTERS.putAll(Filters.COMMON_FILTERS.getMap());
+        JEKYLL_FILTERS.putAll(Filters.JEKYLL_EXTRA_FILTERS.getMap());
+        updateCommonFilters();
     }
 
-    static {
-        // Initialize all standard filters.
-        addDefaultFilters();
+    private static void updateCommonFilters() {
+        CURRENT_COMMON_FILTERS = Filters.of(COMMON_FILTERS);
+        CURRENT_JEKYLL_FILTERS = CURRENT_COMMON_FILTERS.mergeWith(Filters.of(JEKYLL_FILTERS));
     }
 
     /**
@@ -101,30 +48,39 @@ public abstract class Filter extends LValue {
     public final String name;
 
     /**
-     * Used for all package protected filters in the liqp.filters-package
-     * whose name is their class name lower cased.
+     * Used for all package protected filters in the liqp.filters-package whose name is their class name
+     * lower cased.
      */
     protected Filter() {
-        this.name = this.getClass().getSimpleName().toLowerCase();
+        this.name = this.getClass().getSimpleName().toLowerCase(Locale.ENGLISH);
     }
 
     /**
      * Creates a new instance of a Filter.
      *
      * @param name
-     *         the name of the filter.
+     *            the name of the filter.
      */
     public Filter(String name) {
         this.name = name;
     }
 
     /**
+     * Returns the name of the filter.
+     * 
+     * @return The name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
      * Applies the filter on the 'value'.
      *
      * @param value
-     *         the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
+     *            the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
      * @param params
-     *         the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
+     *            the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
      *
      * @deprecated use {@link #apply(Object, TemplateContext, Object...)}
      * @return the result of the filter.
@@ -140,11 +96,11 @@ public abstract class Filter extends LValue {
      * Applies the filter on the 'value', with the given 'context'.
      *
      * @param value
-     *         the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
+     *            the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
      * @param context
-     *         the template context.
+     *            the template context.
      * @param params
-     *         the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
+     *            the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
      *
      * @return the result of the filter.
      */
@@ -157,9 +113,9 @@ public abstract class Filter extends LValue {
      * Check the number of parameters and throws an exception if needed.
      *
      * @param params
-     *         the parameters to check.
+     *            the parameters to check.
      * @param expected
-     *         the expected number of parameters.
+     *            the expected number of parameters.
      */
     final void checkParams(Object[] params, int expected) {
 
@@ -173,28 +129,27 @@ public abstract class Filter extends LValue {
 
         if (params == null || params.length < min || params.length > max) {
             throw new RuntimeException("Liquid error: wrong number of arguments (given " +
-                    (params == null ? 1 : (params.length + 1)) + " expected " + (min + 1) + ".." + (max + 1) + ")");
+                    (params == null ? 1 : (params.length + 1)) + " expected " + (min + 1) + ".." + (max
+                            + 1) + ")");
         }
     }
 
     /**
-     * Returns a value at a specific index from an array of parameters.
-     * If no such index exists, a RuntimeException is thrown.
+     * Returns a value at a specific index from an array of parameters. If no such index exists, a
+     * RuntimeException is thrown.
      *
      * @param index
-     *         the index of the value to be retrieved.
+     *            the index of the value to be retrieved.
      * @param params
-     *         the values.
+     *            the values.
      *
-     * @return a value at a specific index from an array of
-     *         parameters.
+     * @return a value at a specific index from an array of parameters.
      */
     protected Object get(int index, Object... params) {
 
         if (index >= params.length) {
-            throw new RuntimeException("error in filter '" + name +
-                    "': cannot get param index: " + index +
-                    " from: " + Arrays.toString(params));
+            throw new RuntimeException("error in filter '" + name + "': cannot get param index: " +
+                    index + " from: " + Arrays.toString(params));
         }
 
         return params[index];
@@ -204,11 +159,14 @@ public abstract class Filter extends LValue {
      * Retrieves a filter with a specific name.
      *
      * @param name
-     *         the name of the filter to retrieve.
+     *            the name of the filter to retrieve.
      *
      * @return a filter with a specific name.
+     * @deprecated Use {@link Filters#get(String)}
      */
+    @Deprecated
     public static Filter getFilter(String name) {
+        checkInitialized();
 
         Filter filter = COMMON_FILTERS.get(name);
 
@@ -220,36 +178,75 @@ public abstract class Filter extends LValue {
     }
 
     /**
-     * Returns all default filters.
+     * Returns all currently registered filters, except for those registered by default for
+     * {@link Flavor#JEKYLL}.
      *
-     * @return all default filters.
+     * @return all filters.
+     * @deprecated Use {@link liqp.ParseSettings#filters}
      */
+    @Deprecated
     public static Map<String, Filter> getFilters() {
+        checkInitialized();
         return getFilters(DEFAULT_FLAVOR);
     }
 
+    /**
+     * Returns all currently registered filters, including those registered by default for
+     * {@link Flavor#JEKYLL}.
+     *
+     * @return all filters.
+     * @deprecated Use {@link Flavor#getFilters()}
+     */
+    @Deprecated
     public static Map<String, Filter> getFilters(Flavor flavor) {
-        HashMap<String, Filter> filers = new HashMap<>(COMMON_FILTERS);
+        checkInitialized();
+        HashMap<String, Filter> filters = new HashMap<>(COMMON_FILTERS);
         if (Flavor.JEKYLL == flavor) {
-            filers.putAll(JEKYLL_FILTERS);
+            filters.putAll(JEKYLL_FILTERS);
         }
-        return filers;
+        return filters;
     }
 
     /**
      * Registers a new filter.
-     *
+     * 
+     * If a filter exists under the same name, it is replaced by this one (except for three special
+     * Jekyll filters).
+     * 
+     * Note that this method is unsafe, as it affects all uses of this class.
+     * 
      * @param filter
-     *         the filter to be registered.
+     *            the filter to be registered.
+     * @deprecated Use {@link liqp.ParseSettings.Builder#with(Filter)}
      */
+    @Deprecated
     public static void registerFilter(Filter filter) {
+        checkInitialized();
         COMMON_FILTERS.put(filter.name, filter);
+        updateCommonFilters();
     }
 
-    // for testing purpose
+    private static void checkInitialized() {
+        if (CURRENT_COMMON_FILTERS == null) {
+            resetFilters();
+        }
+    }
+
     private static void resetFilters() {
         COMMON_FILTERS.clear();
         JEKYLL_FILTERS.clear();
         addDefaultFilters();
+        updateCommonFilters();
+    }
+
+    @Deprecated
+    public static Filters getCurrentFilters(Flavor flavor) {
+        checkInitialized();
+
+        if (flavor == Flavor.JEKYLL) {
+            return CURRENT_JEKYLL_FILTERS;
+        } else {
+            return CURRENT_COMMON_FILTERS;
+        }
     }
 }

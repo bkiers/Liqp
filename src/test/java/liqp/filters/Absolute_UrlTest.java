@@ -1,13 +1,15 @@
 package liqp.filters;
 
-import liqp.Template;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class Absolute_UrlTest {
 
@@ -30,7 +32,7 @@ public class Absolute_UrlTest {
     @Test
     public void testProduceAnAbsoluteURLFromAPageURL() {
         // given
-        Template template = Template.parse("{{ '/about/my_favorite_page/' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ '/about/my_favorite_page/' | absolute_url }}");
         Map<String,Object> data = getData("http://example.com", "base");
         
         // when
@@ -50,7 +52,7 @@ public class Absolute_UrlTest {
     @Test
     public void testEnsureTheLeadingSlash() {
         // given
-        Template template = Template.parse("{{ 'about/my_favorite_page/' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ 'about/my_favorite_page/' | absolute_url }}");
         Map<String,Object> data = getData("http://example.com", "/base");
 
         // when
@@ -73,7 +75,7 @@ public class Absolute_UrlTest {
     @Test
     public void testEnsureTheLeadingSlashForTheBaseurl() {
         // given
-        Template template = Template.parse("{{ 'about/my_favorite_page/' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ 'about/my_favorite_page/' | absolute_url }}");
         Map<String,Object> data = getData("http://example.com", "base");
 
         // when
@@ -97,7 +99,7 @@ public class Absolute_UrlTest {
     @Test
     public void testBeOkWithBlankButPresentURL() {
         // given
-        Template template = Template.parse("{{ 'about/my_favorite_page/' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ 'about/my_favorite_page/' | absolute_url }}");
         Map<String,Object> data = getData("", "base");
 
         // when
@@ -120,7 +122,7 @@ public class Absolute_UrlTest {
     @Test
     public void testBeOkWithANilURL() {
         // given
-        Template template = Template.parse("{{ 'about/my_favorite_page/' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ 'about/my_favorite_page/' | absolute_url }}");
         Map<String,Object> data = getData(null, "base");
 
         // when
@@ -143,7 +145,7 @@ public class Absolute_UrlTest {
     @Test
     public void testBeOkWithANilBaseurl() {
         // given
-        Template template = Template.parse("{{ 'about/my_favorite_page/' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ 'about/my_favorite_page/' | absolute_url }}");
         Map<String,Object> data = getData("http://example.com", null);
 
         // when
@@ -166,7 +168,7 @@ public class Absolute_UrlTest {
     @Test
     public void testNotPrependForwardSlashIfInputIsEmpty() {
         // given
-        Template template = Template.parse("{{ '' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ '' | absolute_url }}");
         Map<String,Object> data = getData("http://example.com", "/base");
 
         // when
@@ -189,7 +191,7 @@ public class Absolute_UrlTest {
     @Test
     public void testNotAppendForwardSlashIfInputIsSlash() {
         // given
-        Template template = Template.parse("{{ '/' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ '/' | absolute_url }}");
         Map<String,Object> data = getData("http://example.com", "/base");
 
         // when
@@ -212,7 +214,7 @@ public class Absolute_UrlTest {
     @Test
     public void testNotAppendForwardSlashIfInputIsSlashAndNilBaseurl() {
         // given
-        Template template = Template.parse("{{ '/' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ '/' | absolute_url }}");
         Map<String,Object> data = getData("http://example.com", null);
 
         // when
@@ -235,7 +237,7 @@ public class Absolute_UrlTest {
     @Test
     public void notAppendForwardSlashIfBothInputAndBaseurlAreAimplySlash() {
         // given
-        Template template = Template.parse("{{ '/' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ '/' | absolute_url }}");
         Map<String,Object> data = getData("http://example.com", "/");
 
         // when
@@ -258,7 +260,7 @@ public class Absolute_UrlTest {
     @Test
     public void shouldNormalizeInternationalURLs() {
         // given
-        Template template = Template.parse("{{ '' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ '' | absolute_url }}");
         Map<String,Object> data = getData("http://ümlaut.example.org/", null);
 
         // when
@@ -271,7 +273,7 @@ public class Absolute_UrlTest {
     @Test
     public void shouldNormalizeInternationalURLsInPath() {
         // given
-        Template template = Template.parse("{{ 'ü' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ 'ü' | absolute_url }}");
         Map<String,Object> data = getData("http://ümlaut.example.org/", null);
 
         // when
@@ -290,7 +292,7 @@ public class Absolute_UrlTest {
     @Test
     public void shouldNotModifyAbsoluteURL() {
         // given
-        Template template = Template.parse("{{ 'http://example.com/' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ 'http://example.com/' | absolute_url }}");
         Map<String,Object> data = getData("http://ümlaut.example.org/", null);
 
         // when
@@ -310,7 +312,7 @@ public class Absolute_UrlTest {
     @Test
     public void shouldTransformInputURLToString() {
         // given
-        Template template = Template.parse("{{ '/my-page.html' | absolute_url }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ '/my-page.html' | absolute_url }}");
         Map<String,Object> data = getData(new Object() {
             @Override
             public String toString() {

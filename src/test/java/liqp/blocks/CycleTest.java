@@ -1,6 +1,8 @@
 package liqp.blocks;
 
 import liqp.Template;
+import liqp.TemplateParser;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -63,7 +65,7 @@ public class CycleTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -85,14 +87,14 @@ public class CycleTest {
     @Test
     public void cycleTest() throws Exception {
 
-        assertThat(Template.parse("{%cycle \"one\", \"two\"%}").render(), is("one"));
-        assertThat(Template.parse("{%cycle \"one\", \"two\"%} {%cycle \"one\", \"two\"%}").render(), is("one two"));
-        assertThat(Template.parse("{%cycle \"\", \"two\"%} {%cycle \"\", \"two\"%}").render(), is(" two"));
+        assertThat(TemplateParser.DEFAULT.parse("{%cycle \"one\", \"two\"%}").render(), is("one"));
+        assertThat(TemplateParser.DEFAULT.parse("{%cycle \"one\", \"two\"%} {%cycle \"one\", \"two\"%}").render(), is("one two"));
+        assertThat(TemplateParser.DEFAULT.parse("{%cycle \"\", \"two\"%} {%cycle \"\", \"two\"%}").render(), is(" two"));
 
-        assertThat(Template.parse("{%cycle \"one\", \"two\"%} {%cycle \"one\", \"two\"%} {%cycle \"one\", \"two\"%}").render(),
+        assertThat(TemplateParser.DEFAULT.parse("{%cycle \"one\", \"two\"%} {%cycle \"one\", \"two\"%} {%cycle \"one\", \"two\"%}").render(),
                 is("one two one"));
 
-        assertThat(Template.parse("{%cycle \"text-align: left\", \"text-align: right\" %} {%cycle \"text-align: left\", \"text-align: right\"%}").render(),
+        assertThat(TemplateParser.DEFAULT.parse("{%cycle \"text-align: left\", \"text-align: right\" %} {%cycle \"text-align: left\", \"text-align: right\"%}").render(),
                 is("text-align: left text-align: right"));
     }
 
@@ -106,7 +108,7 @@ public class CycleTest {
     public void multiple_cyclesTest() throws Exception {
 
         assertThat(
-                Template.parse(
+                TemplateParser.DEFAULT.parse(
                         "{%cycle 1,2%} " +
                         "{%cycle 1,2%} " +
                         "{%cycle 1,2%} " +
@@ -127,7 +129,7 @@ public class CycleTest {
     public void multiple_named_cyclesTest() throws Exception {
 
         assertThat(
-                Template.parse(
+                TemplateParser.DEFAULT.parse(
                         "{%cycle 1: \"one\", \"two\" %} {%cycle 2: \"one\", \"two\" %} " +
                         "{%cycle 1: \"one\", \"two\" %} {%cycle 2: \"one\", \"two\" %} " +
                         "{%cycle 1: \"one\", \"two\" %} {%cycle 2: \"one\", \"two\" %}").render(),
@@ -147,7 +149,7 @@ public class CycleTest {
         String assigns = "{\"var1\" : 1, \"var2\" : 2 }";
 
         assertThat(
-                Template.parse(
+                TemplateParser.DEFAULT.parse(
                         "{%cycle var1: \"one\", \"two\" %} {%cycle var2: \"one\", \"two\" %} " +
                         "{%cycle var1: \"one\", \"two\" %} {%cycle var2: \"one\", \"two\" %} " +
                         "{%cycle var1: \"one\", \"two\" %} {%cycle var2: \"one\", \"two\" %}").render(assigns),
@@ -156,7 +158,7 @@ public class CycleTest {
 
     @Test
     public void testCycleInNestedScope() {
-        assertThat(Template.parse("{% cycle 1,2,3 %}"
+        assertThat(TemplateParser.DEFAULT.parse("{% cycle 1,2,3 %}"
                         + "{% assign list = \"1\" | split: \",\" %}"
                         + "{% for n in list %}"
                         + "{% cycle 1,2,3 %}"

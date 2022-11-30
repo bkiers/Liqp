@@ -1,12 +1,14 @@
 package liqp.filters;
 
-import liqp.Template;
-import liqp.TemplateContext;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
 
 public class ModuloTest {
 
@@ -23,7 +25,7 @@ public class ModuloTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -33,13 +35,13 @@ public class ModuloTest {
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid1() {
         TemplateContext context = new TemplateContext();
-        Filter.getFilter("modulo").apply(1, context);
+        Filters.COMMON_FILTERS.get("modulo").apply(1, context);
     }
 
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid2() {
         TemplateContext context = new TemplateContext();
-        Filter.getFilter("modulo").apply(1, context, 2, 3);
+        Filters.COMMON_FILTERS.get("modulo").apply(1, context, 2, 3);
     }
 
 
@@ -51,11 +53,11 @@ public class ModuloTest {
     @Test
     public void applyOriginalTest() {
 
-        assertThat(Template.parse("{{ 3 | modulo:2 }}").render(), is((Object)"1"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ 3 | modulo:2 }}").render(), is((Object)"1"));
     }
 
     @Test
     public void testModuloWithFloated() {
-        assertThat(Template.parse("{{ 183.357 | modulo: 12 }}").render(), is((Object)"3.357"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ 183.357 | modulo: 12 }}").render(), is((Object)"3.357"));
     }
 }

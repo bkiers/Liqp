@@ -1,12 +1,14 @@
 package liqp.filters;
 
-import liqp.Template;
-import liqp.TemplateContext;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
 
 public class EscapeTest {
 
@@ -25,7 +27,7 @@ public class EscapeTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render(json));
 
             assertThat(rendered, is(test[1]));
@@ -41,7 +43,7 @@ public class EscapeTest {
     @Test
     public void applyOriginalTest() {
 
-        Filter filter = Filter.getFilter("escape");
+        Filter filter = Filters.COMMON_FILTERS.get("escape");
 
         assertThat(filter.apply("<strong>", new TemplateContext()), is((Object)"&lt;strong&gt;"));
     }

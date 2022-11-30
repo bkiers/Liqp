@@ -1,14 +1,13 @@
 package liqp;
 
-import liqp.parser.Flavor;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
+import liqp.parser.Flavor;
 
 public class TemplateContext {
 
@@ -18,9 +17,16 @@ public class TemplateContext {
     public static final String REGISTRY_FOR_STACK = "for_stack";
 
     protected TemplateContext parent;
+
+    private final TemplateParser parser;
+
+    @Deprecated
     public final ProtectionSettings protectionSettings;
+    @Deprecated
     public final RenderSettings renderSettings;
+    @Deprecated
     public final ParseSettings parseSettings;
+
     private Map<String, Object> variables;
     private Map<String, Object> environmentMap;
     private Map<String, Object> registry;
@@ -28,35 +34,46 @@ public class TemplateContext {
     private List<RuntimeException> errors;
 
     public TemplateContext() {
-        this(new ProtectionSettings.Builder().build(),
-                new RenderSettings.Builder().build(),
-                new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build(),
-                new LinkedHashMap<>());
+        this(TemplateParser.DEFAULT, new LinkedHashMap<>());
     }
 
-    @Deprecated // Use `TemplateContext(protectionSettings, renderSettings, parseSettings, variables)` instead
-    public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings, Flavor flavor, Map<String, Object> variables) {
-        this(protectionSettings, renderSettings, new ParseSettings.Builder().withFlavor(flavor).build(), variables);
+    @Deprecated // Use `TemplateContext(parser, variables)` instead
+    public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings,
+            Flavor flavor, Map<String, Object> variables) {
+        this(new TemplateParser.Builder().withLegacyMode(true).withProtectionSettings(protectionSettings)
+                .withRenderSettings(renderSettings).withParseSettings(new ParseSettings.Builder()
+                        .withFlavor(flavor).build()).build(), variables);
     }
 
-    public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings, ParseSettings parseSettings,
-                           Map<String, Object> variables) {
+    @Deprecated // Use `TemplateContext(parser, variables)` instead
+    public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings,
+            ParseSettings parseSettings, Map<String, Object> variables) {
+        this(new TemplateParser.Builder().withLegacyMode(true).withProtectionSettings(protectionSettings)
+                .withRenderSettings(renderSettings).withParseSettings(parseSettings).build(), variables);
+    }
+
+    public TemplateContext(TemplateParser parser, Map<String, Object> variables) {
         this.parent = null;
-        this.protectionSettings = protectionSettings;
-        this.renderSettings = renderSettings;
-        this.parseSettings = parseSettings;
+        this.parser = parser;
+        this.protectionSettings = parser.getProtectionSettings();
+        this.renderSettings = parser.getRenderSettings();
+        this.parseSettings = parser.getParseSettings();
         this.variables = new LinkedHashMap<>(variables);
         this.errors = new ArrayList<>();
     }
 
     public TemplateContext(TemplateContext parent) {
-        this(parent.protectionSettings, parent.renderSettings, parent.parseSettings, new LinkedHashMap<String, Object>());
+        this(parent.getParser(), new LinkedHashMap<String, Object>());
         this.parent = parent;
     }
 
     public TemplateContext(TemplateContext parent, Map<String, Object> variables) {
         this(parent);
         this.variables = variables;
+    }
+
+    public TemplateParser getParser() {
+        return parser;
     }
 
     public void addError(RuntimeException exception) {
@@ -133,7 +150,7 @@ public class TemplateContext {
         return null;
     }
 
-    public Map<String,Object> getVariables() {
+    public Map<String, Object> getVariables() {
         return new LinkedHashMap<String, Object>(this.variables);
     }
 
@@ -149,13 +166,14 @@ public class TemplateContext {
 
     /**
      * The registry is
-     * */
-    public<T extends Map<String, ?>> T getRegistry(String registryName) {
+     */
+    public <T extends Map<String, ?>> T getRegistry(String registryName) {
         if (parent != null) {
             return parent.getRegistry(registryName);
         }
 
-        if (!Arrays.asList(REGISTRY_CYCLE, REGISTRY_IFCHANGED, REGISTRY_FOR, REGISTRY_FOR_STACK).contains(registryName)) {
+        if (!Arrays.asList(REGISTRY_CYCLE, REGISTRY_IFCHANGED, REGISTRY_FOR, REGISTRY_FOR_STACK)
+                .contains(registryName)) {
             // this checking exists for safety of library, any listed type is expected, not more
             throw new RuntimeException("unknown registry type: " + registryName);
         }
@@ -166,6 +184,18 @@ public class TemplateContext {
         if (!registry.containsKey(registryName)) {
             registry.put(registryName, new HashMap<String, T>());
         }
-        return (T)registry.get(registryName);
+        return (T) registry.get(registryName);
+    }
+
+    public ParseSettings getParseSettings() {
+        return parser.getParseSettings();
+    }
+
+    public RenderSettings getRenderSettings() {
+        return parser.getRenderSettings();
+    }
+
+    public ProtectionSettings getProtectionSettings() {
+        return parser.getProtectionSettings();
     }
 }

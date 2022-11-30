@@ -1,19 +1,21 @@
 package liqp.parser;
 
-import liqp.RenderSettings;
-import liqp.Template;
-import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Test;
+
+import liqp.RenderSettings;
+import liqp.TemplateParser;
+
 public class LiquidSupportTest {
 
-    private static final RenderSettings EAGER_RENDERING = new RenderSettings.Builder().withEvaluateMode(RenderSettings.EvaluateMode.EAGER).build();
+    private static final RenderSettings EAGER_RENDERING_SETTINGS = new RenderSettings.Builder().withEvaluateMode(RenderSettings.EvaluateMode.EAGER).build();
+    private static final TemplateParser EAGER_RENDERING_PARSER = new TemplateParser.Builder().withRenderSettings(EAGER_RENDERING_SETTINGS).build();
 
     // test plan:
     // 1 feature
@@ -58,12 +60,12 @@ public class LiquidSupportTest {
         return data;
     }
     private void assertOldRender(String template, Map<String, Object> data, String expected) {
-        String fooA = Template.parse(template).render(data);
+        String fooA = TemplateParser.DEFAULT.parse(template).render(data);
         assertThat(fooA, is(expected));
     }
 
     private void assertEagerRender(String template, Map<String, Object> data, String expected) {
-        String fooA = Template.parse(template).withRenderSettings(EAGER_RENDERING).render(data);
+        String fooA = EAGER_RENDERING_PARSER.parse(template).render(data);
         assertThat(fooA, is(expected));
     }
     // LookupNode
@@ -179,7 +181,7 @@ public class LiquidSupportTest {
     public void verifyOldBehaviorWorks() {
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("foo", new Foo());
-        String fooA = Template.parse("{{foo.a}}").render(data);
+        String fooA = TemplateParser.DEFAULT.parse("{{foo.a}}").render(data);
 
         assertThat(fooA, is(""));
     }
@@ -188,7 +190,7 @@ public class LiquidSupportTest {
     public void renderMapWithPojosWithNewRenderingSettings() {
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("foo", new Foo());
-        String fooA = Template.parse("{{foo.a}}").withRenderSettings(EAGER_RENDERING).render(data);
+        String fooA = EAGER_RENDERING_PARSER.parse("{{foo.a}}").render(data);
 
         assertThat(fooA, is("A"));
     }
@@ -198,7 +200,7 @@ public class LiquidSupportTest {
         Map<String, Object> data = new HashMap<String, Object>();
         class FooWrapper extends Foo implements Inspectable {}
         data.put("foo", new FooWrapper());
-        String fooA = Template.parse("{{foo.a}}").render(data);
+        String fooA = TemplateParser.DEFAULT.parse("{{foo.a}}").render(data);
 
         assertThat(fooA, is("A"));
     }
@@ -212,7 +214,7 @@ public class LiquidSupportTest {
         in.put("a", inspect);
 
         // when
-        String res = Template.parse("{{a.val}}").render(in);
+        String res = TemplateParser.DEFAULT.parse("{{a.val}}").render(in);
 
         // then
         assertEquals("OK", res);
@@ -224,8 +226,8 @@ public class LiquidSupportTest {
         inspect.setVal("not this");
         Map<String, Object> in = new HashMap<>();
         in.put("a", inspect);
-
-        String fooA = Template.parse("{{a.val}}").withRenderSettings(new RenderSettings.Builder().withEvaluateMode(RenderSettings.EvaluateMode.EAGER).build()).render(in);
+        
+        String fooA = EAGER_RENDERING_PARSER.parse("{{a.val}}").render(in);
 
         assertThat(fooA, is("OK"));
     }

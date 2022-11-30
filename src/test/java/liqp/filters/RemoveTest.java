@@ -1,12 +1,14 @@
 package liqp.filters;
 
-import liqp.Template;
-import liqp.TemplateContext;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
 
 public class RemoveTest {
 
@@ -22,7 +24,7 @@ public class RemoveTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -31,7 +33,7 @@ public class RemoveTest {
 
     @Test(expected = RuntimeException.class)
     public void applyTestInvalidPattern() throws RecognitionException {
-        Template.parse("{{ 'ababab' | remove:nil }}").render();
+        TemplateParser.DEFAULT.parse("{{ 'ababab' | remove:nil }}").render();
     }
 
     /*
@@ -44,7 +46,7 @@ public class RemoveTest {
     @Test
     public void applyOriginalTest() {
         TemplateContext context = new TemplateContext();
-        Filter filter = Filter.getFilter("remove");
+        Filter filter = Filters.COMMON_FILTERS.get("remove");
 
         assertThat(filter.apply("a a a a", context, "a"), is((Object)"   "));
     }

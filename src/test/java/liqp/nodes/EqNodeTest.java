@@ -1,11 +1,13 @@
 package liqp.nodes;
 
-import liqp.Template;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class EqNodeTest {
 
@@ -21,7 +23,7 @@ public class EqNodeTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -50,20 +52,20 @@ public class EqNodeTest {
     @Test
     public void illegal_symbolsTest() throws Exception {
 
-        assertThat(Template.parse("{% if true == empty %}?{% endif %}").render(), is(""));
-        assertThat(Template.parse("{% if true == null %}?{% endif %}").render(), is(""));
-        assertThat(Template.parse("{% if true == blank %}?{% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% if true == empty %}?{% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% if true == null %}?{% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% if true == blank %}?{% endif %}").render(), is(""));
 
-        assertThat(Template.parse("{% if empty == true %}?{% endif %}").render(), is(""));
-        assertThat(Template.parse("{% if empty == null %}?{% endif %}").render(), is(""));
-        assertThat(Template.parse("{% if empty == blank %}?{% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% if empty == true %}?{% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% if empty == null %}?{% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% if empty == blank %}?{% endif %}").render(), is(""));
 
-        assertThat(Template.parse("{% if null == true %}?{% endif %}").render(), is(""));
-        assertThat(Template.parse("{% if null == empty %}?{% endif %}").render(), is(""));
-        assertThat(Template.parse("{% if null == blank %}?{% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% if null == true %}?{% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% if null == empty %}?{% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% if null == blank %}?{% endif %}").render(), is(""));
 
-        assertThat(Template.parse("{% if blank == true %}?{% endif %}").render(), is(""));
-        assertThat(Template.parse("{% if blank == empty %}?{% endif %}").render(), is(""));
-        assertThat(Template.parse("{% if blank == null %}?{% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% if blank == true %}?{% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% if blank == empty %}?{% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% if blank == null %}?{% endif %}").render(), is(""));
     }
 }

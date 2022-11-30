@@ -1,11 +1,13 @@
 package liqp.filters;
 
-import liqp.Template;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class Strip_NewlinesTest {
 
@@ -21,7 +23,7 @@ public class Strip_NewlinesTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render(json));
 
             assertThat(rendered, is(test[1]));
@@ -36,6 +38,6 @@ public class Strip_NewlinesTest {
     @Test
     public void applyOriginalTest() {
 
-        assertThat(Template.parse("{{ source | strip_newlines }}").render("source", "a\nb\nc"), is((Object)"abc"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ source | strip_newlines }}").render("source", "a\nb\nc"), is((Object)"abc"));
     }
 }

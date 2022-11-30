@@ -58,8 +58,7 @@ public class Where_Exp extends Filter {
         String varName = asString(params[0], context);
         String strExpression = asString(params[1], context);
 
-        Template expression = Template.parse("{{ " + strExpression + " }}", context.parseSettings)
-                .withRenderSettings(context.renderSettings);
+        Template expression = context.getParser().parse("{{ " + strExpression + " }}");
 
         List<Object> res = new ArrayList<>();
         for (Object item: items) {

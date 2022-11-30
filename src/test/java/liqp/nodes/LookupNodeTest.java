@@ -1,15 +1,18 @@
 package liqp.nodes;
 
-import java.util.HashMap;
-import java.util.Map;
-import liqp.Template;
-import liqp.TemplateContext;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
-
 import static liqp.TestUtils.getNode;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
 
 public class LookupNodeTest {
 
@@ -25,7 +28,7 @@ public class LookupNodeTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render(json));
 
             assertThat(rendered, is(test[1]));
@@ -274,7 +277,7 @@ public class LookupNodeTest {
 
         String assigns = "{ \"array\" : [1,2,3,4] }";
 
-        assertThat(Template.parse("array has {{ array.size }} elements").render(assigns), is("array has 4 elements"));
+        assertThat(TemplateParser.DEFAULT.parse("array has {{ array.size }} elements").render(assigns), is("array has 4 elements"));
     }
 
     /*
@@ -288,14 +291,14 @@ public class LookupNodeTest {
 
         String assigns = "{ \"hash\" : { \"a\" : 1, \"b\" : 2, \"c\" : 3, \"d\" : 4 } }";
 
-        assertThat(Template.parse("hash has {{ hash.size }} elements").render(assigns), is("hash has 4 elements"));
+        assertThat(TemplateParser.DEFAULT.parse("hash has {{ hash.size }} elements").render(assigns), is("hash has 4 elements"));
     }
 
     /*
      * https://github.com/bkiers/Liqp/issues/209
      *
      * data = { 'Data' => { '1' => { 'Value' => 'tobi' }} }
-     * @template = Liquid::Template.parse("hi {{Data.1.Value}}")
+     * @template = Liquid::TemplateParser.DEFAULT.parse("hi {{Data.1.Value}}")
      * puts @template.render(data)
      * # hi tobi
      */
@@ -304,7 +307,7 @@ public class LookupNodeTest {
 
         String assigns = "{ \"Data\" : { \"1\" : { \"Value\": \"tobi\" } } }";
 
-        assertThat(Template.parse("hi {{Data.1.Value}}").render(assigns), is("hi tobi"));
+        assertThat(TemplateParser.DEFAULT.parse("hi {{Data.1.Value}}").render(assigns), is("hi tobi"));
     }
 }
 

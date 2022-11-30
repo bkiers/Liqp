@@ -57,13 +57,13 @@ public class TemplateTest {
     public void renderObjectTest() throws RecognitionException {
 
         // `a` is public
-        assertThat(Template.parse("{{foo.a}}").render(true, "foo", new Foo()), is("A"));
+        assertThat(TemplateParser.DEFAULT.parse("{{foo.a}}").render(true, "foo", new Foo()), is("A"));
 
         // there is a public `getB()` method that exposes `b`
-        assertThat(Template.parse("{{foo.b}}").render(true, "foo", new Foo()), is("B"));
+        assertThat(TemplateParser.DEFAULT.parse("{{foo.b}}").render(true, "foo", new Foo()), is("B"));
 
         // `c` is not accessible
-        assertThat(Template.parse("{{foo.c}}").render(true, "foo", new Foo()), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{{foo.c}}").render(true, "foo", new Foo()), is(""));
     }
 
     @Test
@@ -71,13 +71,13 @@ public class TemplateTest {
 
         final String expected = "Hey";
 
-        String rendered = Template.parse("{{mu}}").render("{\"mu\" : \"" + expected + "\"}");
+        String rendered = TemplateParser.DEFAULT.parse("{{mu}}").render("{\"mu\" : \"" + expected + "\"}");
         assertThat(rendered, is(expected));
     }
 
     @Test(expected = RuntimeException.class)
     public void renderJSONStringTestInvalidJSON() throws RecognitionException {
-        Template.parse("mu").render("{\"key : \"value\"}"); // missing quote after `key`
+        TemplateParser.DEFAULT.parse("mu").render("{\"key : \"value\"}"); // missing quote after `key`
     }
 
     @Test
@@ -85,24 +85,24 @@ public class TemplateTest {
 
         final String expected = "Hey";
 
-        String rendered = Template.parse("{{mu}}").render("mu", expected);
+        String rendered = TemplateParser.DEFAULT.parse("{{mu}}").render("mu", expected);
         assertThat(rendered, is(expected));
 
-        rendered = Template.parse("{{a}}{{b}}{{c}}").render(
+        rendered = TemplateParser.DEFAULT.parse("{{a}}{{b}}{{c}}").render(
                 "a", expected,
                 "b", expected,
                 "c", null
         );
         assertThat(rendered, is(expected + expected));
 
-        rendered = Template.parse("{{a}}{{b}}{{c}}").render(
+        rendered = TemplateParser.DEFAULT.parse("{{a}}{{b}}{{c}}").render(
                 "a", expected,
                 "b", expected,
                 "c" /* no value */
         );
         assertThat(rendered, is(expected + expected));
 
-        rendered = Template.parse("{{a}}{{b}}{{c}}").render(
+        rendered = TemplateParser.DEFAULT.parse("{{a}}{{b}}{{c}}").render(
                 "a", "A",
                 "b", "B",
                 "c", "C"
@@ -112,7 +112,7 @@ public class TemplateTest {
 
     @Test(expected = RuntimeException.class)
     public void renderVarArgsTestInvalidKey2() throws RecognitionException {
-        Template.parse("mu").render(null, 456);
+        TemplateParser.DEFAULT.parse("mu").render(null, 456);
     }
 
     @Test
@@ -122,7 +122,7 @@ public class TemplateTest {
         data.put("bar", "zoo");
         data.put("bear", true);
 
-        String fooA = Template.parse("{{foo.a}}{{bar}}{{bear}}").render(data);
+        String fooA = TemplateParser.DEFAULT.parse("{{foo.a}}{{bar}}{{bear}}").render(data);
 
         assertThat(fooA, is("Azootrue"));
     }
@@ -130,14 +130,14 @@ public class TemplateTest {
     @Test
     public void parseWithInputStream() throws Exception {
         InputStream inputStream = new FileInputStream(new File("./snippets/header.html"));
-        Template template = Template.parse(inputStream);
+        Template template = TemplateParser.DEFAULT.parse(inputStream);
         assertThat(template.render(), is("HEADER\n"));
     }
 
     @Test
     public void testRenderInspectable() {
         // given
-        Template template = Template.parse("{{ some.val }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ some.val }}");
         class MyInspectable implements Inspectable {
             public final Map<String, String> some = new HashMap<>();
             {
@@ -163,7 +163,7 @@ public class TemplateTest {
     @Test
     public void testRenderInspectableDateType() {
         // given
-        Template template = Template.parse("{{ val | date: '%e %b, %Y' }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ val | date: '%e %b, %Y' }}");
 
         // legacy API: year should be 1900 + year, month is 0-based
         SampleDateInspectable sample = new SampleDateInspectable(new Date(120, Calendar.DECEMBER, 31));
@@ -178,7 +178,7 @@ public class TemplateTest {
     @Test
     public void testRenderDateType() {
         // given
-        Template template = Template.parse("{{ val | date: '%e %b, %Y' }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ val | date: '%e %b, %Y' }}");
 
         Map<String, Object> sample = new HashMap<>();
         // legacy API: year should be 1900 + year, month is 0-based
@@ -195,7 +195,12 @@ public class TemplateTest {
     public void testDeepData() {
         // given
         Map<String, Object> data = getDeepData();
-        Template template = Template.parse("{{a.b[2].d[3].e}}").withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).withRaiseExceptionsInStrictMode(true).build());
+        
+        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(
+                new RenderSettings.Builder().withStrictVariables(true).withRaiseExceptionsInStrictMode(
+                        true).build()).build();
+        
+        Template template = parser.parse("{{a.b[2].d[3].e}}");
 
         // when
         String rendered = template.render(data);
@@ -224,7 +229,12 @@ public class TemplateTest {
                 }};
             };
         };
-        Template template = Template.parse("{{ a.b[2].d[3].e | date: '%Y-%m-%d %H:%M:%S %Z' }}").withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).withRaiseExceptionsInStrictMode(true).build());
+        
+        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(
+                new RenderSettings.Builder().withStrictVariables(true).withRaiseExceptionsInStrictMode(
+                        true).build()).build();
+        
+        Template template = parser.parse("{{ a.b[2].d[3].e | date: '%Y-%m-%d %H:%M:%S %Z' }}");
 
         // when
         String rendered = template.render(data);
@@ -236,7 +246,7 @@ public class TemplateTest {
     @Test
     public void testCustomTagMissingErrorReporting() {
         try {
-            Template.parse("{% custom_tag %}");
+            TemplateParser.DEFAULT.parse("{% custom_tag %}");
         } catch (Exception e) {
             assertEquals("parser error \"Invalid Tag: 'custom_tag'\" on line 1, index 3", e.getMessage());
         }
@@ -245,14 +255,16 @@ public class TemplateTest {
     @Test
     public void testWithCustomTag() {
         // given
-        Template template = Template.parse("{% custom_tag %}", new ParseSettings.Builder()
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(new ParseSettings.Builder()
                 .with(new Tag("custom_tag") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         return "xxx";
                     }
                 })
-                .build());
+                .build()).build();
+        
+        Template template = parser.parse("{% custom_tag %}");
         
         // then
         assertEquals("xxx", template.render());
@@ -261,8 +273,8 @@ public class TemplateTest {
     @Test
     public void testWithCustomBlock() {
         // given
-        Template template = Template.parse("{% custom_uppercase_block %} some text {% endcustom_uppercase_block %}", new ParseSettings.Builder()
-                .with(new Block("custom_uppercase_block") {
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(
+                new ParseSettings.Builder().with(new Block("custom_uppercase_block") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         LNode block = nodes[0];
@@ -272,8 +284,10 @@ public class TemplateTest {
                         }
                         return null;
                     }
-                })
-                .build());
+                }).build()).build();
+
+        Template template = parser.parse(
+                "{% custom_uppercase_block %} some text {% endcustom_uppercase_block %}");
 
         // then
         assertEquals(" SOME TEXT ", template.render());
@@ -282,7 +296,7 @@ public class TemplateTest {
     @Test
     public void testWithCustomFilter() {
         // given
-        Template template = Template.parse("{{ numbers | sum }}", new ParseSettings.Builder()
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(new ParseSettings.Builder()
                 .with(new Filter("sum"){
                     @Override
                     public Object apply(Object value, TemplateContext context, Object... params) {
@@ -294,7 +308,9 @@ public class TemplateTest {
                         return sum;
                     }
                 })
-                .build());
+                .build()).build();
+        
+        Template template = parser.parse("{{ numbers | sum }}");
 
         String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
 

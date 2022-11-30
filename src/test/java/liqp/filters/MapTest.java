@@ -1,13 +1,16 @@
 package liqp.filters;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.HashMap;
-import liqp.Template;
-import liqp.TemplateContext;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
 
 public class MapTest {
 
@@ -30,7 +33,7 @@ public class MapTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render(json));
 
             assertThat(rendered, is(test[1]));
@@ -47,7 +50,7 @@ public class MapTest {
     @Test
     public void applyOriginalTest() {
 
-        Filter filter = Filter.getFilter("map");
+        Filter filter = Filters.COMMON_FILTERS.get("map");
 
         Object[] rendered = (Object[]) filter.apply(
                 new HashMap[]{
@@ -66,6 +69,6 @@ public class MapTest {
 
         final String json = "{\"ary\":[{\"foo\":{\"bar\":\"a\"}}, {\"foo\":{\"bar\":\"b\"}}, {\"foo\":{\"bar\":\"c\"}}]}";
 
-        assertThat(Template.parse("{{ ary | map:'foo' | map:'bar' }}").render(json), is("abc"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ ary | map:'foo' | map:'bar' }}").render(json), is("abc"));
     }
 }

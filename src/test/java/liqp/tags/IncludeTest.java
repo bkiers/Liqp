@@ -1,16 +1,12 @@
 package liqp.tags;
 
-import liqp.*;
-import liqp.exceptions.LiquidException;
-import liqp.exceptions.VariableNotExistException;
-import liqp.filters.Filter;
-import liqp.tags.Include;
-import liqp.parser.Flavor;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.isA;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,9 +16,20 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.isA;
-import static org.junit.Assert.*;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import liqp.ParseSettings;
+import liqp.RenderSettings;
+import liqp.Template;
+import liqp.TemplateParser;
+import liqp.exceptions.LiquidException;
+import liqp.exceptions.VariableNotExistException;
+import liqp.filters.Filter;
+import liqp.parser.Flavor;
 
 public class IncludeTest {
 
@@ -47,7 +54,7 @@ public class IncludeTest {
                 "{% assign shape = 'square' %}\n" +
                 "{% include 'color' with 'red' %}";
 
-        Template template = Template.parse(source);
+        Template template = TemplateParser.DEFAULT.parse(source);
 
         String rendered = template.render();
 
@@ -65,7 +72,15 @@ public class IncludeTest {
 
     @Test
     public void testIncludeVariableSyntaxTag() {
-        Template template = Template.parse("{% include {{ tmpl }} %}", jekyll());
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(jekyll()).build();
+        Template template = parser.parse("{% include {{ tmpl }} %}");
+        String res = template.render("{ \"var\" : \"TEST\", \"tmpl\" : \"include_read_var\"}");
+        assertEquals("TEST", res);
+    }
+
+    @Test
+    public void testIncludeVariableSyntaxTagDefaultJekyll() {
+        Template template = Flavor.JEKYLL.defaultParser().parse("{% include {{ tmpl }} %}");
         String res = template.render("{ \"var\" : \"TEST\", \"tmpl\" : \"include_read_var\"}");
         assertEquals("TEST", res);
     }
@@ -88,16 +103,16 @@ public class IncludeTest {
     @Test(expected = LiquidException.class)
     public void renderWithShouldThrowExceptionInJekyll() throws RecognitionException {
 
-        Template template = Template.parse("{% include 'color' with 'red' %}",
-                new ParseSettings.Builder()
-                        .withFlavor(Flavor.JEKYLL)
-                        .build(),
-                new RenderSettings
-                        .Builder()
-                        .withRaiseExceptionsInStrictMode(true)
-                        .withShowExceptionsFromInclude(true)
-                        .build()
-        );
+        TemplateParser parser = new TemplateParser.Builder() //
+                .withParseSettings(jekyll()) //
+                .withRenderSettings( //
+                        new RenderSettings.Builder() //
+                                .withRaiseExceptionsInStrictMode(true) //
+                                .withShowExceptionsFromInclude(true) //
+                                .build()) //
+                .build();
+
+        Template template = parser.parse("{% include 'color' with 'red' %}");
 
         template.render();
 
@@ -106,17 +121,17 @@ public class IncludeTest {
 
     @Test
     public void renderWithShouldWorkInLiquid() throws RecognitionException {
-
-        Template template = Template.parse("{% include 'color' with 'red' %}",
-                new ParseSettings.Builder()
+        TemplateParser parser = new TemplateParser.Builder() //
+                .withParseSettings(new ParseSettings.Builder()
                         .withFlavor(Flavor.LIQUID)
-                        .build(),
-                new RenderSettings
+                        .build())
+                .withRenderSettings(new RenderSettings
                         .Builder()
                         .withRaiseExceptionsInStrictMode(true)
                         .withShowExceptionsFromInclude(true)
-                        .build()
-        );
+                        .build()).build();
+
+        Template template = parser.parse("{% include 'color' with 'red' %}");
 
         String render = template.render();
 
@@ -127,7 +142,7 @@ public class IncludeTest {
     public void renderTestWithIncludeDirectorySpecifiedInContextLiquidFlavor() throws Exception {
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_with_quotes.html");
-        Template template = Template.parse(index);
+        Template template = TemplateParser.DEFAULT.parse(index);
         String result = template.render();
         assertTrue(result.contains("HEADER"));
     }
@@ -136,7 +151,7 @@ public class IncludeTest {
     public void renderTestWithIncludeDirectorySpecifiedInContextJekyllFlavor() throws Exception {
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_without_quotes.html");
-        Template template = Template.parse(index, Flavor.JEKYLL);
+        Template template = Flavor.JEKYLL.defaultParser().parse(index);
         String result = template.render();
         assertTrue(result.contains("HEADER"));
     }
@@ -146,7 +161,7 @@ public class IncludeTest {
     public void renderTestWithIncludeSubdirectorySpecifiedInContextJekyllFlavor() throws Exception {
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_without_quotes_subdirectory.html");
-        Template template = Template.parse(index, Flavor.JEKYLL);
+        Template template = Flavor.JEKYLL.defaultParser().parse(index);
         String result = template.render();
         assertTrue(result.contains("FOOTER"));
     }
@@ -154,7 +169,7 @@ public class IncludeTest {
     @Test
     public void renderTestWithIncludeDirectorySpecifiedInJekyllFlavor() throws Exception {
         File index = new File("src/test/jekyll/index_without_quotes.html");
-        Template template = Template.parse(index, Flavor.JEKYLL);
+        Template template = Flavor.JEKYLL.defaultParser().parse(index);
         String result = template.render();
         assertTrue(result.contains("HEADER"));
     }
@@ -162,7 +177,7 @@ public class IncludeTest {
     @Test
     public void renderTestWithIncludeDirectorySpecifiedInLiquidFlavor() throws Exception {
         File index = new File("src/test/jekyll/index_with_quotes.html");
-        Template template = Template.parse(index, Flavor.LIQUID);
+        Template template = liquidParser().parse(index);
         String result = template.render();
         assertTrue(result.contains("HEADER"));
     }
@@ -171,20 +186,20 @@ public class IncludeTest {
     @Test
     public void renderTestWithIncludeSubdirectorySpecifiedInJekyllFlavor() throws Exception {
         File index = new File("src/test/jekyll/index_without_quotes_subdirectory.html");
-        Template template = Template.parse(index, Flavor.JEKYLL);
+        Template template = jekyllParser().parse(index);
         String result = template.render();
         assertTrue(result.contains("FOOTER"));
     }
 
     @Test
     public void renderTestWithIncludeSubdirectorySpecifiedInLiquidFlavorWithStrictVariables() throws Exception {
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(Flavor.LIQUID
+                .defaultParseSettings()).withRenderSettings(new RenderSettings.Builder()
+                        .withStrictVariables(true).withShowExceptionsFromInclude(true).build()).build();;
 
         String expected = "Sample Footer";
         File index = new File("src/test/jekyll/index_with_variables.html");
-        Template template = Template.parse(
-            index,
-            new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build(),
-            new RenderSettings.Builder().withStrictVariables(true).withShowExceptionsFromInclude(true).build());
+        Template template = parser.parse(index);
         Map<String, Object> variables = new HashMap<>();
         variables.put("FOOTERTEXT", expected);
         String result = template.render(variables);
@@ -198,10 +213,14 @@ public class IncludeTest {
         thrown.expectCause(isA(VariableNotExistException.class));
 
         File index = new File("src/test/jekyll/index_with_variables.html");
-        Template template = Template.parse(
-            index,
-            new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build(),
-            new RenderSettings.Builder().withStrictVariables(true).withShowExceptionsFromInclude(true).build());
+        TemplateParser parser = new TemplateParser.Builder() //
+            .withParseSettings(Flavor.LIQUID.defaultParseSettings()) //
+            .withRenderSettings(new RenderSettings.Builder() //
+                    .withStrictVariables(true) //
+                    .withShowExceptionsFromInclude(true) //
+                    .build()) //
+            .build();
+        Template template = parser.parse(index);
         template.render();
     }
 
@@ -209,7 +228,7 @@ public class IncludeTest {
     @Test
     public void renderTestWithIncludeSubdirectorySpecifiedInLiquidFlavor() throws Exception {
         File index = new File("src/test/jekyll/index_with_quotes_subdirectory.html");
-        Template template = Template.parse(index, Flavor.LIQUID);
+        Template template = Flavor.LIQUID.defaultParser().parse(index);
         String result = template.render();
         assertTrue(result.contains("FOOTER"));
     }
@@ -220,8 +239,7 @@ public class IncludeTest {
 
         String source = "{% assign variable = 'header.html' %}{% include {{variable}} %}";
 
-        ParseSettings settings = new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build();
-        String rendered = Template.parse(source, settings).render();
+        String rendered = Flavor.JEKYLL.defaultParser().parse(source).render();
 
         assertTrue(rendered.contains("HEADER"));
     }
@@ -229,20 +247,17 @@ public class IncludeTest {
     // https://github.com/bkiers/Liqp/issues/75
     @Test(expected = RuntimeException.class)
     public void expressionInIncludeTagLiquidThrowsException() {
-
         String source = "{% assign variable = 'header.html' %}{% include {{variable}} %}";
 
-        ParseSettings settings = new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build();
-        Template.parse(source, settings).render();
+        Flavor.LIQUID.defaultParser().parse(source).render();
     }
 
     // https://github.com/bkiers/Liqp/issues/75
     @Test(expected = RuntimeException.class)
     public void expressionInIncludeTagDefaultFlavorThrowsException() {
-
         String source = "{% assign variable = 'header.html' %}{% include {{variable}} %}";
 
-        Template.parse(source).render();
+        TemplateParser.DEFAULT.parse(source).render();
     }
 
     @Test
@@ -250,7 +265,7 @@ public class IncludeTest {
         // given
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_without_quotes.html");
-        Template template = Template.parse(index, new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build());
+        Template template = Flavor.JEKYLL.defaultParser().parse(index);
         Map<String, Object> data = new HashMap<String, Object>();
         data.put(Include.INCLUDES_DIRECTORY_KEY, new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes"));
 
@@ -266,7 +281,7 @@ public class IncludeTest {
         // given
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_without_quotes.html");
-        Template template = Template.parse(index, new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build());
+        Template template = Flavor.JEKYLL.defaultParser().parse(index);
         Map<String, Object> data = new HashMap<String, Object>();
         String alternativePath = new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes").getAbsolutePath();
         data.put(Include.INCLUDES_DIRECTORY_KEY, alternativePath);
@@ -282,7 +297,7 @@ public class IncludeTest {
         // given
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_without_quotes.html");
-        Template template = Template.parse(index, new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build());
+        Template template = Flavor.JEKYLL.defaultParser().parse(index);
         Map<String, Object> data = new HashMap<String, Object>();
         String alternativePath = new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes").getAbsolutePath();
         data.put(Include.INCLUDES_DIRECTORY_KEY, Paths.get(alternativePath));
@@ -299,10 +314,30 @@ public class IncludeTest {
         //given
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_with_errored_include.html");
+        ParseSettings parseSettings = Flavor.JEKYLL.defaultParseSettings();
+        RenderSettings renderSettings = new RenderSettings.Builder().withShowExceptionsFromInclude(false).build();
+       
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings)
+                .withRenderSettings(renderSettings).build();
+        
+        Template template = parser.parse(index);
+
+        // when
+        String result = template.render();
+
+        // then
+        assertFalse(result.contains("THE_ERROR"));
+    }
+
+    @Test
+    public void errorInIncludeCauseIgnoreErrorWhenNoExceptionsFromIncludeLegacy() throws IOException {
+        //given
+        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
+        File index = new File(jekyll, "index_with_errored_include.html");
         ParseSettings parseSettings = new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build();
         RenderSettings renderSettings = new RenderSettings.Builder().withShowExceptionsFromInclude(false).build();
+        @SuppressWarnings("deprecation")
         Template template = Template.parse(index, parseSettings).withRenderSettings(renderSettings);
-
 
         // when
         String result = template.render();
@@ -316,10 +351,13 @@ public class IncludeTest {
         //given
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_with_errored_include.html");
-        ParseSettings parseSettings = new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build();
+        ParseSettings parseSettings = Flavor.JEKYLL.defaultParseSettings();;
         RenderSettings renderSettings = new RenderSettings.Builder().withShowExceptionsFromInclude(true).build();
-        Template template = Template.parse(index, parseSettings).withRenderSettings(renderSettings);
+        
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings)
+                .withRenderSettings(renderSettings).build();
 
+        Template template = parser.parse(index);
 
         // when
         template.render();
@@ -331,6 +369,29 @@ public class IncludeTest {
     @Test
     public void errorInIncludeCauseMissingIncludeWithCustomRenderingAndFixedError() throws IOException {
         //given
+        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
+        File index = new File(jekyll, "index_with_errored_include.html");
+
+        ParseSettings parseSettings = new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).with(
+                new Filter("unknown_and_for_sure_enexist_filter") {
+                }).build();
+        
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
+
+        Template template = parser.parse(index);
+
+        // when
+        String result = template.render();
+
+        // then
+        assertTrue(result.contains("THE_ERROR"));
+    }
+
+    @SuppressWarnings("deprecation")
+    @Test
+    public void errorInIncludeCauseMissingIncludeWithCustomRenderingAndFixedErrorLegacy1()
+            throws IOException {
+        // given
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_with_errored_include.html");
         ParseSettings parseSettings = new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build();
@@ -346,14 +407,36 @@ public class IncludeTest {
         assertTrue(result.contains("THE_ERROR"));
     }
 
+    @SuppressWarnings("deprecation")
+    @Test
+    public void errorInIncludeCauseMissingIncludeWithCustomRenderingAndFixedErrorLegacy2()
+            throws IOException {
+        // given
+        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
+        File index = new File(jekyll, "index_with_errored_include.html");
+        ParseSettings parseSettings = new ParseSettings.Builder().withFlavor(Flavor.JEKYLL) //
+                .with(new Filter("unknown_and_for_sure_enexist_filter") {
+                }).build();
+        Template template = Template.parse(index, parseSettings);
+
+        // when
+        String result = template.render();
+
+        // then
+        assertTrue(result.contains("THE_ERROR"));
+    }
+
     @Test
     public void testIncludeMustSeeVariablesFromOuterScopeInLiquid() throws IOException {
         // liquid
 
         String templateText = "{% assign var = 'variable' %}{% include 'include_read_var' %}";
 
-        Template template = Template.parse(templateText, liquid())
-                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build());
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(liquid())
+                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true)
+                        .build()).build();
+
+        Template template = parser.parse(templateText);
 
         assertEquals("variable", template.render());
 
@@ -365,8 +448,11 @@ public class IncludeTest {
         // liquid
         String templateText = "{% include 'include_create_new_var' %}{{ incl_var }}";
 
-        Template template = Template.parse(templateText, liquid())
-                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build());
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(liquid())
+                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true)
+                        .build()).build();
+        
+        Template template = parser.parse(templateText);
 
         assertEquals("incl_var", template.render());
     }
@@ -377,8 +463,11 @@ public class IncludeTest {
 
         String templateText = "{% assign var = 4 %}{% include 'include_decrement_var_not_interfere' %} ! {{ var }}";
 
-        Template template = Template.parse(templateText, liquid())
-                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build());
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(liquid())
+                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true)
+                        .build()).build();
+        
+        Template template = parser.parse(templateText);
 
         assertEquals("-1 ! 4", template.render());
     }
@@ -388,10 +477,13 @@ public class IncludeTest {
     public void testIncludeMustSeeVariablesFromOuterScopeInJekyll() throws IOException {
         // jekyll
 
-        Template template = Template.parse("" +
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(jekyll())
+                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true)
+                        .build()).build();
+
+        Template template = parser.parse("" +
                 "{% assign var = 'variable' %}" +
-                "{% include include_read_var.liquid %}", jekyll())
-                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build());
+                "{% include include_read_var.liquid %}");
 
         assertEquals("variable", template.render());
 
@@ -402,14 +494,17 @@ public class IncludeTest {
     @Test
     public void testIncludesMissingValues() throws IOException {
         // given
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(jekyll())
+                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true)
+                        .build()).build();
+
         // when
-        String rendered = Template.parse( ""
+        String rendered = parser.parse( ""
                 + "{% assign list = \"1,2\" | split: \",\" %}"
                 + "{% for n in list %}"
                 +     "{% assign inner = n %}"
                 +     "{% include include_iterations_variables.liquid %}"
-                + "{% endfor %}", jekyll())
-                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build())
+                + "{% endfor %}")
                 .render();
 
 
@@ -427,7 +522,7 @@ public class IncludeTest {
     public void testRewriteValuesFromInclude() {
         // given
         // when
-        String rendered = Template.parse("{% assign val = 'OUTER'%}{% include 'include_var' %}{{val}}").render();
+        String rendered = TemplateParser.DEFAULT.parse("{% assign val = 'OUTER'%}{% include 'include_var' %}{{val}}").render();
 
         // then
         assertEquals("INNER", rendered);
@@ -435,12 +530,16 @@ public class IncludeTest {
 
     @Test
     public void testDecrementIncrementMustContinueThoughInclude() {
-        String rendered = Template.parse(""
+        TemplateParser parser = new TemplateParser.Builder()
+                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true)
+                        .build()).build();
+        
+        String rendered = parser.parse(""
                 + "[{% decrement var1 %},{% increment var2 %}]"
                 + "[{% include 'include_decrement_var' %}]"
                 + "[{% decrement var1 %},{% increment var2 %}]"
                 + "[{{ var1 }}, {{ var2 }}]"
-                + "").withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build())
+                + "")
                 .render();
 
         assertEquals("[-1,0][-2,1][-3,2][-3, 3]", rendered);
@@ -448,20 +547,23 @@ public class IncludeTest {
 
     @Test
     public void testCycleMustContinueThoughInclude() throws IOException {
-        String rendered = Template.parse(""
+        TemplateParser parser = new TemplateParser.Builder()
+                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true)
+                        .build()).build();
+        
+        String rendered = parser.parse(""
                 + "{% cycle 1,2,3,4 %}"
                 + "{% assign list = \"1\" | split: \",\" %}{% for n in list %}{% cycle 1,2,3,4 %}{% endfor %}"
                 + "{% cycle 1,2,3,4 %}"
                 + "{% include 'include_cycle' %}"
                 + "")
-                .withRenderSettings(new RenderSettings.Builder().withShowExceptionsFromInclude(true).build())
                 .render();
         assertEquals("1234", rendered);
     }
 
     @Test
     public void testIfchangedThoughInclude() throws IOException {
-        String rendered = Template.parse(""
+        String rendered = TemplateParser.DEFAULT.parse(""
                 + "{% ifchanged %}1{% endifchanged %}"
                 + "{% ifchanged %}2{% endifchanged %}"
                 + "{% include 'include_ifchanged' %}"
@@ -474,18 +576,25 @@ public class IncludeTest {
     public void testOwnScopeInInclude() throws IOException {
 
         // when
-        String rendered = Template.parse("{% for item in (1..2) %}{% include 'include_iteration' %}{% endfor %}{{ item }}").render();
+        String rendered = TemplateParser.DEFAULT.parse("{% for item in (1..2) %}{% include 'include_iteration' %}{% endfor %}{{ item }}").render();
 
         // then
         assertEquals("1212", rendered);
     }
 
     public ParseSettings jekyll() {
-        return new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build();
+        return Flavor.JEKYLL.defaultParseSettings();
     }
 
     public ParseSettings liquid() {
-        return new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build();
+        return Flavor.LIQUID.defaultParseSettings();
+    }
+    
+    public TemplateParser jekyllParser() {
+        return new TemplateParser.Builder().withParseSettings(jekyll()).build();
     }
 
+    public TemplateParser liquidParser() {
+        return new TemplateParser.Builder().withParseSettings(liquid()).build();
+    }
 }

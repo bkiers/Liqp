@@ -1,6 +1,5 @@
 package liqp.filters;
 
-import liqp.Template;
 import liqp.TemplateContext;
 
 public class H extends Filter {
@@ -12,7 +11,6 @@ public class H extends Filter {
      */
     @Override
     public Object apply(Object value, TemplateContext context, Object... params) {
-
-        return Filter.getFilter("escape").apply(value, context, params);
+        return Filters.COMMON_FILTERS.get("escape").apply(value, context, params);
     }
 }

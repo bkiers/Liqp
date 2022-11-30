@@ -1,15 +1,15 @@
 package liqp.parser.v4;
 
+import liqp.Insertion;
+import liqp.Insertions;
 import liqp.LValue;
 import liqp.ParseSettings;
 import liqp.exceptions.LiquidException;
 import liqp.filters.Filter;
-import liqp.Insertion;
+import liqp.filters.Filters;
 import liqp.nodes.*;
 import liqp.parser.Flavor;
 import liquid.parser.v4.LiquidParserBaseVisitor;
-import liquid.parser.v4.LiquidParser.Jekyll_include_paramsContext;
-
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -22,13 +22,17 @@ import static liquid.parser.v4.LiquidParser.*;
 
 public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
 
-  private Map<String, Insertion> insertions;
-  private Map<String, Filter> filters;
+  private Insertions insertions;
+  private Filters filters;
   private final ParseSettings parseSettings;
   private boolean isRootBlock = true;
 
+  @Deprecated
   public NodeVisitor(Map<String, Insertion> insertions, Map<String, Filter> filters, ParseSettings parseSettings) {
+    this(Insertions.of(insertions), Filters.of(filters), parseSettings);
+  }
 
+  public NodeVisitor(Insertions insertions, Filters filters, ParseSettings parseSettings) {
     if (insertions == null)
       throw new IllegalArgumentException("tags == null");
 

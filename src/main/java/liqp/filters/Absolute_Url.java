@@ -56,7 +56,7 @@ public class Absolute_Url extends Relative_Url {
                 }
                 return res;
             } catch (Exception e) {
-                if (context.renderSettings.raiseExceptionsInStrictMode) {
+                if (context.getRenderSettings().raiseExceptionsInStrictMode) {
                     throw new RuntimeException(e.getMessage(), e);
                 }
                 return res;

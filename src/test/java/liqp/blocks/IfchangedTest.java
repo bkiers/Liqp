@@ -1,10 +1,12 @@
 package liqp.blocks;
 
-import liqp.Template;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+
+import org.junit.Test;
+
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class IfchangedTest {
 
@@ -29,7 +31,7 @@ public class IfchangedTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render(test[1]));
 
             assertThat(rendered, is(test[2]));
@@ -38,7 +40,7 @@ public class IfchangedTest {
 
     @Test
     public void testIfChangedScope() {
-        String render = Template.parse("{% ifchanged %}1{% endifchanged %}{%for item in (1..4) %}{% ifchanged %}{{ item }}{% endifchanged %}{% endfor %}{% ifchanged %}4{% endifchanged %}{% ifchanged %}5{% endifchanged %}").render();
+        String render = TemplateParser.DEFAULT.parse("{% ifchanged %}1{% endifchanged %}{%for item in (1..4) %}{% ifchanged %}{{ item }}{% endifchanged %}{% endfor %}{% ifchanged %}4{% endifchanged %}{% ifchanged %}5{% endifchanged %}").render();
         assertThat(render, is("12345"));
     }
 }

@@ -1,11 +1,12 @@
 package liqp.nodes;
 
-import liqp.Template;
-import liqp.TemplateContext;
-import liqp.blocks.Block;
-import liqp.tags.Tag;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
+
+import liqp.ParseSettings;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
+import liqp.blocks.Block;
 
 public class BlockNodeTest {
 
@@ -20,14 +21,15 @@ public class BlockNodeTest {
      */
     @Test
     public void customTagTest() throws RecognitionException {
-
-        Tag.registerInsertion(new Block("testtag"){
+        ParseSettings parseSettings = new ParseSettings.Builder().with(new Block("testtag"){
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 return null;
             }
-        });
+        }).build();
+        
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
 
-        Template.parse("{% testtag %} {% endtesttag %}").render();
+        parser.parse("{% testtag %} {% endtesttag %}").render();
     }
 }

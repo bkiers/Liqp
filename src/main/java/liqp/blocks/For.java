@@ -86,7 +86,7 @@ public class For extends Block {
         int limit = attributes.get(LIMIT);
 
         if (data instanceof Inspectable) {
-            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, data);
+            LiquidSupport evaluated = context.getRenderSettings().evaluate(context.getParseSettings().mapper, data);
             data = evaluated.toLiquid();
         }
         if (data instanceof Map) {

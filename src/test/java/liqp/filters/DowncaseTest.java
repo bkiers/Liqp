@@ -1,12 +1,14 @@
 package liqp.filters;
 
-import liqp.Template;
-import liqp.TemplateContext;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
 
 public class DowncaseTest {
 
@@ -22,7 +24,7 @@ public class DowncaseTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -38,7 +40,7 @@ public class DowncaseTest {
     @Test
     public void applyOriginalTest() {
 
-        final Filter filter = Filter.getFilter("downcase");
+        final Filter filter = Filters.COMMON_FILTERS.get("downcase");
         TemplateContext templateContext = new TemplateContext();
         assertThat(filter.apply("Testing", templateContext), is((Object)"testing"));
         assertThat(filter.apply(null, templateContext), is((Object)""));

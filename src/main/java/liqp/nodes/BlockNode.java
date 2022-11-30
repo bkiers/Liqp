@@ -66,8 +66,9 @@ public class BlockNode implements LNode {
                 builder.append(asString(value, context));
             }
 
-            if (builder.length() > context.protectionSettings.maxSizeRenderedString) {
-                throw new RuntimeException("rendered string exceeds " + context.protectionSettings.maxSizeRenderedString);
+            if (builder.length() > context.getParser().getProtectionSettings().maxSizeRenderedString) {
+                throw new RuntimeException("rendered string exceeds " + context.getParser()
+                        .getProtectionSettings().maxSizeRenderedString);
             }
         }
 

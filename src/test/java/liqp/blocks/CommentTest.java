@@ -1,6 +1,8 @@
 package liqp.blocks;
 
 import liqp.Template;
+import liqp.TemplateParser;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -19,7 +21,7 @@ public class CommentTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -54,26 +56,26 @@ public class CommentTest {
     @Test
     public void has_a_block_which_does_nothingTest() throws RecognitionException {
 
-        assertThat(Template.parse("the comment block should be removed {%comment%} be gone.. {%endcomment%} .. right?").render(),
+        assertThat(TemplateParser.DEFAULT.parse("the comment block should be removed {%comment%} be gone.. {%endcomment%} .. right?").render(),
                 is("the comment block should be removed  .. right?"));
 
-        assertThat(Template.parse("{%comment%}{%endcomment%}").render(), is(""));
-        assertThat(Template.parse("{%comment%}{% endcomment %}").render(), is(""));
-        assertThat(Template.parse("{% comment %}{%endcomment%}").render(), is(""));
-        assertThat(Template.parse("{% comment %}{% endcomment %}").render(), is(""));
-        assertThat(Template.parse("{%comment%}comment{%endcomment%}").render(), is(""));
-        assertThat(Template.parse("{% comment %}comment{% endcomment %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{%comment%}{%endcomment%}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{%comment%}{% endcomment %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% comment %}{%endcomment%}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% comment %}{% endcomment %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{%comment%}comment{%endcomment%}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse("{% comment %}comment{% endcomment %}").render(), is(""));
 
-        assertThat(Template.parse("foo{%comment%}comment{%endcomment%}bar").render(), is("foobar"));
-        assertThat(Template.parse("foo{% comment %}comment{% endcomment %}bar").render(), is("foobar"));
-        assertThat(Template.parse("foo{%comment%} comment {%endcomment%}bar").render(), is("foobar"));
-        assertThat(Template.parse("foo{% comment %} comment {% endcomment %}bar").render(), is("foobar"));
+        assertThat(TemplateParser.DEFAULT.parse("foo{%comment%}comment{%endcomment%}bar").render(), is("foobar"));
+        assertThat(TemplateParser.DEFAULT.parse("foo{% comment %}comment{% endcomment %}bar").render(), is("foobar"));
+        assertThat(TemplateParser.DEFAULT.parse("foo{%comment%} comment {%endcomment%}bar").render(), is("foobar"));
+        assertThat(TemplateParser.DEFAULT.parse("foo{% comment %} comment {% endcomment %}bar").render(), is("foobar"));
 
-        assertThat(Template.parse("foo {%comment%} {%endcomment%} bar").render(), is("foo  bar"));
-        assertThat(Template.parse("foo {%comment%}comment{%endcomment%} bar").render(), is("foo  bar"));
-        assertThat(Template.parse("foo {%comment%} comment {%endcomment%} bar").render(), is("foo  bar"));
+        assertThat(TemplateParser.DEFAULT.parse("foo {%comment%} {%endcomment%} bar").render(), is("foo  bar"));
+        assertThat(TemplateParser.DEFAULT.parse("foo {%comment%}comment{%endcomment%} bar").render(), is("foo  bar"));
+        assertThat(TemplateParser.DEFAULT.parse("foo {%comment%} comment {%endcomment%} bar").render(), is("foo  bar"));
 
-        assertThat(Template.parse("foo{%comment%}\n         {%endcomment%}bar").render(), is("foobar"));
+        assertThat(TemplateParser.DEFAULT.parse("foo{%comment%}\n         {%endcomment%}bar").render(), is("foobar"));
     }
 
     @Test
@@ -87,6 +89,6 @@ public class CommentTest {
                 "    {% endif %}\n" +
                 "{% endcomment %}";
 
-        assertThat(Template.parse(source).render(), is(""));
+        assertThat(TemplateParser.DEFAULT.parse(source).render(), is(""));
     }
 }

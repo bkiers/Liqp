@@ -1,12 +1,14 @@
 package liqp;
 
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+
 import liqp.filters.Filter;
+import liqp.filters.Filters;
 import liqp.nodes.LNode;
 import liqp.parser.v4.NodeVisitor;
 import liquid.parser.v4.LiquidLexer;
 import liquid.parser.v4.LiquidParser;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 
 public final class TestUtils {
 
@@ -34,7 +36,7 @@ public final class TestUtils {
         LiquidParser parser =  new LiquidParser(new CommonTokenStream(lexer));
 
         LiquidParser.OutputContext root = parser.output();
-        NodeVisitor visitor = new NodeVisitor(Insertion.getInsertions(), Filter.getFilters(parseSettings.flavor), parseSettings);
+        NodeVisitor visitor = new NodeVisitor(Insertions.STANDARD_INSERTIONS, parseSettings.flavor.getFilters(), parseSettings);
 
         return visitor.visitOutput(root);
     }

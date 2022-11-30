@@ -1,9 +1,10 @@
 package liqp.nodes;
 
-import liqp.Template;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import liqp.TemplateParser;
 
 public class ContainsNodeTest {
     @Test
@@ -12,7 +13,7 @@ public class ContainsNodeTest {
         String data = "{ \"obj\" : { \"groups\" : [1, 2] } }";
 
         // when
-        String rendered = Template.parse("{{obj.groups contains 1}}").render(data);
+        String rendered = TemplateParser.DEFAULT.parse("{{obj.groups contains 1}}").render(data);
 
         // then
         assertEquals("true", rendered);

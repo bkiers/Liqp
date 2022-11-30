@@ -1,12 +1,14 @@
 package liqp.filters;
 
-import liqp.Template;
-import liqp.TemplateContext;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
 
 public class Strip_HTMLTest {
 
@@ -25,7 +27,7 @@ public class Strip_HTMLTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render(json));
 
             assertThat(rendered, is(test[1]));
@@ -43,7 +45,7 @@ public class Strip_HTMLTest {
     @Test
     public void applyOriginalTest() {
         TemplateContext context = new TemplateContext();
-        Filter filter = Filter.getFilter("strip_html");
+        Filter filter = Filters.COMMON_FILTERS.get("strip_html");
 
         assertThat(filter.apply("<div>test</div>", context), is((Object)"test"));
         assertThat(filter.apply("<div id='test'>test</div>", context), is((Object)"test"));

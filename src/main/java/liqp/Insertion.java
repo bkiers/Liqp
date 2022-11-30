@@ -1,25 +1,10 @@
 package liqp;
 
-import liqp.blocks.Capture;
-import liqp.blocks.Case;
-import liqp.blocks.Comment;
-import liqp.blocks.Cycle;
-import liqp.blocks.For;
-import liqp.blocks.If;
-import liqp.blocks.Ifchanged;
-import liqp.blocks.Raw;
-import liqp.blocks.Tablerow;
-import liqp.blocks.Unless;
-import liqp.tags.Assign;
-import liqp.tags.Break;
-import liqp.tags.Continue;
-import liqp.tags.Decrement;
-import liqp.tags.Include;
-import liqp.tags.Increment;
-import liqp.nodes.LNode;
-
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+
+import liqp.nodes.LNode;
 
 /**
  * Basic class for both tags and blocks. Most of internal api uses this. 
@@ -31,24 +16,10 @@ public abstract class Insertion extends LValue {
      */
     private static final Map<String, Insertion> INSERTIONS = new HashMap<>();
 
-    static {
-        // Register all standard insertions.
-        registerInsertion(new Assign());
-        registerInsertion(new Break());
-        registerInsertion(new Capture());
-        registerInsertion(new Case());
-        registerInsertion(new Comment());
-        registerInsertion(new Continue());
-        registerInsertion(new Cycle());
-        registerInsertion(new Decrement());
-        registerInsertion(new For());
-        registerInsertion(new If());
-        registerInsertion(new Ifchanged());
-        registerInsertion(new Include());
-        registerInsertion(new Increment());
-        registerInsertion(new Raw());
-        registerInsertion(new Tablerow());
-        registerInsertion(new Unless());
+    private static Insertions CURRENT_INSERTIONS = null;
+
+    private static void updateCurrentInsertions() {
+      CURRENT_INSERTIONS = Insertions.of(INSERTIONS);
     }
     
     /**
@@ -61,7 +32,7 @@ public abstract class Insertion extends LValue {
      * whose name is their class name lower cased.
      */
     protected Insertion() {
-        this.name = this.getClass().getSimpleName().toLowerCase();
+        this.name = this.getClass().getSimpleName().toLowerCase(Locale.ENGLISH);
     }
 
 
@@ -76,11 +47,27 @@ public abstract class Insertion extends LValue {
     }
 
     /**
-     * Returns all default tags.
+     * Returns the name of this insertion.
+     *
+     * @return The name.
+     */
+    public String getName() {
+      return name;
+    }
+
+    /**
+     * Returns all tags registered for global use.
+     *
+     * Note that this method is unsafe, as {@link #registerInsertion(Insertion)} affects all uses
+     * of this class.
+     *
+     * Use {@link Insertions} instead.
      *
      * @return all default tags.
      */
+    @Deprecated
     public static Map<String, Insertion> getInsertions() {
+        checkInitialized();
         return new HashMap<>(INSERTIONS);
     }
 
@@ -99,15 +86,35 @@ public abstract class Insertion extends LValue {
      */
     public abstract Object render(TemplateContext context, LNode... nodes);
 
-
     /**
-     * Registers a new insertion.
+     * Registers an insertion for global use.
+     * 
+     * If an insertion exists under the same name, it is replaced by this one.
+     * 
+     * Note that this method is unsafe, as it affects all uses of this class.
+     * Use {@link Insertions} instead.
      *
      * @param insertion
      *         the insertion to be registered.
+     * @deprecated Use {@link liqp.ParseSettings.Builder#with(Insertion)}
      */
+    @Deprecated
     public static void registerInsertion(Insertion insertion) {
+        checkInitialized();
         INSERTIONS.put(insertion.name, insertion);
+        updateCurrentInsertions();
     }
     
+    static Insertions getCurrentInsertions() {
+      checkInitialized();
+      return CURRENT_INSERTIONS;
+    }
+
+    private static void checkInitialized() {
+      if (CURRENT_INSERTIONS == null) {
+        Insertions.STANDARD_INSERTIONS.writeTo(INSERTIONS);
+
+        updateCurrentInsertions();
+      }
+    }
 }

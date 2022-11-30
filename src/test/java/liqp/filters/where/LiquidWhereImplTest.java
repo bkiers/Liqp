@@ -21,10 +21,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class LiquidWhereImplTest {
-
-
     private Template parse(String input) {
-        return Template.parse(input, new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build());
+        return Flavor.LIQUID.defaultParser().parse(input);
     }
 
     @Before

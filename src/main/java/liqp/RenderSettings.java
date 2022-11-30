@@ -12,6 +12,8 @@ import java.util.Objects;
 public class RenderSettings {
 
     public static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
+    
+    public static final RenderSettings DEFAULT = new RenderSettings.Builder().build();
 
     public enum EvaluateMode {
         LAZY,

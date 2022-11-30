@@ -15,7 +15,7 @@ public class ReadmeSamplesTest {
         class MyParams implements Inspectable {
             public String name = "tobi";
         };
-        Template template = Template.parse("hi {{name}}");
+        Template template = TemplateParser.DEFAULT.parse("hi {{name}}");
         String rendered = template.render(new MyParams());
         assertEquals("hi tobi", rendered);
     }
@@ -28,7 +28,7 @@ public class ReadmeSamplesTest {
                 return Collections.singletonMap("name", "tobi");
             }
         };
-        Template template = Template.parse("hi {{name}}");
+        Template template = TemplateParser.DEFAULT.parse("hi {{name}}");
         String rendered = template.render(new MyLazy());
         assertEquals("hi tobi", rendered);
     }
@@ -42,10 +42,10 @@ public class ReadmeSamplesTest {
         Map<String, Object> in = Collections.singletonMap("a", new Object() {
             public String val = "tobi";
         });
+        
+        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(renderSettings).build();
 
-        String res = Template.parse("hi {{a.val}}")
-                .withRenderSettings(renderSettings)
-                .render(in);
+        String res = parser.parse("hi {{a.val}}").render(in);
         assertEquals("hi tobi", res);
 //        System.out.println(res);
     }

@@ -1,9 +1,8 @@
 package liqp.filters;
 
-import liqp.RenderSettings;
-import liqp.Template;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -12,9 +11,12 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
+import liqp.RenderSettings;
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class AppendTest {
 
@@ -31,7 +33,7 @@ public class AppendTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -50,8 +52,8 @@ public class AppendTest {
 
         final String assigns = "{\"a\":\"bc\", \"b\":\"d\" }";
 
-        assertThat(Template.parse("{{ a | append: 'd'}}").render(assigns), is("bcd"));
-        assertThat(Template.parse("{{ a | append: b}}").render(assigns), is("bcd"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ a | append: 'd'}}").render(assigns), is("bcd"));
+        assertThat(TemplateParser.DEFAULT.parse("{{ a | append: b}}").render(assigns), is("bcd"));
     }
 
 
@@ -65,11 +67,11 @@ public class AppendTest {
 
         // after time
         Map<String, Object> data = Collections.singletonMap("a", t);
-        String res = Template.parse("{{ a | append: '!' }}").render(data);
+        String res = TemplateParser.DEFAULT.parse("{{ a | append: '!' }}").render(data);
         assertEquals("2007-11-01 15:25:00 +0900!", res);
 
         // before time
-        res = Template.parse("{{ '!' | append: a }}").render(data);
+        res = TemplateParser.DEFAULT.parse("{{ '!' | append: a }}").render(data);
         assertEquals("!2007-11-01 15:25:00 +0900", res);
 
     }
@@ -79,10 +81,11 @@ public class AppendTest {
         RenderSettings eager = new RenderSettings.Builder().withEvaluateMode(RenderSettings.EvaluateMode.EAGER).build();
         Map<String, Object> data = Collections.singletonMap("a", t);
 
-        String res = Template.parse("{{ '!' | append: a }}").withRenderSettings(eager).render(data);
+        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(eager).build();
+        String res = parser.parse("{{ '!' | append: a }}").render(data);
         assertEquals("!2007-11-01 15:25:00 +0900", res);
 
-        res = Template.parse("{{ a | append: '!' }}").withRenderSettings(eager).render(data);
+        res = parser.parse("{{ a | append: '!' }}").render(data);
         assertEquals("2007-11-01 15:25:00 +0900!", res);
     }
 
@@ -96,13 +99,14 @@ public class AppendTest {
         
         RenderSettings renderSettings = new RenderSettings.Builder().withDefaultTimeZone(defaultTimeZone).build();
         
+        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(renderSettings).build();
+
         // is -0500 here
-        String res = Template.parse("{{ '!' | append: a }}").withRenderSettings(renderSettings).render(data);
+        String res = parser.parse("{{ '!' | append: a }}").render(data);
         assertEquals("!2020-01-01 12:59:59 -0500", res);
 
         // is -0500 here
-        res = Template.parse("{{ a | append: '!' }}").withRenderSettings(renderSettings).render(data);
+        res = parser.parse("{{ a | append: '!' }}").render(data);
         assertEquals("2020-01-01 12:59:59 -0500!", res);
-
     }
 }

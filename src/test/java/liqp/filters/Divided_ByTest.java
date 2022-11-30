@@ -1,13 +1,14 @@
 package liqp.filters;
 
-import liqp.Template;
-import liqp.exceptions.LiquidException;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class Divided_ByTest {
 
@@ -25,7 +26,7 @@ public class Divided_ByTest {
 
         for (String[] test : tests) {
 
-            Template template = Template.parse(test[0]);
+            Template template = TemplateParser.DEFAULT.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat(rendered, is(test[1]));
@@ -34,17 +35,17 @@ public class Divided_ByTest {
 
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid1() {
-        Filter.getFilter("divided_by").apply(1);
+        Filters.COMMON_FILTERS.get("divided_by").apply(1);
     }
 
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid2() {
-        Filter.getFilter("divided_by").apply(1, 2, 3);
+        Filters.COMMON_FILTERS.get("divided_by").apply(1, 2, 3);
     }
 
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid3() {
-        Filter.getFilter("divided_by").apply(15L, 0L);
+        Filters.COMMON_FILTERS.get("divided_by").apply(15L, 0L);
     }
 
     /*
@@ -53,7 +54,7 @@ public class Divided_ByTest {
      *   assert_template_result "4", "{{ 14 | divided_by:3 }}"
      *
      *   # Ruby v1.9.2-rc1, or higher, backwards compatible Float test
-     *   assert_match(/4\.(6{13,14})7/, Template.parse("{{ 14 | divided_by:'3.0' }}").render)
+     *   assert_match(/4\.(6{13,14})7/, TemplateParser.DEFAULT.parse("{{ 14 | divided_by:'3.0' }}").render)
      *
      *   assert_template_result "5", "{{ 15 | divided_by:3 }}"
      *   assert_template_result "Liquid error: divided by 0", "{{ 5 | divided_by:0 }}"
@@ -62,7 +63,7 @@ public class Divided_ByTest {
     @Test
     public void applyOriginalTest() {
 
-        Filter filter = Filter.getFilter("divided_by");
+        Filter filter = Filters.COMMON_FILTERS.get("divided_by");
 
         assertThat(filter.apply(12L, 3L), is((Object)4L));
         assertThat(filter.apply(14L, 3L), is((Object)4L));

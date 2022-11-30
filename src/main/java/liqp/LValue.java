@@ -1,7 +1,7 @@
 package liqp;
 
-import liqp.filters.date.CustomDateFormatRegistry;
-import liqp.nodes.AtomNode;
+import static java.math.BigDecimal.ROUND_UNNECESSARY;
+import static liqp.filters.date.Parser.getZonedDateTimeFromTemporalAccessor;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -9,12 +9,14 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static java.math.BigDecimal.ROUND_UNNECESSARY;
-import static liqp.filters.date.Parser.getZonedDateTimeFromTemporalAccessor;
+import liqp.filters.date.CustomDateFormatRegistry;
+import liqp.nodes.AtomNode;
 
 /**
  * An abstract class the Filter and Tag classes extend.
@@ -107,7 +109,7 @@ public abstract class LValue {
 
     /**
      * Returns this value as an array. If a value is already an array,
-     * it is casted to a `Object[]`, if it's a `java.util.List`, it is
+     * it is cast to a `Object[]`, if it's a `java.util.Collection`, it is
      * converted to an array and in all other cases, `value` is simply
      * returned as an `Object[]` with a single value in it.
      * This function treat `Map` as single element.
@@ -117,7 +119,6 @@ public abstract class LValue {
      *
      * @return this value as an array.
      */
-    @SuppressWarnings("unchecked")
     public Object[] asArray(Object value, TemplateContext context) {
 
         if(value == null) {
@@ -128,8 +129,8 @@ public abstract class LValue {
             return (Object[]) value;
         }
 
-        if (value instanceof List) {
-            return ((List) value).toArray();
+        if (value instanceof Collection) {
+            return ((Collection<?>) value).toArray();
         }
 
         if (isTemporal(value)) {
@@ -138,6 +139,43 @@ public abstract class LValue {
         }
 
         return new Object[]{value};
+    }
+
+    /**
+     * Returns this value as a `java.util.List`. If a value is already a `List`,
+     * it is returned as-is, if it's a `java.util.Collection` or an array, it is
+     * converted to a `List`, and in all other cases, `value` is simply
+     * returned as a `List` with a single value in it.
+     * This function treats `Map` as a single element.
+     *
+     * @param value
+     *         the value to convert/cast to an array.
+     *
+     * @return this value as a list.
+     */
+    public List<?> asList(Object value, TemplateContext context) {
+        if (value == null) {
+            return Collections.emptyList();
+        }
+
+        if (value instanceof List) {
+            return (List<?>) value;
+        }
+
+        if (value instanceof Collection) {
+            return new ArrayList<>(((Collection<?>) value));
+        }
+
+        if (value.getClass().isArray()) {
+            return Arrays.asList((Object[]) value);
+        }
+
+        if (isTemporal(value)) {
+            value = asTemporal(value, context);
+            return Arrays.asList(temporalAsArray((ZonedDateTime) value));
+        }
+
+        return Collections.singletonList(value);
     }
 
     // https://apidock.com/ruby/Time/to_a
@@ -281,16 +319,16 @@ public abstract class LValue {
     }
 
     /**
-     * Returns true iff `value` is an array or a java.util.List.
+     * Returns true iff `value` is an array or a java.util.Collection.
      *
      * @param value
      *         the value to check.
      *
-     * @return true iff `value` is an array or a java.util.List.
+     * @return true iff `value` is an array or a java.util.Collection.
      */
     public boolean isArray(Object value) {
 
-        return value != null && (value.getClass().isArray() || value instanceof List);
+        return value != null && (value.getClass().isArray() || value instanceof Collection);
     }
 
     /**

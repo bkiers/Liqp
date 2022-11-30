@@ -2,6 +2,16 @@
 .idea/
 *.iml
 
+*~
+.*.swp
+.DS_Store
+hs_err_pid*.log
+
+.checkstyle
+.pmd
+.pmdruleset.xml
+interpolated-pom.xml
+
 target/
 build/
 

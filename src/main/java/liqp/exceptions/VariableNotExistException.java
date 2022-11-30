@@ -5,7 +5,7 @@ public class VariableNotExistException extends RuntimeException {
     private final String variableName;
 
     public VariableNotExistException(String variableName) {
-        super(String.format("Variable '%s' does not exists", variableName));
+        super(String.format("Variable '%s' does not exist", variableName));
 
         this.variableName = variableName;
     }

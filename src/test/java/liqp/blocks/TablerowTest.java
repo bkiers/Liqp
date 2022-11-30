@@ -1,5 +1,6 @@
 package liqp.blocks;
 
+import static liqp.TestUtils.assertPatternResultEquals;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -456,5 +457,12 @@ public class TablerowTest {
                 .render("{ \"array\" : [{\"id\" : \"id1\"},{\"id\" : \"id2\"}] }"),
                 is("<tr class=\"row1\">\n" +
                         "<td class=\"col1\">id1</td><td class=\"col2\">id2</td></tr>\n"));
+    }
+    
+    @Test
+    public void testVariableNamedOffset() throws Exception {
+        assertPatternResultEquals(TemplateParser.DEFAULT, "<tr class=\"row1\">\n" +
+            "<td class=\"col1\">1</td><td class=\"col2\">2</td><td class=\"col3\">3</td></tr>\n",
+            "{% assign offsets = '1 2 3' | split: ' ' %}{% tablerow offset in offsets %}{{ offset }}{% endtablerow %}");
     }
 }

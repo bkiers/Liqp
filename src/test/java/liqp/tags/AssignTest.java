@@ -1,5 +1,6 @@
 package liqp.tags;
 
+import static liqp.TestUtils.assertPatternResultEquals;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -171,5 +172,10 @@ public class AssignTest {
                 TemplateParser.DEFAULT.parse("{%for i in (1..2) %}{% assign a = \"variable\"%}{% endfor %}{{a}}")
                         .render(),
                 is("variable"));
+    }
+
+    @Test
+    public void testVariableNamedOffset() throws Exception {
+        assertPatternResultEquals(TemplateParser.DEFAULT, "3", "{% assign offset = 3 %}{{offset}}");
     }
 }

@@ -929,6 +929,9 @@ public class ForTest {
             "{% for offset in (1..3) %}{{ offset }}{% endfor %}");
 
         assertPatternResultEquals(TemplateParser.DEFAULT, "123",
+                "{% for else in (1..3) %}{{ else }}{% endfor %}");
+
+        assertPatternResultEquals(TemplateParser.DEFAULT, "123",
             "{% assign offsets = '1,2,3' | split: ',' %}{% for offset in offsets %}{{ offset }}{% endfor %}");
     }
 }

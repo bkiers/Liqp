@@ -141,13 +141,13 @@ for_tag
  ;
 
 for_array
- : TagStart ForStart Id In lookup Reversed? for_attribute* TagEnd
+ : TagStart ForStart id In lookup Reversed? for_attribute* TagEnd
    for_block
    TagStart ForEnd TagEnd
  ;
 
 for_range
- : TagStart ForStart Id In OPar from=expr DotDot to=expr CPar Reversed? for_attribute* TagEnd
+ : TagStart ForStart id In OPar from=expr DotDot to=expr CPar Reversed? for_attribute* TagEnd
    block
    TagStart ForEnd TagEnd
  ;
@@ -168,11 +168,11 @@ attribute
  ;
 
 table_tag
- : TagStart TableStart Id In lookup attribute* TagEnd block TagStart TableEnd TagEnd
+ : TagStart TableStart id In lookup attribute* TagEnd block TagStart TableEnd TagEnd
  ;
 
 capture_tag
- : TagStart CaptureStart Id TagEnd block TagStart CaptureEnd TagEnd  #capture_tag_Id
+ : TagStart CaptureStart id TagEnd block TagStart CaptureEnd TagEnd  #capture_tag_Id
  | TagStart CaptureStart Str TagEnd block TagStart CaptureEnd TagEnd #capture_tag_Str
  ;
 
@@ -210,7 +210,7 @@ param_expr
  ;
 
 assignment
- : TagStart Assign Id EqSign expr filter* TagEnd
+ : TagStart Assign id EqSign expr filter* TagEnd
  ;
 
 expr

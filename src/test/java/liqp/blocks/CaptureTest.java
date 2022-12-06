@@ -1,13 +1,15 @@
 package liqp.blocks;
 
-import liqp.Template;
-import liqp.TemplateParser;
-import liqp.exceptions.LiquidException;
+import static liqp.TestUtils.assertPatternResultEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateParser;
+import liqp.exceptions.LiquidException;
 
 public class CaptureTest {
 
@@ -132,5 +134,11 @@ public class CaptureTest {
     public void capture_detects_bad_syntaxTest() throws Exception {
 
         TemplateParser.DEFAULT.parse("{{ var2 }}{% capture %}{{ var }} foo {% endcapture %}{{ var2 }}{{ var2 }}");
+    }
+    
+    @Test
+    public void testVariableNamedOffset() throws Exception {
+        assertPatternResultEquals(TemplateParser.DEFAULT, "3",
+            "{% capture offset %}3{% endcapture %}{{offset}}");
     }
 }

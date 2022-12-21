@@ -27,7 +27,6 @@ public class TemplateParser {
         private ParseSettings parseSettings = ParseSettings.DEFAULT;
         private RenderSettings renderSettings = RenderSettings.DEFAULT;
         private ProtectionSettings protectionSettings = ProtectionSettings.DEFAULT;
-        private boolean withLegacyMode;
 
         public Builder() {
         }
@@ -47,19 +46,9 @@ public class TemplateParser {
             return this;
         }
 
-        Builder withLegacyMode(boolean b) {
-            this.withLegacyMode = b;
-            return this;
-        }
-
         public TemplateParser build() {
-            if (withLegacyMode) {
-                return new TemplateParser.LegacyMode(this.parseSettings, this.renderSettings,
-                        this.protectionSettings);
-            } else {
-                return new TemplateParser(this.parseSettings, this.renderSettings,
-                        this.protectionSettings);
-            }
+            return new TemplateParser(this.parseSettings, this.renderSettings,
+                    this.protectionSettings);
         }
     }
 
@@ -98,20 +87,4 @@ public class TemplateParser {
         return protectionSettings;
     }
 
-    /**
-     * This is only used internally; do not use.
-     * 
-     * @return {@code true} if this parser is following old-style global settings.
-     */
-    @Deprecated
-    public boolean isLegacyMode() {
-        return (this instanceof LegacyMode);
-    }
-
-    private static class LegacyMode extends TemplateParser {
-        LegacyMode(ParseSettings parseSettings, RenderSettings renderSettings,
-                ProtectionSettings protectionSettings) {
-            super(parseSettings, renderSettings, protectionSettings);
-        }
-    }
 }

@@ -387,45 +387,6 @@ public class IncludeTest {
         assertTrue(result.contains("THE_ERROR"));
     }
 
-    @SuppressWarnings("deprecation")
-    @Test
-    public void errorInIncludeCauseMissingIncludeWithCustomRenderingAndFixedErrorLegacy1()
-            throws IOException {
-        // given
-        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
-        File index = new File(jekyll, "index_with_errored_include.html");
-        ParseSettings parseSettings = new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build();
-        Template template = Template.parse(index, parseSettings);
-
-        Filter.registerFilter(new Filter("unknown_and_for_sure_enexist_filter") {
-        });
-
-        // when
-        String result = template.render();
-
-        // then
-        assertTrue(result.contains("THE_ERROR"));
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    public void errorInIncludeCauseMissingIncludeWithCustomRenderingAndFixedErrorLegacy2()
-            throws IOException {
-        // given
-        File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
-        File index = new File(jekyll, "index_with_errored_include.html");
-        ParseSettings parseSettings = new ParseSettings.Builder().withFlavor(Flavor.JEKYLL) //
-                .with(new Filter("unknown_and_for_sure_enexist_filter") {
-                }).build();
-        Template template = Template.parse(index, parseSettings);
-
-        // when
-        String result = template.render();
-
-        // then
-        assertTrue(result.contains("THE_ERROR"));
-    }
-
     @Test
     public void testIncludeMustSeeVariablesFromOuterScopeInLiquid() throws IOException {
         // liquid

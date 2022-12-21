@@ -35,12 +35,7 @@ public class Include extends Tag {
             }
 
             Template template;
-            if (context.getParser().isLegacyMode()) {
-                template = Template.parse(includeResourceFile, context.getParseSettings(), context
-                        .getRenderSettings());
-            } else {
-                template = context.getParser().parse(includeResourceFile);
-            }
+            template = context.getParser().parse(includeResourceFile);
 
             Map<String, Object> variables = new HashMap<String, Object>();
 

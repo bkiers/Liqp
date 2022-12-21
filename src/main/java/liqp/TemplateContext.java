@@ -40,7 +40,7 @@ public class TemplateContext {
     @Deprecated // Use `TemplateContext(parser, variables)` instead
     public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings,
             Flavor flavor, Map<String, Object> variables) {
-        this(new TemplateParser.Builder().withLegacyMode(true).withProtectionSettings(protectionSettings)
+        this(new TemplateParser.Builder().withProtectionSettings(protectionSettings)
                 .withRenderSettings(renderSettings).withParseSettings(new ParseSettings.Builder()
                         .withFlavor(flavor).build()).build(), variables);
     }
@@ -48,7 +48,7 @@ public class TemplateContext {
     @Deprecated // Use `TemplateContext(parser, variables)` instead
     public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings,
             ParseSettings parseSettings, Map<String, Object> variables) {
-        this(new TemplateParser.Builder().withLegacyMode(true).withProtectionSettings(protectionSettings)
+        this(new TemplateParser.Builder().withProtectionSettings(protectionSettings)
                 .withRenderSettings(renderSettings).withParseSettings(parseSettings).build(), variables);
     }
 

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import liqp.RenderTransformer.ObjectAppender;
 import liqp.TemplateContext;
 import liqp.nodes.AtomNode;
 import liqp.nodes.BlockNode;
@@ -71,9 +72,6 @@ public class For extends Block {
     }
 
     private Object renderArray(String id, TemplateContext context, String tagName, boolean reversed, LNode... tokens) {
-
-        StringBuilder builder = new StringBuilder();
-
         Object data = tokens[2].render(context);
         if (AtomNode.isEmpty(data) || "".equals(data)) {
             data = new ArrayList<>();
@@ -129,6 +127,9 @@ public class For extends Block {
         registry.put(tagName, from + length);
 
         ForLoopDrop forLoopDrop = createLoopDropInStack(context, tagName, length);
+
+        ObjectAppender.Controller builder = context.newObjectAppender(arrayList.size());
+
         try {
             for (Object o : arrayList) {
                 context.incrementIterations();
@@ -143,7 +144,7 @@ public class For extends Block {
             popLoopDropFromStack(context);
         }
 
-        return builder.toString();
+        return builder.getResult();
     }
 
     private ForLoopDrop createLoopDropInStack(TemplateContext context, String tagName, int length) {
@@ -166,7 +167,7 @@ public class For extends Block {
     }
 
 
-    private boolean renderForLoopBody(TemplateContext context, StringBuilder builder, List<LNode> children) {
+    private boolean renderForLoopBody(TemplateContext context, ObjectAppender.Controller builder, List<LNode> children) {
         boolean isBreak = false;
 
         for (LNode node : children) {
@@ -203,9 +204,6 @@ public class For extends Block {
     }
 
     private Object renderRange(String id, TemplateContext context, String tagName, boolean reversed, LNode... tokens) {
-
-        StringBuilder builder = new StringBuilder();
-
         // attributes start from index 7
         Map<String, Integer> attributes = getAttributes(7, context, tagName, tokens);
 
@@ -227,8 +225,9 @@ public class For extends Block {
         int length = (to - from);
 
         ForLoopDrop forLoopDrop = createLoopDropInStack(context, tagName, length);
+        
+        ObjectAppender.Controller builder = context.newObjectAppender(effectiveTo - from + offset + 1);
         try {
-
             for (int i = from + offset; i <= effectiveTo; i++) {
                 int realI;
                 if (reversed) {
@@ -250,8 +249,7 @@ public class For extends Block {
             popLoopDropFromStack(context);
         }
 
-
-        return builder.toString();
+        return builder.getResult();
     }
 
     private Stack<ForLoopDrop> getParentForloopDropStack(TemplateContext context) {

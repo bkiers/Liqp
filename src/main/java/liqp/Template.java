@@ -9,12 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
@@ -547,9 +547,12 @@ public class Template {
      *
      * @return a string denoting the rendered template.
      */
-    @SuppressWarnings("unchecked")
     public String render(String jsonMap) {
+        return prerender(jsonMap).toString();
+    }
 
+    @SuppressWarnings("unchecked")
+    public Object prerender(String jsonMap) {
         Map<String, Object> map;
 
         try {
@@ -558,24 +561,39 @@ public class Template {
             throw new RuntimeException("invalid json map: '" + jsonMap + "'", e);
         }
 
-        return render(map);
+        return prerender(map);
     }
 
     public String render() {
-        return render(new HashMap<String, Object>());
+        return prerender().toString();
+    }
+
+    public Object prerender() {
+        return prerender(new HashMap<String, Object>());
     }
 
     public String render(Inspectable object) {
-        return renderObject(object);
+        return prerender(object).toString();
+    }
+
+    public Object prerender(Inspectable object) {
+        return prerenderObject(object);
     }
 
     /**
      * Render the template with given object, treating it same way as {@link Inspectable} instance.
      */
     public String renderObject(Object obj) {
+        return prerenderObject(obj).toString();
+    }
+
+    /**
+     * Prerender the template with given object, treating it same way as {@link Inspectable} instance.
+     */
+    public Object prerenderObject(Object obj) {
         LiquidSupport evaluated = renderSettings.evaluate(parseSettings.mapper, obj);
         Map<String, Object> map = evaluated.toLiquid();
-        return render(map);
+        return prerender(map);
     }
 
     /**
@@ -594,11 +612,18 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String render(String key, Object value, Object... keyValues) {
-        return render(false, key, value, keyValues);
+        return prerender(key, value, keyValues).toString();
+    }
+
+    public Object prerender(String key, Object value, Object... keyValues) {
+        return prerender(false, key, value, keyValues);
     }
 
     public String render(boolean convertValueToMap, String key, Object value, Object... keyValues) {
+        return prerender(convertValueToMap, key, value, keyValues).toString();
+    }
 
+    public Object prerender(boolean convertValueToMap, String key, Object value, Object... keyValues) {
         Map<String, Object> map = new HashMap<String, Object>();
         putStringKey(convertValueToMap, key, value, map);
 
@@ -608,7 +633,7 @@ public class Template {
             putStringKey(convertValueToMap, key, value, map);
         }
 
-        return render(map);
+        return prerender(map);
     }
 
     /**
@@ -620,35 +645,35 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String render(final Map<String, Object> variables) {
+        return prerender(variables).toString();
+    }
 
+    public Object prerender(final Map<String, Object> variables) {
         if (this.getProtectionSettings().isRenderTimeLimited()) {
-            return render(variables, Executors.newSingleThreadExecutor(), true);
+            return prerender(variables, Executors.newSingleThreadExecutor(), true);
         } else {
             if (this.templateSize > this.getProtectionSettings().maxTemplateSizeBytes) {
                 throw new RuntimeException("template exceeds " +
                         this.protectionSettings.maxTemplateSizeBytes + " bytes");
             }
-            return renderUnguarded(variables);
+            return prerenderUnguarded(variables);
         }
     }
 
     public String render(final Map<String, Object> variables, ExecutorService executorService,
             boolean shutdown) {
+        return prerender(variables, executorService, shutdown).toString();
+    }
 
+    public Object prerender(final Map<String, Object> variables, ExecutorService executorService,
+            boolean shutdown) {
         if (this.templateSize > this.getProtectionSettings().maxTemplateSizeBytes) {
             throw new RuntimeException("template exceeds " +
                     this.protectionSettings.maxTemplateSizeBytes + " bytes");
         }
 
-        Callable<String> task = new Callable<String>() {
-            @Override
-            public String call() {
-                return renderUnguarded(variables);
-            }
-        };
-
         try {
-            Future<String> future = executorService.submit(task);
+            Future<Object> future = executorService.submit(() -> prerenderUnguarded(variables));
             return future.get(this.getProtectionSettings().maxRenderTimeMillis, TimeUnit.MILLISECONDS);
         } catch (TimeoutException e) {
             throw new RuntimeException("exceeded the max amount of time (" + this
@@ -672,11 +697,36 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String renderUnguarded(Map<String, Object> variables) {
-        return renderUnguarded(variables, null, true);
+        return prerenderUnguarded(variables).toString();
+    }
+
+    public Object prerenderUnguarded(Map<String, Object> variables) {
+        return prerenderUnguarded(variables, null, true);
+    }
+
+    public String renderUnguarded(Map<String, Object> variables, TemplateContext parent,
+            boolean doClearThreadLocal) {
+        return prerenderUnguarded(variables, parent, doClearThreadLocal).toString();
     }
 
     @SuppressWarnings("deprecation")
-    public String renderUnguarded(Map<String, Object> variables, TemplateContext parent,
+    private TemplateContext newRootContext(Map<String, Object> variables) {
+        TemplateContext context;
+        if (templateParser == null) {
+            context = new TemplateContext(getProtectionSettings(), getRenderSettings(), getParseSettings(),
+                    variables);
+        } else {
+            context = new TemplateContext(templateParser, variables);
+        }
+        Consumer<Map<String, Object>> configurator = context.getRenderSettings().getEnvironmentMapConfigurator();
+        if (configurator != null) {
+            configurator.accept(context.getEnvironmentMap());
+        }
+
+        return context;
+    }
+
+    public Object prerenderUnguarded(Map<String, Object> variables, TemplateContext parent,
             boolean doClearThreadLocal) {
         if (doClearThreadLocal) {
             BasicTypesSupport.clearReferences();
@@ -697,20 +747,17 @@ public class Template {
         try {
             LNode node = visitor.visit(root);
             if (parent == null) {
-                if (templateParser == null) {
-                    this.templateContext = new TemplateContext(getProtectionSettings(),
-                            getRenderSettings(), getParseSettings(), variables);
-                } else {
-                    this.templateContext = new TemplateContext(templateParser, variables);
-                }
+                this.templateContext = newRootContext(variables);
             } else {
-                this.templateContext = new TemplateContext(parent, variables);
+                this.templateContext = parent.newChildContext(variables);
             }
             if (this.contextHolder != null) {
                 contextHolder.setContext(templateContext);
             }
             Object rendered = node.render(this.templateContext);
-            return rendered == null ? "" : String.valueOf(rendered);
+
+            return templateContext.getParser().getRenderSettings().getRenderTransformer()
+                    .transformObject(templateContext, rendered);
         } catch (Exception e) {
             if (e instanceof RuntimeException) {
                 throw e;
@@ -728,7 +775,18 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String renderUnguarded(TemplateContext parent) {
-        return renderUnguarded(new HashMap<String, Object>(), parent, true);
+        return prerenderUnguarded(parent).toString();
+    }
+
+    /**
+     * Prerenders the template using parent context
+     * 
+     * @param parent
+     *            The parent context.
+     * @return a string denoting the rendered template.
+     */
+    public Object prerenderUnguarded(TemplateContext parent) {
+        return prerenderUnguarded(new HashMap<String, Object>(), parent, true);
     }
 
     // Use toStringTree()

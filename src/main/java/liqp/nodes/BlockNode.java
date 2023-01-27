@@ -1,16 +1,17 @@
 package liqp.nodes;
 
-import liqp.TemplateContext;
-
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
 import static liqp.LValue.BREAK;
 import static liqp.LValue.CONTINUE;
 import static liqp.LValue.asTemporal;
 import static liqp.LValue.isTemporal;
 import static liqp.LValue.rubyDateTimeFormat;
+
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+import liqp.RenderTransformer.ObjectAppender;
+import liqp.TemplateContext;
 
 public class BlockNode implements LNode {
 
@@ -36,51 +37,42 @@ public class BlockNode implements LNode {
 
     @Override
     public Object render(TemplateContext context) {
-
-        StringBuilder builder = new StringBuilder();
-
+        ObjectAppender.Controller builder = context.newObjectAppender(children.size());
         for (LNode node : children) {
-
             Object value = node.render(context);
-
-            if(value == null) {
+            if (value == null) {
                 continue;
             }
 
-            if(value == BREAK || value == CONTINUE) {
+            if (value == BREAK || value == CONTINUE) {
                 return value;
             } else if (value instanceof List) {
 
                 List<?> list = (List<?>) value;
 
                 for (Object obj : list) {
-                    builder.append(asString(obj, context));
+                    builder.append(postprocess(obj, context));
                 }
             } else if (value.getClass().isArray()) {
 
                 Object[] array = (Object[]) value;
                 for (Object obj : array) {
-                    builder.append(asString(obj, context));
+                    builder.append(postprocess(obj, context));
                 }
             } else {
-                builder.append(asString(value, context));
-            }
-
-            if (builder.length() > context.getParser().getProtectionSettings().maxSizeRenderedString) {
-                throw new RuntimeException("rendered string exceeds " + context.getParser()
-                        .getProtectionSettings().maxSizeRenderedString);
+                builder.append(postprocess(value, context));
             }
         }
 
-        return builder.toString();
+        return builder.getResult();
     }
 
-    private String asString(Object value, TemplateContext context) {
+    private Object postprocess(Object value, TemplateContext context) {
         if (isTemporal(value)) {
             ZonedDateTime time = asTemporal(value, context);
             return rubyDateTimeFormat.format(time);
         } else {
-            return String.valueOf(value);
+            return value;
         }
     }
 }

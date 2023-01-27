@@ -1,16 +1,16 @@
 package liqp;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import liqp.parser.LiquidSupport;
-
 import java.time.ZoneId;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import liqp.parser.LiquidSupport;
 
 public class RenderSettings {
-
     public static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
     
     public static final RenderSettings DEFAULT = new RenderSettings.Builder().build();
@@ -19,7 +19,6 @@ public class RenderSettings {
         LAZY,
         EAGER
     }
-
 
     /**
      * If template context is not available yet - it's ok to create new.
@@ -51,6 +50,8 @@ public class RenderSettings {
     public final EvaluateMode evaluateMode;
     public final Locale locale;
     public final ZoneId defaultTimeZone;
+    private final RenderTransformer renderTransformer;
+    private final Consumer<Map<String, Object>> environmentMapConfigurator;
 
     public static class Builder {
 
@@ -60,13 +61,16 @@ public class RenderSettings {
         EvaluateMode evaluateMode;
         Locale locale;
         ZoneId defaultTimeZone;
-
+        RenderTransformer renderTransformer;
+        Consumer<Map<String, Object>> environmentMapConfigurator;
 
         public Builder() {
             this.strictVariables = false;
             this.raiseExceptionsInStrictMode = true;
             this.evaluateMode = EvaluateMode.LAZY;
             this.locale = DEFAULT_LOCALE;
+            this.renderTransformer = null;
+            this.environmentMapConfigurator = null;
         }
 
         public Builder withStrictVariables(boolean strictVariables) {
@@ -90,6 +94,17 @@ public class RenderSettings {
             return this;
         }
 
+        /**
+         * Sets the {@link RenderTransformer}.
+         * 
+         * @param renderTransformer The transformer, or {@code null} to use the default.
+         * @return This builder.
+         */
+        public Builder withRenderTransformer(RenderTransformer renderTransformer) {
+            this.renderTransformer = renderTransformer;
+            return this;
+        }
+
         public Builder withLocale(Locale locale){
             Objects.requireNonNull(locale);
             this.locale = locale;
@@ -108,20 +123,49 @@ public class RenderSettings {
             return this;
         }
 
+        /**
+         * Sets the configurator of the {@link TemplateContext}'s environment map
+         * ({@link TemplateContext#getEnvironmentMap()}) instance.
+         * 
+         * The configurator is called upon the creation of a new root context. Typically, this allows the
+         * addition of certain parameters to the context environment.
+         * 
+         * @param configurator The configurator, or {@code null}.
+         * @return This builder.
+         */
+        public Builder withEnvironmentMapConfigurator(Consumer<Map<String, Object>> configurator) {
+            this.environmentMapConfigurator = configurator;
+            return this;
+        }
+
         public RenderSettings build() {
             if (this.defaultTimeZone == null) {
                 this.defaultTimeZone = ZoneId.systemDefault();
             }
-            return new RenderSettings(this.strictVariables, this.showExceptionsFromInclude, this.raiseExceptionsInStrictMode, this.evaluateMode, this.locale, this.defaultTimeZone);
+            return new RenderSettings(this.strictVariables, this.showExceptionsFromInclude, this.raiseExceptionsInStrictMode, this.evaluateMode, this.renderTransformer, this.locale, this.defaultTimeZone, this.environmentMapConfigurator);
         }
     }
 
-    private RenderSettings(boolean strictVariables, boolean showExceptionsFromInclude, boolean raiseExceptionsInStrictMode, EvaluateMode evaluateMode, Locale locale, ZoneId defaultTimeZone) {
+    private RenderSettings(boolean strictVariables, boolean showExceptionsFromInclude,
+        boolean raiseExceptionsInStrictMode, EvaluateMode evaluateMode,
+        RenderTransformer renderTransformer, Locale locale, ZoneId defaultTimeZone,
+        Consumer<Map<String, Object>> environmentMapConfigurator) {
         this.strictVariables = strictVariables;
         this.showExceptionsFromInclude = showExceptionsFromInclude;
         this.raiseExceptionsInStrictMode = raiseExceptionsInStrictMode;
         this.evaluateMode = evaluateMode;
+        this.renderTransformer = renderTransformer == null ? RenderTransformerDefaultImpl.INSTANCE
+            : renderTransformer;
         this.locale = locale;
         this.defaultTimeZone = defaultTimeZone;
+        this.environmentMapConfigurator = environmentMapConfigurator;
+    }
+
+    public RenderTransformer getRenderTransformer() {
+        return renderTransformer;
+    }
+
+    public Consumer<Map<String, Object>> getEnvironmentMapConfigurator() {
+        return environmentMapConfigurator;
     }
 }

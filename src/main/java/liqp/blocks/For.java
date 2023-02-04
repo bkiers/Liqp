@@ -88,7 +88,7 @@ public class For extends Block {
             data = evaluated.toLiquid();
         }
         if (data instanceof Map) {
-            data = mapAsArray((Map) data);
+            data = mapAsArray((Map<?,?>) data);
         }
         Object[] array = super.asArray(data, context);
 
@@ -194,10 +194,10 @@ public class For extends Block {
                 Object[] arr = super.asArray(value, context);
 
                 for (Object obj : arr) {
-                    builder.append(String.valueOf(obj));
+                    builder.append(obj);
                 }
             } else {
-                builder.append(super.asString(value, context));
+                builder.append(super.asAppendableObject(value, context));
             }
         }
         return isBreak;

@@ -1,9 +1,10 @@
 package liqp.blocks;
 
+import java.util.Map;
+import java.util.Objects;
+
 import liqp.TemplateContext;
 import liqp.nodes.LNode;
-
-import java.util.*;
 
 public class Ifchanged extends Block {
 
@@ -25,9 +26,10 @@ public class Ifchanged extends Block {
             return null;
         }
 
-        Object rendered = nodes[0].render(context);
+        // Compare strings, so we can match (int)1 == "1"
+        String rendered = String.valueOf(nodes[0].render(context));
         Map<String, Object> registryMap = context.getRegistry(TemplateContext.REGISTRY_IFCHANGED);
-        if (!Objects.equals(rendered, registryMap.get(TemplateContext.REGISTRY_IFCHANGED))) {
+        if (!Objects.equals(rendered, String.valueOf(registryMap.get(TemplateContext.REGISTRY_IFCHANGED)))) {
             registryMap.put(TemplateContext.REGISTRY_IFCHANGED, rendered);
             return rendered;
         } else {

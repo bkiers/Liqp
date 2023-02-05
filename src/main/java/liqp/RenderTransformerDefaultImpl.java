@@ -5,7 +5,8 @@ import liqp.RenderTransformer.ObjectAppender.Controller;
 /**
  * The default {@link RenderTransformer}.
  * 
- * Objects are converted to String, and appended to a {@link StringBuilder} where necessary.
+ * Objects are converted to {@link CharSequence}, and appended to a {@link StringBuilder} where
+ * necessary. The resulting object is always transformed to {@link String}.
  */
 final class RenderTransformerDefaultImpl implements RenderTransformer {
     static final RenderTransformerDefaultImpl INSTANCE = new RenderTransformerDefaultImpl();
@@ -18,7 +19,7 @@ final class RenderTransformerDefaultImpl implements RenderTransformer {
         return new Controller() {
             private CharSequence result = "";
             private ObjectAppender appender = (o) -> {
-                result = String.valueOf(o);
+                result = o instanceof CharSequence ? (CharSequence) o : String.valueOf(o);
                 appender = (o2) -> {
                     StringBuilder sb = new StringBuilder();
                     sb.append(result);

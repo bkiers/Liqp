@@ -60,7 +60,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <antlr.version>3.5.1</antlr.version>
-    <antlr4.version>4.10.1</antlr4.version>
+    <antlr4.version>4.7.2</antlr4.version>
     <jackson.databind.version>2.13.4.1</jackson.databind.version>
     <jackson.version>2.13.2</jackson.version>
     <jsoup.version>1.15.3</jsoup.version>
@@ -217,6 +217,28 @@
             <exclude>**/TestUtils.java</exclude>
           </excludes>
         </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.4.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <relocations>
+                <relocation>
+                  <pattern>org.antlr</pattern>
+                  <shadedPattern>liqp.org.antlr</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>

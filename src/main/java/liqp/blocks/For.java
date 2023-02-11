@@ -68,6 +68,12 @@ public class For extends Block {
 
         Object rendered = array ? renderArray(id, nestedContext, tagName, reversed, nodes) : renderRange(id, nestedContext, tagName, reversed, nodes);
 
+        // When context.renderSettings.raiseExceptionsInStrictMode=false,
+        // don't allow nested errors to be lost
+        for (RuntimeException nestedError : nestedContext.errors()) {
+            context.addError(nestedError);
+        }
+
         return rendered;
     }
 

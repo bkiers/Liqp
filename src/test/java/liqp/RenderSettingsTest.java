@@ -24,6 +24,14 @@ public class RenderSettingsTest {
         return new TemplateParser.Builder().withRenderSettings(new RenderSettings.Builder()
                 .withStrictVariables(true).build()).build();
     }
+
+    protected TemplateParser parserWithStrictVariablesAndRaiseExceptionsInStrictModeFalse() {
+        RenderSettings renderSettings = new RenderSettings.Builder()
+                .withStrictVariables(true)
+                .withRaiseExceptionsInStrictMode(false)
+                .build();
+        return new TemplateParser.Builder().withRenderSettings(renderSettings).build();
+    }
     
     @Test
     public void renderWithStrictVariables1() {
@@ -103,12 +111,7 @@ public class RenderSettingsTest {
 
     @Test
     public void raiseExceptionsInStrictModeFalseTest() {
-        RenderSettings renderSettings = new RenderSettings.Builder()
-                .withStrictVariables(true)
-                .withRaiseExceptionsInStrictMode(false)
-                .build();
-        
-        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(renderSettings).build();
+        TemplateParser parser = parserWithStrictVariablesAndRaiseExceptionsInStrictModeFalse();
 
         Template template = parser.parse("{{a}}{{b}}{{c}}");
 
@@ -118,6 +121,27 @@ public class RenderSettingsTest {
 
         // There should be 2 exceptions recorded for non-existing variables `a` and `c`
         assertThat(template.errors().size(), is(2));
+
+        // Rendering should not terminate
+        assertThat(rendered, is("FOO"));
+    }
+
+    @Test
+    public void raiseExceptionsInStrictModeFalseTest2() {
+        TemplateParser parser = parserWithStrictVariablesAndRaiseExceptionsInStrictModeFalse();
+
+        Template template = parser.parse("{% for v in a %}{{v.b}}{% endfor %}" +
+                                         "{% for v in badVariableName %}{{v.b}}{% endfor %}" +
+                                         "{% for v in a %}{{v.badVariableName}}{% endfor %}");
+
+        assertThat(template.errors().size(), is(0));
+
+        String rendered = template.render("{\"a\" : [ { \"b\" : \"FOO\" } ] }");
+
+        // There should be 2 exceptions recorded for non-existing variables `badVariableName` and `v.badVariableName`
+        assertThat(template.errors().size(), is(2));
+        assertThat(((VariableNotExistException) template.errors().get(0)).getVariableName(), is("badVariableName"));
+        assertThat(((VariableNotExistException) template.errors().get(1)).getVariableName(), is("v.badVariableName"));
 
         // Rendering should not terminate
         assertThat(rendered, is("FOO"));

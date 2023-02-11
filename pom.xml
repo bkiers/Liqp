@@ -3,7 +3,7 @@
   <groupId>nl.big-o</groupId>
   <artifactId>liqp</artifactId>
   <packaging>jar</packaging>
-  <version>0.8.3.4-SNAPSHOT</version>
+  <version>0.8.4.1-SNAPSHOT</version>
   <name>Liqp</name>
   <description>A Java implementation of the Liquid templating engine backed up by an ANTLR grammar.</description>
   <url>https://github.com/bkiers/Liqp</url>
@@ -217,6 +217,28 @@
             <exclude>**/TestUtils.java</exclude>
           </excludes>
         </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.4.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <relocations>
+                <relocation>
+                  <pattern>org.antlr</pattern>
+                  <shadedPattern>liqp.org.antlr</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>

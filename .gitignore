@@ -11,6 +11,7 @@ hs_err_pid*.log
 .pmd
 .pmdruleset.xml
 interpolated-pom.xml
+dependency-reduced-pom.xml
 
 target/
 build/

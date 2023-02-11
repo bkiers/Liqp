@@ -7,6 +7,9 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
@@ -150,5 +153,65 @@ public class RenderSettingsTest {
         assertFalse(gotEnvironmentMap.get());
         assertEquals("Hello world", template.render());
         assertTrue(gotEnvironmentMap.get());
+    }
+
+    @Test
+    public void testCustomRenderTransformer() throws Exception {
+        RenderSettings renderSettings = new RenderSettings.Builder().withRenderTransformer(
+            new CustomRenderTransformer()).build();
+
+        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(renderSettings).build();
+        Template template = parser.parse("{{ 'Hello' }} {{ 'world' }}");
+
+        Object obj = template.prerender();
+        assertEquals(MyAppender.class, obj.getClass());
+
+        // our custom RenderTransformer allows access to appended fragments
+        List<Object> list = ((MyAppender) obj).getList();
+        assertEquals(Arrays.asList("Hello", " ", "world"), list);
+
+        // the final output for Template.render and Template.prerender.toString should be identical
+        assertEquals("Hello world", obj.toString());
+        assertEquals("Hello world", template.render());
+    }
+
+    private static final class MyAppender implements ObjectAppender.Controller {
+        final List<Object> list = new ArrayList<>();
+
+        @Override
+        public Object getResult() {
+            return this;
+        }
+
+        @Override
+        public void append(Object obj) {
+            list.add(obj);
+        }
+
+        public List<Object> getList() {
+            return list;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            for (Object o : list) {
+                sb.append(o);
+            }
+            return sb.toString();
+        }
+    }
+
+    private static final class CustomRenderTransformer implements RenderTransformer {
+        @Override
+        public Object transformObject(TemplateContext context, Object obj) {
+            return obj;
+        }
+
+        @Override
+        public ObjectAppender.Controller newObjectAppender(TemplateContext context,
+            int estimatedNumberOfAppends) {
+            return new MyAppender();
+        }
     }
 }

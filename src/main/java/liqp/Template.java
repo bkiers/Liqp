@@ -548,11 +548,11 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String render(String jsonMap) {
-        return prerender(jsonMap).toString();
+        return renderToObject(jsonMap).toString();
     }
 
     @SuppressWarnings("unchecked")
-    public Object prerender(String jsonMap) {
+    private Object renderToObject(String jsonMap) {
         Map<String, Object> map;
 
         try {
@@ -561,39 +561,36 @@ public class Template {
             throw new RuntimeException("invalid json map: '" + jsonMap + "'", e);
         }
 
-        return prerender(map);
+        return renderToObject(map);
     }
 
     public String render() {
-        return prerender().toString();
+        return renderToObject().toString();
     }
 
-    public Object prerender() {
-        return prerender(new HashMap<String, Object>());
+    public Object renderToObject() {
+        return renderToObject(new HashMap<String, Object>());
     }
 
     public String render(Inspectable object) {
-        return prerender(object).toString();
+        return renderToObject(object).toString();
     }
 
-    public Object prerender(Inspectable object) {
-        return prerenderObject(object);
+    public Object renderToObject(Inspectable object) {
+        return renderObjectToObject(object);
     }
 
     /**
      * Render the template with given object, treating it same way as {@link Inspectable} instance.
      */
     public String renderObject(Object obj) {
-        return prerenderObject(obj).toString();
+        return renderObjectToObject(obj).toString();
     }
 
-    /**
-     * Prerender the template with given object, treating it same way as {@link Inspectable} instance.
-     */
-    public Object prerenderObject(Object obj) {
+    private Object renderObjectToObject(Object obj) {
         LiquidSupport evaluated = renderSettings.evaluate(parseSettings.mapper, obj);
         Map<String, Object> map = evaluated.toLiquid();
-        return prerender(map);
+        return renderToObject(map);
     }
 
     /**
@@ -612,18 +609,18 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String render(String key, Object value, Object... keyValues) {
-        return prerender(key, value, keyValues).toString();
+        return renderToObject(key, value, keyValues).toString();
     }
 
-    public Object prerender(String key, Object value, Object... keyValues) {
-        return prerender(false, key, value, keyValues);
+    private Object renderToObject(String key, Object value, Object... keyValues) {
+        return renderToObject(false, key, value, keyValues);
     }
 
     public String render(boolean convertValueToMap, String key, Object value, Object... keyValues) {
-        return prerender(convertValueToMap, key, value, keyValues).toString();
+        return renderToObject(convertValueToMap, key, value, keyValues).toString();
     }
 
-    public Object prerender(boolean convertValueToMap, String key, Object value, Object... keyValues) {
+    private Object renderToObject(boolean convertValueToMap, String key, Object value, Object... keyValues) {
         Map<String, Object> map = new HashMap<String, Object>();
         putStringKey(convertValueToMap, key, value, map);
 
@@ -633,7 +630,7 @@ public class Template {
             putStringKey(convertValueToMap, key, value, map);
         }
 
-        return prerender(map);
+        return renderToObject(map);
     }
 
     /**
@@ -645,27 +642,37 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String render(final Map<String, Object> variables) {
-        return prerender(variables).toString();
+        return renderToObject(variables).toString();
     }
 
-    public Object prerender(final Map<String, Object> variables) {
+    /**
+     * Renders the template. The returned type is unspecified (as it may be controlled by a custom
+     * {@link RenderTransformer}), however calling {@link #toString()} on that object is guaranteed to be
+     * equivalent to calling {@link #render(Map)}.
+     *
+     * @param variables
+     *            a Map denoting the (possibly nested) variables that can be used in this Template.
+     *
+     * @return an object denoting the rendered template.
+     */
+    public Object renderToObject(final Map<String, Object> variables) {
         if (this.getProtectionSettings().isRenderTimeLimited()) {
-            return prerender(variables, Executors.newSingleThreadExecutor(), true);
+            return renderToObject(variables, Executors.newSingleThreadExecutor(), true);
         } else {
             if (this.templateSize > this.getProtectionSettings().maxTemplateSizeBytes) {
                 throw new RuntimeException("template exceeds " +
                         this.protectionSettings.maxTemplateSizeBytes + " bytes");
             }
-            return prerenderUnguarded(variables);
+            return renderToObjectUnguarded(variables);
         }
     }
 
     public String render(final Map<String, Object> variables, ExecutorService executorService,
             boolean shutdown) {
-        return prerender(variables, executorService, shutdown).toString();
+        return renderToObject(variables, executorService, shutdown).toString();
     }
 
-    public Object prerender(final Map<String, Object> variables, ExecutorService executorService,
+    private Object renderToObject(final Map<String, Object> variables, ExecutorService executorService,
             boolean shutdown) {
         if (this.templateSize > this.getProtectionSettings().maxTemplateSizeBytes) {
             throw new RuntimeException("template exceeds " +
@@ -673,7 +680,7 @@ public class Template {
         }
 
         try {
-            Future<Object> future = executorService.submit(() -> prerenderUnguarded(variables));
+            Future<Object> future = executorService.submit(() -> renderToObjectUnguarded(variables));
             return future.get(this.getProtectionSettings().maxRenderTimeMillis, TimeUnit.MILLISECONDS);
         } catch (TimeoutException e) {
             throw new RuntimeException("exceeded the max amount of time (" + this
@@ -697,16 +704,28 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String renderUnguarded(Map<String, Object> variables) {
-        return prerenderUnguarded(variables).toString();
+        return renderToObjectUnguarded(variables).toString();
     }
 
-    public Object prerenderUnguarded(Map<String, Object> variables) {
-        return prerenderUnguarded(variables, null, true);
+    /**
+     * Renders the template without guards provided by protection settings.
+     * 
+     * The returned type is unspecified (as it may be controlled by a custom {@link RenderTransformer}),
+     * however calling {@link #toString()} on that object is guaranteed to be equivalent to calling
+     * {@link #renderToObjectUnguarded(Map)}.
+     *
+     * @param variables
+     *            a Map denoting the (possibly nested) variables that can be used in this Template.
+     *
+     * @return an object denoting the rendered template.
+     */
+    public Object renderToObjectUnguarded(Map<String, Object> variables) {
+        return renderToObjectUnguarded(variables, null, true);
     }
 
     public String renderUnguarded(Map<String, Object> variables, TemplateContext parent,
             boolean doClearThreadLocal) {
-        return prerenderUnguarded(variables, parent, doClearThreadLocal).toString();
+        return renderToObjectUnguarded(variables, parent, doClearThreadLocal).toString();
     }
 
     @SuppressWarnings("deprecation")
@@ -726,7 +745,7 @@ public class Template {
         return context;
     }
 
-    public Object prerenderUnguarded(Map<String, Object> variables, TemplateContext parent,
+    public Object renderToObjectUnguarded(Map<String, Object> variables, TemplateContext parent,
             boolean doClearThreadLocal) {
         if (doClearThreadLocal) {
             BasicTypesSupport.clearReferences();
@@ -775,7 +794,7 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String renderUnguarded(TemplateContext parent) {
-        return prerenderUnguarded(parent).toString();
+        return renderToObjectUnguarded(parent).toString();
     }
 
     /**
@@ -785,8 +804,8 @@ public class Template {
      *            The parent context.
      * @return a string denoting the rendered template.
      */
-    public Object prerenderUnguarded(TemplateContext parent) {
-        return prerenderUnguarded(new HashMap<String, Object>(), parent, true);
+    private Object renderToObjectUnguarded(TemplateContext parent) {
+        return renderToObjectUnguarded(new HashMap<String, Object>(), parent, true);
     }
 
     // Use toStringTree()

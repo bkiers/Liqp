@@ -187,14 +187,14 @@ public class RenderSettingsTest {
         TemplateParser parser = new TemplateParser.Builder().withRenderSettings(renderSettings).build();
         Template template = parser.parse("{{ 'Hello' }} {{ 'world' }}");
 
-        Object obj = template.prerender();
+        Object obj = template.renderToObject();
         assertEquals(MyAppender.class, obj.getClass());
 
         // our custom RenderTransformer allows access to appended fragments
         List<Object> list = ((MyAppender) obj).getList();
         assertEquals(Arrays.asList("Hello", " ", "world"), list);
 
-        // the final output for Template.render and Template.prerender.toString should be identical
+        // the final output for Template.render and Template.renderToObject.toString should be identical
         assertEquals("Hello world", obj.toString());
         assertEquals("Hello world", template.render());
     }

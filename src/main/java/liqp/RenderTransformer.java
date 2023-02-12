@@ -4,8 +4,8 @@ import java.io.Writer;
 
 /**
  * <p>
- * A {@link RenderTransformer} handles the conversion of appendable objects in the "prerender"-phase
- * ({@link Template#prerender()} etc.).
+ * A {@link RenderTransformer} handles the conversion of objects to be returned by
+ * {@link Template#renderToObject()} etc.
  * </p>
  * <p>
  * Implementations may optimize how objects are actually appended/serialized, and when exceptions are

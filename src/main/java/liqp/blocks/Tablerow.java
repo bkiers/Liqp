@@ -1,6 +1,7 @@
 package liqp.blocks;
 
 import liqp.TemplateContext;
+import liqp.RenderTransformer.ObjectAppender;
 import liqp.nodes.LNode;
 import liqp.parser.LiquidSupport;
 
@@ -71,28 +72,26 @@ public class Tablerow extends Block {
         nestedContext.put(TABLEROWLOOP, tablerowloopDrop);
 
 
-        StringBuilder builder = new StringBuilder();
-
-
-
-        if(total == 0) {
-
+        ObjectAppender.Controller builder = context.newObjectAppender(total * 5);
+        if (total == 0) {
             builder.append("<tr class=\"row1\">\n</tr>\n");
-        }
-        else {
-
-            for(int i = 0, c = 1, r = 0; i < total; i++, c++) {
-
+        } else {
+            for (int i = 0, c = 1, r = 0; i < total; i++, c++) {
                 context.incrementIterations();
 
                 nestedContext.put(valueName, collection[i]);
                 if(c == 1) {
                     r++;
-                    builder.append("<tr class=\"row").append(r).append("\">").append(r == 1 ? "\n" : "");
+                    builder.append("<tr class=\"row");
+                    builder.append(r);
+                    builder.append("\">");
+                    builder.append(r == 1 ? "\n" : "");
                 }
 
-                builder.append("<td class=\"col").append(c).append("\">");
-                builder.append(super.asString(block.render(nestedContext), context));
+                builder.append("<td class=\"col");
+                builder.append(c);
+                builder.append("\">");
+                builder.append(super.asAppendableObject(block.render(nestedContext), context));
                 builder.append("</td>");
 
                 if(c == cols || i == total - 1) {
@@ -106,7 +105,7 @@ public class Tablerow extends Block {
         nestedContext.remove(TABLEROWLOOP);
         nestedContext.remove(valueName);
 
-        return builder.toString();
+        return builder.getResult();
     }
 
     private Map<String, Integer> getAttributes(Object[] collection, int fromIndex, TemplateContext context, LNode... tokens) {

@@ -1,11 +1,22 @@
 package liqp;
 
 
-import liqp.exceptions.VariableNotExistException;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.RenderTransformer.ObjectAppender;
+import liqp.exceptions.VariableNotExistException;
+import liqp.filters.Filter;
 
 public class RenderSettingsTest {
     
@@ -134,5 +145,97 @@ public class RenderSettingsTest {
 
         // Rendering should not terminate
         assertThat(rendered, is("FOO"));
+    }
+
+    @Test
+    public void testEnvironmentMapConfigurator() throws Exception {
+        final String secretKey = getClass() + ".secretKey";
+
+        ParseSettings parseSettings = new ParseSettings.Builder().with(new Filter("secret") {
+            @Override
+            public Object apply(Object value, TemplateContext context, Object... params) {
+                ObjectAppender.Controller sb = context.newObjectAppender(3);
+                sb.append(value);
+                sb.append(" ");
+                sb.append(context.getEnvironmentMap().get(secretKey));
+                return sb.getResult();
+            }
+        }).build();
+
+        AtomicBoolean gotEnvironmentMap = new AtomicBoolean(false);
+        RenderSettings renderSettings = new RenderSettings.Builder().withEnvironmentMapConfigurator((
+            env) -> {
+            env.put(secretKey, "world");
+
+            gotEnvironmentMap.set(true);
+        }).build();
+
+        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings)
+            .withRenderSettings(renderSettings).build();
+        Template template = parser.parse("{{ 'Hello' | secret }}");
+
+        assertFalse(gotEnvironmentMap.get());
+        assertEquals("Hello world", template.render());
+        assertTrue(gotEnvironmentMap.get());
+    }
+
+    @Test
+    public void testCustomRenderTransformer() throws Exception {
+        RenderSettings renderSettings = new RenderSettings.Builder().withRenderTransformer(
+            new CustomRenderTransformer()).build();
+
+        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(renderSettings).build();
+        Template template = parser.parse("{{ 'Hello' }} {{ 'world' }}");
+
+        Object obj = template.renderToObject();
+        assertEquals(MyAppender.class, obj.getClass());
+
+        // our custom RenderTransformer allows access to appended fragments
+        List<Object> list = ((MyAppender) obj).getList();
+        assertEquals(Arrays.asList("Hello", " ", "world"), list);
+
+        // the final output for Template.render and Template.renderToObject.toString should be identical
+        assertEquals("Hello world", obj.toString());
+        assertEquals("Hello world", template.render());
+    }
+
+    private static final class MyAppender implements ObjectAppender.Controller {
+        final List<Object> list = new ArrayList<>();
+
+        @Override
+        public Object getResult() {
+            return this;
+        }
+
+        @Override
+        public void append(Object obj) {
+            list.add(obj);
+        }
+
+        public List<Object> getList() {
+            return list;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            for (Object o : list) {
+                sb.append(o);
+            }
+            return sb.toString();
+        }
+    }
+
+    private static final class CustomRenderTransformer implements RenderTransformer {
+        @Override
+        public Object transformObject(TemplateContext context, Object obj) {
+            return obj;
+        }
+
+        @Override
+        public ObjectAppender.Controller newObjectAppender(TemplateContext context,
+            int estimatedNumberOfAppends) {
+            return new MyAppender();
+        }
     }
 }

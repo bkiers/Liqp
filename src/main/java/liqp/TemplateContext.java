@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import liqp.RenderTransformer.ObjectAppender;
 import liqp.parser.Flavor;
 
 public class TemplateContext {
@@ -67,7 +68,18 @@ public class TemplateContext {
         this.parent = parent;
     }
 
+    /**
+     * Deprecated. Use {@link TemplateContext#newChildContext(Map)} instead.
+     * 
+     * @param parent The parent context.
+     * @param variables The variables to use in this child context.
+     */
+    @Deprecated
     public TemplateContext(TemplateContext parent, Map<String, Object> variables) {
+        this(variables, parent);
+    }
+
+    protected TemplateContext(Map<String, Object> variables, TemplateContext parent) {
         this(parent);
         this.variables = variables;
     }
@@ -197,5 +209,14 @@ public class TemplateContext {
 
     public ProtectionSettings getProtectionSettings() {
         return parser.getProtectionSettings();
+    }
+
+    public ObjectAppender.Controller newObjectAppender(int estimatedNumberOfAppends) {
+        return renderSettings.getRenderTransformer().newObjectAppender(this,
+                estimatedNumberOfAppends);
+    }
+
+    public TemplateContext newChildContext(Map<String, Object> variablesForChild) {
+        return new TemplateContext(variablesForChild, this);
     }
 }

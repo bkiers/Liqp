@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import liqp.RenderTransformer.ObjectAppender;
 import liqp.filters.date.CustomDateFormatRegistry;
 import liqp.nodes.AtomNode;
 
@@ -284,6 +285,7 @@ public abstract class LValue {
     public static String asFormattedNumber(BigDecimal bd) {
         return bd.setScale(Math.max(1, bd.stripTrailingZeros().scale()), ROUND_UNNECESSARY).toPlainString();
     }
+    
     /**
      * Returns `value` as a String.
      *
@@ -316,6 +318,39 @@ public abstract class LValue {
         }
 
         return builder.toString();
+    }
+    
+    /**
+     * Returns `value` as an object appendable to {@link ObjectAppender}.
+     *
+     * @param value
+     *         the value to convert.
+     *
+     * @return `value` as an appendable object.
+     */
+    public Object asAppendableObject(Object value, TemplateContext context) {
+        if (value == null) {
+            return "";
+        }
+
+        if (isTemporal(value)) {
+            ZonedDateTime time = asTemporal(value, context);
+            return rubyDateTimeFormat.format(time);
+        }
+
+        if (!isArray(value)) {
+            return value;
+        }
+
+        Object[] array = this.asArray(value, context);
+
+        ObjectAppender.Controller builder = context.newObjectAppender(array.length);
+
+        for (Object obj : array) {
+            builder.append(this.asAppendableObject(obj, context));
+        }
+
+        return builder.getResult();
     }
 
     /**

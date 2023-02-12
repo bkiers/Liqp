@@ -56,7 +56,7 @@ public class Include extends Tag {
                 }
             }
 
-            return template.renderUnguarded(variables, context, true);
+            return template.renderToObjectUnguarded(variables, context, true);
         } catch (Exception e) {
             if (context.renderSettings.showExceptionsFromInclude) {
                 throw new RuntimeException("problem with evaluating include", e);

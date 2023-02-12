@@ -9,12 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
@@ -547,9 +547,12 @@ public class Template {
      *
      * @return a string denoting the rendered template.
      */
-    @SuppressWarnings("unchecked")
     public String render(String jsonMap) {
+        return renderToObject(jsonMap).toString();
+    }
 
+    @SuppressWarnings("unchecked")
+    private Object renderToObject(String jsonMap) {
         Map<String, Object> map;
 
         try {
@@ -558,24 +561,36 @@ public class Template {
             throw new RuntimeException("invalid json map: '" + jsonMap + "'", e);
         }
 
-        return render(map);
+        return renderToObject(map);
     }
 
     public String render() {
-        return render(new HashMap<String, Object>());
+        return renderToObject().toString();
+    }
+
+    public Object renderToObject() {
+        return renderToObject(new HashMap<String, Object>());
     }
 
     public String render(Inspectable object) {
-        return renderObject(object);
+        return renderToObject(object).toString();
+    }
+
+    public Object renderToObject(Inspectable object) {
+        return renderObjectToObject(object);
     }
 
     /**
      * Render the template with given object, treating it same way as {@link Inspectable} instance.
      */
     public String renderObject(Object obj) {
+        return renderObjectToObject(obj).toString();
+    }
+
+    private Object renderObjectToObject(Object obj) {
         LiquidSupport evaluated = renderSettings.evaluate(parseSettings.mapper, obj);
         Map<String, Object> map = evaluated.toLiquid();
-        return render(map);
+        return renderToObject(map);
     }
 
     /**
@@ -594,11 +609,18 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String render(String key, Object value, Object... keyValues) {
-        return render(false, key, value, keyValues);
+        return renderToObject(key, value, keyValues).toString();
+    }
+
+    private Object renderToObject(String key, Object value, Object... keyValues) {
+        return renderToObject(false, key, value, keyValues);
     }
 
     public String render(boolean convertValueToMap, String key, Object value, Object... keyValues) {
+        return renderToObject(convertValueToMap, key, value, keyValues).toString();
+    }
 
+    private Object renderToObject(boolean convertValueToMap, String key, Object value, Object... keyValues) {
         Map<String, Object> map = new HashMap<String, Object>();
         putStringKey(convertValueToMap, key, value, map);
 
@@ -608,7 +630,7 @@ public class Template {
             putStringKey(convertValueToMap, key, value, map);
         }
 
-        return render(map);
+        return renderToObject(map);
     }
 
     /**
@@ -620,35 +642,45 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String render(final Map<String, Object> variables) {
+        return renderToObject(variables).toString();
+    }
 
+    /**
+     * Renders the template. The returned type is unspecified (as it may be controlled by a custom
+     * {@link RenderTransformer}), however calling {@link #toString()} on that object is guaranteed to be
+     * equivalent to calling {@link #render(Map)}.
+     *
+     * @param variables
+     *            a Map denoting the (possibly nested) variables that can be used in this Template.
+     *
+     * @return an object denoting the rendered template.
+     */
+    public Object renderToObject(final Map<String, Object> variables) {
         if (this.getProtectionSettings().isRenderTimeLimited()) {
-            return render(variables, Executors.newSingleThreadExecutor(), true);
+            return renderToObject(variables, Executors.newSingleThreadExecutor(), true);
         } else {
             if (this.templateSize > this.getProtectionSettings().maxTemplateSizeBytes) {
                 throw new RuntimeException("template exceeds " +
                         this.protectionSettings.maxTemplateSizeBytes + " bytes");
             }
-            return renderUnguarded(variables);
+            return renderToObjectUnguarded(variables);
         }
     }
 
     public String render(final Map<String, Object> variables, ExecutorService executorService,
             boolean shutdown) {
+        return renderToObject(variables, executorService, shutdown).toString();
+    }
 
+    private Object renderToObject(final Map<String, Object> variables, ExecutorService executorService,
+            boolean shutdown) {
         if (this.templateSize > this.getProtectionSettings().maxTemplateSizeBytes) {
             throw new RuntimeException("template exceeds " +
                     this.protectionSettings.maxTemplateSizeBytes + " bytes");
         }
 
-        Callable<String> task = new Callable<String>() {
-            @Override
-            public String call() {
-                return renderUnguarded(variables);
-            }
-        };
-
         try {
-            Future<String> future = executorService.submit(task);
+            Future<Object> future = executorService.submit(() -> renderToObjectUnguarded(variables));
             return future.get(this.getProtectionSettings().maxRenderTimeMillis, TimeUnit.MILLISECONDS);
         } catch (TimeoutException e) {
             throw new RuntimeException("exceeded the max amount of time (" + this
@@ -672,11 +704,48 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String renderUnguarded(Map<String, Object> variables) {
-        return renderUnguarded(variables, null, true);
+        return renderToObjectUnguarded(variables).toString();
+    }
+
+    /**
+     * Renders the template without guards provided by protection settings.
+     * 
+     * The returned type is unspecified (as it may be controlled by a custom {@link RenderTransformer}),
+     * however calling {@link #toString()} on that object is guaranteed to be equivalent to calling
+     * {@link #renderToObjectUnguarded(Map)}.
+     *
+     * @param variables
+     *            a Map denoting the (possibly nested) variables that can be used in this Template.
+     *
+     * @return an object denoting the rendered template.
+     */
+    public Object renderToObjectUnguarded(Map<String, Object> variables) {
+        return renderToObjectUnguarded(variables, null, true);
+    }
+
+    public String renderUnguarded(Map<String, Object> variables, TemplateContext parent,
+            boolean doClearThreadLocal) {
+        return renderToObjectUnguarded(variables, parent, doClearThreadLocal).toString();
     }
 
     @SuppressWarnings("deprecation")
-    public String renderUnguarded(Map<String, Object> variables, TemplateContext parent,
+    private TemplateContext newRootContext(Map<String, Object> variables) {
+        TemplateContext context;
+        if (templateParser == null) {
+            context = new TemplateContext(getProtectionSettings(), getRenderSettings(), getParseSettings(),
+                    variables);
+        } else {
+            context = new TemplateContext(templateParser, variables);
+        }
+        Consumer<Map<String, Object>> configurator = context.getRenderSettings().getEnvironmentMapConfigurator();
+        if (configurator != null) {
+            configurator.accept(context.getEnvironmentMap());
+        }
+
+        return context;
+    }
+
+    public Object renderToObjectUnguarded(Map<String, Object> variables, TemplateContext parent,
             boolean doClearThreadLocal) {
         if (doClearThreadLocal) {
             BasicTypesSupport.clearReferences();
@@ -697,20 +766,17 @@ public class Template {
         try {
             LNode node = visitor.visit(root);
             if (parent == null) {
-                if (templateParser == null) {
-                    this.templateContext = new TemplateContext(getProtectionSettings(),
-                            getRenderSettings(), getParseSettings(), variables);
-                } else {
-                    this.templateContext = new TemplateContext(templateParser, variables);
-                }
+                this.templateContext = newRootContext(variables);
             } else {
-                this.templateContext = new TemplateContext(parent, variables);
+                this.templateContext = parent.newChildContext(variables);
             }
             if (this.contextHolder != null) {
                 contextHolder.setContext(templateContext);
             }
             Object rendered = node.render(this.templateContext);
-            return rendered == null ? "" : String.valueOf(rendered);
+
+            return templateContext.getParser().getRenderSettings().getRenderTransformer()
+                    .transformObject(templateContext, rendered);
         } catch (Exception e) {
             if (e instanceof RuntimeException) {
                 throw e;
@@ -728,7 +794,18 @@ public class Template {
      * @return a string denoting the rendered template.
      */
     public String renderUnguarded(TemplateContext parent) {
-        return renderUnguarded(new HashMap<String, Object>(), parent, true);
+        return renderToObjectUnguarded(parent).toString();
+    }
+
+    /**
+     * Prerenders the template using parent context
+     * 
+     * @param parent
+     *            The parent context.
+     * @return a string denoting the rendered template.
+     */
+    private Object renderToObjectUnguarded(TemplateContext parent) {
+        return renderToObjectUnguarded(new HashMap<String, Object>(), parent, true);
     }
 
     // Use toStringTree()

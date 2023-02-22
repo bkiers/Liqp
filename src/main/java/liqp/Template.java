@@ -552,7 +552,7 @@ public class Template {
     }
 
     @SuppressWarnings("unchecked")
-    private Object renderToObject(String jsonMap) {
+    public Object renderToObject(String jsonMap) {
         Map<String, Object> map;
 
         try {

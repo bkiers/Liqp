@@ -319,5 +319,15 @@ public class LookupNodeTest {
         assertEquals("Hello world", TemplateParser.DEFAULT.parse("Hello {{data[1]}}").render(Collections
             .singletonMap("data", new LinkedHashSet<>(Arrays.asList("hello", "world")))));
     }
+
+    @Test
+    public void testNegativeOffset() throws Exception {
+        assertEquals("Hello hello", TemplateParser.DEFAULT.parse("Hello {{data[-2]}}").render(Collections
+            .singletonMap("data", new LinkedHashSet<>(Arrays.asList("hello", "world")))));
+        assertEquals("Hello hello", TemplateParser.DEFAULT.parse("Hello {{data[-2]}}").render(Collections
+            .singletonMap("data", Arrays.asList("hello", "world"))));
+        assertEquals("Hello hello", TemplateParser.DEFAULT.parse("Hello {{data[-2]}}").render(Collections
+            .singletonMap("data", new String[]{"hello", "world"})));
+    }
 }
 

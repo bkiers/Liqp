@@ -207,7 +207,6 @@ public class LookupNode implements LNode {
                     return null;
                 }
                 else {
-                    // FIXME handle this
                     return null;
                 }
             }

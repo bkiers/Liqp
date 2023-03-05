@@ -1,9 +1,12 @@
 package liqp.filters;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.antlr.v4.runtime.RecognitionException;
@@ -150,5 +153,20 @@ public class SortTest {
         };
 
         assertThat(sorted, is(expected));
+    }
+    
+    @Test
+    public void testSortMap() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("World", 2);
+        map.put("Hello", 1);
+
+        assertEquals("World2Hello1", TemplateParser.DEFAULT.parse(
+            "{% assign sorted_data = data %}{% for e in sorted_data %}{{ e }}{% endfor %}")
+            .render(Collections.singletonMap("data", map)));
+
+        assertEquals("Hello1World2", TemplateParser.DEFAULT.parse(
+            "{% assign sorted_data = data | sort %}{% for e in sorted_data %}{{ e }}{% endfor %}")
+            .render(Collections.singletonMap("data", map)));
     }
 }

@@ -181,10 +181,11 @@ public class LookupNode implements LNode {
 
                 if (value.getClass().isArray()) {
                     Object[] arr = ((Object[]) value);
-                    if (index >= arr.length) {
+                    int size = arr.length;
+                    if (index >= size) {
                         return null;
                     } else if (index < 0) {
-                        index = arr.length + index;
+                        index = size + index;
                         if (index < 0) {
                             return null;
                         }
@@ -206,11 +207,14 @@ public class LookupNode implements LNode {
                 } else if (value instanceof Collection) {
                     Collection<?> coll = (Collection<?>) value;
 
-                    if (index < 0) {
-                       index = coll.size() + index;
-                       if (index < 0) {
-                           return null;
-                       }
+                    int size = coll.size();
+                    if (index >= size) {
+                        return null;
+                    } else if (index < 0) {
+                        index = size + index;
+                        if (index < 0) {
+                            return null;
+                        }
                     }
 
                     int i = 0;

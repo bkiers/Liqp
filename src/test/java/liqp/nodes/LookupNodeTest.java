@@ -2,9 +2,13 @@ package liqp.nodes;
 
 import static liqp.TestUtils.getNode;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.antlr.v4.runtime.RecognitionException;
@@ -308,6 +312,22 @@ public class LookupNodeTest {
         String assigns = "{ \"Data\" : { \"1\" : { \"Value\": \"tobi\" } } }";
 
         assertThat(TemplateParser.DEFAULT.parse("hi {{Data.1.Value}}").render(assigns), is("hi tobi"));
+    }
+
+    @Test
+    public void collectionTest() throws Exception {
+        assertEquals("Hello world", TemplateParser.DEFAULT.parse("Hello {{data[1]}}").render(Collections
+            .singletonMap("data", new LinkedHashSet<>(Arrays.asList("hello", "world")))));
+    }
+
+    @Test
+    public void testNegativeOffset() throws Exception {
+        assertEquals("Hello hello", TemplateParser.DEFAULT.parse("Hello {{data[-2]}}").render(Collections
+            .singletonMap("data", new LinkedHashSet<>(Arrays.asList("hello", "world")))));
+        assertEquals("Hello hello", TemplateParser.DEFAULT.parse("Hello {{data[-2]}}").render(Collections
+            .singletonMap("data", Arrays.asList("hello", "world"))));
+        assertEquals("Hello hello", TemplateParser.DEFAULT.parse("Hello {{data[-2]}}").render(Collections
+            .singletonMap("data", new String[]{"hello", "world"})));
     }
 }
 

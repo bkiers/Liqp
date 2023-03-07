@@ -1,14 +1,15 @@
 package liqp.nodes;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
 import liqp.TemplateContext;
 import liqp.exceptions.VariableNotExistException;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
 public class LookupNode implements LNode {
 
@@ -176,14 +177,53 @@ public class LookupNode implements LNode {
 
             key = expression.render(context);
 
-            if(key instanceof Number) {
+            if (key instanceof Number) {
                 int index = ((Number)key).intValue();
 
-                if(value.getClass().isArray()) {
-                    return ((Object[])value)[index];
+                if (value.getClass().isArray()) {
+                    Object[] arr = ((Object[]) value);
+                    if (index >= arr.length) {
+                        return null;
+                    } else if (index < 0) {
+                        index = arr.length + index;
+                        if (index < 0) {
+                            return null;
+                        }
+                    }
+                    return arr[index];
                 }
-                else if(value instanceof List) {
-                    return ((List<?>)value).get(index);
+                else if (value instanceof List) {
+                    List<?> list = ((List<?>) value);
+                    int size = list.size();
+                    if (index >= size) {
+                        return null;
+                    } else if (index < 0) {
+                        index = size + index;
+                        if (index < 0) {
+                            return null;
+                        }
+                    }
+                    return list.get(index);
+                } else if (value instanceof Collection) {
+                    Collection<?> coll = (Collection<?>) value;
+
+                    if (index < 0) {
+                       index = coll.size() + index;
+                       if (index < 0) {
+                           return null;
+                       }
+                       return new ArrayList<>(coll).get(index);
+                    }
+
+                    int i = 0;
+                    for (Iterator<?> it = coll.iterator(); it.hasNext();) {
+                        Object obj = it.next();
+                        if (i == index) {
+                            return obj;
+                        }
+                        i++;
+                    }
+                    return null;
                 }
                 else {
                     return null;

@@ -18,7 +18,7 @@ public class LookupNode implements LNode {
 
     public LookupNode(String id) {
         this.id = id;
-        indexes = new ArrayList<Indexable>();
+        indexes = new ArrayList<>();
     }
 
     public void add(Indexable indexable) {
@@ -92,7 +92,7 @@ public class LookupNode implements LNode {
 
             if(hash.equals("size")) {
                 if(value instanceof Collection) {
-                    return ((Collection)value).size();
+                    return ((Collection<?>)value).size();
                 }
                 else if(value instanceof java.util.Map || value instanceof Inspectable) {
                     java.util.Map map;
@@ -152,7 +152,6 @@ public class LookupNode implements LNode {
 
         @Override
         public String toString() {
-
             return String.format(".%s", hash);
         }
     }
@@ -212,7 +211,6 @@ public class LookupNode implements LNode {
                        if (index < 0) {
                            return null;
                        }
-                       return new ArrayList<>(coll).get(index);
                     }
 
                     int i = 0;
@@ -224,8 +222,7 @@ public class LookupNode implements LNode {
                         i++;
                     }
                     return null;
-                }
-                else {
+                } else {
                     return null;
                 }
             }

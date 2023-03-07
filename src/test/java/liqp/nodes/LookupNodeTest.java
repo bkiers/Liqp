@@ -2,8 +2,7 @@ package liqp.nodes;
 
 import static liqp.TestUtils.getNode;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -328,6 +327,18 @@ public class LookupNodeTest {
             .singletonMap("data", Arrays.asList("hello", "world"))));
         assertEquals("Hello hello", TemplateParser.DEFAULT.parse("Hello {{data[-2]}}").render(Collections
             .singletonMap("data", new String[]{"hello", "world"})));
+    }
+
+    @Test
+    public void testOutOfSize() {
+        assertEquals("Hello default", TemplateParser.DEFAULT.parse("Hello {{data[99] | default: 'default'}}").render(Collections
+                .singletonMap("data", new LinkedHashSet<>(Arrays.asList("hello", "world")))));
+        assertEquals("Hello default", TemplateParser.DEFAULT.parse("Hello {{data[99] | default: 'default'}}").render(Collections
+                .singletonMap("data", Arrays.asList("hello", "world"))));
+        assertEquals("Hello default", TemplateParser.DEFAULT.parse("Hello {{data[99] | default: 'default'}}").render(Collections
+                .singletonMap("data", new String[]{"hello", "world"})));
+        assertEquals("Hello default", TemplateParser.DEFAULT.parse("Hello {{data[99] | default: 'default'}}").render(Collections
+                .singletonMap("data", "123")));
     }
 }
 

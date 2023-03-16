@@ -1,31 +1,16 @@
 package liqp.nodes;
 
-import liqp.LValue;
-import liqp.TemplateContext;
-
-public class LtEqNode extends LValue implements LNode {
+public class LtEqNode extends ComparingExpressionNode {
 
     private LNode lhs;
     private LNode rhs;
 
     public LtEqNode(LNode lhs, LNode rhs) {
-        this.lhs = lhs;
-        this.rhs = rhs;
+        super(lhs, rhs);
     }
 
     @Override
-    public Object render(TemplateContext context) {
-
-        Object a = lhs.render(context);
-        Object b = rhs.render(context);
-
-        if (isTemporal(a)) {
-            a = asTemporal(a, context);
-        }
-        if (isTemporal(b)) {
-            b = asTemporal(b, context);
-        }
-
+    Object doCompare(Object a, Object b) {
         if (a instanceof Comparable && a.getClass().isInstance(b)) {
             return ((Comparable) a).compareTo(b) <= 0;
         } else if (b instanceof Comparable && b.getClass().isInstance(a)) {
@@ -35,4 +20,5 @@ public class LtEqNode extends LValue implements LNode {
         return (a instanceof Number) && (b instanceof Number) &&
                 super.asNumber(a).doubleValue() <= super.asNumber(b).doubleValue();
     }
+
 }

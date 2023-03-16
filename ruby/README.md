@@ -12,18 +12,7 @@ Run in liquid: ` ./run_with_liquid.sh your_script.rb`
 In fact, this may be same script, just unsure yourself you are safe in both cases:
 ```ruby
 
-$is_Jekyll = false
-begin
-  require "jekyll"
-  puts "testing cases using jekyll"
-  $is_Jekyll = true
-rescue LoadError
-  require "liquid"
-  puts "testing cases using liquid"
-end
-def isJekyll
-  $is_Jekyll
-end
+require_relative '_helpers.rb'
 
 # write your code here
 

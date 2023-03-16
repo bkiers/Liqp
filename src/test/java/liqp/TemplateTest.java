@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static liqp.TestUtils.assertPatternResultEquals;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -329,6 +330,18 @@ public class TemplateTest {
         Map<String, Object> a = Collections.singletonMap("b", firstIndex);
         data.put("a", a);
         return data;
+    }
+
+    @Test
+    public void testUseVariableAndTimesFilter() throws RecognitionException {
+        assertPatternResultEquals(TemplateParser.DEFAULT, "true",
+                "{% assign comparingValue = 98 | times: 1.0 %}{{ 99 > comparingValue }}");
+    }
+
+    @Test
+    public void testUseVariableAndDividedByFilter() throws RecognitionException {
+        assertPatternResultEquals(TemplateParser.DEFAULT, "true",
+                "{% assign comparingValue = 98 | divided_by: 1.0 %}{{ 99 > comparingValue }}");
     }
 
 }

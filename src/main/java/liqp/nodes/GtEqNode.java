@@ -31,6 +31,13 @@ public class GtEqNode extends LValue implements LNode {
             return ((Comparable) b).compareTo(a) < 0;
         }
 
+        if (canBeDouble(b) || canBeInteger(b)) {
+            b = asNumber(b);
+        }
+        if (canBeDouble(a) || canBeInteger(a)) {
+            a = asNumber(a);
+        }
+
         // different number class so use this convertion
         return (a instanceof Number) && (b instanceof Number) &&
                 super.asNumber(a).doubleValue() >= super.asNumber(b).doubleValue();

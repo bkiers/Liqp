@@ -70,7 +70,7 @@ public class For extends Block {
 
         // When context.renderSettings.raiseExceptionsInStrictMode=false,
         // don't allow nested errors to be lost
-        for (RuntimeException nestedError : nestedContext.errors()) {
+        for (Exception nestedError : nestedContext.errors()) {
             context.addError(nestedError);
         }
 

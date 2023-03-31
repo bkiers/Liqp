@@ -19,14 +19,34 @@ public class TemplateParser {
     public static final TemplateParser DEFAULT = Flavor.LIQUID.defaultParser();
     public static final TemplateParser DEFAULT_JEKYLL = Flavor.JEKYLL.defaultParser();
 
+    /**
+     * Equivalent of
+     * <code>
+     * Liquid::Template.error_mode = :strict # Raises a SyntaxError when invalid syntax is used
+     * Liquid::Template.error_mode = :warn # Adds strict errors to template.errors but continues as normal
+     * Liquid::Template.error_mode = :lax # The default mode, accepts almost anything.
+     * </code>
+     * where usage is like:
+     * <code>
+     *     template = Liquid::Template.parse('', error_mode: :warn )
+     * </code>
+     */
+    public enum ErrorMode {
+        strict,
+        warn,
+        lax
+    }
+
     private final ParseSettings parseSettings;
     private final RenderSettings renderSettings;
     private final ProtectionSettings protectionSettings;
+    private final ErrorMode errorMode;
 
     public static class Builder {
         private ParseSettings parseSettings = ParseSettings.DEFAULT;
         private RenderSettings renderSettings = RenderSettings.DEFAULT;
         private ProtectionSettings protectionSettings = ProtectionSettings.DEFAULT;
+        private ErrorMode errorMode = Flavor.LIQUID.getErrorMode();
 
         public Builder() {
         }
@@ -46,17 +66,23 @@ public class TemplateParser {
             return this;
         }
 
+        public Builder withErrorMode(ErrorMode errorMode) {
+            this.errorMode = errorMode;
+            return this;
+        }
+
         public TemplateParser build() {
             return new TemplateParser(this.parseSettings, this.renderSettings,
-                    this.protectionSettings);
+                    this.protectionSettings, this.errorMode);
         }
     }
 
     TemplateParser(ParseSettings parseSettings, RenderSettings renderSettings,
-            ProtectionSettings protectionSettings) {
+                   ProtectionSettings protectionSettings, ErrorMode errorMode) {
         this.parseSettings = parseSettings;
         this.renderSettings = renderSettings;
         this.protectionSettings = protectionSettings;
+        this.errorMode = errorMode;
     }
 
     public Template parse(File file) throws IOException {
@@ -87,4 +113,7 @@ public class TemplateParser {
         return protectionSettings;
     }
 
+    public ErrorMode getErrorMode() {
+        return errorMode;
+    }
 }

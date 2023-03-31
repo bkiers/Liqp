@@ -6,19 +6,22 @@ import liqp.TemplateParser;
 import liqp.filters.Filters;
 
 public enum Flavor {
-    LIQUID("snippets", Filters.DEFAULT_FILTERS, Insertions.STANDARD_INSERTIONS), //
-    JEKYLL("_includes", Filters.JEKYLL_FILTERS, Insertions.STANDARD_INSERTIONS);
+    LIQUID("snippets", Filters.DEFAULT_FILTERS, Insertions.STANDARD_INSERTIONS, TemplateParser.ErrorMode.lax), //
+    JEKYLL("_includes", Filters.JEKYLL_FILTERS, Insertions.STANDARD_INSERTIONS, TemplateParser.ErrorMode.warn),
+    LIQP("_includes", Filters.JEKYLL_FILTERS, Insertions.STANDARD_INSERTIONS, TemplateParser.ErrorMode.strict);
 
     public final String snippetsFolderName;
     private final Filters filters;
     private final Insertions insertions;
+    private final TemplateParser.ErrorMode errorMode;
     private ParseSettings parseSettings;
     private TemplateParser parser;
 
-    Flavor(String snippetsFolderName, Filters filters, Insertions insertions) {
+    Flavor(String snippetsFolderName, Filters filters, Insertions insertions, TemplateParser.ErrorMode errorMode) {
         this.snippetsFolderName = snippetsFolderName;
         this.filters = filters;
         this.insertions = insertions;
+        this.errorMode = errorMode;
     }
 
     /**
@@ -61,5 +64,12 @@ public enum Flavor {
             parser = new TemplateParser.Builder().withParseSettings(defaultParseSettings()).build();
         }
         return parser;
+    }
+
+    /**
+     * Returns the default {@link TemplateParser.ErrorMode} for this Flavor.
+     */
+    public TemplateParser.ErrorMode getErrorMode() {
+        return errorMode;
     }
 }

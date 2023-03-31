@@ -184,8 +184,8 @@ public class Examples {
             TemplateParser parser = new TemplateParser.Builder() //
                     .withRenderSettings(new RenderSettings.Builder() //
                             .withStrictVariables(true) //
-                            .withRaiseExceptionsInStrictMode(true) //
                             .build()) //
+                    .withErrorMode(TemplateParser.ErrorMode.strict)
                     .build();
 
             parser.parse("{{mu}}").render();

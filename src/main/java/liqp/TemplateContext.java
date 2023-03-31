@@ -32,7 +32,7 @@ public class TemplateContext {
     private Map<String, Object> environmentMap;
     private Map<String, Object> registry;
 
-    private List<RuntimeException> errors;
+    private List<Exception> errors;
 
     public TemplateContext() {
         this(TemplateParser.DEFAULT, new LinkedHashMap<>());
@@ -88,11 +88,11 @@ public class TemplateContext {
         return parser;
     }
 
-    public void addError(RuntimeException exception) {
+    public void addError(Exception exception) {
         this.errors.add(exception);
     }
 
-    public List<RuntimeException> errors() {
+    public List<Exception> errors() {
         return new ArrayList<>(this.errors);
     }
 
@@ -218,5 +218,9 @@ public class TemplateContext {
 
     public TemplateContext newChildContext(Map<String, Object> variablesForChild) {
         return new TemplateContext(variablesForChild, this);
+    }
+
+    public TemplateParser.ErrorMode getErrorMode() {
+        return parser.getErrorMode();
     }
 }

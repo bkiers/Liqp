@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import liqp.TemplateContext;
+import liqp.TemplateParser;
 import liqp.exceptions.VariableNotExistException;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
@@ -54,8 +55,7 @@ public class LookupNode implements LNode {
         if(value == null && context.getRenderSettings().strictVariables) {
             RuntimeException e = new VariableNotExistException(getVariableName());
             context.addError(e);
-
-            if (context.getRenderSettings().raiseExceptionsInStrictMode) {
+            if (context.getErrorMode() == TemplateParser.ErrorMode.strict) {
                 throw e;
             }
         }

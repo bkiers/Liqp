@@ -28,9 +28,11 @@ public class RenderSettingsTest {
     protected TemplateParser parserWithStrictVariablesAndRaiseExceptionsInStrictModeFalse() {
         RenderSettings renderSettings = new RenderSettings.Builder()
                 .withStrictVariables(true)
-                .withRaiseExceptionsInStrictMode(false)
                 .build();
-        return new TemplateParser.Builder().withRenderSettings(renderSettings).build();
+        return new TemplateParser.Builder()
+                .withRenderSettings(renderSettings)
+                .withErrorMode(TemplateParser.ErrorMode.lax)
+                .build();
     }
     
     @Test

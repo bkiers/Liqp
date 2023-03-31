@@ -534,8 +534,8 @@ public class Template {
         return this;
     }
 
-    public List<RuntimeException> errors() {
-        return this.templateContext == null ? new ArrayList<RuntimeException>() : this.templateContext
+    public List<Exception> errors() {
+        return this.templateContext == null ? new ArrayList<>() : this.templateContext
                 .errors();
     }
 

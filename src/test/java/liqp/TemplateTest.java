@@ -198,8 +198,10 @@ public class TemplateTest {
         Map<String, Object> data = getDeepData();
         
         TemplateParser parser = new TemplateParser.Builder().withRenderSettings(
-                new RenderSettings.Builder().withStrictVariables(true).withRaiseExceptionsInStrictMode(
-                        true).build()).build();
+                new RenderSettings.Builder().withStrictVariables(true)
+                        .build())
+                .withErrorMode(TemplateParser.ErrorMode.strict)
+                .build();
         
         Template template = parser.parse("{{a.b[2].d[3].e}}");
 
@@ -232,8 +234,10 @@ public class TemplateTest {
         };
         
         TemplateParser parser = new TemplateParser.Builder().withRenderSettings(
-                new RenderSettings.Builder().withStrictVariables(true).withRaiseExceptionsInStrictMode(
-                        true).build()).build();
+                new RenderSettings.Builder().withStrictVariables(true)
+                        .build())
+                .withErrorMode(TemplateParser.ErrorMode.strict)
+                .build();
         
         Template template = parser.parse("{{ a.b[2].d[3].e | date: '%Y-%m-%d %H:%M:%S %Z' }}");
 

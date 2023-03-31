@@ -44,9 +44,14 @@ public class RenderSettings {
         return new LiquidSupport.LiquidSupportFromInspectable(mapper, variable);
     }
 
+    /**
+     * The same as <code>template.render!({}, strict_variables: true)</code> in ruby
+     */
     public final boolean strictVariables;
+    /**
+     * This field doesn't have equivalent in ruby.
+     */
     public final boolean showExceptionsFromInclude;
-    public final boolean raiseExceptionsInStrictMode;
     public final EvaluateMode evaluateMode;
     public final Locale locale;
     public final ZoneId defaultTimeZone;
@@ -57,7 +62,6 @@ public class RenderSettings {
 
         boolean strictVariables;
         boolean showExceptionsFromInclude;
-        boolean raiseExceptionsInStrictMode;
         EvaluateMode evaluateMode;
         Locale locale;
         ZoneId defaultTimeZone;
@@ -66,21 +70,15 @@ public class RenderSettings {
 
         public Builder() {
             this.strictVariables = false;
-            this.raiseExceptionsInStrictMode = true;
             this.evaluateMode = EvaluateMode.LAZY;
             this.locale = DEFAULT_LOCALE;
             this.renderTransformer = null;
             this.environmentMapConfigurator = null;
+            this.showExceptionsFromInclude = true;
         }
 
         public Builder withStrictVariables(boolean strictVariables) {
             this.strictVariables = strictVariables;
-            this.showExceptionsFromInclude = false;
-            return this;
-        }
-
-        public Builder withRaiseExceptionsInStrictMode(boolean raiseExceptionsInStrictMode) {
-            this.raiseExceptionsInStrictMode = raiseExceptionsInStrictMode;
             return this;
         }
 
@@ -142,17 +140,15 @@ public class RenderSettings {
             if (this.defaultTimeZone == null) {
                 this.defaultTimeZone = ZoneId.systemDefault();
             }
-            return new RenderSettings(this.strictVariables, this.showExceptionsFromInclude, this.raiseExceptionsInStrictMode, this.evaluateMode, this.renderTransformer, this.locale, this.defaultTimeZone, this.environmentMapConfigurator);
+            return new RenderSettings(this.strictVariables, this.showExceptionsFromInclude, this.evaluateMode, this.renderTransformer, this.locale, this.defaultTimeZone, this.environmentMapConfigurator);
         }
     }
 
-    private RenderSettings(boolean strictVariables, boolean showExceptionsFromInclude,
-        boolean raiseExceptionsInStrictMode, EvaluateMode evaluateMode,
+    private RenderSettings(boolean strictVariables, boolean showExceptionsFromInclude, EvaluateMode evaluateMode,
         RenderTransformer renderTransformer, Locale locale, ZoneId defaultTimeZone,
         Consumer<Map<String, Object>> environmentMapConfigurator) {
         this.strictVariables = strictVariables;
         this.showExceptionsFromInclude = showExceptionsFromInclude;
-        this.raiseExceptionsInStrictMode = raiseExceptionsInStrictMode;
         this.evaluateMode = evaluateMode;
         this.renderTransformer = renderTransformer == null ? RenderTransformerDefaultImpl.INSTANCE
             : renderTransformer;

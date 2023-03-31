@@ -107,9 +107,9 @@ public class IncludeTest {
                 .withParseSettings(jekyll()) //
                 .withRenderSettings( //
                         new RenderSettings.Builder() //
-                                .withRaiseExceptionsInStrictMode(true) //
                                 .withShowExceptionsFromInclude(true) //
                                 .build()) //
+                .withErrorMode(TemplateParser.ErrorMode.strict)
                 .build();
 
         Template template = parser.parse("{% include 'color' with 'red' %}");
@@ -127,9 +127,10 @@ public class IncludeTest {
                         .build())
                 .withRenderSettings(new RenderSettings
                         .Builder()
-                        .withRaiseExceptionsInStrictMode(true)
                         .withShowExceptionsFromInclude(true)
-                        .build()).build();
+                        .build())
+                .withErrorMode(TemplateParser.ErrorMode.strict)
+                .build();
 
         Template template = parser.parse("{% include 'color' with 'red' %}");
 
@@ -219,6 +220,7 @@ public class IncludeTest {
                     .withStrictVariables(true) //
                     .withShowExceptionsFromInclude(true) //
                     .build()) //
+            .withErrorMode(TemplateParser.ErrorMode.strict) //
             .build();
         Template template = parser.parse(index);
         template.render();

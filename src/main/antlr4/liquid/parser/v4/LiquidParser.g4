@@ -1,19 +1,29 @@
 parser grammar LiquidParser;
 
+@parser::header {
+    // add java imports here
+}
+
 @parser::members {
-    private boolean isLiquid = true;
+    private boolean isLiquidStyleInclude = true;
+    private boolean evaluateInOutputTag = false;
 
-    private boolean isLiquid(){
-        return isLiquid;
+    private boolean isLiquidStyleInclude(){
+        return isLiquidStyleInclude;
     }
 
-    private boolean isJekyll(){
-        return !isLiquid;
+    private boolean isJekyllStyleInclude(){
+        return !isLiquidStyleInclude;
     }
 
-    public LiquidParser(TokenStream input, boolean isLiquid) {
+    private boolean isEvaluateInOutputTag() {
+        return evaluateInOutputTag;
+    }
+
+    public LiquidParser(TokenStream input, boolean isLiquidStyleInclude, boolean evaluateInOutputTag) {
         this(input);
-        this.isLiquid = isLiquid;
+        this.isLiquidStyleInclude = isLiquidStyleInclude;
+        this.evaluateInOutputTag = evaluateInOutputTag;
     }
 
     public void reportTokenError(String message, Token token) {
@@ -177,8 +187,8 @@ capture_tag
  ;
 
 include_tag
- : {isLiquid()}? TagStart liquid=Include expr (With Str)? TagEnd
- | {isJekyll()}? TagStart jekyll=Include file_name_or_output (jekyll_include_params)* TagEnd
+ : {isLiquidStyleInclude()}? TagStart liquid=Include expr (With Str)? TagEnd
+ | {isJekyllStyleInclude()}? TagStart jekyll=Include file_name_or_output (jekyll_include_params)* TagEnd
  ;
 
 // only valid for Flavor.JEKYLL
@@ -193,7 +203,8 @@ jekyll_include_params
  ;
 
 output
- : outStart expr filter* OutEnd
+ : {evaluateInOutputTag}? outStart evaluate=expr filter* OutEnd
+ | {!evaluateInOutputTag}? outStart term filter* OutEnd
  ;
 
 filter

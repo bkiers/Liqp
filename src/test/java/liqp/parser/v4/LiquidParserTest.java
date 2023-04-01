@@ -417,7 +417,7 @@ public class LiquidParserTest {
     }
 
     private static String[] textsWithError(String source, String ruleName, Set<String> customBlocks, Set<String> customTags, BaseErrorListener el) {
-        ParseTree tree = parseWithListener(source, ruleName, customBlocks, customTags, el, true);
+        ParseTree tree = parseWithListener(source, ruleName, customBlocks, customTags, el, true, false);
 
         return texts(tree);
     }
@@ -429,7 +429,7 @@ public class LiquidParserTest {
     }
 
     private static String[] texts(String source, String ruleName, boolean isLiquid) {
-        ParseTree tree = parse(source, ruleName, isLiquid);
+        ParseTree tree = parse(source, ruleName, isLiquid, false);
 
         return texts(tree);
     }
@@ -449,12 +449,12 @@ public class LiquidParserTest {
         return childrenTexts;
     }
 
-    private static ParseTree parse(String source, String ruleName, boolean isLiquid) {
-        return parse(source, ruleName, new HashSet<String>(), new HashSet<String>(), isLiquid);
+    private static ParseTree parse(String source, String ruleName, boolean isLiquidStyleInclude, boolean evaluateInOutputTag) {
+        return parse(source, ruleName, new HashSet<String>(), new HashSet<String>(), isLiquidStyleInclude, evaluateInOutputTag);
     }
 
-    private static ParseTree parseWithListener(String source, String ruleName, Set<String> customBlocks, Set<String> customTags, BaseErrorListener el, Boolean isLiquid) {
-        LiquidParser parser = new LiquidParser(LiquidLexerTest.commonTokenStream(source, false, customBlocks, customTags), isLiquid);
+    private static ParseTree parseWithListener(String source, String ruleName, Set<String> customBlocks, Set<String> customTags, BaseErrorListener el, Boolean isLiquidStyleInclude, boolean evaluateInOutputTag) {
+        LiquidParser parser = new LiquidParser(LiquidLexerTest.commonTokenStream(source, false, customBlocks, customTags), isLiquidStyleInclude, evaluateInOutputTag);
 
         parser.removeErrorListeners();
         parser.addErrorListener(el);
@@ -469,17 +469,17 @@ public class LiquidParserTest {
     }
 
     private static ParseTree parse(String source, String ruleName, Set<String> customBlocks, Set<String> customTags) {
-        return parse(source, ruleName, customBlocks, customTags, true);
+        return parse(source, ruleName, customBlocks, customTags, true, false);
     }
 
-    private static ParseTree parse(String source, String ruleName, Set<String> customBlocks, Set<String> customTags, Boolean isLiquid) {
+    private static ParseTree parse(String source, String ruleName, Set<String> customBlocks, Set<String> customTags, Boolean isLiquidStyleInclude, Boolean evaluateInOutputTag) {
         BaseErrorListener el = new BaseErrorListener(){
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
                 throw new RuntimeException(e);
             }
         };
-        return parseWithListener(source, ruleName, customBlocks, customTags, el, isLiquid);
+        return parseWithListener(source, ruleName, customBlocks, customTags, el, isLiquidStyleInclude, evaluateInOutputTag);
     }
 
     private static String[] array(String... values) {

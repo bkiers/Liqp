@@ -18,6 +18,7 @@ public class TemplateParser {
      */
     public static final TemplateParser DEFAULT = Flavor.LIQUID.defaultParser();
     public static final TemplateParser DEFAULT_JEKYLL = Flavor.JEKYLL.defaultParser();
+    public static final TemplateParser DEFAULT_LIQP = Flavor.LIQP.defaultParser();
 
     /**
      * Equivalent of
@@ -46,9 +47,16 @@ public class TemplateParser {
         private ParseSettings parseSettings = ParseSettings.DEFAULT;
         private RenderSettings renderSettings = RenderSettings.DEFAULT;
         private ProtectionSettings protectionSettings = ProtectionSettings.DEFAULT;
-        private ErrorMode errorMode = Flavor.LIQUID.getErrorMode();
+        private ErrorMode errorMode;
 
         public Builder() {
+        }
+
+        public Builder(TemplateParser parser) {
+            parseSettings = parser.parseSettings;
+            renderSettings = parser.renderSettings;
+            protectionSettings = parser.protectionSettings;
+            errorMode = parser.errorMode;
         }
 
         public Builder withParseSettings(ParseSettings s) {
@@ -71,7 +79,12 @@ public class TemplateParser {
             return this;
         }
 
+
         public TemplateParser build() {
+            if (this.errorMode == null) {
+                // fallback to Flavor-default
+                this.errorMode = this.parseSettings.flavor.getErrorMode();
+            }
             return new TemplateParser(this.parseSettings, this.renderSettings,
                     this.protectionSettings, this.errorMode);
         }

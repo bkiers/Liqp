@@ -6,22 +6,46 @@ import liqp.TemplateParser;
 import liqp.filters.Filters;
 
 public enum Flavor {
-    LIQUID("snippets", Filters.DEFAULT_FILTERS, Insertions.STANDARD_INSERTIONS, TemplateParser.ErrorMode.lax), //
-    JEKYLL("_includes", Filters.JEKYLL_FILTERS, Insertions.STANDARD_INSERTIONS, TemplateParser.ErrorMode.warn),
-    LIQP("_includes", Filters.JEKYLL_FILTERS, Insertions.STANDARD_INSERTIONS, TemplateParser.ErrorMode.strict);
+    LIQUID("snippets",
+            Filters.DEFAULT_FILTERS,
+            Insertions.STANDARD_INSERTIONS,
+            TemplateParser.ErrorMode.lax,
+            true,
+            false
+    ), //
+
+    JEKYLL("_includes",
+            Filters.JEKYLL_FILTERS,
+            Insertions.STANDARD_INSERTIONS,
+            TemplateParser.ErrorMode.warn,
+            false,
+            false
+    ),
+
+    LIQP("_includes",
+            Filters.JEKYLL_FILTERS,
+            Insertions.STANDARD_INSERTIONS,
+            TemplateParser.ErrorMode.strict,
+            false,
+            true
+    );
 
     public final String snippetsFolderName;
     private final Filters filters;
     private final Insertions insertions;
     private final TemplateParser.ErrorMode errorMode;
+    private final boolean liquidStyleInclude;
+    private final boolean evaluateInOutputTag;
     private ParseSettings parseSettings;
     private TemplateParser parser;
 
-    Flavor(String snippetsFolderName, Filters filters, Insertions insertions, TemplateParser.ErrorMode errorMode) {
+    Flavor(String snippetsFolderName, Filters filters, Insertions insertions, TemplateParser.ErrorMode errorMode, boolean isLiquidStyleInclude, boolean evaluateInOutputTag) {
         this.snippetsFolderName = snippetsFolderName;
         this.filters = filters;
         this.insertions = insertions;
         this.errorMode = errorMode;
+        this.liquidStyleInclude = isLiquidStyleInclude;
+        this.evaluateInOutputTag = evaluateInOutputTag;
     }
 
     /**
@@ -71,5 +95,17 @@ public enum Flavor {
      */
     public TemplateParser.ErrorMode getErrorMode() {
         return errorMode;
+    }
+
+    /**
+     * Return default behavior for this Flavor whenever expressions must be evaluated in output tag
+     * @return
+     */
+    public boolean isEvaluateInOutputTag() {
+        return evaluateInOutputTag;
+    }
+
+    public boolean isLiquidStyleInclude() {
+        return liquidStyleInclude;
     }
 }

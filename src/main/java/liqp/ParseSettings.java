@@ -22,6 +22,7 @@ public class ParseSettings {
     public final ObjectMapper mapper;
     public final Insertions insertions;
     public final Filters filters;
+    public final boolean evaluateInOutputTag;
 
     public static class Builder {
         Flavor flavor;
@@ -30,6 +31,7 @@ public class ParseSettings {
         ObjectMapper mapper;
         List<Insertion> insertions = new ArrayList<>();
         List<Filter> filters = new ArrayList<>();
+        Boolean evaluateInOutputTag;
 
         public Builder() {
             this.flavor = null;
@@ -95,24 +97,35 @@ public class ParseSettings {
             return this;
         }
 
+        public Builder withEvaluateInOutputTag(boolean evaluateInOutputTag) {
+            this.evaluateInOutputTag = evaluateInOutputTag;
+            return this;
+        }
+
         public ParseSettings build() {
             Flavor fl = this.flavor;
             if (fl == null) {
                 fl = Flavor.LIQUID;
             }
 
+            Boolean evaluateInOutputTag = this.evaluateInOutputTag;
+            if (evaluateInOutputTag == null) {
+                evaluateInOutputTag = fl.isEvaluateInOutputTag();
+            }
+
             return new ParseSettings(fl, this.stripSpacesAroundTags, this.stripSingleLine, this.mapper,
-                    this.insertions, this.filters);
+                    this.insertions, this.filters, evaluateInOutputTag);
         }
     }
 
     private ParseSettings(Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine,
-            ObjectMapper mapper, List<Insertion> insertions, List<Filter> filters) {
+            ObjectMapper mapper, List<Insertion> insertions, List<Filter> filters, boolean evaluateInOutputTag) {
         this.flavor = flavor;
         this.stripSpacesAroundTags = stripSpacesAroundTags;
         this.stripSingleLine = stripSingleLine;
         this.mapper = mapper;
         this.insertions = Insertions.of(insertions);
         this.filters = Filters.of(filters);
+        this.evaluateInOutputTag = evaluateInOutputTag;
     }
 }

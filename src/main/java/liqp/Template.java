@@ -214,7 +214,7 @@ public class Template {
         });
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        LiquidParser parser = new LiquidParser(tokens, this.parseSettings.flavor == Flavor.LIQUID);
+        LiquidParser parser = new LiquidParser(tokens, this.parseSettings.flavor == Flavor.LIQUID, this.parseSettings.evaluateInOutputTag);
 
         parser.removeErrorListeners();
 

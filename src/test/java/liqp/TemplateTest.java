@@ -338,13 +338,13 @@ public class TemplateTest {
 
     @Test
     public void testUseVariableAndTimesFilter() throws RecognitionException {
-        assertPatternResultEquals(TemplateParser.DEFAULT, "true",
+        assertPatternResultEquals(TemplateParser.DEFAULT_LIQP, "true",
                 "{% assign comparingValue = 98 | times: 1.0 %}{{ 99 > comparingValue }}");
     }
 
     @Test
     public void testUseVariableAndDividedByFilter() throws RecognitionException {
-        assertPatternResultEquals(TemplateParser.DEFAULT, "true",
+        assertPatternResultEquals(TemplateParser.DEFAULT_LIQP, "true",
                 "{% assign comparingValue = 98 | divided_by: 1.0 %}{{ 99 > comparingValue }}");
     }
 

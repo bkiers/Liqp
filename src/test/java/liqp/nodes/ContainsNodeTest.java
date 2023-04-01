@@ -13,7 +13,7 @@ public class ContainsNodeTest {
         String data = "{ \"obj\" : { \"groups\" : [1, 2] } }";
 
         // when
-        String rendered = TemplateParser.DEFAULT.parse("{{obj.groups contains 1}}").render(data);
+        String rendered = TemplateParser.DEFAULT_LIQP.parse("{{obj.groups contains 1}}").render(data);
 
         // then
         assertEquals("true", rendered);

@@ -448,12 +448,17 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   }
 
   // output
-  //  : outStart expr filter* OutEnd
-  //  ;
+  // : {evaluateInOutputTag}? outStart evaluate=expr filter* OutEnd
+  // | outStart term filter* OutEnd
+  // ;
   @Override
-  public OutputNode visitOutput(OutputContext ctx) {
-
-    OutputNode node = new OutputNode(visit(ctx.expr()));
+  public LNode visitOutput(OutputContext ctx) {
+    OutputNode node;
+    if (ctx.evaluate != null) {
+      node = new OutputNode(visit(ctx.expr()));
+    } else {
+      node = new OutputNode(visit(ctx.term()));
+    }
 
     for (FilterContext child : ctx.filter()) {
       node.addFilter(visitFilter(child));

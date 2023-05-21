@@ -2,6 +2,8 @@ package liqp.parser.v4;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import liqp.TemplateParser;
 import liquid.parser.v4.LiquidParser;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
@@ -385,12 +387,12 @@ public class LiquidParserTest {
 
         assertThat(
                 texts("{{ true }}", "output"),
-                equalTo(array("{{", "true", "}}"))
+                equalTo(array("{{", "true", "", "}}"))
         );
 
         assertThat(
                 texts("{{ 'some string here' | uppercase }}", "output"),
-                equalTo(array("{{", "'some string here'", "|uppercase", "}}"))
+                equalTo(array("{{", "'some string here'", "|uppercase", "", "}}"))
         );
     }
 
@@ -454,7 +456,7 @@ public class LiquidParserTest {
     }
 
     private static ParseTree parseWithListener(String source, String ruleName, Set<String> customBlocks, Set<String> customTags, BaseErrorListener el, Boolean isLiquidStyleInclude, boolean evaluateInOutputTag) {
-        LiquidParser parser = new LiquidParser(LiquidLexerTest.commonTokenStream(source, false, customBlocks, customTags), isLiquidStyleInclude, evaluateInOutputTag);
+        LiquidParser parser = new LiquidParser(LiquidLexerTest.commonTokenStream(source, false, customBlocks, customTags), isLiquidStyleInclude, evaluateInOutputTag, TemplateParser.ErrorMode.lax);
 
         parser.removeErrorListeners();
         parser.addErrorListener(el);

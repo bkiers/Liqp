@@ -2,28 +2,42 @@ parser grammar LiquidParser;
 
 @parser::header {
     // add java imports here
+import liqp.TemplateParser;
 }
 
 @parser::members {
-    private boolean isLiquidStyleInclude = true;
+    private boolean liquidStyleInclude = true;
     private boolean evaluateInOutputTag = false;
+    private TemplateParser.ErrorMode errorMode = TemplateParser.ErrorMode.lax;
 
     private boolean isLiquidStyleInclude(){
-        return isLiquidStyleInclude;
+        return liquidStyleInclude;
     }
 
     private boolean isJekyllStyleInclude(){
-        return !isLiquidStyleInclude;
+        return !liquidStyleInclude;
     }
 
     private boolean isEvaluateInOutputTag() {
         return evaluateInOutputTag;
     }
 
-    public LiquidParser(TokenStream input, boolean isLiquidStyleInclude, boolean evaluateInOutputTag) {
+    private boolean isStrict() {
+        return errorMode == TemplateParser.ErrorMode.strict;
+    }
+    private boolean isWarn() {
+        return errorMode == TemplateParser.ErrorMode.warn;
+    }
+
+    private boolean isLax() {
+        return errorMode == TemplateParser.ErrorMode.lax;
+    }
+
+    public LiquidParser(TokenStream input, boolean isLiquidStyleInclude, boolean evaluateInOutputTag, TemplateParser.ErrorMode errorMode) {
         this(input);
-        this.isLiquidStyleInclude = isLiquidStyleInclude;
+        this.liquidStyleInclude = isLiquidStyleInclude;
         this.evaluateInOutputTag = evaluateInOutputTag;
+        this.errorMode = errorMode;
     }
 
     public void reportTokenError(String message, Token token) {
@@ -204,7 +218,12 @@ jekyll_include_params
 
 output
  : {evaluateInOutputTag}? outStart evaluate=expr filter* OutEnd
- | {!evaluateInOutputTag}? outStart term filter* OutEnd
+ | {isStrict()}? outStart term filter* OutEnd
+ | {isWarn() || isLax()}? outStart term filter* unparsed=not_out_end? OutEnd
+ ;
+
+not_out_end
+ : ~( OutEnd )*
  ;
 
 filter

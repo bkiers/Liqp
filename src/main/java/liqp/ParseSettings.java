@@ -23,6 +23,7 @@ public class ParseSettings {
     public final Insertions insertions;
     public final Filters filters;
     public final boolean evaluateInOutputTag;
+    public final TemplateParser.ErrorMode errorMode;
 
     public static class Builder {
         Flavor flavor;
@@ -32,6 +33,7 @@ public class ParseSettings {
         List<Insertion> insertions = new ArrayList<>();
         List<Filter> filters = new ArrayList<>();
         Boolean evaluateInOutputTag;
+        TemplateParser.ErrorMode errorMode;
 
         public Builder() {
             this.flavor = null;
@@ -72,6 +74,7 @@ public class ParseSettings {
                     .withStripSpaceAroundTags(stripSpacesAroundTags, stripSingleLine) //
                     .withMapper(settings.mapper) //
                     .withInsertions(settings.insertions.values()) //
+                    .withErrorMode(settings.errorMode)
                     .withFilters(settings.filters.values());
         }
 
@@ -102,6 +105,11 @@ public class ParseSettings {
             return this;
         }
 
+        public Builder withErrorMode(TemplateParser.ErrorMode errorMode) {
+            this.errorMode = errorMode;
+            return this;
+        }
+
         public ParseSettings build() {
             Flavor fl = this.flavor;
             if (fl == null) {
@@ -113,13 +121,18 @@ public class ParseSettings {
                 evaluateInOutputTag = fl.isEvaluateInOutputTag();
             }
 
+            TemplateParser.ErrorMode errorMode = this.errorMode;
+            if (errorMode == null) {
+                errorMode = fl.getErrorMode();
+            }
+
             return new ParseSettings(fl, this.stripSpacesAroundTags, this.stripSingleLine, this.mapper,
-                    this.insertions, this.filters, evaluateInOutputTag);
+                    this.insertions, this.filters, evaluateInOutputTag, errorMode);
         }
     }
 
     private ParseSettings(Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine,
-            ObjectMapper mapper, List<Insertion> insertions, List<Filter> filters, boolean evaluateInOutputTag) {
+            ObjectMapper mapper, List<Insertion> insertions, List<Filter> filters, boolean evaluateInOutputTag, TemplateParser.ErrorMode errorMode) {
         this.flavor = flavor;
         this.stripSpacesAroundTags = stripSpacesAroundTags;
         this.stripSingleLine = stripSingleLine;
@@ -127,5 +140,6 @@ public class ParseSettings {
         this.insertions = Insertions.of(insertions);
         this.filters = Filters.of(filters);
         this.evaluateInOutputTag = evaluateInOutputTag;
+        this.errorMode = errorMode;
     }
 }

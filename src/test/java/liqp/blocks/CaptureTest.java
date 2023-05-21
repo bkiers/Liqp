@@ -132,8 +132,8 @@ public class CaptureTest {
      */
     @Test(expected=LiquidException.class)
     public void capture_detects_bad_syntaxTest() throws Exception {
-
-        TemplateParser.DEFAULT.parse("{{ var2 }}{% capture %}{{ var }} foo {% endcapture %}{{ var2 }}{{ var2 }}");
+        Template template = TemplateParser.DEFAULT.parse("{{ var2 }}{% capture %}{{ var }} foo {% endcapture %}{{ var2 }}{{ var2 }}");
+        String res = template.render("{ \"var\" : \"content\" }");
     }
     
     @Test

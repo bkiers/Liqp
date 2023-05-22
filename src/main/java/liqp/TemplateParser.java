@@ -16,9 +16,9 @@ public class TemplateParser {
     /**
      * Returns a {@link TemplateParser} configured with all default settings for "Liquid" flavor.
      */
-    public static final TemplateParser DEFAULT = Flavor.LIQUID.defaultParser();
+    public static final TemplateParser DEFAULT = Flavor.LIQP.defaultParser();
     public static final TemplateParser DEFAULT_JEKYLL = Flavor.JEKYLL.defaultParser();
-    public static final TemplateParser DEFAULT_LIQP = Flavor.LIQP.defaultParser();
+    public static final TemplateParser DEFAULT_LIQUID = Flavor.LIQUID.defaultParser();
 
     /**
      * Equivalent of

@@ -26,7 +26,7 @@ public enum Flavor {
             Filters.JEKYLL_FILTERS,
             Insertions.STANDARD_INSERTIONS,
             TemplateParser.ErrorMode.strict,
-            false,
+            true,
             true
     );
 

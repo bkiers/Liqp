@@ -1,6 +1,8 @@
 package liqp.nodes;
 
 import liqp.TemplateContext;
+import liqp.TemplateParser;
+import org.jsoup.internal.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +10,15 @@ import java.util.List;
 public class OutputNode implements LNode {
 
     private LNode expression;
+    private String unparsed;
+    private Integer unparsedPosition;
     private List<FilterNode> filters;
 
-    public OutputNode(LNode expression) {
+    public OutputNode(LNode expression, String unparsed, Integer unparsedPosition) {
         this.expression = expression;
-        this.filters = new ArrayList<FilterNode>();
+        this.unparsed = unparsed;
+        this.unparsedPosition = unparsedPosition;
+        this.filters = new ArrayList<>();
     }
 
     public void addFilter(FilterNode filter) {
@@ -26,6 +32,16 @@ public class OutputNode implements LNode {
 
         for (FilterNode node : filters) {
             value = node.apply(value, context);
+        }
+        if (context != null && context.getParseSettings().errorMode == TemplateParser.ErrorMode.warn) {
+            String localUnparsed = unparsed;
+            if (!StringUtil.isBlank(localUnparsed)) {
+                if (localUnparsed.length() > 30) {
+                    localUnparsed = localUnparsed.substring(0, 30) + "...";
+                }
+                context.addError(new RuntimeException("unexpected output: " + localUnparsed + " at position " + unparsedPosition));
+            }
+
         }
 
         return value;

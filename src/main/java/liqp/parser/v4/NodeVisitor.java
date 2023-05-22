@@ -427,7 +427,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  ;
   @Override
   public LNode visitJekyll_include_filename(Jekyll_include_filenameContext ctx) {
-    if (this.parseSettings.flavor != Flavor.JEKYLL) {
+    if (this.parseSettings.liquidStyleInclude) {
       throw new LiquidException("`{% include other_than_tag_end_out_start %}` can only be used for Flavor.JEKYLL", ctx);
     }
     // valid filename in jekyll doesn't allow whitespaces
@@ -455,9 +455,15 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   public LNode visitOutput(OutputContext ctx) {
     OutputNode node;
     if (ctx.evaluate != null) {
-      node = new OutputNode(visit(ctx.expr()));
+      node = new OutputNode(visit(ctx.expr()), null, null);
     } else {
-      node = new OutputNode(visit(ctx.term()));
+      String unparsed = null;
+      Integer unparsedStart = null;
+      if (ctx.unparsed != null) {
+        unparsed = ctx.unparsed.getText();
+        unparsedStart = ctx.unparsed.getStart().getStartIndex();
+      }
+      node = new OutputNode(visit(ctx.term()), unparsed, unparsedStart);
     }
 
     for (FilterContext child : ctx.filter()) {

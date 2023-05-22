@@ -178,36 +178,6 @@ public abstract class Filter extends LValue {
     }
 
     /**
-     * Returns all currently registered filters, except for those registered by default for
-     * {@link Flavor#JEKYLL}.
-     *
-     * @return all filters.
-     * @deprecated Use {@link liqp.ParseSettings#filters}
-     */
-    @Deprecated
-    public static Map<String, Filter> getFilters() {
-        checkInitialized();
-        return getFilters(DEFAULT_FLAVOR);
-    }
-
-    /**
-     * Returns all currently registered filters, including those registered by default for
-     * {@link Flavor#JEKYLL}.
-     *
-     * @return all filters.
-     * @deprecated Use {@link Flavor#getFilters()}
-     */
-    @Deprecated
-    public static Map<String, Filter> getFilters(Flavor flavor) {
-        checkInitialized();
-        HashMap<String, Filter> filters = new HashMap<>(COMMON_FILTERS);
-        if (Flavor.JEKYLL == flavor) {
-            filters.putAll(JEKYLL_FILTERS);
-        }
-        return filters;
-    }
-
-    /**
      * Registers a new filter.
      * 
      * If a filter exists under the same name, it is replaced by this one (except for three special
@@ -237,16 +207,5 @@ public abstract class Filter extends LValue {
         JEKYLL_FILTERS.clear();
         addDefaultFilters();
         updateCommonFilters();
-    }
-
-    @Deprecated
-    public static Filters getCurrentFilters(Flavor flavor) {
-        checkInitialized();
-
-        if (flavor == Flavor.JEKYLL) {
-            return CURRENT_JEKYLL_FILTERS;
-        } else {
-            return CURRENT_COMMON_FILTERS;
-        }
     }
 }

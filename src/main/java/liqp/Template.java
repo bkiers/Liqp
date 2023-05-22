@@ -178,8 +178,7 @@ public class Template {
 
     // TemplateParser constructor
     Template(TemplateParser parser, CharStream input) {
-        this(input, parser.getParseSettings().flavor.getInsertions(), parser.getParseSettings().flavor
-                .getFilters(), parser.getParseSettings());
+        this(input, parser.getParseSettings().flavor.getInsertions(), parser.getParseSettings().filters, parser.getParseSettings());
         this.renderSettings = parser.getRenderSettings();
         this.templateParser = parser;
     }
@@ -261,8 +260,7 @@ public class Template {
      */
     @Deprecated
     public static Template parse(String input) {
-        return new Template(input, Insertion.getCurrentInsertions(), getCurrentFilters(
-                ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
+        return new Template(input, Insertion.getCurrentInsertions(), ParseSettings.DEFAULT_FLAVOR.getFilters(), new ParseSettings.Builder().build());
     }
 
     /**
@@ -304,8 +302,7 @@ public class Template {
      */
     @Deprecated
     public static Template parse(File file) throws IOException {
-        return new Template(file, Insertion.getCurrentInsertions(), getCurrentFilters(
-                ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
+        return new Template(file, Insertion.getCurrentInsertions(), ParseSettings.DEFAULT_FLAVOR.getFilters(), new ParseSettings.Builder().build());
     }
 
     /**
@@ -325,7 +322,7 @@ public class Template {
      */
     @Deprecated
     public static Template parse(File file, ParseSettings settings) throws IOException {
-        return new Template(file, Insertion.getCurrentInsertions(), getCurrentFilters(settings.flavor),
+        return new Template(file, Insertion.getCurrentInsertions(), settings.flavor.getFilters(),
                 settings);
     }
 
@@ -344,7 +341,7 @@ public class Template {
      */
     @Deprecated
     public static Template parse(String input, ParseSettings settings) {
-        return new Template(input, Insertion.getCurrentInsertions(), getCurrentFilters(settings.flavor),
+        return new Template(input, Insertion.getCurrentInsertions(), settings.flavor.getFilters(),
                 settings);
     }
 
@@ -372,7 +369,7 @@ public class Template {
                 new ParseSettings.Builder()//
                         .with(parseSettings) //
                         .withInsertions(Insertion.getCurrentInsertions().values()) //
-                        .withFilters(getCurrentFilters(parseSettings.flavor).values()) //
+                        .withFilters(parseSettings.flavor.getFilters().values()) //
                         .build()) //
                 .withRenderSettings(renderSettings).build();
 
@@ -397,8 +394,7 @@ public class Template {
     @Deprecated
     public static Template parse(String input, ParseSettings parseSettings,
             RenderSettings renderSettings) {
-        return new Template(input, Insertion.getCurrentInsertions(), getCurrentFilters(
-                parseSettings.flavor), parseSettings, renderSettings);
+        return new Template(input, Insertion.getCurrentInsertions(), parseSettings.flavor.getFilters(), parseSettings, renderSettings);
     }
 
     /**
@@ -415,8 +411,7 @@ public class Template {
      */
     @Deprecated
     public static Template parse(InputStream input) {
-        return new Template(input, Insertion.getCurrentInsertions(), getCurrentFilters(
-                ParseSettings.DEFAULT_FLAVOR), new ParseSettings.Builder().build());
+        return new Template(input, Insertion.getCurrentInsertions(), ParseSettings.DEFAULT_FLAVOR.getFilters(), new ParseSettings.Builder().build());
     }
 
     /**
@@ -435,7 +430,7 @@ public class Template {
      */
     @Deprecated
     public static Template parse(InputStream input, ParseSettings settings) {
-        return new Template(input, Insertion.getCurrentInsertions(), getCurrentFilters(settings.flavor),
+        return new Template(input, Insertion.getCurrentInsertions(), settings.flavor.getFilters(),
                 settings);
     }
 
@@ -874,11 +869,6 @@ public class Template {
                 }
             }
         }
-    }
-
-    @SuppressWarnings("deprecation")
-    private static Filters getCurrentFilters(Flavor flavor) {
-        return Filter.getCurrentFilters(flavor);
     }
 
     private static List<ParseTree> children(ParseTree parent) {

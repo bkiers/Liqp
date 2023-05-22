@@ -24,6 +24,7 @@ public class ParseSettings {
     public final Filters filters;
     public final boolean evaluateInOutputTag;
     public final TemplateParser.ErrorMode errorMode;
+    public final boolean liquidStyleInclude;
 
     public static class Builder {
         Flavor flavor;
@@ -34,6 +35,7 @@ public class ParseSettings {
         List<Filter> filters = new ArrayList<>();
         Boolean evaluateInOutputTag;
         TemplateParser.ErrorMode errorMode;
+        Boolean liquidStyleInclude;
 
         public Builder() {
             this.flavor = null;
@@ -75,6 +77,7 @@ public class ParseSettings {
                     .withMapper(settings.mapper) //
                     .withInsertions(settings.insertions.values()) //
                     .withErrorMode(settings.errorMode)
+                    .withLiquidStyleInclude(settings.liquidStyleInclude)
                     .withFilters(settings.filters.values());
         }
 
@@ -110,10 +113,15 @@ public class ParseSettings {
             return this;
         }
 
+        public Builder withLiquidStyleInclude(boolean liquidStyleInclude) {
+            this.liquidStyleInclude = liquidStyleInclude;
+            return this;
+        }
+
         public ParseSettings build() {
             Flavor fl = this.flavor;
             if (fl == null) {
-                fl = Flavor.LIQUID;
+                fl = DEFAULT_FLAVOR;
             }
 
             Boolean evaluateInOutputTag = this.evaluateInOutputTag;
@@ -126,13 +134,18 @@ public class ParseSettings {
                 errorMode = fl.getErrorMode();
             }
 
+            Boolean liquidStyleInclude = this.liquidStyleInclude;
+            if (liquidStyleInclude == null) {
+                liquidStyleInclude = fl.isLiquidStyleInclude();
+            }
+
             return new ParseSettings(fl, this.stripSpacesAroundTags, this.stripSingleLine, this.mapper,
-                    this.insertions, this.filters, evaluateInOutputTag, errorMode);
+                    this.insertions, this.filters, evaluateInOutputTag, errorMode, liquidStyleInclude);
         }
     }
 
     private ParseSettings(Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine,
-            ObjectMapper mapper, List<Insertion> insertions, List<Filter> filters, boolean evaluateInOutputTag, TemplateParser.ErrorMode errorMode) {
+            ObjectMapper mapper, List<Insertion> insertions, List<Filter> filters, boolean evaluateInOutputTag, TemplateParser.ErrorMode errorMode, boolean liquidStyleInclude) {
         this.flavor = flavor;
         this.stripSpacesAroundTags = stripSpacesAroundTags;
         this.stripSingleLine = stripSingleLine;
@@ -141,5 +154,6 @@ public class ParseSettings {
         this.filters = Filters.of(filters);
         this.evaluateInOutputTag = evaluateInOutputTag;
         this.errorMode = errorMode;
+        this.liquidStyleInclude = liquidStyleInclude;
     }
 }

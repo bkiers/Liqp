@@ -31,7 +31,7 @@ public class Map extends Filter {
 
             java.util.Map map;
             if (value instanceof Inspectable) {
-                LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, value);
+                LiquidSupport evaluated = context.getRenderSettings().evaluate(context.getParseSettings().mapper, value);
                 map = evaluated.toLiquid();
             } else {
                 map = (java.util.Map) obj;

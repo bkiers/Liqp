@@ -38,8 +38,7 @@ public final class TestUtils {
         LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer), parseSettings.flavor.isLiquidStyleInclude(), parseSettings.evaluateInOutputTag, parseSettings.flavor.getErrorMode());
 
         LiquidParser.OutputContext root = parser.output();;
-        NodeVisitor visitor = new NodeVisitor(Insertions.STANDARD_INSERTIONS, parseSettings.flavor
-            .getFilters(), parseSettings);
+        NodeVisitor visitor = new NodeVisitor(Insertions.STANDARD_INSERTIONS, parseSettings.filters, parseSettings);
 
         return visitor.visitOutput(root);
     }

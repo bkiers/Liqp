@@ -22,7 +22,7 @@ public enum Flavor {
             false
     ),
 
-    LIQP("_includes",
+    LIQP("snippets",
             Filters.JEKYLL_FILTERS,
             Insertions.STANDARD_INSERTIONS,
             TemplateParser.ErrorMode.strict,

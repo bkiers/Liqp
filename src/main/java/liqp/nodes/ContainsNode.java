@@ -27,7 +27,7 @@ public class ContainsNode extends LValue implements LNode {
         Object needle = rhs.render(context);
 
         if (collection instanceof Inspectable) {
-            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, collection);
+            LiquidSupport evaluated = context.getRenderSettings().evaluate(context.getParseSettings().mapper, collection);
             collection = evaluated.toLiquid();
         }
 

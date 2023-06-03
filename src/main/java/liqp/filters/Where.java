@@ -32,7 +32,7 @@ public class Where extends Filter {
     @Override
     public Object apply(Object value, TemplateContext context, Object... params) {
         WhereImpl delegate;
-        if (context.parseSettings.flavor == Flavor.JEKYLL) {
+        if (context.getParseSettings().flavor == Flavor.JEKYLL) {
             checkParams(params, 2);
             delegate = new JekyllWhereImpl(context, PropertyResolverHelper.INSTANCE);
         } else {

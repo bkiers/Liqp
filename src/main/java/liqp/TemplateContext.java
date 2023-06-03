@@ -23,10 +23,6 @@ public class TemplateContext {
 
     @Deprecated
     public final ProtectionSettings protectionSettings;
-    @Deprecated
-    public final RenderSettings renderSettings;
-    @Deprecated
-    public final ParseSettings parseSettings;
 
     private Map<String, Object> variables;
     private Map<String, Object> environmentMap;
@@ -57,8 +53,6 @@ public class TemplateContext {
         this.parent = null;
         this.parser = parser;
         this.protectionSettings = parser.getProtectionSettings();
-        this.renderSettings = parser.getRenderSettings();
-        this.parseSettings = parser.getParseSettings();
         this.variables = new LinkedHashMap<>(variables);
         this.errors = new ArrayList<>();
     }
@@ -97,7 +91,7 @@ public class TemplateContext {
     }
 
     public void incrementIterations() {
-        this.protectionSettings.incrementIterations();
+        this.getProtectionSettings().incrementIterations();
     }
 
     public boolean containsKey(String key) {
@@ -212,7 +206,7 @@ public class TemplateContext {
     }
 
     public ObjectAppender.Controller newObjectAppender(int estimatedNumberOfAppends) {
-        return renderSettings.getRenderTransformer().newObjectAppender(this,
+        return getRenderSettings().getRenderTransformer().newObjectAppender(this,
                 estimatedNumberOfAppends);
     }
 

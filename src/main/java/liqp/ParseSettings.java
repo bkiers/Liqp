@@ -1,8 +1,6 @@
 package liqp;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -86,7 +84,6 @@ public class ParseSettings {
             return this;
         }
 
-        @Deprecated
         Builder withInsertions(Collection<Insertion> insertions) {
             this.insertions.addAll(insertions);
             return this;
@@ -97,7 +94,6 @@ public class ParseSettings {
             return this;
         }
 
-        @Deprecated
         Builder withFilters(Collection<Filter> filters) {
             this.filters.addAll(filters);
             return this;
@@ -139,19 +135,24 @@ public class ParseSettings {
                 liquidStyleInclude = fl.isLiquidStyleInclude();
             }
 
+            Map<String, Filter> finalFiltersMap = new HashMap<>(fl.getFilters().getMap());
+            finalFiltersMap.putAll(Filters.of(filters).getMap());
+
+            Filters finalFilters = Filters.of(finalFiltersMap);
+
             return new ParseSettings(fl, this.stripSpacesAroundTags, this.stripSingleLine, this.mapper,
-                    this.insertions, this.filters, evaluateInOutputTag, errorMode, liquidStyleInclude);
+                    this.insertions, finalFilters, evaluateInOutputTag, errorMode, liquidStyleInclude);
         }
     }
 
     private ParseSettings(Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine,
-            ObjectMapper mapper, List<Insertion> insertions, List<Filter> filters, boolean evaluateInOutputTag, TemplateParser.ErrorMode errorMode, boolean liquidStyleInclude) {
+            ObjectMapper mapper, List<Insertion> insertions, Filters filters, boolean evaluateInOutputTag, TemplateParser.ErrorMode errorMode, boolean liquidStyleInclude) {
         this.flavor = flavor;
         this.stripSpacesAroundTags = stripSpacesAroundTags;
         this.stripSingleLine = stripSingleLine;
         this.mapper = mapper;
         this.insertions = Insertions.of(insertions);
-        this.filters = Filters.of(filters);
+        this.filters = filters;
         this.evaluateInOutputTag = evaluateInOutputTag;
         this.errorMode = errorMode;
         this.liquidStyleInclude = liquidStyleInclude;

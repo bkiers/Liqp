@@ -13,12 +13,14 @@ import liqp.parser.Flavor;
  * The new main entrance point of this library.
  */
 public class TemplateParser {
-    /**
-     * Returns a {@link TemplateParser} configured with all default settings for "Liquid" flavor.
-     */
-    public static final TemplateParser DEFAULT = Flavor.LIQP.defaultParser();
+
     public static final TemplateParser DEFAULT_JEKYLL = Flavor.JEKYLL.defaultParser();
     public static final TemplateParser DEFAULT_LIQUID = Flavor.LIQUID.defaultParser();
+    public static final TemplateParser DEFAULT_LIQP = Flavor.LIQP.defaultParser();
+    /**
+     * Returns a {@link TemplateParser} configured with all default settings for "Liqp" flavor.
+     */
+    public static final TemplateParser DEFAULT = DEFAULT_LIQP;
 
     /**
      * Equivalent of

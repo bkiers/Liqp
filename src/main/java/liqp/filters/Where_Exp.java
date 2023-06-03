@@ -46,7 +46,7 @@ public class Where_Exp extends Filter {
         }
 
         if (items == null && value instanceof Inspectable) {
-            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, value);
+            LiquidSupport evaluated = context.getRenderSettings().evaluate(context.getParseSettings().mapper, value);
             value = evaluated.toLiquid();
         }
         if (isMap(value)) {

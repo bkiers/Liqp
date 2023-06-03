@@ -213,7 +213,7 @@ public class Template {
         });
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        LiquidParser parser = new LiquidParser(tokens, this.parseSettings.flavor == Flavor.LIQUID, this.parseSettings.evaluateInOutputTag, this.parseSettings.errorMode);
+        LiquidParser parser = new LiquidParser(tokens, this.parseSettings.flavor.isLiquidStyleInclude(), this.parseSettings.evaluateInOutputTag, this.parseSettings.errorMode);
 
         parser.removeErrorListeners();
 
@@ -322,8 +322,7 @@ public class Template {
      */
     @Deprecated
     public static Template parse(File file, ParseSettings settings) throws IOException {
-        return new Template(file, Insertion.getCurrentInsertions(), settings.flavor.getFilters(),
-                settings);
+        return new Template(file, Insertion.getCurrentInsertions(), settings.filters, settings);
     }
 
     /**
@@ -341,8 +340,7 @@ public class Template {
      */
     @Deprecated
     public static Template parse(String input, ParseSettings settings) {
-        return new Template(input, Insertion.getCurrentInsertions(), settings.flavor.getFilters(),
-                settings);
+        return new Template(input, Insertion.getCurrentInsertions(), settings.filters, settings);
     }
 
     /**
@@ -369,7 +367,7 @@ public class Template {
                 new ParseSettings.Builder()//
                         .with(parseSettings) //
                         .withInsertions(Insertion.getCurrentInsertions().values()) //
-                        .withFilters(parseSettings.flavor.getFilters().values()) //
+                        .withFilters(parseSettings.filters.values()) //
                         .build()) //
                 .withRenderSettings(renderSettings).build();
 
@@ -394,7 +392,7 @@ public class Template {
     @Deprecated
     public static Template parse(String input, ParseSettings parseSettings,
             RenderSettings renderSettings) {
-        return new Template(input, Insertion.getCurrentInsertions(), parseSettings.flavor.getFilters(), parseSettings, renderSettings);
+        return new Template(input, Insertion.getCurrentInsertions(), parseSettings.filters, parseSettings, renderSettings);
     }
 
     /**
@@ -430,8 +428,7 @@ public class Template {
      */
     @Deprecated
     public static Template parse(InputStream input, ParseSettings settings) {
-        return new Template(input, Insertion.getCurrentInsertions(), settings.flavor.getFilters(),
-                settings);
+        return new Template(input, Insertion.getCurrentInsertions(), settings.filters, settings);
     }
 
     @Deprecated // Use `parse(file, settings)` instead

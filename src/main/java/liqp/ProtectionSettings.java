@@ -11,6 +11,7 @@ public class ProtectionSettings {
     public final long maxTemplateSizeBytes;
 
     // A global counter that keeps track of the amount of iterations
+    // its a bug!!!!!!!!!!!!!!!!!!!!
     private int iterations = 0;
 
     public static class Builder {

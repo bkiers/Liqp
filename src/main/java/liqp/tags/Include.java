@@ -30,7 +30,7 @@ public class Include extends Tag {
             if (includesDirectory != null) {
                 includeResourceFile = new File(includesDirectory, includeResource + extension);
             } else {
-                includeResourceFile = new File(context.parseSettings.flavor.snippetsFolderName,
+                includeResourceFile = new File(context.getParseSettings().flavor.snippetsFolderName,
                         includeResource + extension);
             }
 
@@ -40,7 +40,7 @@ public class Include extends Tag {
             Map<String, Object> variables = new HashMap<String, Object>();
 
             if (nodes.length > 1) {
-                if (context.parseSettings.flavor != Flavor.JEKYLL) {
+                if (context.getParseSettings().flavor != Flavor.JEKYLL) {
                     // check if there's a optional "with expression"
                     Object value = nodes[1].render(context);
                     context.put(includeResource, value);
@@ -58,7 +58,7 @@ public class Include extends Tag {
 
             return template.renderToObjectUnguarded(variables, context, true);
         } catch (Exception e) {
-            if (context.renderSettings.showExceptionsFromInclude) {
+            if (context.getRenderSettings().showExceptionsFromInclude) {
                 throw new RuntimeException("problem with evaluating include", e);
             } else {
                 return "";

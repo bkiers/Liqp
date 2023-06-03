@@ -16,6 +16,7 @@ public class TemplateContext {
     public static final String REGISTRY_IFCHANGED = "ifchanged";
     public static final String REGISTRY_FOR = "for";
     public static final String REGISTRY_FOR_STACK = "for_stack";
+    public static final String REGISTRY_ITERATION_PROTECTOR = "iteration_protector";
 
     protected TemplateContext parent;
 
@@ -91,7 +92,13 @@ public class TemplateContext {
     }
 
     public void incrementIterations() {
-        this.getProtectionSettings().incrementIterations();
+        Map<String, Integer> iteratorProtector = getRegistry(REGISTRY_ITERATION_PROTECTOR);
+        if (!iteratorProtector.containsKey(REGISTRY_ITERATION_PROTECTOR)) {
+            iteratorProtector.put(REGISTRY_ITERATION_PROTECTOR, 0);
+        }
+        int value = iteratorProtector.get(REGISTRY_ITERATION_PROTECTOR) + 1;
+        iteratorProtector.put(REGISTRY_ITERATION_PROTECTOR, value);
+        this.getProtectionSettings().checkForMaxIterations(value);
     }
 
     public boolean containsKey(String key) {
@@ -178,7 +185,7 @@ public class TemplateContext {
             return parent.getRegistry(registryName);
         }
 
-        if (!Arrays.asList(REGISTRY_CYCLE, REGISTRY_IFCHANGED, REGISTRY_FOR, REGISTRY_FOR_STACK)
+        if (!Arrays.asList(REGISTRY_CYCLE, REGISTRY_IFCHANGED, REGISTRY_FOR, REGISTRY_FOR_STACK, REGISTRY_ITERATION_PROTECTOR)
                 .contains(registryName)) {
             // this checking exists for safety of library, any listed type is expected, not more
             throw new RuntimeException("unknown registry type: " + registryName);

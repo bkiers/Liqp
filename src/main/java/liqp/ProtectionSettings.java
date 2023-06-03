@@ -10,10 +10,6 @@ public class ProtectionSettings {
     public final long maxRenderTimeMillis;
     public final long maxTemplateSizeBytes;
 
-    // A global counter that keeps track of the amount of iterations
-    // its a bug!!!!!!!!!!!!!!!!!!!!
-    private int iterations = 0;
-
     public static class Builder {
 
         private int maxIterations;
@@ -60,11 +56,8 @@ public class ProtectionSettings {
         this.maxTemplateSizeBytes = maxTemplateSizeBytes;
     }
 
-    public void incrementIterations() {
-
-        this.iterations++;
-
-        if (this.iterations > this.maxIterations) {
+    public void checkForMaxIterations(int iterations) {
+        if (iterations > this.maxIterations) {
             throw new ExceededMaxIterationsException(this.maxIterations);
         }
     }

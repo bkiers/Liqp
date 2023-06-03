@@ -11,6 +11,7 @@ public enum Flavor {
             Insertions.STANDARD_INSERTIONS,
             TemplateParser.ErrorMode.lax,
             true,
+            true,
             false
     ), //
 
@@ -18,6 +19,7 @@ public enum Flavor {
             Filters.JEKYLL_FILTERS,
             Insertions.STANDARD_INSERTIONS,
             TemplateParser.ErrorMode.warn,
+            false,
             false,
             false
     ),
@@ -27,6 +29,7 @@ public enum Flavor {
             Insertions.STANDARD_INSERTIONS,
             TemplateParser.ErrorMode.strict,
             true,
+            true,
             true
     );
 
@@ -35,16 +38,24 @@ public enum Flavor {
     private final Insertions insertions;
     private final TemplateParser.ErrorMode errorMode;
     private final boolean liquidStyleInclude;
+    private final boolean liquidStyleWhere;
     private final boolean evaluateInOutputTag;
     private ParseSettings parseSettings;
     private TemplateParser parser;
 
-    Flavor(String snippetsFolderName, Filters filters, Insertions insertions, TemplateParser.ErrorMode errorMode, boolean isLiquidStyleInclude, boolean evaluateInOutputTag) {
+    Flavor(String snippetsFolderName,
+           Filters filters,
+           Insertions insertions,
+           TemplateParser.ErrorMode errorMode,
+           boolean isLiquidStyleInclude,
+           boolean isLiquidStyleWhere,
+           boolean evaluateInOutputTag) {
         this.snippetsFolderName = snippetsFolderName;
         this.filters = filters;
         this.insertions = insertions;
         this.errorMode = errorMode;
         this.liquidStyleInclude = isLiquidStyleInclude;
+        this.liquidStyleWhere = isLiquidStyleWhere;
         this.evaluateInOutputTag = evaluateInOutputTag;
     }
 
@@ -107,5 +118,9 @@ public enum Flavor {
 
     public boolean isLiquidStyleInclude() {
         return liquidStyleInclude;
+    }
+
+    public boolean isLiquidStyleWhere() {
+        return liquidStyleWhere;
     }
 }

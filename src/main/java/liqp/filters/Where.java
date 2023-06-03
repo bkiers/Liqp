@@ -32,12 +32,12 @@ public class Where extends Filter {
     @Override
     public Object apply(Object value, TemplateContext context, Object... params) {
         WhereImpl delegate;
-        if (context.getParseSettings().flavor == Flavor.JEKYLL) {
-            checkParams(params, 2);
-            delegate = new JekyllWhereImpl(context, PropertyResolverHelper.INSTANCE);
-        } else {
+        if (context.getParseSettings().flavor.isLiquidStyleWhere()) {
             checkParams(params, 1, 2);
             delegate = new LiquidWhereImpl(context, PropertyResolverHelper.INSTANCE);
+        } else {
+            checkParams(params, 2);
+            delegate = new JekyllWhereImpl(context, PropertyResolverHelper.INSTANCE);
         }
         return delegate.apply(value, params);
     }

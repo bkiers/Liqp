@@ -34,3 +34,8 @@ jobs:
           cache: 'maven'
       - name: Build & Test
         run: ./mvnw -B verify
+      - name: Generate JaCoCo Badge
+        id: jacoco
+        uses: cicirello/jacoco-badge-generator@v2
+        with:
+          generate-branches-badge: true

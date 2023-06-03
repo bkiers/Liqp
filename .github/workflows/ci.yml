@@ -43,6 +43,7 @@ jobs:
         run: ./mvnw -B verify
       - name: Generate JaCoCo Badge
         if: ${{ matrix.jacoco }}
+        uses: cicirello/jacoco-badge-generator@v2
         id: jacoco
         with:
           generate-branches-badge: true

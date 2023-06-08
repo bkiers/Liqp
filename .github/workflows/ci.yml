@@ -1,5 +1,8 @@
 name: ci
-
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  
 on:
   push:
     branches:
@@ -7,17 +10,7 @@ on:
   pull_request:
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Stop old builds
-        if: github.ref != 'refs/heads/master'
-        uses: styfle/cancel-workflow-action@0.9.1
-        with:
-          access_token: ${{ github.token }}
-
   build:
-    needs: setup
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -52,7 +45,7 @@ jobs:
           generate-branches-badge: true
           branches-badge-filename: branches.svg
       - name: Commit and push the badge (if it changed)
-        if: ${{ matrix.jacoco }}
+        if: ${{ matrix.jacoco && contains(github.ref, 'master') }}
         uses: EndBug/add-and-commit@v7
         with:
           default_author: github_actions

@@ -10,6 +10,7 @@ import java.util.Map;
 import liqp.LValue;
 import liqp.ParseSettings;
 import liqp.TemplateContext;
+import liqp.TemplateParser;
 import liqp.parser.Flavor;
 
 /**
@@ -20,27 +21,6 @@ import liqp.parser.Flavor;
  * -- https://github.com/Shopify/liquid/wiki/Liquid-for-Designers
  */
 public abstract class Filter extends LValue {
-
-    /**
-     * A map holding all common filters.
-     */
-    private static final Map<String, Filter> COMMON_FILTERS = new HashMap<>();
-
-    private static final Map<String, Filter> JEKYLL_FILTERS = new HashMap<>();
-
-    private static Filters CURRENT_COMMON_FILTERS = null;
-    private static Filters CURRENT_JEKYLL_FILTERS = null;
-
-    private static void addDefaultFilters() {
-        COMMON_FILTERS.putAll(Filters.COMMON_FILTERS.getMap());
-        JEKYLL_FILTERS.putAll(Filters.JEKYLL_EXTRA_FILTERS.getMap());
-        updateCommonFilters();
-    }
-
-    private static void updateCommonFilters() {
-        CURRENT_COMMON_FILTERS = Filters.of(COMMON_FILTERS);
-        CURRENT_JEKYLL_FILTERS = CURRENT_COMMON_FILTERS.mergeWith(Filters.of(JEKYLL_FILTERS));
-    }
 
     /**
      * The name of the filter.
@@ -166,15 +146,7 @@ public abstract class Filter extends LValue {
      */
     @Deprecated
     public static Filter getFilter(String name) {
-        checkInitialized();
-
-        Filter filter = COMMON_FILTERS.get(name);
-
-        if (filter == null) {
-            throw new RuntimeException("unknown filter: " + name);
-        }
-
-        return filter;
+        return TemplateParser._GET_CURRENT().getParseSettings().filters.get(name);
     }
 
     /**
@@ -191,21 +163,15 @@ public abstract class Filter extends LValue {
      */
     @Deprecated
     public static void registerFilter(Filter filter) {
-        checkInitialized();
-        COMMON_FILTERS.put(filter.name, filter);
-        updateCommonFilters();
-    }
-
-    private static void checkInitialized() {
-        if (CURRENT_COMMON_FILTERS == null) {
-            resetFilters();
+        synchronized (TemplateParser.class) {
+            TemplateParser._SET_CURRENT( new TemplateParser.Builder(TemplateParser._GET_CURRENT())
+                    .withParseSettings(new ParseSettings.Builder(TemplateParser._GET_CURRENT().getParseSettings()).with(filter).build())
+                    .build());
         }
     }
 
+
     private static void resetFilters() {
-        COMMON_FILTERS.clear();
-        JEKYLL_FILTERS.clear();
-        addDefaultFilters();
-        updateCommonFilters();
+        TemplateParser._SET_CURRENT(TemplateParser.DEFAULT);
     }
 }

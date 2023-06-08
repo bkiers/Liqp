@@ -43,6 +43,18 @@ public class ParseSettings {
             mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         }
 
+        public Builder(ParseSettings other) {
+            this.flavor = other.flavor;
+            this.stripSpacesAroundTags = other.stripSpacesAroundTags;
+            this.stripSingleLine = other.stripSingleLine;
+            this.mapper = other.mapper;
+            this.insertions = new ArrayList<>(other.insertions.values());
+            this.filters = new ArrayList<>(other.filters.values());
+            this.evaluateInOutputTag = other.evaluateInOutputTag;
+            this.errorMode = other.errorMode;
+            this.liquidStyleInclude = other.liquidStyleInclude;
+        }
+
         public Builder withFlavor(Flavor flavor) {
             this.flavor = flavor;
             return this;
@@ -135,10 +147,7 @@ public class ParseSettings {
                 liquidStyleInclude = fl.isLiquidStyleInclude();
             }
 
-            Map<String, Filter> finalFiltersMap = new HashMap<>(fl.getFilters().getMap());
-            finalFiltersMap.putAll(Filters.of(filters).getMap());
-
-            Filters finalFilters = Filters.of(finalFiltersMap);
+            Filters finalFilters = fl.getFilters().mergeWith(filters);
 
             return new ParseSettings(fl, this.stripSpacesAroundTags, this.stripSingleLine, this.mapper,
                     this.insertions, finalFilters, evaluateInOutputTag, errorMode, liquidStyleInclude);

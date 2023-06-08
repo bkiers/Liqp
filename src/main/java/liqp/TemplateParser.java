@@ -23,6 +23,37 @@ public class TemplateParser {
     public static final TemplateParser DEFAULT = DEFAULT_LIQP;
 
     /**
+     * Internal use only.
+     * Replacement for all static methods. Now all the static context methods will work with this field.
+     * Since parser is immutable, all changes will be reflected via overriding this field.
+     * Therefore, holding reference to this object is useless as it will be overridden any next good chance.
+     * Concurrent modifications will cause unpredictable behavior, so it is not recommended.
+     * Internally  field modified only in synchronized block where <code>TemplateParser.class</code> object is used as a monitor.
+     */
+    static TemplateParser _CURRENT_HOLDER = DEFAULT;
+
+    /**
+     * Internal use only.
+     * Get the current static context parser.
+     * @see #_CURRENT_HOLDER
+     */
+    public static TemplateParser _GET_CURRENT() {
+        return _CURRENT_HOLDER;
+    }
+
+    /**
+     * Internal use only.
+     * set the current static context parser.
+     * @see #_CURRENT_HOLDER
+     */
+    public static void _SET_CURRENT(TemplateParser newCurrent) {
+        if (newCurrent == null) {
+            newCurrent = DEFAULT;
+        }
+        _CURRENT_HOLDER = newCurrent;
+    }
+
+    /**
      * Equivalent of
      * <code>
      * Liquid::Template.error_mode = :strict # Raises a SyntaxError when invalid syntax is used

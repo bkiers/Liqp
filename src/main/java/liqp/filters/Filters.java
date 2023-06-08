@@ -1,11 +1,7 @@
 package liqp.filters;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -158,6 +154,30 @@ public final class Filters {
 
         Map<String, Filter> newMap = new HashMap<>(map);
         newMap.putAll(other.map);
+        return new Filters(newMap);
+    }
+
+    /**
+     * Returns a new {@link Filters} instance that combines this instance with the given filters.
+     *
+     * If there are filters with the same name in both instances, then the {@code other} filter takes
+     * precedence.
+     *
+     * @param other
+     *            The other Filters instance.
+     * @return A new, merged instance.
+     */
+    public Filters mergeWith(List<Filter> other) {
+        Objects.requireNonNull(other);
+
+        if (other.isEmpty()) {
+            return this;
+        } else if (this.map.isEmpty()) {
+            return Filters.of(other);
+        }
+
+        Map<String, Filter> newMap = new HashMap<>(map);
+        newMap.putAll(Filters.of(other).map);
         return new Filters(newMap);
     }
 

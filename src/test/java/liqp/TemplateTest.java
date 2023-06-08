@@ -25,8 +25,7 @@ import java.util.Map;
 
 import static liqp.TestUtils.assertPatternResultEquals;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 public class TemplateTest {
 
@@ -346,6 +345,12 @@ public class TemplateTest {
     public void testUseVariableAndDividedByFilter() throws RecognitionException {
         assertPatternResultEquals(TemplateParser.DEFAULT, "true",
                 "{% assign comparingValue = 98 | divided_by: 1.0 %}{{ 99 > comparingValue }}");
+    }
+
+    @Test
+    public void testWalk() {
+        String res = TemplateParser.DEFAULT.parse("{{foo.a}}").toStringTree();
+        assertNotNull(res);
     }
 
 }

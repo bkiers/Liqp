@@ -3,7 +3,7 @@
   <groupId>nl.big-o</groupId>
   <artifactId>liqp</artifactId>
   <packaging>jar</packaging>
-  <version>0.8.5.3-SNAPSHOT</version>
+  <version>0.8.5.4-SNAPSHOT</version>
   <name>Liqp</name>
   <description>A Java implementation of the Liquid templating engine backed up by an ANTLR grammar.</description>
   <url>https://github.com/bkiers/Liqp</url>
@@ -61,7 +61,7 @@
 
     <antlr.version>3.5.1</antlr.version>
     <antlr4.version>4.7.2</antlr4.version>
-    <jackson.databind.version>2.13.4.1</jackson.databind.version>
+    <jackson.databind.version>2.13.4.2</jackson.databind.version>
     <jackson.version>2.13.2</jackson.version>
     <jsoup.version>1.15.3</jsoup.version>
     <junit.version>4.13.1</junit.version>
@@ -218,7 +218,34 @@
           </excludes>
         </configuration>
       </plugin>
-      
+
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.10</version>
+        <configuration>
+          <excludes>
+            <exclude>**/liquid/parser/v4/**</exclude>
+            <exclude>**/liqp/Examples.class</exclude>
+            <exclude>**/liqp/Examples$*.class</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
@@ -230,6 +257,21 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+              <useDependencyReducedPomInJar>true</useDependencyReducedPomInJar>
+              <artifactSet>
+                <includes>
+                  <include>org.antlr</include>
+                </includes>
+              </artifactSet>
+              <filters>
+                <filter>
+                  <artifact>org.antlr</artifact>
+                  <excludes>
+                    <exclude>META-INF/MANIFEST.MF</exclude>
+                  </excludes>
+                </filter>
+              </filters>
               <relocations>
                 <relocation>
                   <pattern>org.antlr</pattern>

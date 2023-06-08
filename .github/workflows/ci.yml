@@ -51,4 +51,3 @@ jobs:
           default_author: github_actions
           message: 'commit badge'
           add: '*.svg'
-          

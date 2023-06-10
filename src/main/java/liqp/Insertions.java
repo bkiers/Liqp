@@ -76,7 +76,7 @@ public final class Insertions {
             return EMPTY;
         }
         return new Insertions(insertions.stream().collect(Collectors.toMap(Insertion::getName, Function
-                .identity())));
+                .identity(), (a, b) -> b)));
     }
 
     /**
@@ -149,7 +149,7 @@ public final class Insertions {
      * @return The set of names.
      */
     private Set<String> getNames(Predicate<? super Map.Entry<String, Insertion>> predicate) {
-        return this.map.entrySet().stream().filter(predicate).map(x -> x.getKey()).collect(Collectors
+        return this.map.entrySet().stream().filter(predicate).map(Map.Entry::getKey).collect(Collectors
                 .toSet());
     }
 
@@ -202,5 +202,14 @@ public final class Insertions {
      */
     public Collection<Insertion> values() {
         return Collections.unmodifiableCollection(map.values());
+    }
+
+    /**
+     * Returns an unmodifiable map of the stored {@link Insertion} names.
+     *
+     * @return The map.
+     */
+    public Map<String, Insertion> asMap() {
+        return Collections.unmodifiableMap(map);
     }
 }

@@ -140,7 +140,7 @@ public class DateTest {
 
         assertThat(filter.apply(1152098955, context,"%m/%d/%Y"), is((Object)"07/05/2006"));
         assertThat(filter.apply("1152098955", context,"%m/%d/%Y"), is((Object)"07/05/2006"));
-        TemplateContext anotherZone = new TemplateContext(new ProtectionSettings.Builder().build(),
+        TemplateContext anotherZone = new TemplateContext(ProtectionSettings.DEFAULT,
                 new RenderSettings.Builder().withDefaultTimeZone(ZoneOffset.UTC).build(),
                 new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build(),
                 new LinkedHashMap<>());
@@ -222,8 +222,8 @@ public class DateTest {
 
     @Test
     public void test240() {
-        assertEquals("10-13", Template.parse("{{ \"2022-10-13 12:06:04\" | date: \"%m-%e\" }}").render());
-        assertEquals("10-13", Template.parse("{{ \"2022-10-13\" | date: \"%m-%e\" }}").render());
-        assertEquals("10-13", Template.parse("{{ \"13-10-2022\" | date: \"%m-%e\" }}").render());
+        assertEquals("10-13", TemplateParser.DEFAULT.parse("{{ \"2022-10-13 12:06:04\" | date: \"%m-%e\" }}").render());
+        assertEquals("10-13", TemplateParser.DEFAULT.parse("{{ \"2022-10-13\" | date: \"%m-%e\" }}").render());
+        assertEquals("10-13", TemplateParser.DEFAULT.parse("{{ \"13-10-2022\" | date: \"%m-%e\" }}").render());
     }
 }

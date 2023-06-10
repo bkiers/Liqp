@@ -22,13 +22,4 @@ public abstract class Block extends Insertion {
         super(name);
     }
 
-    /**
-     * Variant of {@link #registerInsertion(Insertion)} with strict limitation to {@link Block} subtype.
-     * 
-     * @deprecated Use {@link ParseSettings}.
-     */
-    @Deprecated
-    public static void registerBlock(Block block) {
-        registerInsertion(block);
-    }
 }

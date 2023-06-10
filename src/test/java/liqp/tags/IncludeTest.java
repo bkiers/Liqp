@@ -36,12 +36,6 @@ public class IncludeTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    @Before
-    public void init() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        Method method = Filter.class.getDeclaredMethod("resetFilters");
-        method.setAccessible(true);
-        method.invoke(null);
-    }
 
     @Test
     public void renderTest() throws RecognitionException {
@@ -87,15 +81,15 @@ public class IncludeTest {
 
     @Test
     public void testIncludeWithExpression() {
-        Template template = Template.parse("{% include include_read_include_var var=otherVar %}", jekyll());
+        Template template = TemplateParser.DEFAULT_JEKYLL.parse("{% include include_read_include_var var=otherVar %}");
         String res = template.render("{ \"otherVar\" : \"TEST\"}");
         assertEquals("TEST", res);
     }
 
     @Test
     public void testIncludeWithMultipleExpressions() {
-      Template template = Template.parse(
-          "{% include include_read_include_var foo=bar var=otherVar var=\"var\" var=yetAnotherVar %}", jekyll());
+      Template template = TemplateParser.DEFAULT_JEKYLL.parse(
+          "{% include include_read_include_var foo=bar var=otherVar var=\"var\" var=yetAnotherVar %}");
       String res = template.render("{ \"otherVar\" : \"TEST\", \"yetAnotherVar\": \"ANOTHER\"}");
       assertEquals("ANOTHER", res);
     }
@@ -339,7 +333,7 @@ public class IncludeTest {
         ParseSettings parseSettings = new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build();
         RenderSettings renderSettings = new RenderSettings.Builder().withShowExceptionsFromInclude(false).build();
         @SuppressWarnings("deprecation")
-        Template template = Template.parse(index, parseSettings).withRenderSettings(renderSettings);
+        Template template = new TemplateParser.Builder().withRenderSettings(renderSettings).build().parse(index);
 
         // when
         String result = template.render();

@@ -91,7 +91,7 @@ public final class Filters {
             return EMPTY;
         }
         return new Filters(filters.stream().collect(Collectors.toMap(Filter::getName, Function
-                .identity())));
+                .identity(), (a, b) -> b)));
     }
 
     /**

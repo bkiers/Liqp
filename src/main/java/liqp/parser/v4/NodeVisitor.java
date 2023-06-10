@@ -27,11 +27,6 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   private final ParseSettings parseSettings;
   private boolean isRootBlock = true;
 
-  @Deprecated
-  public NodeVisitor(Map<String, Insertion> insertions, Map<String, Filter> filters, ParseSettings parseSettings) {
-    this(Insertions.of(insertions), Filters.of(filters), parseSettings);
-  }
-
   public NodeVisitor(Insertions insertions, Filters filters, ParseSettings parseSettings) {
     if (insertions == null)
       throw new IllegalArgumentException("tags == null");

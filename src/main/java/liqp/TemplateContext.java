@@ -22,9 +22,6 @@ public class TemplateContext {
 
     private final TemplateParser parser;
 
-    @Deprecated
-    public final ProtectionSettings protectionSettings;
-
     private Map<String, Object> variables;
     private Map<String, Object> environmentMap;
     private Map<String, Object> registry;
@@ -35,15 +32,7 @@ public class TemplateContext {
         this(TemplateParser.DEFAULT, new LinkedHashMap<>());
     }
 
-    @Deprecated // Use `TemplateContext(parser, variables)` instead
-    public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings,
-            Flavor flavor, Map<String, Object> variables) {
-        this(new TemplateParser.Builder().withProtectionSettings(protectionSettings)
-                .withRenderSettings(renderSettings).withParseSettings(new ParseSettings.Builder()
-                        .withFlavor(flavor).build()).build(), variables);
-    }
 
-    @Deprecated // Use `TemplateContext(parser, variables)` instead
     public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings,
             ParseSettings parseSettings, Map<String, Object> variables) {
         this(new TemplateParser.Builder().withProtectionSettings(protectionSettings)
@@ -53,7 +42,6 @@ public class TemplateContext {
     public TemplateContext(TemplateParser parser, Map<String, Object> variables) {
         this.parent = null;
         this.parser = parser;
-        this.protectionSettings = parser.getProtectionSettings();
         this.variables = new LinkedHashMap<>(variables);
         this.errors = new ArrayList<>();
     }
@@ -61,17 +49,6 @@ public class TemplateContext {
     public TemplateContext(TemplateContext parent) {
         this(parent.getParser(), new LinkedHashMap<String, Object>());
         this.parent = parent;
-    }
-
-    /**
-     * Deprecated. Use {@link TemplateContext#newChildContext(Map)} instead.
-     * 
-     * @param parent The parent context.
-     * @param variables The variables to use in this child context.
-     */
-    @Deprecated
-    public TemplateContext(TemplateContext parent, Map<String, Object> variables) {
-        this(variables, parent);
     }
 
     protected TemplateContext(Map<String, Object> variables, TemplateContext parent) {

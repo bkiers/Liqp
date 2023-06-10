@@ -23,37 +23,6 @@ public class TemplateParser {
     public static final TemplateParser DEFAULT = DEFAULT_LIQP;
 
     /**
-     * Internal use only.
-     * Replacement for all static methods. Now all the static context methods will work with this field.
-     * Since parser is immutable, all changes will be reflected via overriding this field.
-     * Therefore, holding reference to this object is useless as it will be overridden any next good chance.
-     * Concurrent modifications will cause unpredictable behavior, so it is not recommended.
-     * Internally  field modified only in synchronized block where <code>TemplateParser.class</code> object is used as a monitor.
-     */
-    static TemplateParser _CURRENT_HOLDER = DEFAULT;
-
-    /**
-     * Internal use only.
-     * Get the current static context parser.
-     * @see #_CURRENT_HOLDER
-     */
-    public static TemplateParser _GET_CURRENT() {
-        return _CURRENT_HOLDER;
-    }
-
-    /**
-     * Internal use only.
-     * set the current static context parser.
-     * @see #_CURRENT_HOLDER
-     */
-    public static void _SET_CURRENT(TemplateParser newCurrent) {
-        if (newCurrent == null) {
-            newCurrent = DEFAULT;
-        }
-        _CURRENT_HOLDER = newCurrent;
-    }
-
-    /**
      * Equivalent of
      * <code>
      * Liquid::Template.error_mode = :strict # Raises a SyntaxError when invalid syntax is used
@@ -132,19 +101,19 @@ public class TemplateParser {
     }
 
     public Template parse(File file) throws IOException {
-        return new Template.BuiltTemplate(this, CharStreams.fromPath(file.toPath()));
+        return new Template(this, CharStreams.fromPath(file.toPath()));
     }
 
     public Template parse(String input) {
-        return new Template.BuiltTemplate(this, CharStreams.fromString(input));
+        return new Template(this, CharStreams.fromString(input));
     }
 
     public Template parse(InputStream input) throws IOException {
-        return new Template.BuiltTemplate(this, CharStreams.fromStream(input));
+        return new Template(this, CharStreams.fromStream(input));
     }
 
     public Template parse(Reader reader) throws IOException {
-        return new Template.BuiltTemplate(this, CharStreams.fromReader(reader));
+        return new Template(this, CharStreams.fromReader(reader));
     }
 
     public ParseSettings getParseSettings() {

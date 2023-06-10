@@ -135,43 +135,4 @@ public abstract class Filter extends LValue {
         return params[index];
     }
 
-    /**
-     * Retrieves a filter with a specific name.
-     *
-     * @param name
-     *            the name of the filter to retrieve.
-     *
-     * @return a filter with a specific name.
-     * @deprecated Use {@link Filters#get(String)}
-     */
-    @Deprecated
-    public static Filter getFilter(String name) {
-        return TemplateParser._GET_CURRENT().getParseSettings().filters.get(name);
-    }
-
-    /**
-     * Registers a new filter.
-     * 
-     * If a filter exists under the same name, it is replaced by this one (except for three special
-     * Jekyll filters).
-     * 
-     * Note that this method is unsafe, as it affects all uses of this class.
-     * 
-     * @param filter
-     *            the filter to be registered.
-     * @deprecated Use {@link liqp.ParseSettings.Builder#with(Filter)}
-     */
-    @Deprecated
-    public static void registerFilter(Filter filter) {
-        synchronized (TemplateParser.class) {
-            TemplateParser._SET_CURRENT( new TemplateParser.Builder(TemplateParser._GET_CURRENT())
-                    .withParseSettings(new ParseSettings.Builder(TemplateParser._GET_CURRENT().getParseSettings()).with(filter).build())
-                    .build());
-        }
-    }
-
-
-    private static void resetFilters() {
-        TemplateParser._SET_CURRENT(TemplateParser.DEFAULT);
-    }
 }

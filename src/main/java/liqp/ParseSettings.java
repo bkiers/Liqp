@@ -88,11 +88,16 @@ public class ParseSettings {
                     .withInsertions(settings.insertions.values()) //
                     .withErrorMode(settings.errorMode)
                     .withLiquidStyleInclude(settings.liquidStyleInclude)
-                    .withFilters(settings.filters.values());
+                    .with(settings.filters.values());
         }
 
         public Builder with(Insertion insertion) {
             this.insertions.add(insertion);
+            return this;
+        }
+
+        public Builder with(Filter filter) {
+            this.filters.add(filter);
             return this;
         }
 
@@ -101,12 +106,7 @@ public class ParseSettings {
             return this;
         }
 
-        public Builder with(Filter filter) {
-            filters.add(filter);
-            return this;
-        }
-
-        Builder withFilters(Collection<Filter> filters) {
+        public Builder with(Collection<Filter> filters) {
             this.filters.addAll(filters);
             return this;
         }
@@ -152,6 +152,7 @@ public class ParseSettings {
             return new ParseSettings(fl, this.stripSpacesAroundTags, this.stripSingleLine, this.mapper,
                     this.insertions, finalFilters, evaluateInOutputTag, errorMode, liquidStyleInclude);
         }
+
     }
 
     private ParseSettings(Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine,

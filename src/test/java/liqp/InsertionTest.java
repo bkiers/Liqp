@@ -37,42 +37,6 @@ public class InsertionTest {
                 templateString);
         assertThat("blk[a(sim)bblk[c]d]", is(template.render()));
     }
-    
-    @SuppressWarnings("deprecation")
-    @Test
-    public void testNestedCustomTagsAndBlocksDeprecated() {
-        String blockName = "block" + System.currentTimeMillis();
-
-        Block.registerBlock(new Block(blockName) {
-            @Override
-            public Object render(TemplateContext context, LNode... nodes) {
-                String data = (nodes.length >= 2 ? nodes[1].render(context) : nodes[0].render(context)).toString();
-
-                return "blk[" + data + "]";
-            }
-        });
-
-        Tag.registerTag(new Tag("simple") {
-            @Override
-            public Object render(TemplateContext context, LNode... nodes) {
-                return "(sim)";
-            }
-        });
-        String templateString = "{% "+blockName+" %}a{% simple %}b{% "+blockName+" %}c{% end"+blockName+" %}d{% end"+blockName+" %}";
-        
-        try {
-            // The default TemplateParser is not affected by the global registrations above
-            TemplateParser.DEFAULT.parse(templateString);
-            fail("Should have thrown a LiquidException");
-        } catch (LiquidException e) {
-            // expected
-        }
-        
-        // The old API is affected (beware of dangerous side effects)
-        Template template = Template.parse(templateString);
-
-        assertThat("blk[a(sim)bblk[c]d]", is(template.render()));
-    }
 
     @Test
     public void testNestedCustomTagsAndBlocksAsOneCollection() {

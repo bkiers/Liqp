@@ -409,7 +409,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  ;
   @Override
   public LNode visitJekyll_include_output(Jekyll_include_outputContext ctx) {
-    if (this.parseSettings.flavor != Flavor.JEKYLL)
+    if (this.parseSettings.liquidStyleInclude)
       throw new LiquidException("`{% include ouput %}` can only be used for Flavor.JEKYLL", ctx);
 
     return visitOutput(ctx.output());

@@ -35,7 +35,7 @@ public final class TestUtils {
         throws Exception {
 
         LiquidLexer lexer = new LiquidLexer(CharStreams.fromString("{{ " + source + " }}"));
-        LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer), parseSettings.flavor.isLiquidStyleInclude(), parseSettings.evaluateInOutputTag, parseSettings.flavor.getErrorMode());
+        LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer), parseSettings.liquidStyleInclude, parseSettings.evaluateInOutputTag, parseSettings.errorMode);
 
         LiquidParser.OutputContext root = parser.output();;
         NodeVisitor visitor = new NodeVisitor(Insertions.STANDARD_INSERTIONS, parseSettings.filters, parseSettings);

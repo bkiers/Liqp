@@ -147,21 +147,23 @@ public class ParseSettings {
                 liquidStyleInclude = fl.isLiquidStyleInclude();
             }
 
+            Insertions allInsertions = fl.getInsertions().mergeWith(Insertions.of(this.insertions));
+
             Filters finalFilters = fl.getFilters().mergeWith(filters);
 
             return new ParseSettings(fl, this.stripSpacesAroundTags, this.stripSingleLine, this.mapper,
-                    this.insertions, finalFilters, evaluateInOutputTag, errorMode, liquidStyleInclude);
+                    allInsertions, finalFilters, evaluateInOutputTag, errorMode, liquidStyleInclude);
         }
 
     }
 
     private ParseSettings(Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine,
-            ObjectMapper mapper, List<Insertion> insertions, Filters filters, boolean evaluateInOutputTag, TemplateParser.ErrorMode errorMode, boolean liquidStyleInclude) {
+            ObjectMapper mapper, Insertions insertions, Filters filters, boolean evaluateInOutputTag, TemplateParser.ErrorMode errorMode, boolean liquidStyleInclude) {
         this.flavor = flavor;
         this.stripSpacesAroundTags = stripSpacesAroundTags;
         this.stripSingleLine = stripSingleLine;
         this.mapper = mapper;
-        this.insertions = Insertions.of(insertions);
+        this.insertions = insertions;
         this.filters = filters;
         this.evaluateInOutputTag = evaluateInOutputTag;
         this.errorMode = errorMode;

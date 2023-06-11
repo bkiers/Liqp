@@ -40,7 +40,7 @@ public class Include extends Tag {
             Map<String, Object> variables = new HashMap<String, Object>();
 
             if (nodes.length > 1) {
-                if (context.getParseSettings().flavor != Flavor.JEKYLL) {
+                if (context.getParseSettings().liquidStyleInclude) {
                     // check if there's a optional "with expression"
                     Object value = nodes[1].render(context);
                     context.put(includeResource, value);

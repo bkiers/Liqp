@@ -32,7 +32,7 @@ public class Where extends Filter {
     @Override
     public Object apply(Object value, TemplateContext context, Object... params) {
         WhereImpl delegate;
-        if (context.getParseSettings().flavor.isLiquidStyleWhere()) {
+        if (context.getParseSettings().liquidStyleInclude) {
             checkParams(params, 1, 2);
             delegate = new LiquidWhereImpl(context, PropertyResolverHelper.INSTANCE);
         } else {

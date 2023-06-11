@@ -124,7 +124,7 @@ public class Template {
 
     // TemplateParser constructor
     Template(TemplateParser parser, CharStream input) {
-        this(input, parser.getParseSettings().flavor.getInsertions(), parser.getParseSettings().filters, parser.getParseSettings());
+        this(input, parser.getParseSettings().insertions, parser.getParseSettings().filters, parser.getParseSettings());
         this.templateParser = parser;
     }
 
@@ -159,7 +159,7 @@ public class Template {
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         ParseSettings parseSettings = this.templateParser.getParseSettings();
-        LiquidParser parser = new LiquidParser(tokens, parseSettings.flavor.isLiquidStyleInclude(), parseSettings.evaluateInOutputTag, parseSettings.errorMode);
+        LiquidParser parser = new LiquidParser(tokens, parseSettings.liquidStyleInclude, parseSettings.evaluateInOutputTag, parseSettings.errorMode);
 
         parser.removeErrorListeners();
 

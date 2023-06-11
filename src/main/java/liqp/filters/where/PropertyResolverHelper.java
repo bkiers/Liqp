@@ -21,7 +21,7 @@ public class PropertyResolverHelper {
             private final LValue lValue = new LValue() {};
             @Override
             public Object getItemProperty(TemplateContext context, Object input, Object property) {
-                LiquidSupport evaluated = context.getRenderSettings().evaluate(context.getParseSettings().mapper, input);
+                LiquidSupport evaluated = context.evaluate(input);
                 return evaluated.toLiquid().get(lValue.asString(property, context));
             }
 

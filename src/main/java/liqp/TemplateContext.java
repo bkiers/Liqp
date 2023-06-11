@@ -7,8 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.RenderTransformer.ObjectAppender;
-import liqp.parser.Flavor;
+import liqp.parser.LiquidSupport;
 
 public class TemplateContext {
 
@@ -55,6 +56,23 @@ public class TemplateContext {
         this(parent);
         this.variables = variables;
     }
+
+    /**
+     * If template context is not available yet - it's ok to create new.
+     * This function don't need access to local context variables,
+     * as it operates with parameters.
+     */
+    public LiquidSupport evaluate(final Object variable) {
+        return evaluate(this.getParseSettings().mapper, variable);
+    }
+
+    static LiquidSupport evaluate(ObjectMapper mapper, final Object variable) {
+        if (variable instanceof LiquidSupport) {
+            return ((LiquidSupport) variable);
+        }
+        return new LiquidSupport.LiquidSupportFromInspectable(mapper, variable);
+    }
+
 
     public TemplateParser getParser() {
         return parser;
@@ -174,6 +192,7 @@ public class TemplateContext {
         if (!registry.containsKey(registryName)) {
             registry.put(registryName, new HashMap<String, T>());
         }
+        //noinspection unchecked
         return (T) registry.get(registryName);
     }
 

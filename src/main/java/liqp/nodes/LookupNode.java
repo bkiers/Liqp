@@ -97,7 +97,7 @@ public class LookupNode implements LNode {
                 else if(value instanceof java.util.Map || value instanceof Inspectable) {
                     java.util.Map map;
                     if (value instanceof Inspectable) {
-                        LiquidSupport evaluated = context.getRenderSettings().evaluate(context.getParseSettings().mapper, value);
+                        LiquidSupport evaluated = context.evaluate(value);
                         map = evaluated.toLiquid();
                     } else {
                         map = (java.util.Map) value;
@@ -136,7 +136,7 @@ public class LookupNode implements LNode {
             if(value instanceof java.util.Map || value instanceof Inspectable) {
                 java.util.Map map;
                 if (value instanceof Inspectable) {
-                    LiquidSupport evaluated = context.getRenderSettings().evaluate(context.getParseSettings().mapper, value);
+                    LiquidSupport evaluated = context.evaluate(value);
                     map = evaluated.toLiquid();
                 } else {
                     map = (java.util.Map) value;

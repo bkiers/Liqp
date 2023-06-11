@@ -33,18 +33,6 @@ public class RenderSettings {
     }
 
     /**
-     * If template context is not available yet - it's ok to create new.
-     * This function don't need access to local context variables,
-     * as it operates with parameters.
-     */
-    public LiquidSupport evaluate(final ObjectMapper mapper, final Object variable) {
-        if (variable instanceof LiquidSupport) {
-            return ((LiquidSupport) variable);
-        }
-        return new LiquidSupport.LiquidSupportFromInspectable(mapper, variable);
-    }
-
-    /**
      * The same as <code>template.render!({}, strict_variables: true)</code> in ruby
      */
     public final boolean strictVariables;

@@ -11,6 +11,7 @@ import java.util.Map;
 
 public class Include extends Tag {
 
+    @Deprecated
     public static final String INCLUDES_DIRECTORY_KEY = "liqp@includes_directory";
     public static String DEFAULT_EXTENSION = ".liquid";
 
@@ -30,7 +31,7 @@ public class Include extends Tag {
             if (includesDirectory != null) {
                 includeResourceFile = new File(includesDirectory, includeResource + extension);
             } else {
-                includeResourceFile = new File(context.getParseSettings().flavor.snippetsFolderName,
+                includeResourceFile = new File(context.getParser().getSnippetsFolderName(),
                         includeResource + extension);
             }
 
@@ -40,7 +41,7 @@ public class Include extends Tag {
             Map<String, Object> variables = new HashMap<String, Object>();
 
             if (nodes.length > 1) {
-                if (context.getParseSettings().liquidStyleInclude) {
+                if (context.getParser().liquidStyleInclude) {
                     // check if there's a optional "with expression"
                     Object value = nodes[1].render(context);
                     context.put(includeResource, value);
@@ -58,7 +59,7 @@ public class Include extends Tag {
 
             return template.renderToObjectUnguarded(variables, context, true);
         } catch (Exception e) {
-            if (context.getRenderSettings().showExceptionsFromInclude) {
+            if (context.getParser().showExceptionsFromInclude) {
                 throw new RuntimeException("problem with evaluating include", e);
             } else {
                 return "";

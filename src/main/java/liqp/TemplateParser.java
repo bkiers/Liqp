@@ -4,7 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.function.Consumer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import liqp.filters.Filter;
+import liqp.filters.Filters;
+import liqp.parser.LiquidSupport;
 import org.antlr.v4.runtime.CharStreams;
 
 import liqp.parser.Flavor;
@@ -14,13 +21,16 @@ import liqp.parser.Flavor;
  */
 public class TemplateParser {
 
-    public static final TemplateParser DEFAULT_JEKYLL = Flavor.JEKYLL.defaultParser();
-    public static final TemplateParser DEFAULT_LIQUID = Flavor.LIQUID.defaultParser();
-    public static final TemplateParser DEFAULT_LIQP = Flavor.LIQP.defaultParser();
+    public static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
+
+    public static final Flavor DEFAULT_FLAVOR = Flavor.LIQP;
     /**
      * Returns a {@link TemplateParser} configured with all default settings for "Liqp" flavor.
      */
-    public static final TemplateParser DEFAULT = DEFAULT_LIQP;
+    public static final TemplateParser DEFAULT = DEFAULT_FLAVOR.defaultParser();
+
+    public static final TemplateParser DEFAULT_JEKYLL = Flavor.JEKYLL.defaultParser();
+
 
     /**
      * Equivalent of
@@ -40,39 +50,264 @@ public class TemplateParser {
         lax
     }
 
-    private final ParseSettings parseSettings;
-    private final RenderSettings renderSettings;
-    private final ProtectionSettings protectionSettings;
-    private final ErrorMode errorMode;
+    public final Flavor flavor;
+    public final boolean stripSpacesAroundTags;
+    public final boolean stripSingleLine;
+    public final ObjectMapper mapper;
+    public final Insertions insertions;
+    public final Filters filters;
+    public final boolean evaluateInOutputTag;
+    public final TemplateParser.ErrorMode errorMode;
+    public final boolean liquidStyleInclude;
+    public final boolean liquidStyleWhere;
+
+
+    /**
+     * The same as <code>template.render!({}, strict_variables: true)</code> in ruby
+     */
+    public final boolean strictVariables;
+    /**
+     * This field doesn't have equivalent in ruby.
+     */
+    public final boolean showExceptionsFromInclude;
+    public final TemplateParser.EvaluateMode evaluateMode;
+    public final Locale locale;
+    public final ZoneId defaultTimeZone;
+    private final RenderTransformer renderTransformer;
+    private final Consumer<Map<String, Object>> environmentMapConfigurator;
+    private final String snippetsFolderName;
+
+
+    private final int limitMaxIterations;
+    private final int limitMaxSizeRenderedString;
+    private final long limitMaxRenderTimeMillis;
+    private final long limitMaxTemplateSizeBytes;
+
+    public enum EvaluateMode {
+        LAZY,
+        EAGER
+    }
+
+
+    /**
+     * If template context is not available yet - it's ok to create new.
+     * This function don't need access to local context variables,
+     * as it operates with parameters.
+     */
+    public Map<String, Object> evaluate(final ObjectMapper mapper, Map<String, Object> variables) {
+        if (evaluateMode == TemplateParser.EvaluateMode.EAGER) {
+            return LiquidSupport.LiquidSupportFromInspectable.objectToMap(mapper, variables);
+        }
+        return variables;
+    }
+
+
+    /**
+     * If template context is not available yet - it's ok to create new.
+     * This function don't need access to local context variables,
+     * as it operates with parameters.
+     */
+    public LiquidSupport evaluate(final Object variable) {
+        return evaluate(mapper, variable);
+    }
+
+    static LiquidSupport evaluate(ObjectMapper mapper, final Object variable) {
+        if (variable instanceof LiquidSupport) {
+            return ((LiquidSupport) variable);
+        }
+        return new LiquidSupport.LiquidSupportFromInspectable(mapper, variable);
+    }
+
 
     public static class Builder {
-        private ParseSettings parseSettings = ParseSettings.DEFAULT;
-        private RenderSettings renderSettings = RenderSettings.DEFAULT;
-        private ProtectionSettings protectionSettings = ProtectionSettings.DEFAULT;
-        private ErrorMode errorMode;
+
+        private Flavor flavor;
+        private boolean stripSpacesAroundTags;
+        private boolean stripSingleLine;
+        private ObjectMapper mapper;
+        private List<Insertion> insertions = new ArrayList<>();
+        private List<Filter> filters = new ArrayList<>();
+        private Boolean evaluateInOutputTag;
+        private TemplateParser.ErrorMode errorMode;
+        private Boolean liquidStyleInclude;
+        private Boolean liquidStyleWhere;
+
+
+        private boolean strictVariables;
+        private boolean showExceptionsFromInclude;
+        private EvaluateMode evaluateMode;
+        private Locale locale;
+        private ZoneId defaultTimeZone;
+        private RenderTransformer renderTransformer;
+        private Consumer<Map<String, Object>> environmentMapConfigurator;
+        private String snippetsFolderName;
+
+
+        private Integer limitMaxIterations = Integer.MAX_VALUE;
+        private Integer limitMaxSizeRenderedString = Integer.MAX_VALUE;
+        private Long limitMaxRenderTimeMillis  = Long.MAX_VALUE;
+        private Long limitMaxTemplateSizeBytes  = Long.MAX_VALUE;
 
         public Builder() {
         }
 
         public Builder(TemplateParser parser) {
-            parseSettings = parser.parseSettings;
-            renderSettings = parser.renderSettings;
-            protectionSettings = parser.protectionSettings;
-            errorMode = parser.errorMode;
+            this.flavor = parser.flavor;
+            this.stripSpacesAroundTags = parser.stripSpacesAroundTags;
+            this.stripSingleLine = parser.stripSingleLine;
+            this.mapper = parser.mapper;
+            this.insertions = new ArrayList<>(parser.insertions.values());
+            this.filters = new ArrayList<>(parser.filters.values());
+
+            this.strictVariables = false;
+            this.evaluateMode = TemplateParser.EvaluateMode.LAZY;
+            this.locale = DEFAULT_LOCALE;
+            this.renderTransformer = null;
+            this.environmentMapConfigurator = null;
+            this.showExceptionsFromInclude = true;
+
+            this.limitMaxIterations = parser.limitMaxIterations;
+            this.limitMaxSizeRenderedString = parser.limitMaxSizeRenderedString;
+            this.limitMaxRenderTimeMillis = parser.limitMaxRenderTimeMillis;
+            this.limitMaxTemplateSizeBytes = parser.limitMaxTemplateSizeBytes;
+            this.evaluateInOutputTag = parser.evaluateInOutputTag;
+            this.liquidStyleInclude = parser.liquidStyleInclude;
+
+            this.errorMode = parser.errorMode;
         }
 
-        public Builder withParseSettings(ParseSettings s) {
-            this.parseSettings = s;
+        public Builder withFlavor(Flavor flavor) {
+            this.flavor = flavor;
             return this;
         }
 
-        public Builder withRenderSettings(RenderSettings s) {
-            this.renderSettings = s;
+        public Builder withStripSpaceAroundTags(boolean stripSpacesAroundTags, boolean stripSingleLine) {
+
+            if (stripSingleLine && !stripSpacesAroundTags) {
+                throw new IllegalStateException(
+                        "stripSpacesAroundTags must be true if stripSingleLine is true");
+            }
+
+            this.stripSpacesAroundTags = stripSpacesAroundTags;
+            this.stripSingleLine = stripSingleLine;
             return this;
         }
 
-        public Builder withProtectionSettings(ProtectionSettings s) {
-            this.protectionSettings = s;
+        public Builder withStripSpaceAroundTags(boolean stripSpacesAroundTags) {
+            return this.withStripSpaceAroundTags(stripSpacesAroundTags, false);
+        }
+
+        public Builder withStripSingleLine(boolean stripSingleLine) {
+            this.stripSingleLine = stripSingleLine;
+            return this;
+        }
+
+        public Builder withObjectMapper(ObjectMapper mapper) {
+            this.mapper = mapper;
+            return this;
+        }
+
+        public Builder withInsertion(Insertion insertion) {
+            this.insertions.add(insertion);
+            return this;
+        }
+
+        public Builder withFilter(Filter filter) {
+            this.filters.add(filter);
+            return this;
+        }
+
+        public Builder withEvaluateInOutputTag(boolean evaluateInOutputTag) {
+            this.evaluateInOutputTag = evaluateInOutputTag;
+            return this;
+        }
+
+        public Builder withLiquidStyleInclude(boolean liquidStyleInclude) {
+            this.liquidStyleInclude = liquidStyleInclude;
+            return this;
+        }
+
+        public Builder withStrictVariables(boolean strictVariables) {
+            this.strictVariables = strictVariables;
+            return this;
+        }
+
+        public Builder withShowExceptionsFromInclude(boolean showExceptionsFromInclude) {
+            this.showExceptionsFromInclude = showExceptionsFromInclude;
+            return this;
+        }
+
+        public Builder withEvaluateMode(TemplateParser.EvaluateMode evaluateMode) {
+            this.evaluateMode = evaluateMode;
+            return this;
+        }
+
+        /**
+         * Sets the {@link RenderTransformer}.
+         *
+         * @param renderTransformer The transformer, or {@code null} to use the default.
+         * @return This builder.
+         */
+        public Builder withRenderTransformer(RenderTransformer renderTransformer) {
+            this.renderTransformer = renderTransformer;
+            return this;
+        }
+
+        public Builder withLocale(Locale locale){
+            Objects.requireNonNull(locale);
+            this.locale = locale;
+            return this;
+        }
+
+        /**
+         * Set default timezone for showing timezone of date/time types
+         * that does not have own timezone information.
+         * May be null, so the timezone pattern will be omitted in formatted strings.
+         * @param defaultTimeZone - value or <code>null<code/>
+         * @return
+         */
+        public Builder withDefaultTimeZone(ZoneId defaultTimeZone) {
+            this.defaultTimeZone = defaultTimeZone;
+            return this;
+        }
+
+        /**
+         * Sets the configurator of the {@link TemplateContext}'s environment map
+         * ({@link TemplateContext#getEnvironmentMap()}) instance.
+         *
+         * The configurator is called upon the creation of a new root context. Typically, this allows the
+         * addition of certain parameters to the context environment.
+         *
+         * @param configurator The configurator, or {@code null}.
+         * @return This builder.
+         */
+        public Builder withEnvironmentMapConfigurator(Consumer<Map<String, Object>> configurator) {
+            this.environmentMapConfigurator = configurator;
+            return this;
+        }
+
+        public  Builder withSnippetsFolderName(String snippetsFolderName) {
+            this.snippetsFolderName = snippetsFolderName;
+            return this;
+        }
+
+        public Builder withMaxIterations(int maxIterations) {
+            this.limitMaxIterations = maxIterations;
+            return this;
+        }
+
+        public Builder withMaxSizeRenderedString(int maxSizeRenderedString) {
+            this.limitMaxSizeRenderedString = maxSizeRenderedString;
+            return this;
+        }
+
+        public Builder withMaxRenderTimeMillis(long maxRenderTimeMillis) {
+            this.limitMaxRenderTimeMillis = maxRenderTimeMillis;
+            return this;
+        }
+
+        public Builder withMaxTemplateSizeBytes(long maxTemplateSizeBytes) {
+            this.limitMaxTemplateSizeBytes = maxTemplateSizeBytes;
             return this;
         }
 
@@ -81,23 +316,75 @@ public class TemplateParser {
             return this;
         }
 
-
         public TemplateParser build() {
-            if (this.errorMode == null) {
-                // fallback to Flavor-default
-                this.errorMode = this.parseSettings.flavor.getErrorMode();
+            Flavor fl = this.flavor;
+            if (fl == null) {
+                fl = DEFAULT_FLAVOR;
             }
-            return new TemplateParser(this.parseSettings, this.renderSettings,
-                    this.protectionSettings, this.errorMode);
+
+            Boolean evaluateInOutputTag = this.evaluateInOutputTag;
+            if (evaluateInOutputTag == null) {
+                evaluateInOutputTag = fl.isEvaluateInOutputTag();
+            }
+
+            Boolean liquidStyleInclude = this.liquidStyleInclude;
+            if (liquidStyleInclude == null) {
+                liquidStyleInclude = fl.isLiquidStyleInclude();
+            }
+
+            Boolean liquidStyleWhere = this.liquidStyleWhere;
+            if (liquidStyleWhere == null) {
+                liquidStyleWhere = fl.isLiquidStyleWhere();
+            }
+
+            ErrorMode errorMode = this.errorMode;
+            if (errorMode == null) {
+                errorMode = fl.getErrorMode();
+            }
+
+            Insertions allInsertions = fl.getInsertions().mergeWith(Insertions.of(this.insertions));
+
+            Filters finalFilters = fl.getFilters().mergeWith(filters);
+
+
+            if (snippetsFolderName == null) {
+                snippetsFolderName = fl.snippetsFolderName;
+            }
+
+            return new TemplateParser(strictVariables, showExceptionsFromInclude, evaluateMode, renderTransformer, locale, defaultTimeZone, environmentMapConfigurator, errorMode, fl, stripSpacesAroundTags, stripSingleLine, mapper,
+                    allInsertions, finalFilters, snippetsFolderName, evaluateInOutputTag, liquidStyleInclude, liquidStyleWhere, limitMaxIterations, limitMaxSizeRenderedString, limitMaxRenderTimeMillis, limitMaxTemplateSizeBytes);
         }
     }
 
-    TemplateParser(ParseSettings parseSettings, RenderSettings renderSettings,
-                   ProtectionSettings protectionSettings, ErrorMode errorMode) {
-        this.parseSettings = parseSettings;
-        this.renderSettings = renderSettings;
-        this.protectionSettings = protectionSettings;
+    TemplateParser(boolean strictVariables, boolean showExceptionsFromInclude, EvaluateMode evaluateMode,
+                   RenderTransformer renderTransformer, Locale locale, ZoneId defaultTimeZone,
+                   Consumer<Map<String, Object>> environmentMapConfigurator, ErrorMode errorMode, Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine,
+                   ObjectMapper mapper, Insertions insertions, Filters filters, String snippetsFolderName, boolean evaluateInOutputTag, boolean liquidStyleInclude, Boolean liquidStyleWhere, int maxIterations, int maxSizeRenderedString, long maxRenderTimeMillis, long maxTemplateSizeBytes) {
+        this.flavor = flavor;
+        this.stripSpacesAroundTags = stripSpacesAroundTags;
+        this.stripSingleLine = stripSingleLine;
+        this.mapper = mapper;
+        this.insertions = insertions;
+        this.filters = filters;
+        this.evaluateInOutputTag = evaluateInOutputTag;
         this.errorMode = errorMode;
+        this.liquidStyleInclude = liquidStyleInclude;
+        this.liquidStyleWhere = liquidStyleWhere;
+
+        this.strictVariables = strictVariables;
+        this.showExceptionsFromInclude = showExceptionsFromInclude;
+        this.evaluateMode = evaluateMode;
+        this.renderTransformer = renderTransformer == null ? RenderTransformerDefaultImpl.INSTANCE
+                : renderTransformer;
+        this.locale = locale;
+        this.defaultTimeZone = defaultTimeZone;
+        this.environmentMapConfigurator = environmentMapConfigurator;
+        this.snippetsFolderName = snippetsFolderName;
+
+        this.limitMaxIterations = maxIterations;
+        this.limitMaxSizeRenderedString = maxSizeRenderedString;
+        this.limitMaxRenderTimeMillis = maxRenderTimeMillis;
+        this.limitMaxTemplateSizeBytes = maxTemplateSizeBytes;
     }
 
     public Template parse(File file) throws IOException {
@@ -116,19 +403,51 @@ public class TemplateParser {
         return new Template(this, CharStreams.fromReader(reader));
     }
 
-    public ParseSettings getParseSettings() {
-        return parseSettings;
+    public int getLimitMaxIterations() {
+        return limitMaxIterations;
     }
 
-    public RenderSettings getRenderSettings() {
-        return renderSettings;
+    public int getLimitMaxSizeRenderedString() {
+        return limitMaxSizeRenderedString;
     }
 
-    public ProtectionSettings getProtectionSettings() {
-        return protectionSettings;
+    public long getLimitMaxRenderTimeMillis() {
+        return limitMaxRenderTimeMillis;
+    }
+
+    public long getLimitMaxTemplateSizeBytes() {
+        return limitMaxTemplateSizeBytes;
+    }
+
+    public Boolean isRenderTimeLimited() {
+        return limitMaxRenderTimeMillis != Long.MAX_VALUE;
     }
 
     public ErrorMode getErrorMode() {
         return errorMode;
+    }
+
+    public boolean isStripSingleLine() {
+        return stripSingleLine;
+    }
+
+    public boolean isStripSpacesAroundTags() {
+        return stripSpacesAroundTags;
+    }
+
+    public ObjectMapper getMapper() {
+        return mapper;
+    }
+
+    public RenderTransformer getRenderTransformer() {
+        return renderTransformer;
+    }
+
+    public Consumer<Map<String, Object>> getEnvironmentMapConfigurator() {
+        return environmentMapConfigurator;
+    }
+
+    public String getSnippetsFolderName() {
+        return snippetsFolderName;
     }
 }

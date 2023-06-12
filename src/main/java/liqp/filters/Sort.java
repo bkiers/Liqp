@@ -114,7 +114,7 @@ public class Sort extends Filter {
         for (Object obj : array) {
 
             if (property != null && obj instanceof Inspectable) {
-                LiquidSupport evaluated = context.evaluate(
+                LiquidSupport evaluated = context.getParser().evaluate(
                         obj);
                 obj = evaluated.toLiquid();
             }

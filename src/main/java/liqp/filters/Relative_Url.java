@@ -86,7 +86,7 @@ public class Relative_Url extends Filter {
 
     protected Map<String, Object> objectToMap(Object configRoot, TemplateContext context) {
         if (configRoot instanceof Inspectable) {
-            LiquidSupport evaluated = context.evaluate(configRoot);
+            LiquidSupport evaluated = context.getParser().evaluate(configRoot);
             configRoot = evaluated.toLiquid();
         }
         Map<String, Object> siteMap;

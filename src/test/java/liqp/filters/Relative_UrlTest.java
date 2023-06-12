@@ -1,7 +1,5 @@
 package liqp.filters;
 
-import liqp.ParseSettings;
-import liqp.Template;
 import liqp.TemplateParser;
 import liqp.parser.Flavor;
 import liqp.parser.Inspectable;
@@ -11,7 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 public class Relative_UrlTest {
 
     /**
@@ -217,11 +215,7 @@ public class Relative_UrlTest {
         return Collections.singletonMap("site", (Object)siteMap);
     }
 
-    private ParseSettings jekyll() {
-        return Flavor.JEKYLL.defaultParseSettings();
-    }
-
     private TemplateParser jekyllParser() {
-        return new TemplateParser.Builder().withParseSettings(jekyll()).build();
+        return new TemplateParser.Builder().withFlavor(Flavor.JEKYLL).build();
     }
 }

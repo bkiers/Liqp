@@ -53,15 +53,6 @@ public class Template {
      */
     private final ParseTree root;
 
-    /**
-     * This instance's insertions.
-     */
-    private final Insertions insertions;
-
-    /**
-     * This instance's filters.
-     */
-    private final Filters filters;
 
     private final long templateSize;
 
@@ -69,39 +60,49 @@ public class Template {
 
     private ContextHolder contextHolder;
 
-    private TemplateParser templateParser = null;
+    private final TemplateParser templateParser;
 
     /**
      * Creates a new Template instance from a given input.
-     * 
-     * @param input
-     *            the file holding the Liquid source.
-     * @param insertions
-     *            the insertions this instance will make use of.
-     * @param filters
-     *            the filters this instance will make use of.
+     *
+     * @param input      the file holding the Liquid source.
      */
-    private Template(String input, Insertions insertions, Filters filters, ParseSettings parseSettings) {
-        this(CharStreams.fromString(input, input), insertions, filters, parseSettings);
+    private Template(TemplateParser templateParser, String input) {
+        this(templateParser, CharStreams.fromString(input, input));
     }
 
-    private Template(CharStream stream, Insertions insertions, Filters filters, ParseSettings parseSettingsIn) {
-        this.templateParser = new TemplateParser.Builder()
-                .withParseSettings(new ParseSettings.Builder(parseSettingsIn)
-                        .withInsertions(insertions.values())
-                        .with(filters.values())
-                        .build())
+    /**
+     * Creates a new Template instance from a given file.
+     *
+     * @param file
+     *            the file holding the Liquid source.
+     */
+    private Template(TemplateParser parser, File file)
+            throws IOException {
+        this(parser, fromFile(file));
+    }
 
-                .build();
-        this.insertions = this.templateParser.getParseSettings().insertions;
-        this.filters = this.templateParser.getParseSettings().filters;
 
-        Set<String> blockNames = this.insertions.getBlockNames();
-        Set<String> tagNames = this.insertions.getTagNames();
+    /**
+     * Creates a new Template instance from a given stream.
+     *
+     * @param stream
+     *            the file holding the Liquid source.
+     */
+    private Template(TemplateParser parser, InputStream stream)
+            throws IOException {
+        this(parser, fromStream(stream));
+    }
+
+    Template(TemplateParser templateParser, CharStream stream) {
+        this.templateParser = templateParser;
+
+        Set<String> blockNames = this.templateParser.insertions.getBlockNames();
+        Set<String> tagNames = this.templateParser.insertions.getTagNames();
 
         this.templateSize = stream.size();
-        LiquidLexer lexer = new LiquidLexer(stream, this.templateParser.getParseSettings().stripSpacesAroundTags,
-                this.templateParser.getParseSettings().stripSingleLine, blockNames, tagNames);
+        LiquidLexer lexer = new LiquidLexer(stream, this.templateParser.isStripSpacesAroundTags(),
+                this.templateParser.isStripSingleLine(), blockNames, tagNames);
         try {
             root = parse(lexer);
         } catch (LiquidException e) {
@@ -111,22 +112,6 @@ public class Template {
         }
     }
 
-    /**
-     * Creates a new Template instance from a given file.
-     *
-     * @param file
-     *            the file holding the Liquid source.
-     */
-    private Template(File file, Insertions insertions, Filters filters, ParseSettings parseSettings)
-            throws IOException {
-        this(fromFile(file), insertions, filters, parseSettings);
-    }
-
-    // TemplateParser constructor
-    Template(TemplateParser parser, CharStream input) {
-        this(input, parser.getParseSettings().insertions, parser.getParseSettings().filters, parser.getParseSettings());
-        this.templateParser = parser;
-    }
 
     private static CharStream fromStream(InputStream in) {
         try {
@@ -158,8 +143,7 @@ public class Template {
         });
 
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        ParseSettings parseSettings = this.templateParser.getParseSettings();
-        LiquidParser parser = new LiquidParser(tokens, parseSettings.liquidStyleInclude, parseSettings.evaluateInOutputTag, parseSettings.errorMode);
+        LiquidParser parser = new LiquidParser(tokens, templateParser.liquidStyleInclude, templateParser.evaluateInOutputTag, templateParser.errorMode);
 
         parser.removeErrorListeners();
 
@@ -237,7 +221,7 @@ public class Template {
         Map<String, Object> map;
 
         try {
-            map = this.templateParser.getParseSettings().mapper.readValue(jsonMap, HashMap.class);
+            map = this.templateParser.mapper.readValue(jsonMap, HashMap.class);
         } catch (Exception e) {
             throw new RuntimeException("invalid json map: '" + jsonMap + "'", e);
         }
@@ -269,7 +253,7 @@ public class Template {
     }
 
     private Object renderObjectToObject(Object obj) {
-        LiquidSupport evaluated = TemplateContext.evaluate(getTemplateParser().getParseSettings().mapper, obj);
+        LiquidSupport evaluated = templateParser.evaluate(getTemplateParser().getMapper(), obj);
         Map<String, Object> map = evaluated.toLiquid();
         return renderToObject(map);
     }
@@ -337,12 +321,12 @@ public class Template {
      * @return an object denoting the rendered template.
      */
     public Object renderToObject(final Map<String, Object> variables) {
-        if (this.templateParser.getProtectionSettings().isRenderTimeLimited()) {
+        if (this.templateParser.isRenderTimeLimited()) {
             return renderToObject(variables, Executors.newSingleThreadExecutor(), true);
         } else {
-            if (this.templateSize > this.templateParser.getProtectionSettings().maxTemplateSizeBytes) {
-                throw new RuntimeException("template exceeds " +
-                        this.templateParser.getProtectionSettings().maxTemplateSizeBytes + " bytes");
+            long maxTemplateSizeBytes = this.templateParser.getLimitMaxTemplateSizeBytes();
+            if (this.templateSize > maxTemplateSizeBytes) {
+                throw new RuntimeException("template exceeds " + maxTemplateSizeBytes + " bytes");
             }
             return renderToObjectUnguarded(variables);
         }
@@ -355,17 +339,17 @@ public class Template {
 
     private Object renderToObject(final Map<String, Object> variables, ExecutorService executorService,
             boolean shutdown) {
-        if (this.templateSize > this.templateParser.getProtectionSettings().maxTemplateSizeBytes) {
-            throw new RuntimeException("template exceeds " +
-                    this.templateParser.getProtectionSettings().maxTemplateSizeBytes + " bytes");
+        long maxTemplateSizeBytes = this.templateParser.getLimitMaxTemplateSizeBytes();
+        if (this.templateSize > maxTemplateSizeBytes) {
+            throw new RuntimeException("template exceeds " + maxTemplateSizeBytes + " bytes");
         }
 
+        long maxRenderTimeMillis = this.templateParser.getLimitMaxRenderTimeMillis();
         try {
             Future<Object> future = executorService.submit(() -> renderToObjectUnguarded(variables));
-            return future.get(this.templateParser.getProtectionSettings().maxRenderTimeMillis, TimeUnit.MILLISECONDS);
+            return future.get(maxRenderTimeMillis, TimeUnit.MILLISECONDS);
         } catch (TimeoutException e) {
-            throw new RuntimeException("exceeded the max amount of time (" + this.templateParser
-                    .getProtectionSettings().maxRenderTimeMillis + " ms.)");
+            throw new RuntimeException("exceeded the max amount of time (" + maxRenderTimeMillis + " ms.)");
         } catch (Throwable t) {
             throw new RuntimeException("Oops, something unexpected happened: ", t);
         } finally {
@@ -411,7 +395,7 @@ public class Template {
 
     private TemplateContext newRootContext(Map<String, Object> variables) {
         TemplateContext context = new TemplateContext(templateParser, variables);
-        Consumer<Map<String, Object>> configurator = context.getRenderSettings().getEnvironmentMapConfigurator();
+        Consumer<Map<String, Object>> configurator = context.getParser().getEnvironmentMapConfigurator();
         if (configurator != null) {
             configurator.accept(context.getEnvironmentMap());
         }
@@ -434,10 +418,9 @@ public class Template {
                         .toString());
             }
         }
-        ParseSettings parseSettings = templateParser.getParseSettings();
-        variables = templateParser.getRenderSettings().evaluate(parseSettings.mapper, variables);
+        variables = templateParser.evaluate(templateParser.mapper, variables);
 
-        final NodeVisitor visitor = new NodeVisitor(this.insertions, this.filters, parseSettings);
+        final NodeVisitor visitor = new NodeVisitor(templateParser.insertions, templateParser.filters, templateParser.liquidStyleInclude);
         try {
             LNode node = visitor.visit(root);
             if (parent == null) {
@@ -450,7 +433,7 @@ public class Template {
             }
             Object rendered = node.render(this.templateContext);
 
-            return templateContext.getParser().getRenderSettings().getRenderTransformer()
+            return templateContext.getParser().getRenderTransformer()
                     .transformObject(templateContext, rendered);
         } catch (Exception e) {
             if (e instanceof RuntimeException) {
@@ -564,9 +547,9 @@ public class Template {
         }
         if (convertValueToMap && value != null) {
             if ((value.getClass().isArray() || value instanceof List) && (!(value instanceof Map))) {
-                map.put(key, templateParser.getParseSettings().mapper.convertValue(value, List.class));
+                map.put(key, templateParser.mapper.convertValue(value, List.class));
             } else {
-                map.put(key, templateParser.getParseSettings().mapper.convertValue(value, Map.class));
+                map.put(key, templateParser.mapper.convertValue(value, Map.class));
             }
         } else {
             map.put(key, value);

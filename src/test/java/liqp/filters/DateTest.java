@@ -1,8 +1,14 @@
 package liqp.filters;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
+import liqp.filters.date.CustomDateFormatSupport;
+import liqp.parser.Flavor;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Before;
+import org.junit.Test;
+import ua.co.k.strftime.formatters.HybridFormat;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -12,28 +18,18 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Before;
-import org.junit.Test;
-
-import liqp.ParseSettings;
-import liqp.ProtectionSettings;
-import liqp.RenderSettings;
-import liqp.Template;
-import liqp.TemplateContext;
-import liqp.TemplateParser;
-import liqp.filters.date.CustomDateFormatSupport;
-import liqp.parser.Flavor;
-import ua.co.k.strftime.formatters.HybridFormat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class DateTest {
-    
-    private ParseSettings dateFilterSetting = null;
+
+    private TemplateParser dateFilterSetting;
 
     @Before
     public void init() {
         // reset
-        dateFilterSetting = new ParseSettings.Builder().with(new Date()).build();
+        dateFilterSetting = new TemplateParser.Builder().withFilter(new Date()).build();
     }
 
     // NOTE: you have to put your machine in US/Eastern time for this test to pass
@@ -140,10 +136,8 @@ public class DateTest {
 
         assertThat(filter.apply(1152098955, context,"%m/%d/%Y"), is((Object)"07/05/2006"));
         assertThat(filter.apply("1152098955", context,"%m/%d/%Y"), is((Object)"07/05/2006"));
-        TemplateContext anotherZone = new TemplateContext(ProtectionSettings.DEFAULT,
-                new RenderSettings.Builder().withDefaultTimeZone(ZoneOffset.UTC).build(),
-                new ParseSettings.Builder().withFlavor(Flavor.LIQUID).build(),
-                new LinkedHashMap<>());
+        TemplateParser parser = new TemplateParser.Builder().withFlavor(Flavor.LIQUID).withDefaultTimeZone(ZoneOffset.UTC).build();
+        TemplateContext anotherZone = new TemplateContext(parser, new LinkedHashMap<>());
         assertThat(filter.apply("1152098955", anotherZone,"%H"), is((Object)"11"));
         assertThat(filter.apply(1152098955, anotherZone,"%H"), is((Object)"11"));
     }
@@ -182,14 +176,14 @@ public class DateTest {
             }
         });
 
-        ParseSettings parseSettings = new ParseSettings.Builder().with(f).build();
+        TemplateParser parser = new TemplateParser.Builder().withFilter(f).build();
 
         // when
         CustomDate customDate = new CustomDate(1152098955000L);
 
         // then
         TemplateContext context = new TemplateContext();
-        assertThat(parseSettings.filters.get("date").apply(customDate, context, "%m/%d/%Y"), is(
+        assertThat(parser.filters.get("date").apply(customDate, context, "%m/%d/%Y"), is(
                 (Object) "07/05/2006"));
     }
 

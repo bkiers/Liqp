@@ -1,14 +1,12 @@
 package liqp.tags;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
+import liqp.Template;
+import liqp.TemplateParser;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import liqp.ParseSettings;
-import liqp.Template;
-import liqp.TemplateParser;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 // All output in this test class is tested against Ruby 2.3.1 and Liquid 4.0.0
 public class WhitespaceControlTest {
@@ -87,8 +85,7 @@ public class WhitespaceControlTest {
     public void defaultStrip() throws RecognitionException {
 
         String source = "a  \n  {% assign letter = 'b' %}  \n{{ letter }}\n  c";
-        ParseSettings settings = new ParseSettings.Builder().withStripSpaceAroundTags(true).build();
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(settings).build();
+        TemplateParser parser = new TemplateParser.Builder().withStripSpaceAroundTags(true).build();
         Template template = parser.parse(source);
         String rendered = String.valueOf(template.render().replace(' ', '.'));
 

@@ -30,7 +30,7 @@ public class Date extends Filter {
 
     @Override
     public Object apply(Object value, TemplateContext context, Object... params) {
-        Locale locale = context.getRenderSettings().locale;
+        Locale locale = context.getParser().locale;
 
         if (isArray(value) && asArray(value, context).length ==1) {
             value = asArray(value, context)[0];
@@ -43,9 +43,9 @@ public class Date extends Filter {
                 compatibleDate = LValue.asTemporal(value, context);
             } else if(super.isNumber(value)) {
                 // No need to divide this by 1000, the param is expected to be in seconds already!
-                compatibleDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(super.asNumber(value).longValue() * 1000), context.getRenderSettings().defaultTimeZone);
+                compatibleDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(super.asNumber(value).longValue() * 1000), context.getParser().defaultTimeZone);
             } else {
-                compatibleDate = Parser.parse(super.asString(value, context), locale, context.getRenderSettings().defaultTimeZone);
+                compatibleDate = Parser.parse(super.asString(value, context), locale, context.getParser().defaultTimeZone);
             }
             if (compatibleDate == null) {
                 return value;

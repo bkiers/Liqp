@@ -35,15 +35,12 @@ public class ReadmeSamplesTest {
     
     @Test
     public void testEagerMode() {
-        RenderSettings renderSettings = new RenderSettings.Builder()
-                .withEvaluateMode(RenderSettings.EvaluateMode.EAGER)
-                .build();
 
         Map<String, Object> in = Collections.singletonMap("a", new Object() {
             public String val = "tobi";
         });
         
-        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(renderSettings).build();
+        TemplateParser parser = new TemplateParser.Builder().withEvaluateMode(TemplateParser.EvaluateMode.EAGER).build();
 
         String res = parser.parse("hi {{a.val}}").render(in);
         assertEquals("hi tobi", res);

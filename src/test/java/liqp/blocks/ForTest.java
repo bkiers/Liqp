@@ -1,25 +1,20 @@
 package liqp.blocks;
 
-import static java.util.Collections.singletonMap;
-import static liqp.TestUtils.assertPatternResultEquals;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Assert;
-import org.junit.Test;
-
-import liqp.RenderSettings;
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.TemplateParser;
 import liqp.parser.Inspectable;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.Collections.singletonMap;
+import static liqp.TestUtils.assertPatternResultEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
 
 public class ForTest {
 
@@ -897,10 +892,8 @@ public class ForTest {
     public void test_for_cleans_up_registers() {
         Template.ContextHolder holder = new Template.ContextHolder();
         try {
-            TemplateParser parser = new TemplateParser.Builder().withRenderSettings(
-                    new RenderSettings.Builder()
-                            .withStrictVariables(true)
-                            .build())
+            TemplateParser parser = new TemplateParser.Builder()
+                    .withStrictVariables(true)
                     .withErrorMode(TemplateParser.ErrorMode.strict)
                     .build();
 

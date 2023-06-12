@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.RenderTransformer.ObjectAppender;
+import liqp.exceptions.ExceededMaxIterationsException;
 import liqp.parser.LiquidSupport;
 
 public class TemplateContext {
@@ -34,10 +35,8 @@ public class TemplateContext {
     }
 
 
-    public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings,
-            ParseSettings parseSettings, Map<String, Object> variables) {
-        this(new TemplateParser.Builder().withProtectionSettings(protectionSettings)
-                .withRenderSettings(renderSettings).withParseSettings(parseSettings).build(), variables);
+    public TemplateContext(Map<String, Object> variables) {
+        this(new TemplateParser.Builder().build(), variables);
     }
 
     public TemplateContext(TemplateParser parser, Map<String, Object> variables) {
@@ -56,23 +55,6 @@ public class TemplateContext {
         this(parent);
         this.variables = variables;
     }
-
-    /**
-     * If template context is not available yet - it's ok to create new.
-     * This function don't need access to local context variables,
-     * as it operates with parameters.
-     */
-    public LiquidSupport evaluate(final Object variable) {
-        return evaluate(this.getParseSettings().mapper, variable);
-    }
-
-    static LiquidSupport evaluate(ObjectMapper mapper, final Object variable) {
-        if (variable instanceof LiquidSupport) {
-            return ((LiquidSupport) variable);
-        }
-        return new LiquidSupport.LiquidSupportFromInspectable(mapper, variable);
-    }
-
 
     public TemplateParser getParser() {
         return parser;
@@ -93,7 +75,7 @@ public class TemplateContext {
         }
         int value = iteratorProtector.get(REGISTRY_ITERATION_PROTECTOR) + 1;
         iteratorProtector.put(REGISTRY_ITERATION_PROTECTOR, value);
-        this.getProtectionSettings().checkForMaxIterations(value);
+        this.checkForMaxIterations(value);
     }
 
     public boolean containsKey(String key) {
@@ -196,25 +178,22 @@ public class TemplateContext {
         return (T) registry.get(registryName);
     }
 
-    public ParseSettings getParseSettings() {
-        return parser.getParseSettings();
-    }
-
-    public RenderSettings getRenderSettings() {
-        return parser.getRenderSettings();
-    }
-
-    public ProtectionSettings getProtectionSettings() {
-        return parser.getProtectionSettings();
-    }
 
     public ObjectAppender.Controller newObjectAppender(int estimatedNumberOfAppends) {
-        return getRenderSettings().getRenderTransformer().newObjectAppender(this,
+        return parser.getRenderTransformer().newObjectAppender(this,
                 estimatedNumberOfAppends);
     }
 
     public TemplateContext newChildContext(Map<String, Object> variablesForChild) {
         return new TemplateContext(variablesForChild, this);
+    }
+
+
+    public void checkForMaxIterations(int iterations) {
+        int maxIterations = parser.getLimitMaxIterations();
+        if (iterations > maxIterations) {
+            throw new ExceededMaxIterationsException(maxIterations);
+        }
     }
 
     public TemplateParser.ErrorMode getErrorMode() {

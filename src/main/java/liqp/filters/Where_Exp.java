@@ -1,6 +1,5 @@
 package liqp.filters;
 
-import liqp.ParseSettings;
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.TemplateParser;
@@ -46,7 +45,7 @@ public class Where_Exp extends Filter {
         }
 
         if (items == null && value instanceof Inspectable) {
-            LiquidSupport evaluated = context.evaluate(value);
+            LiquidSupport evaluated = context.getParser().evaluate(value);
             value = evaluated.toLiquid();
         }
         if (isMap(value)) {
@@ -62,10 +61,7 @@ public class Where_Exp extends Filter {
 
         Template expression = new TemplateParser
                 .Builder(context.getParser())
-                .withParseSettings(new ParseSettings.Builder()
-                        .with(context.getParser().getParseSettings())
-                        .withEvaluateInOutputTag(true)
-                        .build())
+                .withEvaluateInOutputTag(true)
                 .build().parse("{{ " + strExpression + " }}");
 
         List<Object> res = new ArrayList<>();

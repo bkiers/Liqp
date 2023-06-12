@@ -1,18 +1,16 @@
 package liqp.filters;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import liqp.Template;
+import liqp.TemplateParser;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
-
-import liqp.RenderSettings;
-import liqp.Template;
-import liqp.TemplateParser;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class AbsTest {
 
@@ -61,8 +59,9 @@ public class AbsTest {
         String res = TemplateParser.DEFAULT.parse("{{ a | abs }}").render(Collections.singletonMap("a", LocalDateTime.now()));
         assertEquals("0", res);
 
-        RenderSettings eager = new RenderSettings.Builder().withEvaluateMode(RenderSettings.EvaluateMode.EAGER).build();
-        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(eager).build();
+        TemplateParser parser = new TemplateParser.Builder()
+                .withEvaluateMode(TemplateParser.EvaluateMode.EAGER)
+                .build();
         
         res = parser.parse("{{ a | abs }}").render(Collections.singletonMap("a", LocalDateTime.now()));
         assertEquals("0", res);

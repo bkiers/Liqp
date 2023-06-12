@@ -21,16 +21,12 @@ import liqp.filters.Filter;
 public class RenderSettingsTest {
     
     protected TemplateParser parserWithStrictVariables() {
-        return new TemplateParser.Builder().withRenderSettings(new RenderSettings.Builder()
-                .withStrictVariables(true).build()).build();
+        return new TemplateParser.Builder().withStrictVariables(true).build();
     }
 
     protected TemplateParser parserWithStrictVariablesAndRaiseExceptionsInStrictModeFalse() {
-        RenderSettings renderSettings = new RenderSettings.Builder()
-                .withStrictVariables(true)
-                .build();
         return new TemplateParser.Builder()
-                .withRenderSettings(renderSettings)
+                .withStrictVariables(true)
                 .withErrorMode(TemplateParser.ErrorMode.lax)
                 .build();
     }
@@ -153,27 +149,24 @@ public class RenderSettingsTest {
     public void testEnvironmentMapConfigurator() throws Exception {
         final String secretKey = getClass() + ".secretKey";
 
-        ParseSettings parseSettings = new ParseSettings.Builder().with(new Filter("secret") {
-            @Override
-            public Object apply(Object value, TemplateContext context, Object... params) {
-                ObjectAppender.Controller sb = context.newObjectAppender(3);
-                sb.append(value);
-                sb.append(" ");
-                sb.append(context.getEnvironmentMap().get(secretKey));
-                return sb.getResult();
-            }
-        }).build();
-
         AtomicBoolean gotEnvironmentMap = new AtomicBoolean(false);
-        RenderSettings renderSettings = new RenderSettings.Builder().withEnvironmentMapConfigurator((
-            env) -> {
-            env.put(secretKey, "world");
 
-            gotEnvironmentMap.set(true);
-        }).build();
+        TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("secret") {
+                    @Override
+                    public Object apply(Object value, TemplateContext context, Object... params) {
+                        ObjectAppender.Controller sb = context.newObjectAppender(3);
+                        sb.append(value);
+                        sb.append(" ");
+                        sb.append(context.getEnvironmentMap().get(secretKey));
+                        return sb.getResult();
+                    }
+                })
+                .withEnvironmentMapConfigurator((
+                        env) -> {
+                    env.put(secretKey, "world");
 
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings)
-            .withRenderSettings(renderSettings).build();
+                    gotEnvironmentMap.set(true);
+                }).build();
         Template template = parser.parse("{{ 'Hello' | secret }}");
 
         assertFalse(gotEnvironmentMap.get());
@@ -183,10 +176,8 @@ public class RenderSettingsTest {
 
     @Test
     public void testCustomRenderTransformer() throws Exception {
-        RenderSettings renderSettings = new RenderSettings.Builder().withRenderTransformer(
-            new CustomRenderTransformer()).build();
 
-        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(renderSettings).build();
+        TemplateParser parser = new TemplateParser.Builder().withRenderTransformer(new CustomRenderTransformer()).build();
         Template template = parser.parse("{{ 'Hello' }} {{ 'world' }}");
 
         Object obj = template.renderToObject();

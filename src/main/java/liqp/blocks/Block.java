@@ -1,7 +1,6 @@
 package liqp.blocks;
 
 import liqp.Insertion;
-import liqp.ParseSettings;
 
 public abstract class Block extends Insertion {
     /**

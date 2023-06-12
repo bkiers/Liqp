@@ -1,7 +1,6 @@
 package liqp.parser;
 
 import liqp.Insertions;
-import liqp.ParseSettings;
 import liqp.TemplateParser;
 import liqp.filters.Filters;
 
@@ -40,7 +39,6 @@ public enum Flavor {
     private final boolean liquidStyleInclude;
     private final boolean liquidStyleWhere;
     private final boolean evaluateInOutputTag;
-    private ParseSettings parseSettings;
     private TemplateParser parser;
 
     Flavor(String snippetsFolderName,
@@ -78,25 +76,13 @@ public enum Flavor {
     }
 
     /**
-     * Returns the default {@link ParseSettings} for this Flavor.
-     * 
-     * @return The settings.
-     */
-    public ParseSettings defaultParseSettings() {
-        if (parseSettings == null) {
-            parseSettings = new ParseSettings.Builder().withFlavor(this).build();
-        }
-        return parseSettings;
-    }
-
-    /**
      * Returns the default {@link TemplateParser} for this Flavor.
      * 
      * @return The parser.
      */
     public TemplateParser defaultParser() {
         if (parser == null) {
-            parser = new TemplateParser.Builder().withParseSettings(defaultParseSettings()).build();
+            parser = new TemplateParser.Builder().withFlavor(this).build();
         }
         return parser;
     }

@@ -197,8 +197,7 @@ public abstract class LValue {
     public static ZonedDateTime asTemporal(Object value, TemplateContext context) {
         ZonedDateTime time = ZonedDateTime.now();
         if (value instanceof TemporalAccessor) {
-            time = getZonedDateTimeFromTemporalAccessor((TemporalAccessor) value, context
-                    .getRenderSettings().defaultTimeZone);
+            time = getZonedDateTimeFromTemporalAccessor((TemporalAccessor) value, context.getParser().defaultTimeZone);
         } else if (CustomDateFormatRegistry.isCustomDateType(value)) {
             time = CustomDateFormatRegistry.getFromCustomType(value);
         }

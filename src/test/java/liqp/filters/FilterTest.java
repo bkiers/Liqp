@@ -1,6 +1,5 @@
 package liqp.filters;
 
-import liqp.ParseSettings;
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.TemplateParser;
@@ -9,24 +8,20 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class FilterTest {
 
     @Test
     public void testCustomFilter() throws RecognitionException {
-        ParseSettings parseSettings = new ParseSettings.Builder().with(new Filter("textilize") {
+
+        TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("textilize") {
             @Override
             public Object apply(Object value, TemplateContext context, Object... params) {
                 String s = super.asString(value, context).trim();
                 return "<b>" + s.substring(1, s.length() - 1) + "</b>";
             }
         }).build();
-
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
 
         Template template = parser.parse("{{ '*hi*' | textilize }}");
         String rendered = String.valueOf(template.render());
@@ -39,16 +34,13 @@ public class FilterTest {
     public void testFlavoredFilters() {
         String templateText = "{{ ' a  b   c' | normalize_whitespace }}";
 
-        ParseSettings jekyllSettings = new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build();
-        ParseSettings defaultSettings = new ParseSettings.Builder().build();
-
-        Template template1 = new TemplateParser.Builder().withParseSettings(jekyllSettings).build()
+        Template template1 = new TemplateParser.Builder().withFlavor(Flavor.JEKYLL).build()
                 .parse(templateText);
 
         String res = template1.render();
         assertEquals("a b c", res);
 
-        Template template2 = new TemplateParser.Builder().withParseSettings(defaultSettings).build()
+        Template template2 = new TemplateParser.Builder().build()
                 .parse(templateText);
         try {
             template2.render();

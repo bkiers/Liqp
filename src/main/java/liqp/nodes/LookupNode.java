@@ -52,7 +52,7 @@ public class LookupNode implements LNode {
             value = index.get(value, context);
         }
 
-        if(value == null && context.getRenderSettings().strictVariables) {
+        if(value == null && context.getParser().strictVariables) {
             RuntimeException e = new VariableNotExistException(getVariableName());
             context.addError(e);
             if (context.getErrorMode() == TemplateParser.ErrorMode.strict) {
@@ -97,7 +97,7 @@ public class LookupNode implements LNode {
                 else if(value instanceof java.util.Map || value instanceof Inspectable) {
                     java.util.Map map;
                     if (value instanceof Inspectable) {
-                        LiquidSupport evaluated = context.evaluate(value);
+                        LiquidSupport evaluated = context.getParser().evaluate(value);
                         map = evaluated.toLiquid();
                     } else {
                         map = (java.util.Map) value;
@@ -136,7 +136,7 @@ public class LookupNode implements LNode {
             if(value instanceof java.util.Map || value instanceof Inspectable) {
                 java.util.Map map;
                 if (value instanceof Inspectable) {
-                    LiquidSupport evaluated = context.evaluate(value);
+                    LiquidSupport evaluated = context.getParser().evaluate(value);
                     map = evaluated.toLiquid();
                 } else {
                     map = (java.util.Map) value;

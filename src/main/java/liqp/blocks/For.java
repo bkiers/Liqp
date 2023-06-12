@@ -90,7 +90,7 @@ public class For extends Block {
         int limit = attributes.get(LIMIT);
 
         if (data instanceof Inspectable) {
-            LiquidSupport evaluated = context.evaluate(data);
+            LiquidSupport evaluated = context.getParser().evaluate(data);
             data = evaluated.toLiquid();
         }
         if (data instanceof Map) {

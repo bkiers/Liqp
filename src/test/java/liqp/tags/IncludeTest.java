@@ -196,6 +196,7 @@ public class IncludeTest {
                 .withFlavor(Flavor.LIQUID) //
                 .withStrictVariables(true) //
                 .withShowExceptionsFromInclude(true) //
+                .withErrorMode(TemplateParser.ErrorMode.strict) //
             .build();
         Template template = parser.parse(index);
         template.render();

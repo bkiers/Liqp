@@ -5,6 +5,7 @@ import liqp.TemplateContext;
 import liqp.TemplateParser;
 import liqp.filters.date.CustomDateFormatSupport;
 import liqp.parser.Flavor;
+import liqp.spi.SPIHelper;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +31,7 @@ public class DateTest {
     public void init() {
         // reset
         dateFilterSetting = new TemplateParser.Builder().withFilter(new Date()).build();
+        SPIHelper.applyCustomDateTypes();
     }
 
     // NOTE: you have to put your machine in US/Eastern time for this test to pass

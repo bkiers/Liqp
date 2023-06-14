@@ -9,6 +9,8 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import liqp.filters.Filter;
 import liqp.filters.Filters;
 import liqp.parser.LiquidSupport;
@@ -122,7 +124,7 @@ public class TemplateParser {
     public static class Builder {
 
         private Flavor flavor;
-        private boolean stripSpacesAroundTags;
+        private boolean stripSpacesAroundTags = false;
         private boolean stripSingleLine;
         private ObjectMapper mapper;
         private List<Insertion> insertions = new ArrayList<>();
@@ -133,10 +135,10 @@ public class TemplateParser {
         private Boolean liquidStyleWhere;
 
 
-        private boolean strictVariables;
+        private boolean strictVariables = false;
         private boolean showExceptionsFromInclude;
-        private EvaluateMode evaluateMode;
-        private Locale locale;
+        private EvaluateMode evaluateMode = EvaluateMode.LAZY;
+        private Locale locale = DEFAULT_LOCALE;
         private ZoneId defaultTimeZone;
         private RenderTransformer renderTransformer;
         private Consumer<Map<String, Object>> environmentMapConfigurator;
@@ -159,12 +161,12 @@ public class TemplateParser {
             this.insertions = new ArrayList<>(parser.insertions.values());
             this.filters = new ArrayList<>(parser.filters.values());
 
-            this.strictVariables = false;
-            this.evaluateMode = TemplateParser.EvaluateMode.LAZY;
-            this.locale = DEFAULT_LOCALE;
-            this.renderTransformer = null;
-            this.environmentMapConfigurator = null;
-            this.showExceptionsFromInclude = true;
+            this.strictVariables = parser.strictVariables;
+            this.evaluateMode = parser.evaluateMode;
+            this.locale = parser.locale;
+            this.renderTransformer = parser.renderTransformer;
+            this.environmentMapConfigurator = parser.environmentMapConfigurator;
+            this.showExceptionsFromInclude = parser.showExceptionsFromInclude;
 
             this.limitMaxIterations = parser.limitMaxIterations;
             this.limitMaxSizeRenderedString = parser.limitMaxSizeRenderedString;
@@ -172,6 +174,7 @@ public class TemplateParser {
             this.limitMaxTemplateSizeBytes = parser.limitMaxTemplateSizeBytes;
             this.evaluateInOutputTag = parser.evaluateInOutputTag;
             this.liquidStyleInclude = parser.liquidStyleInclude;
+            this.liquidStyleWhere = parser.liquidStyleWhere;
 
             this.errorMode = parser.errorMode;
         }
@@ -340,6 +343,16 @@ public class TemplateParser {
             ErrorMode errorMode = this.errorMode;
             if (errorMode == null) {
                 errorMode = fl.getErrorMode();
+            }
+
+            if (mapper == null) {
+                mapper = new ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+            }
+
+            if (this.defaultTimeZone == null) {
+                this.defaultTimeZone = ZoneId.systemDefault();
             }
 
             Insertions allInsertions = fl.getInsertions().mergeWith(Insertions.of(this.insertions));

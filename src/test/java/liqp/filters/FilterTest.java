@@ -40,7 +40,7 @@ public class FilterTest {
         String res = template1.render();
         assertEquals("a b c", res);
 
-        Template template2 = new TemplateParser.Builder().build()
+        Template template2 = new TemplateParser.Builder().withFlavor(Flavor.LIQUID).build()
                 .parse(templateText);
         try {
             template2.render();

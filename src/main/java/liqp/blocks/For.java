@@ -64,7 +64,7 @@ public class For extends Block {
         boolean reversed = super.asBoolean(nodes[6].render(context));
 
         // Each for tag has its own context that keeps track of its own variables (scope)
-        TemplateContext nestedContext = new TemplateContext(context);
+        TemplateContext nestedContext = context.newChildContext();
 
         Object rendered = array ? renderArray(id, nestedContext, tagName, reversed, nodes) : renderRange(id, nestedContext, tagName, reversed, nodes);
 

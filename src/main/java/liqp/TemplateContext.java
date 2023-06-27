@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.RenderTransformer.ObjectAppender;
 import liqp.exceptions.ExceededMaxIterationsException;
 import liqp.parser.LiquidSupport;
+import liqp.filters.Filters;
+import liqp.parser.Flavor;
 
 public class TemplateContext {
 
@@ -29,6 +31,7 @@ public class TemplateContext {
     private Map<String, Object> registry;
 
     private List<Exception> errors;
+    private final Template template;
 
     public TemplateContext() {
         this(TemplateParser.DEFAULT, new LinkedHashMap<>());
@@ -40,6 +43,11 @@ public class TemplateContext {
     }
 
     public TemplateContext(TemplateParser parser, Map<String, Object> variables) {
+      this(null, parser, variables);
+    }
+
+    public TemplateContext(Template template, TemplateParser parser, Map<String, Object> variables) {
+        this.template = template;
         this.parent = null;
         this.parser = parser;
         this.variables = new LinkedHashMap<>(variables);
@@ -47,7 +55,7 @@ public class TemplateContext {
     }
 
     public TemplateContext(TemplateContext parent) {
-        this(parent.getParser(), new LinkedHashMap<String, Object>());
+        this(parent.template, parent.getParser(), new LinkedHashMap<String, Object>());
         this.parent = parent;
     }
 
@@ -198,5 +206,25 @@ public class TemplateContext {
 
     public TemplateParser.ErrorMode getErrorMode() {
         return parser.getErrorMode();
+    }
+
+    public TemplateContext newChildContext() {
+        return newChildContext(new HashMap<>());
+    }
+
+    public Filters getFilters() {
+        if(template == null) {
+            return getParseSettings().filters;
+        } else {
+            return template.getFilters();
+        }
+    }
+
+    public Insertions getInsertions() {
+        if(template == null) {
+            return getParseSettings().insertions;
+        } else {
+            return template.getInsertions();
+        }
     }
 }

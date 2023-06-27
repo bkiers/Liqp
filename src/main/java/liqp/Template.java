@@ -1,13 +1,12 @@
 package liqp;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,7 +17,6 @@ import java.util.function.Consumer;
 
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
@@ -69,21 +67,7 @@ public class Template {
 
     private ContextHolder contextHolder;
 
-    private TemplateParser templateParser = null;
-
-    /**
-     * Creates a new Template instance from a given input.
-     * 
-     * @param input
-     *            the file holding the Liquid source.
-     * @param insertions
-     *            the insertions this instance will make use of.
-     * @param filters
-     *            the filters this instance will make use of.
-     */
-    private Template(String input, Insertions insertions, Filters filters, ParseSettings parseSettings) {
-        this(CharStreams.fromString(input, input), insertions, filters, parseSettings);
-    }
+    private TemplateParser templateParser;
 
     private Template(CharStream stream, Insertions insertions, Filters filters, ParseSettings parseSettingsIn) {
         this.templateParser = new TemplateParser.Builder()
@@ -111,37 +95,10 @@ public class Template {
         }
     }
 
-    /**
-     * Creates a new Template instance from a given file.
-     *
-     * @param file
-     *            the file holding the Liquid source.
-     */
-    private Template(File file, Insertions insertions, Filters filters, ParseSettings parseSettings)
-            throws IOException {
-        this(fromFile(file), insertions, filters, parseSettings);
-    }
-
     // TemplateParser constructor
     Template(TemplateParser parser, CharStream input) {
         this(input, parser.getParseSettings().insertions, parser.getParseSettings().filters, parser.getParseSettings());
-        this.templateParser = parser;
-    }
-
-    private static CharStream fromStream(InputStream in) {
-        try {
-            return CharStreams.fromStream(in);
-        } catch (IOException e) {
-            throw new RuntimeException("could not parse input: " + in, e);
-        }
-    }
-
-    private static CharStream fromFile(File path) {
-        try {
-            return CharStreams.fromFileName(path.getAbsolutePath());
-        } catch (IOException e) {
-            throw new RuntimeException("could not parse input: " + path, e);
-        }
+        this.templateParser = Objects.requireNonNull(parser);
     }
 
     private ParseTree parse(LiquidLexer lexer) {
@@ -410,7 +367,7 @@ public class Template {
     }
 
     private TemplateContext newRootContext(Map<String, Object> variables) {
-        TemplateContext context = new TemplateContext(templateParser, variables);
+        TemplateContext context = new TemplateContext(this, templateParser, variables);
         Consumer<Map<String, Object>> configurator = context.getRenderSettings().getEnvironmentMapConfigurator();
         if (configurator != null) {
             configurator.accept(context.getEnvironmentMap());
@@ -575,5 +532,13 @@ public class Template {
 
     TemplateParser getTemplateParser() {
         return templateParser;
+    }
+
+    Filters getFilters() {
+        return filters;
+    }
+
+    Insertions getInsertions() {
+        return insertions;
     }
 }

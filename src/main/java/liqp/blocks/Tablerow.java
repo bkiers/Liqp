@@ -1,13 +1,13 @@
 package liqp.blocks;
 
-import liqp.TemplateContext;
-import liqp.RenderTransformer.ObjectAppender;
-import liqp.nodes.LNode;
-import liqp.parser.LiquidSupport;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import liqp.RenderTransformer.ObjectAppender;
+import liqp.TemplateContext;
+import liqp.nodes.LNode;
+import liqp.parser.LiquidSupport;
 
 public class Tablerow extends Block {
 
@@ -66,7 +66,7 @@ public class Tablerow extends Block {
             }
         }
 
-        TemplateContext nestedContext = new TemplateContext(context);
+        TemplateContext nestedContext = context.newChildContext();
         int total = Math.min(collection.length, limit);
         TablerowloopDrop tablerowloopDrop = new TablerowloopDrop(total, cols);
         nestedContext.put(TABLEROWLOOP, tablerowloopDrop);

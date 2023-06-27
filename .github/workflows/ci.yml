@@ -39,7 +39,7 @@ jobs:
             11
           cache: 'maven'
       - name: Build & Test
-        run: ./mvnw -B verify && if [[ "${{ matrix.java-version }}" != "11" ]]; then JAVA_HOME="$JAVA_HOME_${{ matrix.java-version }}_X64" ./mvnw -B verify -P \!antlr,antlr-skip; fi
+        run: ./mvnw -B verify && if [[ "${{ matrix.java-version }}" != "11" ]]; then JAVA_HOME="$JAVA_HOME_${{ matrix.java-version }}_X64" ./mvnw -B verify -P antlr-skip; fi
       - name: Generate JaCoCo Badge
         if: ${{ matrix.jacoco }}
         uses: cicirello/jacoco-badge-generator@v2

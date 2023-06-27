@@ -387,12 +387,12 @@ public class LiquidParserTest {
 
         assertThat(
                 texts("{{ true }}", "output"),
-                equalTo(array("{{", "true", "", "}}"))
+                equalTo(array("{{", "true", "}}"))
         );
 
         assertThat(
                 texts("{{ 'some string here' | uppercase }}", "output"),
-                equalTo(array("{{", "'some string here'", "|uppercase", "", "}}"))
+                equalTo(array("{{", "'some string here'", "|uppercase", "}}"))
         );
     }
 

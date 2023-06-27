@@ -1,9 +1,9 @@
 package liqp.filters;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import java.util.HashMap;
+import java.util.Collections;
 
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
@@ -53,11 +53,11 @@ public class MapTest {
         Filter filter = Filters.COMMON_FILTERS.get("map");
 
         Object[] rendered = (Object[]) filter.apply(
-                new HashMap[]{
-                        new HashMap<String, Integer>(){{ put("a", 1); }},
-                        new HashMap<String, Integer>(){{ put("a", 2); }},
-                        new HashMap<String, Integer>(){{ put("a", 3); }},
-                        new HashMap<String, Integer>(){{ put("a", 4); }},
+                new java.util.Map<?,?>[]{
+                    Collections.singletonMap("a", 1),
+                    Collections.singletonMap("a", 2),
+                    Collections.singletonMap("a", 3),
+                    Collections.singletonMap("a", 4),
                 },
                 new TemplateContext(),
                 "a"

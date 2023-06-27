@@ -13,6 +13,7 @@ public class ReadmeSamplesTest {
     @Test
     public void testInspectable() {
         class MyParams implements Inspectable {
+            @SuppressWarnings("unused")
             public String name = "tobi";
         };
         Template template = TemplateParser.DEFAULT.parse("hi {{name}}");
@@ -40,6 +41,7 @@ public class ReadmeSamplesTest {
                 .build();
 
         Map<String, Object> in = Collections.singletonMap("a", new Object() {
+            @SuppressWarnings("unused")
             public String val = "tobi";
         });
         

@@ -1,12 +1,10 @@
 package liqp;
 
-import liqp.filters.Filter;
-import liqp.blocks.Block;
-import liqp.tags.Tag;
-import liqp.nodes.LNode;
-import liqp.parser.Inspectable;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
+import static liqp.TestUtils.assertPatternResultEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,9 +21,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import static liqp.TestUtils.assertPatternResultEquals;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
+import liqp.blocks.Block;
+import liqp.filters.Filter;
+import liqp.nodes.LNode;
+import liqp.parser.Inspectable;
+import liqp.tags.Tag;
 
 public class TemplateTest {
 
@@ -46,6 +49,7 @@ public class TemplateTest {
 
         public String a = "A";
         private String b = "B";
+        @SuppressWarnings("unused")
         private String c = "C";
 
         public String getB() {
@@ -160,6 +164,7 @@ public class TemplateTest {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testRenderInspectableDateType() {
         // given
@@ -175,6 +180,7 @@ public class TemplateTest {
         assertEquals("31 Dec, 2020", res);
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testRenderDateType() {
         // given
@@ -211,6 +217,7 @@ public class TemplateTest {
         assertEquals("ok", rendered);
     }
 
+    @SuppressWarnings("unused")
     @Test
     public void testDeepInspectable() {
 
@@ -218,14 +225,17 @@ public class TemplateTest {
         Inspectable data = new Inspectable() {
             public Inspectable a = new Inspectable() {
                 public Object[] b = new Object[]{null, null, new Inspectable() {
-                    public List d = new ArrayList();
+                    public List<Object> d = new ArrayList<Object>();
                     {
                         d.add(new Object()); // 0
                         d.add(new Object()); // 1
                         d.add(new Object()); // 2
-                        d.add(new HashMap() {{
-                            put("e", ZonedDateTime.of(LocalDateTime.of(2021, 11, 3, 16, 40, 44), ZoneId.of("America/Los_Angeles")));
-                        }
+                        d.add(new HashMap<String, ZonedDateTime>() {
+                            private static final long serialVersionUID = 1L;
+                            {
+                                put("e", ZonedDateTime.of(LocalDateTime.of(2021, 11, 3, 16, 40, 44),
+                                    ZoneId.of("America/Los_Angeles")));
+                            }
                         }); // 3
                     }
                 }};
@@ -324,7 +334,7 @@ public class TemplateTest {
 
     private Map<String, Object> getDeepData() {
         Map<String, Object> data = new HashMap<>();
-        Map secondIndex = Collections.singletonMap("e", "ok");
+        Map<?,?> secondIndex = Collections.singletonMap("e", "ok");
         Object[] d = new Object[]{null, null, null, secondIndex};
         List<Object> firstIndex = new ArrayList<>();
         firstIndex.add(new Object()); // 0

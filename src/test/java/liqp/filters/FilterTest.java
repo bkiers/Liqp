@@ -1,18 +1,19 @@
 package liqp.filters;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
 import liqp.ParseSettings;
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.TemplateParser;
 import liqp.parser.Flavor;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 public class FilterTest {
 

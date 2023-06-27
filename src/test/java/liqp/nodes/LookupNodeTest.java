@@ -2,7 +2,8 @@ package liqp.nodes;
 
 import static liqp.TestUtils.getNode;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,6 +56,7 @@ public class LookupNodeTest {
      *
      * end
      */
+    @SuppressWarnings("serial")
     @Test
     public void lengthQueryTest() throws Exception {
 
@@ -138,15 +140,9 @@ public class LookupNodeTest {
         products.put("count", 5);
         products.put("tags", new String[]{"deepsnow", "freestyle"});
 
-        product.put("variants", new HashMap[]{
-                new HashMap<String, Object>(){{
-                    put("title", "draft151cm");
-                }},
-                new HashMap<String, Object>(){{
-                    put("title", "element151cm");
-                }}
-            }
-        );
+        product.put("variants", new Map<?, ?>[] {
+            Collections.singletonMap("title", "draft151cm"), //
+            Collections.singletonMap("title", "element151cm"),});
 
         context.put("products", products);
         context.put("product", product);
@@ -192,15 +188,14 @@ public class LookupNodeTest {
      *   assert_equal 'freestyle', @context['products[nested.var].last']
      * end
      */
+    @SuppressWarnings("serial")
     @Test
     public void accessHashesWithHashAccessVariablesTest() throws Exception {
 
         TemplateContext context = new TemplateContext();
 
         context.put("var", "tags");
-        context.put("nested", new HashMap<String, Object>(){{
-            put("var", "tags");
-        }});
+        context.put("nested", Collections.singletonMap("var", "tags"));
         context.put("products", new HashMap<String, Object>(){{
             put("count", 5);
             put("tags", new String[]{"deepsnow", "freestyle"});
@@ -226,9 +221,7 @@ public class LookupNodeTest {
         TemplateContext context = new TemplateContext();
 
         context.put("array", new Integer[]{1, 2, 3, 4, 5});
-        context.put("hash", new HashMap<String, Object>(){{
-            put("first", "Hello");
-        }});
+        context.put("hash", Collections.singletonMap("first", "Hello"));
 
         assertThat(getNode("array.first", "expr").render(context), is((Object)1));
         assertThat(getNode("array[\"first\"]", "expr").render(context), is((Object)null));
@@ -247,21 +240,20 @@ public class LookupNodeTest {
      *
      * end
      */
+    @SuppressWarnings("serial")
     @Test
     public void firstCanAppearInMiddleOfCallChainTest() throws Exception {
 
         TemplateContext context = new TemplateContext();
 
-        context.put("product", new HashMap<String, Object>(){{
-            put("variants", new HashMap[]{
+        context.put("product", Collections.singletonMap("variants", new HashMap[]{
                     new HashMap<String, Object>(){{
                         put("title", "draft151cm");
                     }},
                     new HashMap<String, Object>(){{
                         put("title", "element151cm");
                     }}
-            });
-        }});
+            }));
 
         assertThat(getNode("product.variants[0].title", "expr").render(context), is((Object)"draft151cm"));
         assertThat(getNode("product.variants[1].title", "expr").render(context), is((Object)"element151cm"));

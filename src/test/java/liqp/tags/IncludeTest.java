@@ -1,26 +1,20 @@
 package liqp.tags;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.isA;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import liqp.ParseSettings;
 import liqp.RenderSettings;
@@ -32,11 +26,6 @@ import liqp.filters.Filter;
 import liqp.parser.Flavor;
 
 public class IncludeTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
-
     @Test
     public void renderTest() throws RecognitionException {
 
@@ -202,11 +191,8 @@ public class IncludeTest {
     }
 
 
-    @Test
+    @Test(expected = VariableNotExistException.class)
     public void renderTestWithIncludeSubdirectorySpecifiedInLiquidFlavorWithStrictVariablesException() throws Exception {
-
-        thrown.expectCause(isA(VariableNotExistException.class));
-
         File index = new File("src/test/jekyll/index_with_variables.html");
         TemplateParser parser = new TemplateParser.Builder() //
             .withParseSettings(Flavor.LIQUID.defaultParseSettings()) //
@@ -217,7 +203,14 @@ public class IncludeTest {
             .withErrorMode(TemplateParser.ErrorMode.strict) //
             .build();
         Template template = parser.parse(index);
-        template.render();
+
+        try {
+            template.render();
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof VariableNotExistException) {
+                throw (VariableNotExistException) e.getCause();
+            }
+        }
     }
 
     // https://github.com/bkiers/Liqp/issues/95
@@ -330,9 +323,7 @@ public class IncludeTest {
         //given
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_with_errored_include.html");
-        ParseSettings parseSettings = new ParseSettings.Builder().withFlavor(Flavor.JEKYLL).build();
         RenderSettings renderSettings = new RenderSettings.Builder().withShowExceptionsFromInclude(false).build();
-        @SuppressWarnings("deprecation")
         Template template = new TemplateParser.Builder().withRenderSettings(renderSettings).build().parse(index);
 
         // when

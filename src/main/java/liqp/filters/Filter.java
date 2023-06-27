@@ -1,17 +1,10 @@
 package liqp.filters;
 
-import static liqp.ParseSettings.DEFAULT_FLAVOR;
-
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import liqp.LValue;
-import liqp.ParseSettings;
 import liqp.TemplateContext;
-import liqp.TemplateParser;
-import liqp.parser.Flavor;
 
 /**
  * Output markup takes filters. Filters are simple methods. The first parameter is always the output of

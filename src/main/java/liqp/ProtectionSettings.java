@@ -2,6 +2,7 @@ package liqp;
 
 import liqp.exceptions.ExceededMaxIterationsException;
 
+@SuppressWarnings("hiding")
 public class ProtectionSettings {
     public static final ProtectionSettings DEFAULT = new ProtectionSettings.Builder().build();
 

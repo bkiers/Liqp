@@ -1,12 +1,12 @@
 package liqp.filters.where;
 
-import liqp.TemplateContext;
-import liqp.nodes.AtomNode;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import liqp.TemplateContext;
+import liqp.nodes.AtomNode;
 
 /**
  * Created by vasyl.khrystiuk on 10/09/2019.
@@ -137,25 +137,25 @@ public class JekyllWhereImpl extends WhereImpl {
         }
 
         if (input instanceof java.util.Map) {
-            input = ((Map) input).values();
+            input = ((Map<?,?>) input).values();
         }
 
         if (input.getClass().isArray()) {
             input = arrayToArrayList((Object[]) input);
         }
-        Collection inputColl = (Collection) input;
+        Collection<?> inputColl = (Collection<?>) input;
 
-        List res = new ArrayList();
+        List<Object> res = new ArrayList<>();
         for (Object item : inputColl) {
             Object itemProperty = itemProperty(item, property);
-            if (comparePropertyVsTarget(itemProperty, value, context)) {
+            if (comparePropertyVsTarget(itemProperty, value)) {
                 res.add(item);
             }
         }
         return res.toArray(new Object[res.size()]);
     }
 
-    private boolean comparePropertyVsTarget(Object itemProperty, Object target, TemplateContext context) {
+    private boolean comparePropertyVsTarget(Object itemProperty, Object target) {
         if (target == null) {
             return itemProperty == null;
         }
@@ -181,7 +181,7 @@ public class JekyllWhereImpl extends WhereImpl {
         // version of Array(property).join
         Object[] objects;
         if (itemProperty instanceof Map) {
-            objects = mapAsArray((Map) itemProperty);
+            objects = mapAsArray((Map<?,?>) itemProperty);
         } else {
             objects = asArray(itemProperty, context);
         }
@@ -194,7 +194,7 @@ public class JekyllWhereImpl extends WhereImpl {
         if (adapter != null) {
             return parseSortInput(adapter.getItemProperty(context, e, property));
         }
-        return parseSortInput(((Map) e).get(property));
+        return parseSortInput(((Map<?,?>) e).get(property));
     }
 
     private Object parseSortInput(Object property) {

@@ -13,10 +13,11 @@ public class CustomDateFormatRegistry {
     // might be better storage for this will be tree,
     // so the subtypes will be properly handled
     // and parent type will not override child's one
-    private static final List<CustomDateFormatSupport> supportedTypes = new ArrayList<>();
+    private static final List<CustomDateFormatSupport<Object>> supportedTypes = new ArrayList<>();
 
-    public static void add(CustomDateFormatSupport supportThis) {
-        supportedTypes.add(0, supportThis);
+    @SuppressWarnings("unchecked")
+    public static void add(CustomDateFormatSupport<?> supportThis) {
+        supportedTypes.add(0, (CustomDateFormatSupport<Object>)supportThis);
     }
 
 
@@ -25,7 +26,7 @@ public class CustomDateFormatRegistry {
     }
 
     public static boolean isCustomDateType(Object value) {
-        for (CustomDateFormatSupport el: supportedTypes) {
+        for (CustomDateFormatSupport<?> el: supportedTypes) {
             if (el.support(value)) {
                 return true;
             }
@@ -34,7 +35,7 @@ public class CustomDateFormatRegistry {
     }
 
     public static ZonedDateTime getFromCustomType(Object value) {
-        for (CustomDateFormatSupport el: supportedTypes) {
+        for (CustomDateFormatSupport<Object> el: supportedTypes) {
             if (el.support(value)) {
                 return el.getValue(value);
             }

@@ -102,7 +102,7 @@ public enum Flavor {
     }
 
     /**
-     * Returns the default {@link TemplateParser.ErrorMode} for this Flavor.
+     * Returns the default {@link liqp.TemplateParser.ErrorMode} for this Flavor.
      */
     public TemplateParser.ErrorMode getErrorMode() {
         return errorMode;
@@ -110,7 +110,7 @@ public enum Flavor {
 
     /**
      * Return default behavior for this Flavor whenever expressions must be evaluated in output tag
-     * @return
+     * @return if {@code true}.
      */
     public boolean isEvaluateInOutputTag() {
         return evaluateInOutputTag;

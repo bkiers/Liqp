@@ -1,9 +1,9 @@
 package liqp;
 
-import static java.math.BigDecimal.ROUND_UNNECESSARY;
 import static liqp.filters.date.Parser.getZonedDateTimeFromTemporalAccessor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
@@ -219,9 +219,9 @@ public abstract class LValue {
      * @param value
      * @return
      */
-    protected Object[] mapAsArray(Map value) {
+    protected Object[] mapAsArray(Map<?,?> value) {
         List<Object[]> keyValuePairs = new ArrayList<>();
-        for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) value).entrySet()) {
+        for (Map.Entry<?, ?> entry : value.entrySet()) {
             keyValuePairs.add(new Object[]{entry.getKey(), entry.getValue()});
         }
         return keyValuePairs.toArray();
@@ -279,7 +279,7 @@ public abstract class LValue {
     // mimic ruby's `BigDecimal.to_f` with standard java capabilities
     // same time provide expected out for java.math.BigDecimal
     public static String asFormattedNumber(BigDecimal bd) {
-        return bd.setScale(Math.max(1, bd.stripTrailingZeros().scale()), ROUND_UNNECESSARY).toPlainString();
+        return bd.setScale(Math.max(1, bd.stripTrailingZeros().scale()), RoundingMode.UNNECESSARY).toPlainString();
     }
     
     /**
@@ -438,7 +438,7 @@ public abstract class LValue {
         if (this.isArray(value) && this.asArray(value, context).length == 0)
             return true;
 
-        if ((value instanceof Map) && ((Map) value).isEmpty())
+        if ((value instanceof Map) && ((Map<?,?>) value).isEmpty())
             return true;
 
         return false;
@@ -456,8 +456,8 @@ public abstract class LValue {
         return value != null && (value instanceof Map);
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> asMap(Object value) {
-
         return (Map<String, Object>)value;
     }
 }

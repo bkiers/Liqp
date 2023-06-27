@@ -8,7 +8,6 @@ import liqp.filters.date.Parser;
 import ua.co.k.strftime.StrftimeFormatter;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Locale;
 
@@ -22,7 +21,7 @@ public class Date extends Filter {
         super();
     }
 
-    protected Date(CustomDateFormatSupport typeSupport) {
+    protected Date(CustomDateFormatSupport<?> typeSupport) {
         super();
         CustomDateFormatRegistry.add(typeSupport);
     }
@@ -89,7 +88,7 @@ public class Date extends Filter {
         datePatterns.remove(pattern);
     }
 
-    public static Filter withCustomDateType(CustomDateFormatSupport typeSupport) {
+    public static Filter withCustomDateType(CustomDateFormatSupport<?> typeSupport) {
         return new Date(typeSupport);
     }
 }

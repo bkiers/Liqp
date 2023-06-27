@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import liqp.parser.LiquidSupport;
 
+@SuppressWarnings("hiding")
 public class RenderSettings {
     public static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
     
@@ -102,7 +103,7 @@ public class RenderSettings {
          * that does not have own timezone information.
          * May be null, so the timezone pattern will be omitted in formatted strings.
          * @param defaultTimeZone - value or <code>null<code/>
-         * @return
+         * @return This builder.
          */
         public Builder withDefaultTimeZone(ZoneId defaultTimeZone) {
             this.defaultTimeZone = defaultTimeZone;

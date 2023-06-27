@@ -1,7 +1,7 @@
 package liqp.exceptions;
 
-
 public class VariableNotExistException extends RuntimeException {
+    private static final long serialVersionUID = -2726673309959828365L;
     private final String variableName;
 
     public VariableNotExistException(String variableName) {

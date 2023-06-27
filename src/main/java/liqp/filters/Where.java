@@ -5,7 +5,6 @@ import liqp.filters.where.JekyllWhereImpl;
 import liqp.filters.where.LiquidWhereImpl;
 import liqp.filters.where.PropertyResolverHelper;
 import liqp.filters.where.WhereImpl;
-import liqp.parser.Flavor;
 
 /**
  * There are two different implementations of this filter in ruby.

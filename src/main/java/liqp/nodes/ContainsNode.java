@@ -1,14 +1,14 @@
 package liqp.nodes;
 
-import liqp.LValue;
-import liqp.TemplateContext;
-import liqp.parser.Inspectable;
-import liqp.parser.LiquidSupport;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import liqp.LValue;
+import liqp.TemplateContext;
+import liqp.parser.Inspectable;
+import liqp.parser.LiquidSupport;
 
 public class ContainsNode extends LValue implements LNode {
 

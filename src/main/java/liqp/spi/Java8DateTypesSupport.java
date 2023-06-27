@@ -1,20 +1,9 @@
 package liqp.spi;
 
-import com.fasterxml.jackson.core.JsonGenerator;
+import java.time.temporal.Temporal;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import liqp.TemplateContext;
-import liqp.filters.date.CustomDateFormatSupport;
-
-import java.io.IOException;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.time.temporal.Temporal;
-import java.util.Map;
-
 
 public class Java8DateTypesSupport extends BasicTypesSupport {
     @Override

@@ -1,11 +1,11 @@
 package liqp.filters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import liqp.TemplateContext;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Map extends Filter {
 
@@ -29,12 +29,12 @@ public class Map extends Filter {
 
         for (Object obj : array) {
 
-            java.util.Map map;
+            java.util.Map<?,?> map;
             if (value instanceof Inspectable) {
                 LiquidSupport evaluated = context.evaluate(value);
                 map = evaluated.toLiquid();
             } else {
-                map = (java.util.Map) obj;
+                map = (java.util.Map<?,?>) obj;
             }
 
             Object val = map.get(key);

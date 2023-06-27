@@ -10,6 +10,7 @@ import liqp.filters.Filter;
 import liqp.filters.Filters;
 import liqp.parser.Flavor;
 
+@SuppressWarnings("hiding")
 public class ParseSettings {
     public static final Flavor DEFAULT_FLAVOR = Flavor.LIQUID;
     public static final ParseSettings DEFAULT = DEFAULT_FLAVOR.defaultParseSettings();

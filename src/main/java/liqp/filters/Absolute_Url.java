@@ -66,7 +66,7 @@ public class Absolute_Url extends Relative_Url {
         }
     }
 
-    public static String convertUnicodeURLToAscii(String url) throws URISyntaxException {
+    public static String convertUnicodeURLToAscii(@SuppressWarnings("hiding") String url) throws URISyntaxException {
         if(url != null) {
             url = url.trim();
             URI uri = new URI(url);

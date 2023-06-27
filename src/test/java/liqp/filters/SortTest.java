@@ -1,8 +1,8 @@
 package liqp.filters;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,20 +61,20 @@ public class SortTest {
 
         assertThat(filter.apply(new Integer[]{4,3,2,1}, context), is((Object)new Integer[]{1,2,3,4}));
 
-        java.util.Map[] unsorted = new java.util.Map[]{
-                new HashMap<String, Integer>(){{ put("a", 4); }},
-                new HashMap<String, Integer>(){{ put("a", 3); }},
-                new HashMap<String, Integer>(){{ put("a", 2); }},
-                new HashMap<String, Integer>(){{ put("a", 1); }}
+        java.util.Map<?,?>[] unsorted = new java.util.Map[]{
+            Collections.singletonMap("a", 4),
+            Collections.singletonMap("a", 3),
+            Collections.singletonMap("a", 2),
+            Collections.singletonMap("a", 1),
         };
 
-        java.util.Map[] sorted = (Sort.SortableMap[])filter.apply(unsorted, context, "a");
+        java.util.Map<?,?>[] sorted = (Sort.SortableMap[])filter.apply(unsorted, context, "a");
 
-        java.util.Map[] expected = new java.util.Map[]{
-                new HashMap<String, Integer>(){{ put("a", 1); }},
-                new HashMap<String, Integer>(){{ put("a", 2); }},
-                new HashMap<String, Integer>(){{ put("a", 3); }},
-                new HashMap<String, Integer>(){{ put("a", 4); }}
+        java.util.Map<?,?>[] expected = new java.util.Map[]{
+            Collections.singletonMap("a", 1),
+            Collections.singletonMap("a", 2),
+            Collections.singletonMap("a", 3),
+            Collections.singletonMap("a", 4),
         };
 
         assertThat(sorted, is(expected));
@@ -104,12 +104,12 @@ public class SortTest {
                 new Pojo(4), new Pojo(3), new Pojo(2), new Pojo(1)
         };
 
-        java.util.Map[] sorted = (Sort.SortableMap[]) filter.apply(unsortedIns, context, "a");
-        java.util.Map[] expected = new java.util.Map[]{
-                new HashMap<String, Integer>() {{ put("a", 1); }},
-                new HashMap<String, Integer>() {{ put("a", 2); }},
-                new HashMap<String, Integer>() {{ put("a", 3); }},
-                new HashMap<String, Integer>() {{ put("a", 4); }}
+        java.util.Map<?,?>[] sorted = (Sort.SortableMap[]) filter.apply(unsortedIns, context, "a");
+        java.util.Map<?,?>[] expected = new java.util.Map[]{
+            Collections.singletonMap("a", 1),
+            Collections.singletonMap("a", 2),
+            Collections.singletonMap("a", 3),
+            Collections.singletonMap("a", 4),
         };
 
         assertThat(sorted, is(expected));
@@ -136,20 +136,12 @@ public class SortTest {
                 new PojoWithSupport(4), new PojoWithSupport(3), new PojoWithSupport(2), new PojoWithSupport(1)
         };
 
-        java.util.Map[] sorted = (Sort.SortableMap[]) filter.apply(unsortedIns, context, "a");
-        java.util.Map[] expected = new java.util.Map[]{
-                new HashMap<String, Integer>() {{
-                    put("a", 1);
-                }},
-                new HashMap<String, Integer>() {{
-                    put("a", 2);
-                }},
-                new HashMap<String, Integer>() {{
-                    put("a", 3);
-                }},
-                new HashMap<String, Integer>() {{
-                    put("a", 4);
-                }}
+        java.util.Map<?,?>[] sorted = (Sort.SortableMap[]) filter.apply(unsortedIns, context, "a");
+        java.util.Map<?,?>[] expected = new java.util.Map[]{
+            Collections.singletonMap("a", 1),
+            Collections.singletonMap("a", 2),
+            Collections.singletonMap("a", 3),
+            Collections.singletonMap("a", 4),
         };
 
         assertThat(sorted, is(expected));

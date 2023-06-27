@@ -47,6 +47,7 @@ public class GtEqNodeTest {
     public void testDateTypes() {
         // so many ZoneOffset.systemDefault(), because
         // broken java.util.Date cannot another way
+        @SuppressWarnings("unused")
         Inspectable data = new Inspectable() {
             public Date a = new Date(100 /* milliseconds */);
             public LocalDateTime b = LocalDateTime.ofInstant(Instant.ofEpochMilli(99), ZoneOffset.systemDefault());

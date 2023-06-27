@@ -35,11 +35,13 @@ public class MinusTest {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid1() {
         Filters.COMMON_FILTERS.get("minus").apply(1);
     }
 
+    @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid2() {
         Filters.COMMON_FILTERS.get("minus").apply(1, 2, 3);

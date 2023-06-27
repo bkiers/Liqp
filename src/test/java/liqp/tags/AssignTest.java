@@ -2,7 +2,7 @@ package liqp.tags;
 
 import static liqp.TestUtils.assertPatternResultEquals;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;

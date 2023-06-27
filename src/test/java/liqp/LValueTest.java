@@ -1,11 +1,10 @@
 package liqp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import liqp.filters.Date;
-import liqp.spi.SPIHelper;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import liqp.spi.SPIHelper;
 public class LValueTest {
     @Test
     public void testIsTemporal() {

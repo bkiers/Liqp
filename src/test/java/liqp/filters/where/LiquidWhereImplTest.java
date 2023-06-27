@@ -1,18 +1,24 @@
 package liqp.filters.where;
 
-import liqp.Template;
-import liqp.parser.Flavor;
-import liqp.parser.LiquidSupport;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.Before;
+import org.junit.Test;
+
+import liqp.Template;
+import liqp.parser.Flavor;
+import liqp.parser.LiquidSupport;
 
 public class LiquidWhereImplTest {
     private Template parse(String input) {

@@ -1,12 +1,14 @@
 package liqp.tags;
 
-import liqp.Template;
-import liqp.TemplateParser;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.ParseSettings;
+import liqp.Template;
+import liqp.TemplateParser;
 
 public class WhitespaceWindowsControlTest {
 

@@ -130,7 +130,10 @@ public class DateTest {
         assertThat(filter.apply("2006-07-05 10:00:00", context,"%B"), is((Object)"July"));
 
         assertThat(filter.apply("2006-07-05 10:00:00", context,""), is((Object)"2006-07-05 10:00:00"));
-        assertThat(filter.apply("2006-07-05 10:00:00", context,null), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context, (Object)null), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context, (Object[])null), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context, new Object[0]), is((Object)"2006-07-05 10:00:00"));
 
         assertThat(filter.apply("2006-07-05 10:00:00", context,"%m/%d/%Y"), is((Object)"07/05/2006"));
 

@@ -2,7 +2,7 @@ package liqp.blocks;
 
 import static liqp.TestUtils.assertPatternResultEquals;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
@@ -133,7 +133,7 @@ public class CaptureTest {
     @Test(expected=LiquidException.class)
     public void capture_detects_bad_syntaxTest() throws Exception {
         Template template = TemplateParser.DEFAULT.parse("{{ var2 }}{% capture %}{{ var }} foo {% endcapture %}{{ var2 }}{{ var2 }}");
-        String res = template.render("{ \"var\" : \"content\" }");
+        template.render("{ \"var\" : \"content\" }");
     }
     
     @Test

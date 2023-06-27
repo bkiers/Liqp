@@ -1,7 +1,7 @@
 package liqp.filters;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
@@ -31,11 +31,13 @@ public class PlusTest {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid1() {
         Filters.COMMON_FILTERS.get("plus").apply(1);
     }
 
+    @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid2() {
         Filters.COMMON_FILTERS.get("plus").apply(1, 2, 3);

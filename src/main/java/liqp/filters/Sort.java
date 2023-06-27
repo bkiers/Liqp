@@ -56,7 +56,7 @@ public class Sort extends Filter {
 
         array = super.asArray(value, context);
 
-        List<Comparable> list = asComparableList(context, array, property);
+        List<Comparable<Object>> list = asComparableList(context, array, property);
 
         Collections.sort(list);
 
@@ -107,9 +107,10 @@ public class Sort extends Filter {
         }
     }
 
-    private List<Comparable> asComparableList(TemplateContext context, Object[] array, String property) {
+    @SuppressWarnings("unchecked")
+    private List<Comparable<Object>> asComparableList(TemplateContext context, Object[] array, String property) {
 
-        List<Comparable> list = new ArrayList<Comparable>();
+        List<Comparable<Object>> list = new ArrayList<Comparable<Object>>();
 
         for (Object obj : array) {
 
@@ -119,29 +120,33 @@ public class Sort extends Filter {
                 obj = evaluated.toLiquid();
             }
             if (obj instanceof java.util.Map && property != null) {
-                list.add(new SortableMap((java.util.Map<String, Comparable>) obj, property));
+                list.add(new SortableMap((java.util.Map<String, Comparable<Object>>) obj, property));
             } else {
-                list.add((Comparable) obj);
+                list.add((Comparable<Object>) obj);
             }
         }
 
         return list;
     }
 
-    static class SortableMap extends HashMap<String, Comparable> implements Comparable<SortableMap> {
-
+    static class SortableMap extends HashMap<String, Comparable<Object>> implements Comparable<Object> {
+        private static final long serialVersionUID = -6480701533195197967L;
         final String property;
 
-        SortableMap(java.util.Map<String, Comparable> map, String property) {
+        SortableMap(java.util.Map<String, Comparable<Object>> map, String property) {
             super.putAll(map);
             this.property = property;
         }
 
         @Override
-        public int compareTo(SortableMap that) {
-
-            Comparable thisValue = this.get(property);
-            Comparable thatValue = that.get(property);
+        public int compareTo(Object that) {
+            Comparable<Object> thisValue = this.get(property);
+            Object thatValue;
+            if(that instanceof SortableMap)  {
+                thatValue = ((SortableMap)that).get(property);
+            } else {
+                thatValue = that;
+            }
 
             if (thisValue == null || thatValue == null) {
                 throw new RuntimeException("Liquid error: comparison of Hash with Hash failed");
@@ -154,7 +159,7 @@ public class Sort extends Filter {
         public String toString() {
             StringBuilder builder = new StringBuilder();
 
-            for (java.util.Map.Entry entry : super.entrySet()) {
+            for (java.util.Map.Entry<?,?> entry : super.entrySet()) {
                 builder.append(entry.getKey()).append(entry.getValue());
             }
 

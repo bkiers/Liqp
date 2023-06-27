@@ -1,18 +1,17 @@
 package liqp.nodes;
 
-import liqp.TemplateContext;
-import liqp.filters.Filter;
-import liqp.spi.BasicTypesSupport;
-import org.antlr.v4.runtime.ParserRuleContext;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.antlr.v4.runtime.ParserRuleContext;
+
+import liqp.TemplateContext;
+import liqp.filters.Filter;
 
 public class FilterNode implements LNode {
 
     private final int line;
     private final int tokenStartIndex;
-    private final String text;
     private final Filter filter;
     private final List<LNode> params;
 
@@ -28,7 +27,6 @@ public class FilterNode implements LNode {
 
         this.line = line;
         this.tokenStartIndex = tokenStartIndex;
-        this.text = text;
         this.filter = filter;
         this.params = new ArrayList<LNode>();
     }

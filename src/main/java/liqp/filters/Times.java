@@ -2,8 +2,6 @@ package liqp.filters;
 
 import java.math.BigDecimal;
 
-import static java.math.BigDecimal.ROUND_UNNECESSARY;
-
 public class Times extends Filter {
 
     /*

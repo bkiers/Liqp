@@ -1,9 +1,8 @@
 package liqp.filters;
 
-import liqp.Template;
-import liqp.TemplateContext;
-
 import java.math.BigDecimal;
+
+import liqp.TemplateContext;
 
 public class Modulo extends Filter {
 

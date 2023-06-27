@@ -1,15 +1,16 @@
 package liqp.spi;
 
+import java.io.IOException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+
 import liqp.filters.date.CustomDateFormatRegistry;
 import liqp.filters.date.CustomDateFormatSupport;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class BasicTypesSupport implements TypesSupport {
 
@@ -26,6 +27,8 @@ public abstract class BasicTypesSupport implements TypesSupport {
         // so we will preserve the object in case of eager evaluation
         // and will put it back when needed
         module.addSerializer(new StdSerializer<T>(clazz) {
+            private static final long serialVersionUID = -6538120903478739907L;
+
             @Override
             public void serialize(T value, JsonGenerator gen, SerializerProvider provider) throws IOException {
                 gen.writeStartObject();
@@ -36,7 +39,7 @@ public abstract class BasicTypesSupport implements TypesSupport {
         });
     }
 
-    protected void addCustomDateType(CustomDateFormatSupport typeSupport) {
+    protected void addCustomDateType(CustomDateFormatSupport<?> typeSupport) {
         if (!CustomDateFormatRegistry.isRegistered(typeSupport)) {
             CustomDateFormatRegistry.add(typeSupport);
         }
@@ -47,7 +50,7 @@ public abstract class BasicTypesSupport implements TypesSupport {
             return obj;
         }
         //noinspection rawtypes
-        Map mapObj = (Map) obj;
+        Map<?,?> mapObj = (Map<?,?>) obj;
         if (!Boolean.TRUE.equals(mapObj.get("@supportedTypeMarker"))) {
             return obj;
         }
@@ -67,8 +70,8 @@ public abstract class BasicTypesSupport implements TypesSupport {
         return key;
     }
 
-    public static <TT> TT getByReference(String key) {
-        return (TT)local.get().remove(key);
+    public static Object getByReference(String key) {
+        return local.get().remove(key);
     }
 
     public static void clearReferences(){

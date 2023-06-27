@@ -94,13 +94,13 @@ public class LookupNode implements LNode {
                 if(value instanceof Collection) {
                     return ((Collection<?>)value).size();
                 }
-                else if(value instanceof java.util.Map || value instanceof Inspectable) {
-                    java.util.Map map;
+                else if(value instanceof Map || value instanceof Inspectable) {
+                    Map<?,?> map;
                     if (value instanceof Inspectable) {
                         LiquidSupport evaluated = context.getParser().evaluate(value);
                         map = evaluated.toLiquid();
                     } else {
-                        map = (java.util.Map) value;
+                        map = (Map<?,?>) value;
                     }
                     return map.containsKey(hash) ? map.get(hash) : map.size();
                 }
@@ -113,8 +113,8 @@ public class LookupNode implements LNode {
                 }
             }
             else if(hash.equals("first")) {
-                if(value instanceof java.util.List) {
-                    java.util.List list = (java.util.List)value;
+                if(value instanceof List) {
+                    List<?> list = (List<?>)value;
                     return list.isEmpty() ? null : list.get(0);
                 }
                 else if(value.getClass().isArray()) {
@@ -123,8 +123,8 @@ public class LookupNode implements LNode {
                 }
             }
             else if(hash.equals("last")) {
-                if(value instanceof java.util.List) {
-                    java.util.List list = (java.util.List)value;
+                if(value instanceof List) {
+                    List<?> list = (List<?>)value;
                     return list.isEmpty() ? null : list.get(list.size() - 1);
                 }
                 else if(value.getClass().isArray()) {
@@ -133,13 +133,13 @@ public class LookupNode implements LNode {
                 }
             }
 
-            if(value instanceof java.util.Map || value instanceof Inspectable) {
-                java.util.Map map;
+            if(value instanceof Map || value instanceof Inspectable) {
+                Map<?,?> map;
                 if (value instanceof Inspectable) {
                     LiquidSupport evaluated = context.getParser().evaluate(value);
                     map = evaluated.toLiquid();
                 } else {
-                    map = (java.util.Map) value;
+                    map = (Map<?,?>) value;
                 }
                 return map.get(hash);
             }

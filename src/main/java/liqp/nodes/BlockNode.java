@@ -16,7 +16,6 @@ import liqp.TemplateContext;
 public class BlockNode implements LNode {
 
     private List<LNode> children;
-    private final boolean isRootBlock;
 
     public BlockNode() {
         this(false);
@@ -24,7 +23,6 @@ public class BlockNode implements LNode {
 
     public BlockNode(boolean isRootBlock) {
         this.children = new ArrayList<LNode>();
-        this.isRootBlock = isRootBlock;
     }
 
     public void add(LNode node) {

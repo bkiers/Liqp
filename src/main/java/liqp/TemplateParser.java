@@ -314,6 +314,7 @@ public class TemplateParser {
             return this;
         }
 
+        @SuppressWarnings("hiding")
         public Builder withErrorMode(ErrorMode errorMode) {
             this.errorMode = errorMode;
             return this;

@@ -1,16 +1,16 @@
 package liqp.filters.where;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import liqp.TemplateContext;
-import liqp.spi.BasicTypesSupport;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import liqp.TemplateContext;
 
 /**
  * Created by vasyl.khrystiuk on 10/09/2019.
@@ -85,7 +85,7 @@ public class LiquidWhereImpl extends WhereImpl {
         if (resolver != null) {
             node = resolver.getItemProperty(context, el, rawProperty);
         } else {
-            Map map = mapper.convertValue(el, Map.class);
+            Map<?,?> map = mapper.convertValue(el, Map.class);
             if (!map.containsKey(property)) {
                 return false;
             }

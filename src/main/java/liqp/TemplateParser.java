@@ -47,9 +47,9 @@ public class TemplateParser {
      * </code>
      */
     public enum ErrorMode {
-        strict,
-        warn,
-        lax
+        STRICT,
+        WARN,
+        LAX
     }
 
     public final Flavor flavor;

@@ -8,7 +8,7 @@ public enum Flavor {
     LIQUID("snippets",
             Filters.DEFAULT_FILTERS,
             Insertions.STANDARD_INSERTIONS,
-            TemplateParser.ErrorMode.lax,
+            TemplateParser.ErrorMode.LAX,
             true,
             true,
             false
@@ -17,7 +17,7 @@ public enum Flavor {
     JEKYLL("_includes",
             Filters.JEKYLL_FILTERS,
             Insertions.STANDARD_INSERTIONS,
-            TemplateParser.ErrorMode.warn,
+            TemplateParser.ErrorMode.WARN,
             false,
             false,
             false
@@ -26,7 +26,7 @@ public enum Flavor {
     LIQP("snippets",
             Filters.JEKYLL_FILTERS,
             Insertions.STANDARD_INSERTIONS,
-            TemplateParser.ErrorMode.strict,
+            TemplateParser.ErrorMode.STRICT,
             true,
             true,
             true

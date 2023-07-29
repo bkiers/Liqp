@@ -894,7 +894,7 @@ public class ForTest {
         try {
             TemplateParser parser = new TemplateParser.Builder()
                     .withStrictVariables(true)
-                    .withErrorMode(TemplateParser.ErrorMode.strict)
+                    .withErrorMode(TemplateParser.ErrorMode.STRICT)
                     .build();
 
             parser.parse("{% for i in (1..2) %}{{ standard_error }}{% endfor %}")

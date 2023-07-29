@@ -198,7 +198,7 @@ public class TemplateTest {
         
         TemplateParser parser = new TemplateParser.Builder()
                 .withStrictVariables(true)
-                .withErrorMode(TemplateParser.ErrorMode.strict)
+                .withErrorMode(TemplateParser.ErrorMode.STRICT)
                 .build();
         
         Template template = parser.parse("{{a.b[2].d[3].e}}");
@@ -233,7 +233,7 @@ public class TemplateTest {
         
         TemplateParser parser = new TemplateParser.Builder()
                 .withStrictVariables(true)
-                .withErrorMode(TemplateParser.ErrorMode.strict)
+                .withErrorMode(TemplateParser.ErrorMode.STRICT)
                 .build();
         
         Template template = parser.parse("{{ a.b[2].d[3].e | date: '%Y-%m-%d %H:%M:%S %Z' }}");

@@ -58,7 +58,7 @@ public class Absolute_Url extends Relative_Url {
                 return res;
             } catch (Exception e) {
                 context.addError(e);
-                if (context.getErrorMode() == TemplateParser.ErrorMode.strict) {
+                if (context.getErrorMode() == TemplateParser.ErrorMode.STRICT) {
                     throw new RuntimeException(e);
                 }
                 return res;

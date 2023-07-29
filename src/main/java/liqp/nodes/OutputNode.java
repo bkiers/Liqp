@@ -33,7 +33,7 @@ public class OutputNode implements LNode {
         for (FilterNode node : filters) {
             value = node.apply(value, context);
         }
-        if (context != null && context.getParser().errorMode == TemplateParser.ErrorMode.warn) {
+        if (context != null && context.getParser().errorMode == TemplateParser.ErrorMode.WARN) {
             String localUnparsed = unparsed;
             if (!StringUtil.isBlank(localUnparsed)) {
                 if (localUnparsed.length() > 30) {

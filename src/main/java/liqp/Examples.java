@@ -171,7 +171,7 @@ public class Examples {
         try {
             TemplateParser parser = new TemplateParser.Builder() //
                     .withStrictVariables(true)
-                    .withErrorMode(TemplateParser.ErrorMode.strict)
+                    .withErrorMode(TemplateParser.ErrorMode.STRICT)
                     .build();
 
             parser.parse("{{mu}}").render();

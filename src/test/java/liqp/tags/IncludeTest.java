@@ -90,7 +90,7 @@ public class IncludeTest {
         TemplateParser parser = new TemplateParser.Builder() //
                 .withFlavor(Flavor.JEKYLL)
                 .withShowExceptionsFromInclude(true)
-                .withErrorMode(TemplateParser.ErrorMode.strict)
+                .withErrorMode(TemplateParser.ErrorMode.STRICT)
                 .build();
 
         Template template = parser.parse("{% include 'color' with 'red' %}");
@@ -105,7 +105,7 @@ public class IncludeTest {
         TemplateParser parser = new TemplateParser.Builder() //
                 .withFlavor(Flavor.LIQUID)
                 .withShowExceptionsFromInclude(true)
-                .withErrorMode(TemplateParser.ErrorMode.strict)
+                .withErrorMode(TemplateParser.ErrorMode.STRICT)
                 .build();
 
         Template template = parser.parse("{% include 'color' with 'red' %}");
@@ -196,7 +196,7 @@ public class IncludeTest {
                 .withFlavor(Flavor.LIQUID) //
                 .withStrictVariables(true) //
                 .withShowExceptionsFromInclude(true) //
-                .withErrorMode(TemplateParser.ErrorMode.strict) //
+                .withErrorMode(TemplateParser.ErrorMode.STRICT) //
             .build();
         Template template = parser.parse(index);
         template.render();

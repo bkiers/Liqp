@@ -8,7 +8,7 @@ import liqp.TemplateParser;
 @parser::members {
     private boolean liquidStyleInclude = true;
     private boolean evaluateInOutputTag = false;
-    private TemplateParser.ErrorMode errorMode = TemplateParser.ErrorMode.lax;
+    private TemplateParser.ErrorMode errorMode = TemplateParser.ErrorMode.LAX;
 
     private boolean isLiquidStyleInclude(){
         return liquidStyleInclude;
@@ -23,14 +23,14 @@ import liqp.TemplateParser;
     }
 
     private boolean isStrict() {
-        return errorMode == TemplateParser.ErrorMode.strict;
+        return errorMode == TemplateParser.ErrorMode.STRICT;
     }
     private boolean isWarn() {
-        return errorMode == TemplateParser.ErrorMode.warn;
+        return errorMode == TemplateParser.ErrorMode.WARN;
     }
 
     private boolean isLax() {
-        return errorMode == TemplateParser.ErrorMode.lax;
+        return errorMode == TemplateParser.ErrorMode.LAX;
     }
 
     public LiquidParser(TokenStream input, boolean isLiquidStyleInclude, boolean evaluateInOutputTag, TemplateParser.ErrorMode errorMode) {

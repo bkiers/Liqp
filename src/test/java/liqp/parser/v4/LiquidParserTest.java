@@ -456,7 +456,7 @@ public class LiquidParserTest {
     }
 
     private static ParseTree parseWithListener(String source, String ruleName, Set<String> customBlocks, Set<String> customTags, BaseErrorListener el, Boolean isLiquidStyleInclude, boolean evaluateInOutputTag) {
-        LiquidParser parser = new LiquidParser(LiquidLexerTest.commonTokenStream(source, false, customBlocks, customTags), isLiquidStyleInclude, evaluateInOutputTag, TemplateParser.ErrorMode.lax);
+        LiquidParser parser = new LiquidParser(LiquidLexerTest.commonTokenStream(source, false, customBlocks, customTags), isLiquidStyleInclude, evaluateInOutputTag, TemplateParser.ErrorMode.LAX);
 
         parser.removeErrorListeners();
         parser.addErrorListener(el);

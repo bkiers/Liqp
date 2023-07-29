@@ -55,7 +55,7 @@ public class LookupNode implements LNode {
         if(value == null && context.getParser().strictVariables) {
             RuntimeException e = new VariableNotExistException(getVariableName());
             context.addError(e);
-            if (context.getErrorMode() == TemplateParser.ErrorMode.strict) {
+            if (context.getErrorMode() == TemplateParser.ErrorMode.STRICT) {
                 throw e;
             }
         }

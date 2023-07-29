@@ -27,7 +27,7 @@ public class RenderSettingsTest {
     protected TemplateParser parserWithStrictVariablesAndRaiseExceptionsInStrictModeFalse() {
         return new TemplateParser.Builder()
                 .withStrictVariables(true)
-                .withErrorMode(TemplateParser.ErrorMode.lax)
+                .withErrorMode(TemplateParser.ErrorMode.LAX)
                 .build();
     }
     

@@ -76,7 +76,7 @@ public class Relative_Url extends Filter {
                 return afterDecoding;
             } catch (URISyntaxException e) {
                 context.addError(e);
-                if (context.getErrorMode() == TemplateParser.ErrorMode.strict) {
+                if (context.getErrorMode() == TemplateParser.ErrorMode.STRICT) {
                     throw new RuntimeException(e.getMessage(), e);
                 }
                 return res;

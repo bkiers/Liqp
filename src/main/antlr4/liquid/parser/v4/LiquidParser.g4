@@ -217,13 +217,13 @@ jekyll_include_params
  ;
 
 output
- : {evaluateInOutputTag}? outStart evaluate=expr filter* OutEnd
+ : {isEvaluateInOutputTag()}? outStart evaluate=expr filter* OutEnd
  | {isStrict()}? outStart term filter* OutEnd
  | {isWarn() || isLax()}? outStart term filter* unparsed=not_out_end? OutEnd
  ;
 
 not_out_end
- : ~( OutEnd )*
+ : ( ~OutEnd )+
  ;
 
 filter

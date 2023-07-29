@@ -81,7 +81,7 @@ public class LiquidWhereImpl extends WhereImpl {
         String property = asString(rawProperty, context);
         PropertyResolverAdapter resolver = resolverHelper.findFor(el);
         Object node;
-        ObjectMapper mapper = context.parseSettings.mapper;
+        ObjectMapper mapper = context.getParser().mapper;
         if (resolver != null) {
             node = resolver.getItemProperty(context, el, rawProperty);
         } else {

@@ -15,7 +15,7 @@ public class Size extends Filter {
     public Object apply(Object value, TemplateContext context, Object... params) {
 
         if (value instanceof Inspectable) {
-            LiquidSupport evaluated = context.getRenderSettings().evaluate(context.getParseSettings().mapper, value);
+            LiquidSupport evaluated = context.getParser().evaluate(value);
             value = evaluated.toLiquid();
         }
 

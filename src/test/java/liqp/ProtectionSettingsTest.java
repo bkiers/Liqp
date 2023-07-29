@@ -9,16 +9,14 @@ public class ProtectionSettingsTest {
         TemplateParser.DEFAULT.parse("{% for i in (1..100) %}{{ i }}{% endfor %}")
                 .render();
         
-        TemplateParser parser = new TemplateParser.Builder().withProtectionSettings(
-                new ProtectionSettings.Builder().withMaxRenderTimeMillis(1000L).build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withMaxRenderTimeMillis(1000L).build();
 
         parser.parse("{% for i in (1..100) %}{{ i }}{% endfor %}").render();
     }
 
     @Test(expected = RuntimeException.class)
     public void testExceedMaxRenderTimeMillis() {
-        TemplateParser parser = new TemplateParser.Builder().withProtectionSettings(
-                new ProtectionSettings.Builder().withMaxRenderTimeMillis(1).build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withMaxRenderTimeMillis(1).build();
 
         parser.parse("{% for i in (1..100000) %}{{ i }}{% endfor %}").render();
     }
@@ -28,8 +26,7 @@ public class ProtectionSettingsTest {
         TemplateParser.DEFAULT.parse("{% for i in (1..100) %}{{ i }}{% endfor %}")
                 .render();
         
-        TemplateParser parser = new TemplateParser.Builder().withProtectionSettings(
-                new ProtectionSettings.Builder().withMaxIterations(1000).build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withMaxIterations(1000).build();
 
         parser.parse("{% for i in (1..100) %}{{ i }}{% endfor %}")
                 .render();
@@ -37,8 +34,7 @@ public class ProtectionSettingsTest {
 
     @Test(expected = RuntimeException.class)
     public void testExceedMaxIterationsRange() {
-        TemplateParser parser = new TemplateParser.Builder().withProtectionSettings(
-                new ProtectionSettings.Builder().withMaxIterations(99).build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withMaxIterations(99).build();
 
         parser.parse("{% for i in (1..100) %}{{ i }}{% endfor %}")
                 .render();
@@ -49,8 +45,7 @@ public class ProtectionSettingsTest {
         TemplateParser.DEFAULT.parse("{% for i in array %}{{ i }}{% endfor %}")
                 .render("{\"array\": [1, 2, 3, 4, 5, 6, 7, 8, 9]}");
 
-        TemplateParser parser = new TemplateParser.Builder().withProtectionSettings(
-                new ProtectionSettings.Builder().withMaxIterations(20).build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withMaxIterations(20).build();
 
         parser.parse("{% for i in array %}{{ i }}{% endfor %}")
                 .render("{\"array\": [1, 2, 3, 4, 5, 6, 7, 8, 9]}");
@@ -58,8 +53,7 @@ public class ProtectionSettingsTest {
 
     @Test(expected = RuntimeException.class)
     public void testExceedMaxIterationsArray() {
-        TemplateParser parser = new TemplateParser.Builder().withProtectionSettings(
-                new ProtectionSettings.Builder().withMaxIterations(5).build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withMaxIterations(5).build();
         
         parser.parse("{% for i in array %}{{ i }}{% endfor %}")
                 .render("{\"array\": [1, 2, 3, 4, 5, 6, 7, 8, 9]}");
@@ -67,8 +61,7 @@ public class ProtectionSettingsTest {
 
     @Test(expected = RuntimeException.class)
     public void testExceedMaxIterationsArray2D() {
-        TemplateParser parser = new TemplateParser.Builder().withProtectionSettings(
-                new ProtectionSettings.Builder().withMaxIterations(10).build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withMaxIterations(10).build();
 
         parser.parse("{% for a in array %}{% for i in a %}{{ i }}{% endfor %}{% endfor %}")
                 .render("{\"array\": [[1,2,3,4,5], [11,12,13,14,15], [21,22,23,24,25]]}");
@@ -82,8 +75,7 @@ public class ProtectionSettingsTest {
 
     @Test(expected = RuntimeException.class)
     public void testExceedMaxIterationsTablerow() {
-        TemplateParser parser = new TemplateParser.Builder().withProtectionSettings(
-                new ProtectionSettings.Builder().withMaxIterations(5).build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withMaxIterations(5).build();
 
         parser.parse("{% tablerow n in collections.frontpage cols:3%} {{n}} {% endtablerow %}")
                 .render("{ \"collections\" : { \"frontpage\" : [1,2,3,4,5,6] } }");
@@ -94,16 +86,14 @@ public class ProtectionSettingsTest {
         TemplateParser.DEFAULT.parse("{% tablerow n in collections.frontpage cols:3%} {{n}} {% endtablerow %}")
                 .render("{ \"collections\" : { \"frontpage\" : [1,2,3,4,5,6] } }");
 
-        TemplateParser parser = new TemplateParser.Builder().withProtectionSettings(
-                new ProtectionSettings.Builder().withMaxTemplateSizeBytes(3000).build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withMaxTemplateSizeBytes(3000).build();
         parser.parse("{% tablerow n in collections.frontpage cols:3%} {{n}} {% endtablerow %}").render(
                 "{ \"collections\" : { \"frontpage\" : [1,2,3,4,5,6] } }");
     }
 
     @Test(expected = RuntimeException.class)
     public void testExceedMaxTemplateSizeBytes() {
-        TemplateParser parser = new TemplateParser.Builder().withProtectionSettings(
-                new ProtectionSettings.Builder().withMaxTemplateSizeBytes(30).build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withMaxTemplateSizeBytes(30).build();
 
         parser.parse("{% tablerow n in collections.frontpage cols:3%} {{n}} {% endtablerow %}")
                 .render("{ \"collections\" : { \"frontpage\" : [1,2,3,4,5,6] } }");
@@ -114,8 +104,7 @@ public class ProtectionSettingsTest {
         TemplateParser.DEFAULT.parse("{% for i in (1..100) %}{{ abc }}{% endfor %}")
                 .render("{\"abc\": \"abcdefghijklmnopqrstuvwxyz\"}");
 
-        TemplateParser parser = new TemplateParser.Builder().withProtectionSettings(
-                new ProtectionSettings.Builder().withMaxSizeRenderedString(2700).build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withMaxSizeRenderedString(2700).build();
 
         parser.parse("{% for i in (1..100) %}{{ abc }}{% endfor %}").render(
                 "{\"abc\": \"abcdefghijklmnopqrstuvwxyz\"}");
@@ -123,8 +112,7 @@ public class ProtectionSettingsTest {
 
     @Test(expected = RuntimeException.class)
     public void testExceedMaxSizeRenderedString() {
-        TemplateParser parser = new TemplateParser.Builder().withProtectionSettings(
-                new ProtectionSettings.Builder().withMaxSizeRenderedString(2500).build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withMaxSizeRenderedString(2500).build();
         
         parser.parse("{% for i in (1..1000) %}{{ abc }}{% endfor %}")
                 .render("{\"abc\": \"abcdefghijklmnopqrstuvwxyz\"}");

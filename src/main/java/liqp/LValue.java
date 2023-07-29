@@ -77,35 +77,31 @@ public abstract class LValue {
             return Math.abs(delta) < 0.00000000001;
         }
 
-        if (AtomNode.isEmpty(a) && (b instanceof CharSequence)) {
-            return ((CharSequence)b).length() == 0;
-        }
-
-        if (AtomNode.isEmpty(b) && (a instanceof CharSequence)) {
-            return ((CharSequence)a).length() == 0;
-        }
-
-        if (AtomNode.isEmpty(a) && (b instanceof Collection)) {
-            return ((Collection)b).size() == 0;
-        }
-
-        if (AtomNode.isEmpty(b) && (a instanceof Collection)) {
-            return ((Collection)a).size() == 0;
-        }
-
-        if (AtomNode.isEmpty(a) && (b.getClass().isArray())) {
-            return ((Object[])b).length == 0;
-        }
-
-        if (AtomNode.isEmpty(b) && (a.getClass().isArray())) {
-            return ((Object[])a).length == 0;
-        }
-
-        if (AtomNode.isEmpty(b) && (a instanceof Map)) {
-            return ((Map)a).size() == 0;
+        if (isEmpty(a) && isEmpty(b)) {
+            return true;
         }
 
         return a.equals(b);
+    }
+
+
+    private static boolean isEmpty(Object val) {
+        if (AtomNode.isEmpty(val)) {
+            return true;
+        }
+        if ((val instanceof CharSequence)) {
+            return ((CharSequence)val).length() == 0;
+        }
+        if (val instanceof Collection) {
+            return ((Collection<?>)val).size() == 0;
+        }
+        if (val instanceof Map) {
+            return ((Map<?, ?>)val).size() == 0;
+        }
+        if (val.getClass().isArray()) {
+            return ((Object[])val).length == 0;
+        }
+        return false;
     }
 
     /**
@@ -201,8 +197,7 @@ public abstract class LValue {
     public static ZonedDateTime asTemporal(Object value, TemplateContext context) {
         ZonedDateTime time = ZonedDateTime.now();
         if (value instanceof TemporalAccessor) {
-            time = getZonedDateTimeFromTemporalAccessor((TemporalAccessor) value, context
-                    .getRenderSettings().defaultTimeZone);
+            time = getZonedDateTimeFromTemporalAccessor((TemporalAccessor) value, context.getParser().defaultTimeZone);
         } else if (CustomDateFormatRegistry.isCustomDateType(value)) {
             time = CustomDateFormatRegistry.getFromCustomType(value);
         }

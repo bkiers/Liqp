@@ -30,22 +30,23 @@ public class Date extends Filter {
 
     @Override
     public Object apply(Object value, TemplateContext context, Object... params) {
-        Locale locale = context.getRenderSettings().locale;
+        Locale locale = context.getParser().locale;
 
         if (isArray(value) && asArray(value, context).length ==1) {
             value = asArray(value, context)[0];
         }
         try {
             final ZonedDateTime compatibleDate;
-            if ("now".equals(super.asString(value, context)) || "today".equals(super.asString(value, context))) {
+            String valAsString = super.asString(value, context);
+            if ("now".equals(valAsString) || "today".equals(valAsString)) {
                 compatibleDate = ZonedDateTime.now();
             } else if (LValue.isTemporal(value)) {
                 compatibleDate = LValue.asTemporal(value, context);
             } else if(super.isNumber(value)) {
                 // No need to divide this by 1000, the param is expected to be in seconds already!
-                compatibleDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(super.asNumber(value).longValue() * 1000), context.renderSettings.defaultTimeZone);
+                compatibleDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(super.asNumber(value).longValue() * 1000), context.getParser().defaultTimeZone);
             } else {
-                compatibleDate = Parser.parse(super.asString(value, context), locale, context.renderSettings.defaultTimeZone);
+                compatibleDate = Parser.parse(valAsString, locale, context.getParser().defaultTimeZone);
             }
             if (compatibleDate == null) {
                 return value;

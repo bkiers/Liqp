@@ -1,16 +1,10 @@
 package liqp.filters;
 
-import static liqp.ParseSettings.DEFAULT_FLAVOR;
+import liqp.LValue;
+import liqp.TemplateContext;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
-
-import liqp.LValue;
-import liqp.ParseSettings;
-import liqp.TemplateContext;
-import liqp.parser.Flavor;
 
 /**
  * Output markup takes filters. Filters are simple methods. The first parameter is always the output of
@@ -20,27 +14,6 @@ import liqp.parser.Flavor;
  * -- https://github.com/Shopify/liquid/wiki/Liquid-for-Designers
  */
 public abstract class Filter extends LValue {
-
-    /**
-     * A map holding all common filters.
-     */
-    private static final Map<String, Filter> COMMON_FILTERS = new HashMap<>();
-
-    private static final Map<String, Filter> JEKYLL_FILTERS = new HashMap<>();
-
-    private static Filters CURRENT_COMMON_FILTERS = null;
-    private static Filters CURRENT_JEKYLL_FILTERS = null;
-
-    private static void addDefaultFilters() {
-        COMMON_FILTERS.putAll(Filters.COMMON_FILTERS.getMap());
-        JEKYLL_FILTERS.putAll(Filters.JEKYLL_EXTRA_FILTERS.getMap());
-        updateCommonFilters();
-    }
-
-    private static void updateCommonFilters() {
-        CURRENT_COMMON_FILTERS = Filters.of(COMMON_FILTERS);
-        CURRENT_JEKYLL_FILTERS = CURRENT_COMMON_FILTERS.mergeWith(Filters.of(JEKYLL_FILTERS));
-    }
 
     /**
      * The name of the filter.
@@ -155,98 +128,4 @@ public abstract class Filter extends LValue {
         return params[index];
     }
 
-    /**
-     * Retrieves a filter with a specific name.
-     *
-     * @param name
-     *            the name of the filter to retrieve.
-     *
-     * @return a filter with a specific name.
-     * @deprecated Use {@link Filters#get(String)}
-     */
-    @Deprecated
-    public static Filter getFilter(String name) {
-        checkInitialized();
-
-        Filter filter = COMMON_FILTERS.get(name);
-
-        if (filter == null) {
-            throw new RuntimeException("unknown filter: " + name);
-        }
-
-        return filter;
-    }
-
-    /**
-     * Returns all currently registered filters, except for those registered by default for
-     * {@link Flavor#JEKYLL}.
-     *
-     * @return all filters.
-     * @deprecated Use {@link liqp.ParseSettings#filters}
-     */
-    @Deprecated
-    public static Map<String, Filter> getFilters() {
-        checkInitialized();
-        return getFilters(DEFAULT_FLAVOR);
-    }
-
-    /**
-     * Returns all currently registered filters, including those registered by default for
-     * {@link Flavor#JEKYLL}.
-     *
-     * @return all filters.
-     * @deprecated Use {@link Flavor#getFilters()}
-     */
-    @Deprecated
-    public static Map<String, Filter> getFilters(Flavor flavor) {
-        checkInitialized();
-        HashMap<String, Filter> filters = new HashMap<>(COMMON_FILTERS);
-        if (Flavor.JEKYLL == flavor) {
-            filters.putAll(JEKYLL_FILTERS);
-        }
-        return filters;
-    }
-
-    /**
-     * Registers a new filter.
-     * 
-     * If a filter exists under the same name, it is replaced by this one (except for three special
-     * Jekyll filters).
-     * 
-     * Note that this method is unsafe, as it affects all uses of this class.
-     * 
-     * @param filter
-     *            the filter to be registered.
-     * @deprecated Use {@link liqp.ParseSettings.Builder#with(Filter)}
-     */
-    @Deprecated
-    public static void registerFilter(Filter filter) {
-        checkInitialized();
-        COMMON_FILTERS.put(filter.name, filter);
-        updateCommonFilters();
-    }
-
-    private static void checkInitialized() {
-        if (CURRENT_COMMON_FILTERS == null) {
-            resetFilters();
-        }
-    }
-
-    private static void resetFilters() {
-        COMMON_FILTERS.clear();
-        JEKYLL_FILTERS.clear();
-        addDefaultFilters();
-        updateCommonFilters();
-    }
-
-    @Deprecated
-    public static Filters getCurrentFilters(Flavor flavor) {
-        checkInitialized();
-
-        if (flavor == Flavor.JEKYLL) {
-            return CURRENT_JEKYLL_FILTERS;
-        } else {
-            return CURRENT_COMMON_FILTERS;
-        }
-    }
 }

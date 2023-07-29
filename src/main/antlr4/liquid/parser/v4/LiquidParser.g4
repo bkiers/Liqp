@@ -1,19 +1,43 @@
 parser grammar LiquidParser;
 
+@parser::header {
+    // add java imports here
+import liqp.TemplateParser;
+}
+
 @parser::members {
-    private boolean isLiquid = true;
+    private boolean liquidStyleInclude = true;
+    private boolean evaluateInOutputTag = false;
+    private TemplateParser.ErrorMode errorMode = TemplateParser.ErrorMode.LAX;
 
-    private boolean isLiquid(){
-        return isLiquid;
+    private boolean isLiquidStyleInclude(){
+        return liquidStyleInclude;
     }
 
-    private boolean isJekyll(){
-        return !isLiquid;
+    private boolean isJekyllStyleInclude(){
+        return !liquidStyleInclude;
     }
 
-    public LiquidParser(TokenStream input, boolean isLiquid) {
+    private boolean isEvaluateInOutputTag() {
+        return evaluateInOutputTag;
+    }
+
+    private boolean isStrict() {
+        return errorMode == TemplateParser.ErrorMode.STRICT;
+    }
+    private boolean isWarn() {
+        return errorMode == TemplateParser.ErrorMode.WARN;
+    }
+
+    private boolean isLax() {
+        return errorMode == TemplateParser.ErrorMode.LAX;
+    }
+
+    public LiquidParser(TokenStream input, boolean isLiquidStyleInclude, boolean evaluateInOutputTag, TemplateParser.ErrorMode errorMode) {
         this(input);
-        this.isLiquid = isLiquid;
+        this.liquidStyleInclude = isLiquidStyleInclude;
+        this.evaluateInOutputTag = evaluateInOutputTag;
+        this.errorMode = errorMode;
     }
 
     public void reportTokenError(String message, Token token) {
@@ -177,8 +201,8 @@ capture_tag
  ;
 
 include_tag
- : {isLiquid()}? TagStart liquid=Include expr (With Str)? TagEnd
- | {isJekyll()}? TagStart jekyll=Include file_name_or_output (jekyll_include_params)* TagEnd
+ : {isLiquidStyleInclude()}? TagStart liquid=Include expr (With Str)? TagEnd
+ | {isJekyllStyleInclude()}? TagStart jekyll=Include file_name_or_output (jekyll_include_params)* TagEnd
  ;
 
 // only valid for Flavor.JEKYLL
@@ -193,7 +217,13 @@ jekyll_include_params
  ;
 
 output
- : outStart expr filter* OutEnd
+ : {isEvaluateInOutputTag()}? outStart evaluate=expr filter* OutEnd
+ | {isStrict()}? outStart term filter* OutEnd
+ | {isWarn() || isLax()}? outStart term filter* unparsed=not_out_end? OutEnd
+ ;
+
+not_out_end
+ : ( ~OutEnd )+
  ;
 
 filter

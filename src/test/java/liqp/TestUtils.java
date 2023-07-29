@@ -28,18 +28,17 @@ public final class TestUtils {
      * @throws Exception
      */
     public static LNode getNode(String source, String rule) throws Exception {
-        return getNode(source, rule, new ParseSettings.Builder().build());
+        return getNode(source, rule, new TemplateParser.Builder().withEvaluateInOutputTag(true).build());
     }
 
-    public static LNode getNode(String source, String rule, ParseSettings parseSettings)
+    public static LNode getNode(String source, String rule, TemplateParser templateParser)
         throws Exception {
 
         LiquidLexer lexer = new LiquidLexer(CharStreams.fromString("{{ " + source + " }}"));
-        LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer));
+        LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer), templateParser.liquidStyleInclude, templateParser.evaluateInOutputTag, templateParser.errorMode);
 
-        LiquidParser.OutputContext root = parser.output();
-        NodeVisitor visitor = new NodeVisitor(Insertions.STANDARD_INSERTIONS, parseSettings.flavor
-            .getFilters(), parseSettings);
+        LiquidParser.OutputContext root = parser.output();;
+        NodeVisitor visitor = new NodeVisitor(Insertions.STANDARD_INSERTIONS, templateParser.filters, templateParser.liquidStyleInclude);
 
         return visitor.visitOutput(root);
     }

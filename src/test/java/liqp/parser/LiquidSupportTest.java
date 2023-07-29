@@ -1,21 +1,18 @@
 package liqp.parser;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import liqp.TemplateParser;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Test;
-
-import liqp.RenderSettings;
-import liqp.TemplateParser;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class LiquidSupportTest {
 
-    private static final RenderSettings EAGER_RENDERING_SETTINGS = new RenderSettings.Builder().withEvaluateMode(RenderSettings.EvaluateMode.EAGER).build();
-    private static final TemplateParser EAGER_RENDERING_PARSER = new TemplateParser.Builder().withRenderSettings(EAGER_RENDERING_SETTINGS).build();
+    private static final TemplateParser EAGER_RENDERING_PARSER = new TemplateParser.Builder().withEvaluateMode(TemplateParser.EvaluateMode.EAGER).build();
 
     // test plan:
     // 1 feature

@@ -3,19 +3,15 @@ package liqp.parser.v4;
 import liqp.Insertion;
 import liqp.Insertions;
 import liqp.LValue;
-import liqp.ParseSettings;
 import liqp.exceptions.LiquidException;
-import liqp.filters.Filter;
 import liqp.filters.Filters;
 import liqp.nodes.*;
-import liqp.parser.Flavor;
 import liquid.parser.v4.LiquidParserBaseVisitor;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import static liquid.parser.v4.LiquidParser.*;
@@ -24,28 +20,20 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
 
   private Insertions insertions;
   private Filters filters;
-  private final ParseSettings parseSettings;
+  private final boolean liquidStyleInclude;
   private boolean isRootBlock = true;
 
-  @Deprecated
-  public NodeVisitor(Map<String, Insertion> insertions, Map<String, Filter> filters, ParseSettings parseSettings) {
-    this(Insertions.of(insertions), Filters.of(filters), parseSettings);
-  }
-
-  public NodeVisitor(Insertions insertions, Filters filters, ParseSettings parseSettings) {
+  public NodeVisitor(Insertions insertions, Filters filters, boolean liquidStyleInclude) {
     if (insertions == null)
       throw new IllegalArgumentException("tags == null");
 
     if (filters == null)
       throw new IllegalArgumentException("filters == null");
 
-    if (parseSettings == null)
-      throw new IllegalArgumentException("parseSettings == null");
-
     this.insertions = insertions;
 
     this.filters = filters;
-    this.parseSettings = parseSettings;
+    this.liquidStyleInclude = liquidStyleInclude;
   }
 
   // parse
@@ -414,7 +402,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  ;
   @Override
   public LNode visitJekyll_include_output(Jekyll_include_outputContext ctx) {
-    if (this.parseSettings.flavor != Flavor.JEKYLL)
+    if (this.liquidStyleInclude)
       throw new LiquidException("`{% include ouput %}` can only be used for Flavor.JEKYLL", ctx);
 
     return visitOutput(ctx.output());
@@ -427,7 +415,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   //  ;
   @Override
   public LNode visitJekyll_include_filename(Jekyll_include_filenameContext ctx) {
-    if (this.parseSettings.flavor != Flavor.JEKYLL) {
+    if (this.liquidStyleInclude) {
       throw new LiquidException("`{% include other_than_tag_end_out_start %}` can only be used for Flavor.JEKYLL", ctx);
     }
     // valid filename in jekyll doesn't allow whitespaces
@@ -448,12 +436,23 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   }
 
   // output
-  //  : outStart expr filter* OutEnd
-  //  ;
+  // : {evaluateInOutputTag}? outStart evaluate=expr filter* OutEnd
+  // | outStart term filter* OutEnd
+  // ;
   @Override
-  public OutputNode visitOutput(OutputContext ctx) {
-
-    OutputNode node = new OutputNode(visit(ctx.expr()));
+  public LNode visitOutput(OutputContext ctx) {
+    OutputNode node;
+    if (ctx.evaluate != null) {
+      node = new OutputNode(visit(ctx.expr()), null, null);
+    } else {
+      String unparsed = null;
+      Integer unparsedStart = null;
+      if (ctx.unparsed != null) {
+        unparsed = ctx.unparsed.getText();
+        unparsedStart = ctx.unparsed.getStart().getStartIndex();
+      }
+      node = new OutputNode(visit(ctx.term()), unparsed, unparsedStart);
+    }
 
     for (FilterContext child : ctx.filter()) {
       node.addFilter(visitFilter(child));

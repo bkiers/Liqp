@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.TemplateContext;
+import liqp.TemplateParser;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
 
@@ -74,7 +75,8 @@ public class Relative_Url extends Filter {
                 }
                 return afterDecoding;
             } catch (URISyntaxException e) {
-                if (context.getRenderSettings().raiseExceptionsInStrictMode) {
+                context.addError(e);
+                if (context.getErrorMode() == TemplateParser.ErrorMode.STRICT) {
                     throw new RuntimeException(e.getMessage(), e);
                 }
                 return res;
@@ -84,7 +86,7 @@ public class Relative_Url extends Filter {
 
     protected Map<String, Object> objectToMap(Object configRoot, TemplateContext context) {
         if (configRoot instanceof Inspectable) {
-            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, configRoot);
+            LiquidSupport evaluated = context.getParser().evaluate(configRoot);
             configRoot = evaluated.toLiquid();
         }
         Map<String, Object> siteMap;

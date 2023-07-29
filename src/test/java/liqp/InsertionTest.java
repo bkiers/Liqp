@@ -16,8 +16,9 @@ import liqp.tags.Tag;
 public class InsertionTest {
     @Test
     public void testNestedCustomTagsAndBlocks() {
-        ParseSettings parseSettings = new ParseSettings.Builder() //
-                .with(new Block("block") {
+
+        TemplateParser templateParser = new TemplateParser.Builder()
+                .withInsertion(new Block("block") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         String data = (nodes.length >= 2 ? nodes[1].render(context) : nodes[0].render(
@@ -25,7 +26,8 @@ public class InsertionTest {
 
                         return "blk[" + data + "]";
                     }
-                }).with(new Tag("simple") {
+                })
+                .withInsertion(new Tag("simple") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         return "(sim)";
@@ -33,44 +35,7 @@ public class InsertionTest {
                 }).build();
 
         String templateString = "{% block %}a{% simple %}b{% block %}c{% endblock %}d{% endblock %}";
-        Template template = new TemplateParser.Builder().withParseSettings(parseSettings).build().parse(
-                templateString);
-        assertThat("blk[a(sim)bblk[c]d]", is(template.render()));
-    }
-    
-    @SuppressWarnings("deprecation")
-    @Test
-    public void testNestedCustomTagsAndBlocksDeprecated() {
-        String blockName = "block" + System.currentTimeMillis();
-
-        Block.registerBlock(new Block(blockName) {
-            @Override
-            public Object render(TemplateContext context, LNode... nodes) {
-                String data = (nodes.length >= 2 ? nodes[1].render(context) : nodes[0].render(context)).toString();
-
-                return "blk[" + data + "]";
-            }
-        });
-
-        Tag.registerTag(new Tag("simple") {
-            @Override
-            public Object render(TemplateContext context, LNode... nodes) {
-                return "(sim)";
-            }
-        });
-        String templateString = "{% "+blockName+" %}a{% simple %}b{% "+blockName+" %}c{% end"+blockName+" %}d{% end"+blockName+" %}";
-        
-        try {
-            // The default TemplateParser is not affected by the global registrations above
-            TemplateParser.DEFAULT.parse(templateString);
-            fail("Should have thrown a LiquidException");
-        } catch (LiquidException e) {
-            // expected
-        }
-        
-        // The old API is affected (beware of dangerous side effects)
-        Template template = Template.parse(templateString);
-
+        Template template = templateParser.parse(templateString);
         assertThat("blk[a(sim)bblk[c]d]", is(template.render()));
     }
 
@@ -78,8 +43,8 @@ public class InsertionTest {
     public void testNestedCustomTagsAndBlocksAsOneCollection() {
         String templateString = "{% block %}a{% simple %}b{% block %}c{% endblock %}d{% endblock %}";
         
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(
-                new ParseSettings.Builder().with(new Block("block") {
+        TemplateParser parser = new TemplateParser.Builder().withInsertion(
+                new Block("block") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         String data = (nodes.length >= 2 ? nodes[1].render(context) : nodes[0].render(
@@ -87,28 +52,27 @@ public class InsertionTest {
 
                         return "blk[" + data + "]";
                     }
-                }).with(new Tag("simple") {
-                    @Override
-                    public Object render(TemplateContext context, LNode... nodes) {
-                        return "(sim)";
-                    }
-                }).build()).build();
-        
+                }).withInsertion(new Tag("simple") {
+            @Override
+            public Object render(TemplateContext context, LNode... nodes) {
+                return "(sim)";
+            }
+        }).build();
+
         Template template = parser.parse(templateString);
         assertThat("blk[a(sim)bblk[c]d]", is(template.render()));
     }
 
     @Test
     public void testCustomTag() throws RecognitionException {
-        ParseSettings parseSettings = new ParseSettings.Builder().with(new Tag("twice") {
+
+        TemplateParser parser = new TemplateParser.Builder().withInsertion(new Tag("twice") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 Double number = super.asNumber(nodes[0].render(context)).doubleValue();
                 return number * 2;
             }
         }).build();
-        
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
         
         Template template = parser.parse("{% twice 10 %}");
         String rendered = String.valueOf(template.render());
@@ -118,7 +82,7 @@ public class InsertionTest {
 
     @Test
     public void testCustomTagBlock() throws RecognitionException {
-        ParseSettings parseSettings = new ParseSettings.Builder().with(new Block("twice") {
+        TemplateParser templateParser = new TemplateParser.Builder().withInsertion(new Block("twice") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 LNode blockNode = nodes[nodes.length - 1];
@@ -127,9 +91,8 @@ public class InsertionTest {
             }
         }).build();
         
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
 
-        Template template = parser.parse("{% twice %}abc{% endtwice %}");
+        Template template = templateParser.parse("{% twice %}abc{% endtwice %}");
         String rendered = String.valueOf(template.render());
 
         assertThat(rendered, is("abc abc"));
@@ -224,14 +187,13 @@ public class InsertionTest {
 
     @Test
     public void testCustomTagRegistration() {
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(new ParseSettings.Builder()
-                .with(new Tag("custom_tag") {
+        TemplateParser parser = new TemplateParser.Builder()
+                .withInsertion(new Tag("custom_tag") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         return "xxx";
                     }
-                })
-                .build()).build();
+                }).build();
         
         Template template = parser.parse("{% custom_tag %}");
         assertEquals("xxx", template.render());

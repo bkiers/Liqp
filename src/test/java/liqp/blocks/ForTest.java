@@ -1,25 +1,20 @@
 package liqp.blocks;
 
-import static java.util.Collections.singletonMap;
-import static liqp.TestUtils.assertPatternResultEquals;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Assert;
-import org.junit.Test;
-
-import liqp.RenderSettings;
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.TemplateParser;
 import liqp.parser.Inspectable;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static java.util.Collections.singletonMap;
+import static liqp.TestUtils.assertPatternResultEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
 
 public class ForTest {
 
@@ -779,7 +774,7 @@ public class ForTest {
      * {% endfor %}`
      * HEREDOC
      *
-     * @template = Liquid::TemplateParser.DEFAULT.parse(template)
+     * @template = Liquid::TemplateParser.parse(template)
      * rendered = @template.render('chars' => %w[a b c])
      *
      * puts(rendered)
@@ -831,7 +826,7 @@ public class ForTest {
     }
 
     /*
-     * @template = Liquid::TemplateParser.DEFAULT.parse("{% for item in hash %}{{ item[0] }} is {{ item[1] }};{% endfor %}")
+     * @template = Liquid::TemplateParser.parse("{% for item in hash %}{{ item[0] }} is {{ item[1] }};{% endfor %}")
      *
      * puts @template.render('hash' => {'a' => 'AAA', 'b' => 'BBB'})
      */
@@ -884,10 +879,10 @@ public class ForTest {
 
     /*
      * def test_for_cleans_up_registers
-     *     context = Context.new(ErrorDrop.new)
+     *     context = Context.new(ErrorDrop.new) # <--- error mode is strict here
      *
      *     assert_raises(StandardError) do
-     *       Liquid::TemplateParser.DEFAULT.parse('{% for i in (1..2) %}{{ standard_error }}{% endfor %}').render!(context)
+     *       Liquid::TemplateParser.parse('{% for i in (1..2) %}{{ standard_error }}{% endfor %}').render!(context)
      *     end
      *
      *     assert context.registers[:for_stack].empty?
@@ -897,9 +892,11 @@ public class ForTest {
     public void test_for_cleans_up_registers() {
         Template.ContextHolder holder = new Template.ContextHolder();
         try {
-            TemplateParser parser = new TemplateParser.Builder().withRenderSettings(
-                    new RenderSettings.Builder().withStrictVariables(true).build()).build();
-            
+            TemplateParser parser = new TemplateParser.Builder()
+                    .withStrictVariables(true)
+                    .withErrorMode(TemplateParser.ErrorMode.STRICT)
+                    .build();
+
             parser.parse("{% for i in (1..2) %}{{ standard_error }}{% endfor %}")
                     .withContextHolder(holder)
                     .render();

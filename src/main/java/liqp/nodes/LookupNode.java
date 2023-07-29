@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import liqp.TemplateContext;
+import liqp.TemplateParser;
 import liqp.exceptions.VariableNotExistException;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
@@ -51,11 +52,10 @@ public class LookupNode implements LNode {
             value = index.get(value, context);
         }
 
-        if(value == null && context.getRenderSettings().strictVariables) {
+        if(value == null && context.getParser().strictVariables) {
             RuntimeException e = new VariableNotExistException(getVariableName());
             context.addError(e);
-
-            if (context.getRenderSettings().raiseExceptionsInStrictMode) {
+            if (context.getErrorMode() == TemplateParser.ErrorMode.STRICT) {
                 throw e;
             }
         }
@@ -97,7 +97,7 @@ public class LookupNode implements LNode {
                 else if(value instanceof java.util.Map || value instanceof Inspectable) {
                     java.util.Map map;
                     if (value instanceof Inspectable) {
-                        LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, value);
+                        LiquidSupport evaluated = context.getParser().evaluate(value);
                         map = evaluated.toLiquid();
                     } else {
                         map = (java.util.Map) value;
@@ -136,7 +136,7 @@ public class LookupNode implements LNode {
             if(value instanceof java.util.Map || value instanceof Inspectable) {
                 java.util.Map map;
                 if (value instanceof Inspectable) {
-                    LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, value);
+                    LiquidSupport evaluated = context.getParser().evaluate(value);
                     map = evaluated.toLiquid();
                 } else {
                     map = (java.util.Map) value;

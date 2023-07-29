@@ -15,15 +15,12 @@ import liqp.tags.Tag;
 public class Examples {
 
     private static void demoGuards() {
-        ProtectionSettings protectionSettings = new ProtectionSettings.Builder() //
+
+        TemplateParser parser = new TemplateParser.Builder() //
                 .withMaxSizeRenderedString(300) //
                 .withMaxIterations(15) //
                 .withMaxRenderTimeMillis(100L) //
                 .withMaxTemplateSizeBytes(100) //
-                .build();
-
-        TemplateParser parser = new TemplateParser.Builder() //
-                .withProtectionSettings(protectionSettings) //
                 .build();
 
         String rendered = parser.parse("{% for i in (1..10) %}{{ text }}{% endfor %}").render(
@@ -52,7 +49,7 @@ public class Examples {
     private static void demoCustomStrongFilter() {
 
         // first register your custom filter
-        ParseSettings parseSettings = new ParseSettings.Builder().with(new Filter("b") {
+        TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("b") {
             @Override
             public Object apply(Object value, TemplateContext context, Object... params) {
                 // create a string from the value
@@ -63,8 +60,6 @@ public class Examples {
             }
         }).build();
 
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
-
         // use your filter
         Template template = parser.parse("{{ wiki | b }}");
         String rendered = template.render("{\"wiki\" : \"Some *bold* text *in here*.\"}");
@@ -72,8 +67,7 @@ public class Examples {
     }
 
     private static void demoCustomRepeatFilter() {
-        // Register your custom filter via ParseSettings
-        ParseSettings parseSettings = new ParseSettings.Builder().with(new Filter("repeat") {
+        TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("repeat") {
             @Override
             public Object apply(Object value, TemplateContext context, Object... params) {
 
@@ -93,8 +87,6 @@ public class Examples {
             }
         }).build();
 
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
-
         // use your filter
         Template template = parser.parse("{{ 'a' | repeat }}\n{{ 'b' | repeat:5 }}");
         String rendered = template.render();
@@ -102,7 +94,7 @@ public class Examples {
     }
 
     private static void demoCustomSumFilter() {
-        ParseSettings parseSettings = new ParseSettings.Builder().with(new Filter("sum") {
+        TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("sum") {
             @Override
             public Object apply(Object value, TemplateContext context, Object... params) {
 
@@ -118,15 +110,14 @@ public class Examples {
             }
         }).build();
 
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
-
         Template template = parser.parse("{{ numbers | sum }}");
         String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
         System.out.println(rendered);
     }
 
     private static void customLoopBlock() {
-        ParseSettings parseSettings = new ParseSettings.Builder().with(new Block("loop") {
+
+        TemplateParser parser = new TemplateParser.Builder().withInsertion(new Block("loop") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
 
@@ -143,8 +134,6 @@ public class Examples {
             }
         }).build();
 
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
-
         String source = "{% loop 5 %}looping!\n{% endloop %}";
 
         Template template = parser.parse(source);
@@ -155,7 +144,8 @@ public class Examples {
     }
 
     public static void instanceFilter() {
-        ParseSettings parseSettings = new ParseSettings.Builder().with(new Filter("sum") {
+
+        TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("sum") {
             @Override
             public Object apply(Object value, TemplateContext context, Object... params) {
 
@@ -170,8 +160,6 @@ public class Examples {
                 return sum;
             }
         }).build();
-
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
 
         Template template = parser.parse("{{ numbers | sum }}");
 
@@ -182,10 +170,8 @@ public class Examples {
     public static void demoStrictVariables() {
         try {
             TemplateParser parser = new TemplateParser.Builder() //
-                    .withRenderSettings(new RenderSettings.Builder() //
-                            .withStrictVariables(true) //
-                            .withRaiseExceptionsInStrictMode(true) //
-                            .build()) //
+                    .withStrictVariables(true)
+                    .withErrorMode(TemplateParser.ErrorMode.STRICT)
                     .build();
 
             parser.parse("{{mu}}").render();
@@ -195,7 +181,7 @@ public class Examples {
     }
 
     public static void customRandomTag() {
-        ParseSettings parseSettings = new ParseSettings.Builder().with(new Tag("rand") {
+        TemplateParser parser = new TemplateParser.Builder().withInsertion(new Tag("rand") {
             private final Random rand = new Random();
 
             @Override
@@ -204,15 +190,14 @@ public class Examples {
             }
         }).build();
 
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
-
         Template template = parser.parse("{% rand %}");
         String rendered = template.render();
         System.out.println(rendered);
     }
 
     public static void customFilter() {
-        ParseSettings parseSettings = new ParseSettings.Builder().with(new Filter("sum") {
+
+        TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("sum") {
             @Override
             public Object apply(Object value, TemplateContext context, Object... params) {
 
@@ -226,8 +211,6 @@ public class Examples {
                 return sum;
             }
         }).build();
-
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(parseSettings).build();
 
         Template template = parser.parse("{{ numbers | sum }}");
 

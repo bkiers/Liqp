@@ -1,6 +1,5 @@
 package liqp.filters.where;
 
-import liqp.ParseSettings;
 import liqp.Template;
 import liqp.parser.Flavor;
 import liqp.parser.LiquidSupport;
@@ -10,12 +9,7 @@ import org.junit.Test;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;

@@ -33,7 +33,7 @@ final class RenderTransformerDefaultImpl implements RenderTransformer {
             };
 
             private void checkLength() {
-                int maxLen = context.getParser().getProtectionSettings().maxSizeRenderedString;
+                int maxLen = context.getParser().getLimitMaxSizeRenderedString();
                 if (result.length() > maxLen) {
                     throw new RuntimeException("rendered string exceeds " + maxLen);
                 }

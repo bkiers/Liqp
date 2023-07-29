@@ -1,6 +1,7 @@
 package liqp.filters;
 
 import liqp.TemplateContext;
+import liqp.TemplateParser;
 
 import java.net.IDN;
 import java.net.URI;
@@ -56,8 +57,9 @@ public class Absolute_Url extends Relative_Url {
                 }
                 return res;
             } catch (Exception e) {
-                if (context.getRenderSettings().raiseExceptionsInStrictMode) {
-                    throw new RuntimeException(e.getMessage(), e);
+                context.addError(e);
+                if (context.getErrorMode() == TemplateParser.ErrorMode.STRICT) {
+                    throw new RuntimeException(e);
                 }
                 return res;
             }

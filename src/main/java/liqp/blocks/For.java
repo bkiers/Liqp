@@ -70,7 +70,7 @@ public class For extends Block {
 
         // When context.renderSettings.raiseExceptionsInStrictMode=false,
         // don't allow nested errors to be lost
-        for (RuntimeException nestedError : nestedContext.errors()) {
+        for (Exception nestedError : nestedContext.errors()) {
             context.addError(nestedError);
         }
 
@@ -90,7 +90,7 @@ public class For extends Block {
         int limit = attributes.get(LIMIT);
 
         if (data instanceof Inspectable) {
-            LiquidSupport evaluated = context.getRenderSettings().evaluate(context.getParseSettings().mapper, data);
+            LiquidSupport evaluated = context.getParser().evaluate(data);
             data = evaluated.toLiquid();
         }
         if (data instanceof Map) {

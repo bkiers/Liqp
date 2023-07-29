@@ -196,9 +196,10 @@ public class TemplateTest {
         // given
         Map<String, Object> data = getDeepData();
         
-        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(
-                new RenderSettings.Builder().withStrictVariables(true).withRaiseExceptionsInStrictMode(
-                        true).build()).build();
+        TemplateParser parser = new TemplateParser.Builder()
+                .withStrictVariables(true)
+                .withErrorMode(TemplateParser.ErrorMode.STRICT)
+                .build();
         
         Template template = parser.parse("{{a.b[2].d[3].e}}");
 
@@ -230,9 +231,10 @@ public class TemplateTest {
             };
         };
         
-        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(
-                new RenderSettings.Builder().withStrictVariables(true).withRaiseExceptionsInStrictMode(
-                        true).build()).build();
+        TemplateParser parser = new TemplateParser.Builder()
+                .withStrictVariables(true)
+                .withErrorMode(TemplateParser.ErrorMode.STRICT)
+                .build();
         
         Template template = parser.parse("{{ a.b[2].d[3].e | date: '%Y-%m-%d %H:%M:%S %Z' }}");
 
@@ -255,14 +257,12 @@ public class TemplateTest {
     @Test
     public void testWithCustomTag() {
         // given
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(new ParseSettings.Builder()
-                .with(new Tag("custom_tag") {
-                    @Override
-                    public Object render(TemplateContext context, LNode... nodes) {
-                        return "xxx";
-                    }
-                })
-                .build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withInsertion(new Tag("custom_tag") {
+            @Override
+            public Object render(TemplateContext context, LNode... nodes) {
+                return "xxx";
+            }
+        }).build();
         
         Template template = parser.parse("{% custom_tag %}");
         
@@ -273,18 +273,17 @@ public class TemplateTest {
     @Test
     public void testWithCustomBlock() {
         // given
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(
-                new ParseSettings.Builder().with(new Block("custom_uppercase_block") {
-                    @Override
-                    public Object render(TemplateContext context, LNode... nodes) {
-                        LNode block = nodes[0];
-                        Object res = block.render(context);
-                        if (res != null) {
-                            return res.toString().toUpperCase(Locale.US);
-                        }
-                        return null;
-                    }
-                }).build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withInsertion(new Block("custom_uppercase_block") {
+            @Override
+            public Object render(TemplateContext context, LNode... nodes) {
+                LNode block = nodes[0];
+                Object res = block.render(context);
+                if (res != null) {
+                    return res.toString().toUpperCase(Locale.US);
+                }
+                return null;
+            }
+        }).build();
 
         Template template = parser.parse(
                 "{% custom_uppercase_block %} some text {% endcustom_uppercase_block %}");
@@ -296,19 +295,17 @@ public class TemplateTest {
     @Test
     public void testWithCustomFilter() {
         // given
-        TemplateParser parser = new TemplateParser.Builder().withParseSettings(new ParseSettings.Builder()
-                .with(new Filter("sum"){
-                    @Override
-                    public Object apply(Object value, TemplateContext context, Object... params) {
-                        Object[] numbers = super.asArray(value, context);
-                        double sum = 0;
-                        for(Object obj : numbers) {
-                            sum += super.asNumber(obj).doubleValue();
-                        }
-                        return sum;
-                    }
-                })
-                .build()).build();
+        TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("sum"){
+            @Override
+            public Object apply(Object value, TemplateContext context, Object... params) {
+                Object[] numbers = super.asArray(value, context);
+                double sum = 0;
+                for(Object obj : numbers) {
+                    sum += super.asNumber(obj).doubleValue();
+                }
+                return sum;
+            }
+        }).build();
         
         Template template = parser.parse("{{ numbers | sum }}");
 

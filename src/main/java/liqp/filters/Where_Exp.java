@@ -2,6 +2,7 @@ package liqp.filters;
 
 import liqp.Template;
 import liqp.TemplateContext;
+import liqp.TemplateParser;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
 
@@ -44,7 +45,7 @@ public class Where_Exp extends Filter {
         }
 
         if (items == null && value instanceof Inspectable) {
-            LiquidSupport evaluated = context.renderSettings.evaluate(context.parseSettings.mapper, value);
+            LiquidSupport evaluated = context.getParser().evaluate(value);
             value = evaluated.toLiquid();
         }
         if (isMap(value)) {
@@ -58,7 +59,10 @@ public class Where_Exp extends Filter {
         String varName = asString(params[0], context);
         String strExpression = asString(params[1], context);
 
-        Template expression = context.getParser().parse("{{ " + strExpression + " }}");
+        Template expression = new TemplateParser
+                .Builder(context.getParser())
+                .withEvaluateInOutputTag(true)
+                .build().parse("{{ " + strExpression + " }}");
 
         List<Object> res = new ArrayList<>();
         for (Object item: items) {

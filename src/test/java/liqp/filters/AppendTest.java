@@ -1,8 +1,9 @@
 package liqp.filters;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
+import liqp.Template;
+import liqp.TemplateParser;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -11,12 +12,9 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
 
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
-
-import liqp.RenderSettings;
-import liqp.Template;
-import liqp.TemplateParser;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class AppendTest {
 
@@ -78,10 +76,11 @@ public class AppendTest {
 
     @Test
     public void testAppendToDateTypeEager() {
-        RenderSettings eager = new RenderSettings.Builder().withEvaluateMode(RenderSettings.EvaluateMode.EAGER).build();
         Map<String, Object> data = Collections.singletonMap("a", t);
 
-        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(eager).build();
+        TemplateParser parser = new TemplateParser.Builder()
+                .withEvaluateMode(TemplateParser.EvaluateMode.EAGER)
+                .build();
         String res = parser.parse("{{ '!' | append: a }}").render(data);
         assertEquals("!2007-11-01 15:25:00 +0900", res);
 
@@ -97,9 +96,9 @@ public class AppendTest {
         // -5 here (uses fixed offset as don't want to play with DST)
         ZoneId defaultTimeZone = ZoneId.ofOffset("UTC", ZoneOffset.ofHours(-5));
         
-        RenderSettings renderSettings = new RenderSettings.Builder().withDefaultTimeZone(defaultTimeZone).build();
-        
-        TemplateParser parser = new TemplateParser.Builder().withRenderSettings(renderSettings).build();
+        TemplateParser parser = new TemplateParser.Builder()
+                .withDefaultTimeZone(defaultTimeZone)
+                .build();
 
         // is -0500 here
         String res = parser.parse("{{ '!' | append: a }}").render(data);

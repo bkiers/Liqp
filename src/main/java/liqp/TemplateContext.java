@@ -7,8 +7,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import liqp.RenderTransformer.ObjectAppender;
-import liqp.parser.Flavor;
+import liqp.exceptions.ExceededMaxIterationsException;
+import liqp.parser.LiquidSupport;
 
 public class TemplateContext {
 
@@ -16,49 +18,30 @@ public class TemplateContext {
     public static final String REGISTRY_IFCHANGED = "ifchanged";
     public static final String REGISTRY_FOR = "for";
     public static final String REGISTRY_FOR_STACK = "for_stack";
+    public static final String REGISTRY_ITERATION_PROTECTOR = "iteration_protector";
 
     protected TemplateContext parent;
 
     private final TemplateParser parser;
 
-    @Deprecated
-    public final ProtectionSettings protectionSettings;
-    @Deprecated
-    public final RenderSettings renderSettings;
-    @Deprecated
-    public final ParseSettings parseSettings;
-
     private Map<String, Object> variables;
     private Map<String, Object> environmentMap;
     private Map<String, Object> registry;
 
-    private List<RuntimeException> errors;
+    private List<Exception> errors;
 
     public TemplateContext() {
         this(TemplateParser.DEFAULT, new LinkedHashMap<>());
     }
 
-    @Deprecated // Use `TemplateContext(parser, variables)` instead
-    public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings,
-            Flavor flavor, Map<String, Object> variables) {
-        this(new TemplateParser.Builder().withProtectionSettings(protectionSettings)
-                .withRenderSettings(renderSettings).withParseSettings(new ParseSettings.Builder()
-                        .withFlavor(flavor).build()).build(), variables);
-    }
 
-    @Deprecated // Use `TemplateContext(parser, variables)` instead
-    public TemplateContext(ProtectionSettings protectionSettings, RenderSettings renderSettings,
-            ParseSettings parseSettings, Map<String, Object> variables) {
-        this(new TemplateParser.Builder().withProtectionSettings(protectionSettings)
-                .withRenderSettings(renderSettings).withParseSettings(parseSettings).build(), variables);
+    public TemplateContext(Map<String, Object> variables) {
+        this(new TemplateParser.Builder().build(), variables);
     }
 
     public TemplateContext(TemplateParser parser, Map<String, Object> variables) {
         this.parent = null;
         this.parser = parser;
-        this.protectionSettings = parser.getProtectionSettings();
-        this.renderSettings = parser.getRenderSettings();
-        this.parseSettings = parser.getParseSettings();
         this.variables = new LinkedHashMap<>(variables);
         this.errors = new ArrayList<>();
     }
@@ -66,17 +49,6 @@ public class TemplateContext {
     public TemplateContext(TemplateContext parent) {
         this(parent.getParser(), new LinkedHashMap<String, Object>());
         this.parent = parent;
-    }
-
-    /**
-     * Deprecated. Use {@link TemplateContext#newChildContext(Map)} instead.
-     * 
-     * @param parent The parent context.
-     * @param variables The variables to use in this child context.
-     */
-    @Deprecated
-    public TemplateContext(TemplateContext parent, Map<String, Object> variables) {
-        this(variables, parent);
     }
 
     protected TemplateContext(Map<String, Object> variables, TemplateContext parent) {
@@ -88,16 +60,22 @@ public class TemplateContext {
         return parser;
     }
 
-    public void addError(RuntimeException exception) {
+    public void addError(Exception exception) {
         this.errors.add(exception);
     }
 
-    public List<RuntimeException> errors() {
+    public List<Exception> errors() {
         return new ArrayList<>(this.errors);
     }
 
     public void incrementIterations() {
-        this.protectionSettings.incrementIterations();
+        Map<String, Integer> iteratorProtector = getRegistry(REGISTRY_ITERATION_PROTECTOR);
+        if (!iteratorProtector.containsKey(REGISTRY_ITERATION_PROTECTOR)) {
+            iteratorProtector.put(REGISTRY_ITERATION_PROTECTOR, 0);
+        }
+        int value = iteratorProtector.get(REGISTRY_ITERATION_PROTECTOR) + 1;
+        iteratorProtector.put(REGISTRY_ITERATION_PROTECTOR, value);
+        this.checkForMaxIterations(value);
     }
 
     public boolean containsKey(String key) {
@@ -184,7 +162,7 @@ public class TemplateContext {
             return parent.getRegistry(registryName);
         }
 
-        if (!Arrays.asList(REGISTRY_CYCLE, REGISTRY_IFCHANGED, REGISTRY_FOR, REGISTRY_FOR_STACK)
+        if (!Arrays.asList(REGISTRY_CYCLE, REGISTRY_IFCHANGED, REGISTRY_FOR, REGISTRY_FOR_STACK, REGISTRY_ITERATION_PROTECTOR)
                 .contains(registryName)) {
             // this checking exists for safety of library, any listed type is expected, not more
             throw new RuntimeException("unknown registry type: " + registryName);
@@ -196,27 +174,29 @@ public class TemplateContext {
         if (!registry.containsKey(registryName)) {
             registry.put(registryName, new HashMap<String, T>());
         }
+        //noinspection unchecked
         return (T) registry.get(registryName);
     }
 
-    public ParseSettings getParseSettings() {
-        return parser.getParseSettings();
-    }
-
-    public RenderSettings getRenderSettings() {
-        return parser.getRenderSettings();
-    }
-
-    public ProtectionSettings getProtectionSettings() {
-        return parser.getProtectionSettings();
-    }
 
     public ObjectAppender.Controller newObjectAppender(int estimatedNumberOfAppends) {
-        return renderSettings.getRenderTransformer().newObjectAppender(this,
+        return parser.getRenderTransformer().newObjectAppender(this,
                 estimatedNumberOfAppends);
     }
 
     public TemplateContext newChildContext(Map<String, Object> variablesForChild) {
         return new TemplateContext(variablesForChild, this);
+    }
+
+
+    public void checkForMaxIterations(int iterations) {
+        int maxIterations = parser.getLimitMaxIterations();
+        if (iterations > maxIterations) {
+            throw new ExceededMaxIterationsException(maxIterations);
+        }
+    }
+
+    public TemplateParser.ErrorMode getErrorMode() {
+        return parser.getErrorMode();
     }
 }

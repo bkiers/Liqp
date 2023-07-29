@@ -267,7 +267,7 @@ public class TemplateParser {
          * that does not have own timezone information.
          * May be null, so the timezone pattern will be omitted in formatted strings.
          * @param defaultTimeZone - value or <code>null<code/>
-         * @return
+         * @return this builder
          */
         public Builder withDefaultTimeZone(ZoneId defaultTimeZone) {
             this.defaultTimeZone = defaultTimeZone;

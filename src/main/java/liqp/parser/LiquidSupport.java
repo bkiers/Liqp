@@ -47,7 +47,7 @@ public interface LiquidSupport extends Inspectable {
 
 
     class LiquidSerializer extends StdSerializer<LiquidSupport> {
-        private static final long serialVersionUID = -7053942654651060805L;
+        private static final long serialVersionUID = 1L;
 
         public LiquidSerializer() {
             this(null);

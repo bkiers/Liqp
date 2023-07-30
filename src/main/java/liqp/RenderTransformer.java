@@ -16,8 +16,8 @@ import java.io.Writer;
  * created temporarily on the heap, increasing the chance of an out-of-memory situation, and a generally
  * high allocation activity (spikes in the memory allocation graph).
  * <p>
- * For example, the following liquid template results in <em>10012</em> {@link StringBuilder}
- * {@link #toString()} conversions:
+ * For example, the following liquid template results in <em>10012</em>
+ * {@link StringBuilder#toString()} conversions:
  * 
  * <pre><code>{% for l in (1..10)%}{% for k in (1..1000) %}
  *   {% for i in (1..1000) %}Hello! {{ i }} world

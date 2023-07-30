@@ -212,19 +212,4 @@ public class TemplateContext {
         return newChildContext(new HashMap<>());
     }
 
-    public Filters getFilters() {
-        if(template == null) {
-            return getParseSettings().filters;
-        } else {
-            return template.getFilters();
-        }
-    }
-
-    public Insertions getInsertions() {
-        if(template == null) {
-            return getParseSettings().insertions;
-        } else {
-            return template.getInsertions();
-        }
-    }
 }

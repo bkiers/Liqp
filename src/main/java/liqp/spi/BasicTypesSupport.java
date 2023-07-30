@@ -27,7 +27,7 @@ public abstract class BasicTypesSupport implements TypesSupport {
         // so we will preserve the object in case of eager evaluation
         // and will put it back when needed
         module.addSerializer(new StdSerializer<T>(clazz) {
-            private static final long serialVersionUID = -6538120903478739907L;
+            private static final long serialVersionUID = 1L;
 
             @Override
             public void serialize(T value, JsonGenerator gen, SerializerProvider provider) throws IOException {

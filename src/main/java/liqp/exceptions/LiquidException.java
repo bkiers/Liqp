@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.misc.IntervalSet;
 import java.util.List;
 
 public class LiquidException extends RuntimeException {
-  private static final long serialVersionUID = -7720091243157735323L;
+  private static final long serialVersionUID = 1L;
 
   public final int line;
   public final int charPositionInLine;

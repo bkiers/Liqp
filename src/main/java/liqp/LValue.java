@@ -452,7 +452,7 @@ public abstract class LValue {
     }
 
     public boolean isMap(Object value) {
-        return value != null && (value instanceof Map);
+        return (value instanceof Map);
     }
 
     @SuppressWarnings("unchecked")

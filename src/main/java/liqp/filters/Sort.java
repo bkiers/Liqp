@@ -130,7 +130,7 @@ public class Sort extends Filter {
     }
 
     static class SortableMap extends HashMap<String, Comparable<Object>> implements Comparable<Object> {
-        private static final long serialVersionUID = -6480701533195197967L;
+        private static final long serialVersionUID = 1L;
         final String property;
 
         SortableMap(java.util.Map<String, Comparable<Object>> map, String property) {

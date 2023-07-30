@@ -1,7 +1,7 @@
 package liqp.filters;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.antlr.v4.runtime.RecognitionException;
@@ -33,16 +33,19 @@ public class Divided_ByTest {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid1() {
         Filters.COMMON_FILTERS.get("divided_by").apply(1);
     }
 
+    @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid2() {
         Filters.COMMON_FILTERS.get("divided_by").apply(1, 2, 3);
     }
 
+    @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid3() {
         Filters.COMMON_FILTERS.get("divided_by").apply(15L, 0L);
@@ -60,6 +63,7 @@ public class Divided_ByTest {
      *   assert_template_result "Liquid error: divided by 0", "{{ 5 | divided_by:0 }}"
      * end
      */
+    @SuppressWarnings("deprecation")
     @Test
     public void applyOriginalTest() {
 

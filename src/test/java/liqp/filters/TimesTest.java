@@ -1,8 +1,8 @@
 package liqp.filters;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import org.antlr.v4.runtime.RecognitionException;
@@ -35,11 +35,13 @@ public class TimesTest {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid1() {
         Filters.COMMON_FILTERS.get("times").apply(1);
     }
 
+    @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid2() {
         Filters.COMMON_FILTERS.get("times").apply(1, 2, 3);
@@ -57,6 +59,7 @@ public class TimesTest {
      *   assert_template_result "4", "{{ price | times:2 }}", 'price' => NumberLikeThing.new(2)
      * end
      */
+    @SuppressWarnings("deprecation")
     @Test
     public void applyOriginalTest() {
 

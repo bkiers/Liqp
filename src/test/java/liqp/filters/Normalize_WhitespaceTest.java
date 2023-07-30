@@ -1,10 +1,8 @@
 package liqp.filters;
 
-import org.junit.Test;
-
-import java.util.Objects;
-
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 /**
  * Created by vasyl.khrystiuk on 10/30/2019.

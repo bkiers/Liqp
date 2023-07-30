@@ -45,6 +45,7 @@ public class JekyllWhereImplTest {
         public String marker;
     }
 
+    @SuppressWarnings("serial")
     private Object[] array_of_objects1 = new Object[]{
             new HashMap<String, String>() {{
                 put("color", "teal");
@@ -74,9 +75,10 @@ public class JekyllWhereImplTest {
             new ObjectEntry("blue", "medium")
     };
 
-    private List array_of_objects3 = new ArrayList() {{
+    @SuppressWarnings("serial")
+    private List<?> array_of_objects3 = new ArrayList<Object>() {{
             add(new ObjectEntry("teal", "large"));
-            add(new HashMap(){{
+            add(new HashMap<String, String>(){{
                 put("color", "red");
                 put("size", "large");
             }});
@@ -156,9 +158,10 @@ public class JekyllWhereImplTest {
     @Test
     public void testFilterObjectsWithNullPropertiesAppropriately() {
         // given
-        Map o1 = new HashMap<>();
+        Map<String, String> o1 = new HashMap<>();
         o1.put("marker", "=1=");
         Object o2 = new Child(null, "=2=");
+        @SuppressWarnings("serial")
         Object o3 = new HashMap<String, String>() {{
             put("color", "");
             put("marker", "=3=");
@@ -285,7 +288,7 @@ public class JekyllWhereImplTest {
         "f" => {"tags" => "xtra"},
     }
          */
-        Map data = new HashMap();
+        Map<String, TagsHolder> data = new HashMap<>();
         data.put("a", new TagsHolder(new Object(), "a"));
         data.put("b", new TagsHolder("", "b"));
         data.put("c", new TagsHolder(null, "c"));
@@ -371,18 +374,18 @@ public class JekyllWhereImplTest {
     @Test
     public void shouldStringifyDuringComparisonForCompatibilityWithLiquidParsing() {
         // given
-        Map data = new HashMap();
-        Map o1 = new HashMap();
+        Map<String, Object> data = new HashMap<>();
+        Map<String, Object> o1 = new HashMap<>();
         o1.put("rating", 1.2);
         o1.put("featured", false);
         data.put("The Words", o1);
 
-        Map o2 = new HashMap();
+        Map<String, Object> o2 = new HashMap<>();
         o2.put("rating", 9.2);
         o2.put("featured", true);
         data.put("Limitless", o2);
 
-        Map o3 = new HashMap();
+        Map<String, Object> o3 = new HashMap<>();
         o3.put("rating", 4.7);
         o3.put("featured", true);
         data.put("Hustle", o3);
@@ -403,18 +406,18 @@ public class JekyllWhereImplTest {
     @Test
     public void shouldProperlyUseMapAfterFirst() {
         // given
-        Map data = new HashMap();
-        Map o1 = new HashMap();
+        Map<String, Object> data = new HashMap<>();
+        Map<String, Object> o1 = new HashMap<>();
         o1.put("rating", 1.2);
         o1.put("featured", false);
         data.put("The Words", o1);
 
-        Map o2 = new HashMap();
+        Map<String, Object> o2 = new HashMap<>();
         o2.put("rating", 9.2);
         o2.put("featured", true);
         data.put("Limitless", o2);
 
-        Map o3 = new HashMap();
+        Map<String, Object> o3 = new HashMap<>();
         o3.put("rating", 4.7);
         o3.put("featured", true);
         data.put("Hustle", o3);

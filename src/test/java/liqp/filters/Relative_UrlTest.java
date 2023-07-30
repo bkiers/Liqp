@@ -1,15 +1,17 @@
 package liqp.filters;
 
-import liqp.TemplateParser;
-import liqp.parser.Flavor;
-import liqp.parser.Inspectable;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+import liqp.TemplateParser;
+import liqp.parser.Flavor;
+import liqp.parser.Inspectable;
+
 public class Relative_UrlTest {
 
     /**
@@ -156,6 +158,7 @@ public class Relative_UrlTest {
         java.util.Map<String, Object> data = new HashMap<>();
         //noinspection unused
         data.put("site", new Inspectable() {
+            @SuppressWarnings("unused")
             public final String baseurl = "/baseurl/";
         });
 

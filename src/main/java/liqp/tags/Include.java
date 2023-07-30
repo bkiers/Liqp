@@ -1,13 +1,12 @@
 package liqp.tags;
 
-import liqp.Template;
-import liqp.TemplateContext;
-import liqp.nodes.LNode;
-import liqp.parser.Flavor;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.nodes.LNode;
 
 public class Include extends Tag {
 
@@ -15,7 +14,6 @@ public class Include extends Tag {
     public static final String INCLUDES_DIRECTORY_KEY = "liqp@includes_directory";
     public static String DEFAULT_EXTENSION = ".liquid";
 
-    @SuppressWarnings("deprecation")
     @Override
     public Object render(TemplateContext context, LNode... nodes) {
 

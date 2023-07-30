@@ -1,7 +1,7 @@
 package liqp.filters;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
@@ -47,7 +47,8 @@ public class Escape_OnceTest {
         final Filter filter = Filters.COMMON_FILTERS.get("escape_once");
 
         TemplateContext context = new TemplateContext();
-        assertThat(filter.apply(Filters.COMMON_FILTERS.get("escape").apply("<strong>", context)), is((Object)"&lt;strong&gt;"));
+        assertThat(filter.apply(Filters.COMMON_FILTERS.get("escape").apply("<strong>", context),
+            context), is((Object) "&lt;strong&gt;"));
 
         // the same test:
         assertThat(filter.apply("&lt;strong&gt;", context), is((Object)"&lt;strong&gt;"));

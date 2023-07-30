@@ -1,16 +1,22 @@
 package liqp.parser.v4;
 
-import java.util.HashSet;
-import java.util.Set;
-import liquid.parser.v4.LiquidLexer;
-import org.antlr.v4.runtime.*;
-import org.junit.Test;
-
-import java.util.List;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
+import org.antlr.v4.runtime.Token;
+import org.junit.Test;
+
+import liquid.parser.v4.LiquidLexer;
 
 public class LiquidLexerTest {
 

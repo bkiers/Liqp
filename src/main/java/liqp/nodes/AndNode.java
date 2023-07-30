@@ -3,8 +3,6 @@ package liqp.nodes;
 import liqp.LValue;
 import liqp.TemplateContext;
 
-import java.util.Map;
-
 public class AndNode extends LValue implements LNode {
 
     private LNode lhs;

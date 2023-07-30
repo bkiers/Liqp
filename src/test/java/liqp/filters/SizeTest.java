@@ -58,9 +58,13 @@ public class SizeTest {
         assertThat(filter.apply(new HashMap<>(), context), is(0));
         assertThat(filter.apply(Collections.singletonMap("a", 1), context), is(1));
         assertThat(filter.apply(new Inspectable() {
+            @SuppressWarnings("unused")
             public final String a = "a";
+            @SuppressWarnings("unused")
             public final String b = "b";
+            @SuppressWarnings("unused")
             public final String c = "c";
+            @SuppressWarnings("unused")
             public final String d = "d";
         }, context), is(4));
     }

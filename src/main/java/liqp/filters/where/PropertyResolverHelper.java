@@ -1,13 +1,13 @@
 package liqp.filters.where;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import liqp.LValue;
 import liqp.TemplateContext;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class PropertyResolverHelper {
     private final List<PropertyResolverAdapter> propertyResolverAdapters;
@@ -33,7 +33,7 @@ public class PropertyResolverHelper {
         INSTANCE.add(new PropertyResolverAdapter() {
             @Override
             public Object getItemProperty(TemplateContext context, Object input, Object property) {
-                return ((Map)input).get(property);
+                return ((Map<?,?>)input).get(property);
             }
 
             @Override

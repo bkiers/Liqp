@@ -1,5 +1,9 @@
 package liqp.parser;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,13 +11,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import liqp.TemplateContext;
+
 import liqp.spi.BasicTypesSupport;
 import liqp.spi.SPIHelper;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Special kind of {@link Inspectable} that do not perform
@@ -47,6 +47,7 @@ public interface LiquidSupport extends Inspectable {
 
 
     class LiquidSerializer extends StdSerializer<LiquidSupport> {
+        private static final long serialVersionUID = -7053942654651060805L;
 
         public LiquidSerializer() {
             this(null);
@@ -93,14 +94,14 @@ public interface LiquidSupport extends Inspectable {
             return objectToMap(mapper, variable);
         }
 
-        static void visitMap(Map<?, ?> map) {
-            for (Map.Entry entry: map.entrySet()) {
+        static void visitMap(Map<String, Object> map) {
+            for (Map.Entry<String,Object> entry: map.entrySet()) {
                 Object value = BasicTypesSupport.restoreObject(entry.getValue());
                 visit(value);
                 entry.setValue(value);
             }
         }
-        static void visitList(List list) {
+        static void visitList(List<Object> list) {
             for (int i = 0; i< list.size(); i++) {
                 Object object = list.get(i);
                 Object value = BasicTypesSupport.restoreObject(object);
@@ -109,11 +110,12 @@ public interface LiquidSupport extends Inspectable {
                 list.set(i, value);
             }
         }
+        @SuppressWarnings("unchecked")
         static void visit(Object object) {
             if (object instanceof Map) {
-                visitMap((Map)object);
+                visitMap((Map<String,Object>)object);
             } if (object instanceof List) {
-                visitList((List)object);
+                visitList((List<Object>)object);
             }
         }
 

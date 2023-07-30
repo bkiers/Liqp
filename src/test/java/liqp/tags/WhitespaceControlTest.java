@@ -1,12 +1,13 @@
 package liqp.tags;
 
-import liqp.Template;
-import liqp.TemplateParser;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import liqp.Template;
+import liqp.TemplateParser;
 
 // All output in this test class is tested against Ruby 2.3.1 and Liquid 4.0.0
 public class WhitespaceControlTest {

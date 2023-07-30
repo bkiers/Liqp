@@ -2,7 +2,7 @@ package liqp.nodes;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -47,6 +47,7 @@ public class LtEqNodeTest {
     public void testDateTypes() {
         // so many ZoneOffset.systemDefault(), because
         // broken java.util.Date cannot another way
+        @SuppressWarnings("unused")
         Inspectable data = new Inspectable() {
             public Date a = new Date(100 /* milliseconds */);
             public LocalDateTime b = LocalDateTime.ofInstant(Instant.ofEpochMilli(99), ZoneOffset.systemDefault());

@@ -1,20 +1,23 @@
 package liqp.blocks;
 
-import liqp.Template;
-import liqp.TemplateContext;
-import liqp.TemplateParser;
-import liqp.parser.Inspectable;
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Assert;
-import org.junit.Test;
+import static java.util.Collections.singletonMap;
+import static liqp.TestUtils.assertPatternResultEquals;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.util.Collections.singletonMap;
-import static liqp.TestUtils.assertPatternResultEquals;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
+import liqp.Template;
+import liqp.TemplateContext;
+import liqp.TemplateParser;
+import liqp.parser.Inspectable;
 
 public class ForTest {
 
@@ -168,6 +171,7 @@ public class ForTest {
     public void test_for_with_drop_value_range() {
         //noinspection unused
         Object foobar = new Inspectable() {
+            @SuppressWarnings("unused")
             public final int value = 3;
         };
         assertTemplateResult(" 1  2  3 ", "{%for item in (1..foobar.value) %} {{item}} {%endfor%}", singletonMap("foobar", foobar));
@@ -841,7 +845,7 @@ public class ForTest {
         String expected = "a is AAA;b is BBB;";
         String rendered = TemplateParser.DEFAULT.parse(template).render(hash);
 
-        Assert.assertThat(rendered, is(expected));
+        assertThat(rendered, is(expected));
     }
 
 
@@ -913,7 +917,7 @@ public class ForTest {
         assertThat(TemplateParser.DEFAULT.parse(template).render(), is(expected));
     }
 
-    public void assertTemplateResult(String expected, String template, Map data) {
+    public void assertTemplateResult(String expected, String template, Map<String, Object> data) {
         assertThat(TemplateParser.DEFAULT.parse(template).render(data), is(expected));
     }
     public void assertTemplateResult(String expected, String template, String data) {

@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import liqp.RenderTransformer.ObjectAppender;
 import liqp.exceptions.ExceededMaxIterationsException;
-import liqp.parser.LiquidSupport;
 import liqp.filters.Filters;
-import liqp.parser.Flavor;
+import liqp.parser.LiquidSupport;
 
 public class TemplateContext {
 
@@ -162,9 +162,7 @@ public class TemplateContext {
         return environmentMap;
     }
 
-    /**
-     * The registry is
-     */
+    @SuppressWarnings("unchecked")
     public <T extends Map<String, ?>> T getRegistry(String registryName) {
         if (parent != null) {
             return parent.getRegistry(registryName);

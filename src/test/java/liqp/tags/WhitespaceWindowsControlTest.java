@@ -6,7 +6,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import liqp.ParseSettings;
 import liqp.Template;
 import liqp.TemplateParser;
 

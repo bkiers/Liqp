@@ -10,6 +10,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import liqp.RenderTransformer.ObjectAppender;
+import liqp.exceptions.ExceededMaxIterationsException;
 import liqp.filters.Filters;
 import liqp.parser.LiquidSupport;
 

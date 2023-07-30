@@ -14,7 +14,6 @@ import java.util.Map;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
-import liqp.RenderSettings;
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.TemplateParser;

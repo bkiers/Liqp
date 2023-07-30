@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import liqp.ParseSettings;
 import liqp.TemplateParser;
 import liqp.parser.Flavor;
 import liqp.parser.Inspectable;

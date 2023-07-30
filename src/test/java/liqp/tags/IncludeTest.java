@@ -1,6 +1,7 @@
 package liqp.tags;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.isA;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -14,16 +15,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Rule;
 import org.junit.Test;
 
-import liqp.ParseSettings;
-import liqp.RenderSettings;
 import liqp.Template;
 import liqp.TemplateParser;
 import liqp.exceptions.LiquidException;
 import liqp.exceptions.VariableNotExistException;
 import liqp.filters.Filter;
 import liqp.parser.Flavor;
+import org.junit.rules.ExpectedException;
 
 public class IncludeTest {
 

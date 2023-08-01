@@ -30,7 +30,7 @@ public class TemplateContext {
     private Map<String, Object> environmentMap;
     private Map<String, Object> registry;
 
-    private List<Exception> errors;
+    private final List<Exception> errors;
     private final Template template;
 
     public TemplateContext() {

@@ -3,6 +3,8 @@ package liqp.nodes;
 import static junit.framework.TestCase.assertEquals;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -10,8 +12,11 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import liqp.exceptions.LiquidException;
+import liqp.parser.Flavor;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -79,5 +84,32 @@ public class GtNodeTest {
         assertEquals("yes", value);
         value = TemplateParser.DEFAULT.parse("{% if a >= c %}yes{% else %}no{% endif %}").render(data);
         assertEquals("no", value);
+    }
+
+    @Test
+    public void testBug267AsLiquid() {
+        try {
+            new TemplateParser.Builder().withFlavor(Flavor.LIQUID).build().parse("{{ 98 > 97 }}").render();
+            fail();
+        } catch (LiquidException e) {
+            assertTrue(e.getMessage().contains("parser error"));
+        } catch (Exception e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void testBug267AsJekyll() {
+        Template.ContextHolder contextHolder = new Template.ContextHolder();
+        String res = new TemplateParser.Builder()
+                .withFlavor(Flavor.JEKYLL)
+                .build()
+                .parse("{{ 98 > 97 }}")
+                .withContextHolder(contextHolder)
+                .render();
+        assertEquals("98", res);
+        List<Exception> errors = contextHolder.getContext().errors();
+        assertEquals(1, errors.size());
+        assertTrue(errors.get(0).getMessage().contains("unexpected output"));
     }
 }

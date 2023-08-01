@@ -8,7 +8,7 @@ public enum Flavor {
     LIQUID("snippets",
             Filters.DEFAULT_FILTERS,
             Insertions.STANDARD_INSERTIONS,
-            TemplateParser.ErrorMode.LAX,
+            TemplateParser.ErrorMode.STRICT,
             true,
             true,
             false

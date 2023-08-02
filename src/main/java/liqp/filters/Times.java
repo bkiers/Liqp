@@ -26,6 +26,6 @@ public class Times extends Filter {
 
         BigDecimal first = new BigDecimal(super.asNumber(value).toString());
         BigDecimal second = new BigDecimal(super.asNumber(rhsObj).toString());
-        return asFormattedNumber(first.multiply(second));
+        return first.multiply(second);
     }
 }

@@ -93,10 +93,10 @@ public abstract class LValue {
             return ((CharSequence)val).length() == 0;
         }
         if (val instanceof Collection) {
-            return ((Collection<?>)val).size() == 0;
+            return ((Collection<?>) val).isEmpty();
         }
         if (val instanceof Map) {
-            return ((Map<?, ?>)val).size() == 0;
+            return ((Map<?, ?>) val).isEmpty();
         }
         if (val.getClass().isArray()) {
             return ((Object[])val).length == 0;
@@ -273,6 +273,13 @@ public abstract class LValue {
         String str = String.valueOf(value).trim();
 
         return str.matches("\\d+") ? Long.valueOf(str) : Double.valueOf(str);
+    }
+
+    public BigDecimal asStrictNumber(Number number) {
+        if (number == null) {
+            return null;
+        }
+        return new BigDecimal(number.toString());
     }
 
     // mimic ruby's `BigDecimal.to_f` with standard java capabilities

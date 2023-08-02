@@ -3,23 +3,33 @@ package liqp.nodes;
 import liqp.LValue;
 import liqp.TemplateContext;
 
-public class EqNode implements LNode {
+import java.util.Objects;
 
-    private LNode lhs;
-    private LNode rhs;
+public class EqNode extends ComparingExpressionNode {
 
     public EqNode(LNode lhs, LNode rhs) {
-        this.lhs = lhs;
-        this.rhs = rhs;
+        super(lhs, rhs);
     }
 
     @Override
-    public Object render(TemplateContext context) {
+    Object doCompare(Object a, Object b) {
 
-        Object a = lhs.render(context);
-        Object b = rhs.render(context);
+        if (a == null) {
+            return b == null;
+        }
+        if (b == null) {
+            return false;
+        }
 
+        if (a instanceof Boolean && b instanceof Boolean) {
+            return Objects.equals(a, b);
+        }
+        if (a instanceof Boolean) {
+            return false;
+        }
+        if (b instanceof Boolean) {
+            return false;
+        }
         return LValue.areEqual(a, b);
-
     }
 }

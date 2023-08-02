@@ -87,7 +87,7 @@ public class GtNodeTest {
     }
 
     @Test
-    public void testBug267AsLiquid() {
+    public void testBug267ExpressionInOutputAsLiquid() {
         try {
             new TemplateParser.Builder().withFlavor(Flavor.LIQUID).build().parse("{{ 98 > 97 }}").render();
             fail();
@@ -99,7 +99,7 @@ public class GtNodeTest {
     }
 
     @Test
-    public void testBug267AsJekyll() {
+    public void testBug267ExpressionInOutputAsJekyll() {
         Template.ContextHolder contextHolder = new Template.ContextHolder();
         String res = new TemplateParser.Builder()
                 .withFlavor(Flavor.JEKYLL)
@@ -111,5 +111,19 @@ public class GtNodeTest {
         List<Exception> errors = contextHolder.getContext().errors();
         assertEquals(1, errors.size());
         assertTrue(errors.get(0).getMessage().contains("unexpected output"));
+    }
+
+    @Test
+    public void testBug267StringVsNumber() {
+        try {
+            new TemplateParser.Builder()
+                    .withFlavor(Flavor.JEKYLL)
+                    .build()
+                    .parse("{% if 98 > '98' %}true{% else %}false{% endif %}")
+                    .render();
+            fail();
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("not the same type"));
+        }
     }
 }

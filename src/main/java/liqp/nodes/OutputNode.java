@@ -5,6 +5,7 @@ import liqp.TemplateParser;
 import liqp.exceptions.LiquidException;
 import org.jsoup.internal.StringUtil;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +54,9 @@ public class OutputNode implements LNode {
 
         }
 
+        if (value instanceof BigDecimal) {
+            value = ((BigDecimal) value).toPlainString();
+        }
         return value;
     }
 }

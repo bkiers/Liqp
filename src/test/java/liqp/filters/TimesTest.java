@@ -5,11 +5,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import liqp.LValue;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
 import liqp.Template;
 import liqp.TemplateParser;
+
+import java.math.BigDecimal;
 
 public class TimesTest {
 
@@ -61,15 +64,15 @@ public class TimesTest {
      */
     @SuppressWarnings("deprecation")
     @Test
-    public void applyOriginalTest() {
+    public void applyoriginaltest() {
 
         Filter filter = Filters.COMMON_FILTERS.get("times");
 
         assertThat(filter.apply(3L, 4L), is((Object)12L));
         // assert_template_result "0", "{{ 'foo' | times:4 }}" // see: applyTest()
         assertTrue(String.valueOf(filter.apply(2.1, 3L)).matches("6[.,]3"));
-        assertEquals("7.25", filter.apply(0.0725, 100));
-        assertEquals("-7.25", filter.apply(-0.0725, 100));
-        assertEquals("7.25", filter.apply(-0.0725, -100));
+        assertEquals("7.25", LValue.asFormattedNumber((BigDecimal) filter.apply(0.0725, 100)));
+        assertEquals("-7.25", LValue.asFormattedNumber((BigDecimal) filter.apply(-0.0725, 100)));
+        assertEquals("7.25", LValue.asFormattedNumber((BigDecimal) filter.apply(-0.0725, -100)));
     }
 }

@@ -243,6 +243,7 @@ public class IncludeTest {
         TemplateParser.DEFAULT.parse(source).render();
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void includeDirectoryKeyInInputShouldChangeIncludeDirectory() throws IOException {
         // given
@@ -259,6 +260,7 @@ public class IncludeTest {
         assertTrue(result.contains("ALTERNATIVE"));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void includeDirectoryKeyStringInInputShouldChangeIncludeDirectory() throws IOException {
         // given
@@ -275,6 +277,8 @@ public class IncludeTest {
         // then
         assertTrue(result.contains("ALTERNATIVE"));
     }
+
+    @SuppressWarnings("deprecation")
     @Test
     public void includeDirectoryKeyPathInInputShouldChangeIncludeDirectory() throws IOException {
         // given

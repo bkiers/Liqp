@@ -346,6 +346,7 @@ public class Template {
         return context;
     }
 
+    @SuppressWarnings("deprecation")
     public Object renderToObjectUnguarded(Map<String, Object> variables, TemplateContext parent,
             boolean doClearThreadLocal) {
         if (doClearThreadLocal) {

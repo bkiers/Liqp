@@ -1,7 +1,6 @@
 package liqp.tags;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.isA;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Rule;
 import org.junit.Test;
 
 import liqp.Template;
@@ -24,14 +22,8 @@ import liqp.exceptions.LiquidException;
 import liqp.exceptions.VariableNotExistException;
 import liqp.filters.Filter;
 import liqp.parser.Flavor;
-import org.junit.rules.ExpectedException;
 
 public class IncludeTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
-
     @Test
     public void renderTest() throws RecognitionException {
 
@@ -194,8 +186,6 @@ public class IncludeTest {
     @Test
     public void renderTestWithIncludeSubdirectorySpecifiedInLiquidFlavorWithStrictVariablesException() throws Exception {
 
-        thrown.expectCause(isA(VariableNotExistException.class));
-
         File index = new File("src/test/jekyll/index_with_variables.html");
         TemplateParser parser = new TemplateParser.Builder() //
                 .withFlavor(Flavor.LIQUID) //
@@ -204,7 +194,17 @@ public class IncludeTest {
                 .withErrorMode(TemplateParser.ErrorMode.STRICT) //
             .build();
         Template template = parser.parse(index);
-        template.render();
+
+        try {
+            template.render();
+            fail("Should have thrown a RuntimeException with a VariableNotExistException cause");
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof VariableNotExistException) {
+                // expected
+            } else {
+                throw e;
+            }
+        }
     }
 
     // https://github.com/bkiers/Liqp/issues/95

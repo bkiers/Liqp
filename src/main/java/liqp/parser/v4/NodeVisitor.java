@@ -94,16 +94,7 @@ import liquid.parser.v4.LiquidParser.Term_exprContext;
 import liquid.parser.v4.LiquidParser.Term_lookupContext;
 import liquid.parser.v4.LiquidParser.Unless_tagContext;
 import liquid.parser.v4.LiquidParser.When_tagContext;
-import liqp.nodes.*;
 import liquid.parser.v4.LiquidParserBaseVisitor;
-import org.antlr.v4.runtime.misc.Interval;
-import org.antlr.v4.runtime.tree.TerminalNode;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static liquid.parser.v4.LiquidParser.*;
 
 public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
 

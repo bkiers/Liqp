@@ -1,14 +1,11 @@
 package liqp;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -22,7 +19,6 @@ import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import liqp.exceptions.LiquidException;
-import liqp.filters.Filters;
 import liqp.nodes.LNode;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
@@ -58,38 +54,6 @@ public class Template {
 
     private final TemplateParser templateParser;
 
-    /**
-     * Creates a new Template instance from a given input.
-     *
-     * @param input      the file holding the Liquid source.
-     */
-    private Template(TemplateParser templateParser, String input) {
-        this(templateParser, CharStreams.fromString(input, input));
-    }
-
-    /**
-     * Creates a new Template instance from a given file.
-     *
-     * @param file
-     *            the file holding the Liquid source.
-     */
-    private Template(TemplateParser parser, File file)
-            throws IOException {
-        this(parser, fromFile(file));
-    }
-
-
-    /**
-     * Creates a new Template instance from a given stream.
-     *
-     * @param stream
-     *            the file holding the Liquid source.
-     */
-    private Template(TemplateParser parser, InputStream stream)
-            throws IOException {
-        this(parser, fromStream(stream));
-    }
-
     Template(TemplateParser templateParser, CharStream stream) {
         this.templateParser = templateParser;
 
@@ -105,23 +69,6 @@ public class Template {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException("could not parse input: " + stream.getSourceName(), e);
-        }
-    }
-
-
-    private static CharStream fromStream(InputStream in) {
-        try {
-            return CharStreams.fromStream(in);
-        } catch (IOException e) {
-            throw new RuntimeException("could not parse input: " + in, e);
-        }
-    }
-
-    private static CharStream fromFile(File path) {
-        try {
-            return CharStreams.fromFileName(path.getAbsolutePath());
-        } catch (IOException e) {
-            throw new RuntimeException("could not parse input: " + path, e);
         }
     }
 
@@ -249,7 +196,7 @@ public class Template {
     }
 
     private Object renderObjectToObject(Object obj) {
-        LiquidSupport evaluated = templateParser.evaluate(getTemplateParser().getMapper(), obj);
+        LiquidSupport evaluated = TemplateParser.evaluate(getTemplateParser().getMapper(), obj);
         Map<String, Object> map = evaluated.toLiquid();
         return renderToObject(map);
     }
@@ -399,6 +346,7 @@ public class Template {
         return context;
     }
 
+    @SuppressWarnings("deprecation")
     public Object renderToObjectUnguarded(Map<String, Object> variables, TemplateContext parent,
             boolean doClearThreadLocal) {
         if (doClearThreadLocal) {

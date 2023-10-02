@@ -1,7 +1,5 @@
 package liqp.nodes;
 
-import java.util.Objects;
-
 public class GtEqNode extends ComparingExpressionNode {
 
     public GtEqNode(LNode lhs, LNode rhs) {

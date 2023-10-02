@@ -3,8 +3,6 @@ package liqp.nodes;
 import liqp.LValue;
 import liqp.TemplateContext;
 
-import java.util.Objects;
-
 public abstract class ComparingExpressionNode extends LValue implements LNode {
     protected final LNode lhs;
     protected final LNode rhs;

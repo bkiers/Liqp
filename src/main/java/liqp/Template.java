@@ -196,7 +196,7 @@ public class Template {
     }
 
     private Object renderObjectToObject(Object obj) {
-        LiquidSupport evaluated = templateParser.evaluate(getTemplateParser().getMapper(), obj);
+        LiquidSupport evaluated = TemplateParser.evaluate(getTemplateParser().getMapper(), obj);
         Map<String, Object> map = evaluated.toLiquid();
         return renderToObject(map);
     }

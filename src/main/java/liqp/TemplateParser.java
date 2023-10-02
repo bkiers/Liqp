@@ -96,6 +96,7 @@ public class TemplateParser {
      * This function don't need access to local context variables,
      * as it operates with parameters.
      */
+    @SuppressWarnings("hiding")
     public Map<String, Object> evaluate(final ObjectMapper mapper, Map<String, Object> variables) {
         if (evaluateMode == TemplateParser.EvaluateMode.EAGER) {
             return LiquidSupport.LiquidSupportFromInspectable.objectToMap(mapper, variables);
@@ -179,11 +180,13 @@ public class TemplateParser {
             this.errorMode = parser.errorMode;
         }
 
+        @SuppressWarnings("hiding")
         public Builder withFlavor(Flavor flavor) {
             this.flavor = flavor;
             return this;
         }
 
+        @SuppressWarnings("hiding")
         public Builder withStripSpaceAroundTags(boolean stripSpacesAroundTags, boolean stripSingleLine) {
 
             if (stripSingleLine && !stripSpacesAroundTags) {
@@ -196,15 +199,18 @@ public class TemplateParser {
             return this;
         }
 
+        @SuppressWarnings("hiding")
         public Builder withStripSpaceAroundTags(boolean stripSpacesAroundTags) {
             return this.withStripSpaceAroundTags(stripSpacesAroundTags, false);
         }
 
+        @SuppressWarnings("hiding")
         public Builder withStripSingleLine(boolean stripSingleLine) {
             this.stripSingleLine = stripSingleLine;
             return this;
         }
 
+        @SuppressWarnings("hiding")
         public Builder withObjectMapper(ObjectMapper mapper) {
             this.mapper = mapper;
             return this;
@@ -220,26 +226,31 @@ public class TemplateParser {
             return this;
         }
 
+        @SuppressWarnings("hiding")
         public Builder withEvaluateInOutputTag(boolean evaluateInOutputTag) {
             this.evaluateInOutputTag = evaluateInOutputTag;
             return this;
         }
 
+        @SuppressWarnings("hiding")
         public Builder withLiquidStyleInclude(boolean liquidStyleInclude) {
             this.liquidStyleInclude = liquidStyleInclude;
             return this;
         }
 
+        @SuppressWarnings("hiding")
         public Builder withStrictVariables(boolean strictVariables) {
             this.strictVariables = strictVariables;
             return this;
         }
 
+        @SuppressWarnings("hiding")
         public Builder withShowExceptionsFromInclude(boolean showExceptionsFromInclude) {
             this.showExceptionsFromInclude = showExceptionsFromInclude;
             return this;
         }
 
+        @SuppressWarnings("hiding")
         public Builder withEvaluateMode(TemplateParser.EvaluateMode evaluateMode) {
             this.evaluateMode = evaluateMode;
             return this;
@@ -251,12 +262,14 @@ public class TemplateParser {
          * @param renderTransformer The transformer, or {@code null} to use the default.
          * @return This builder.
          */
+        @SuppressWarnings("hiding")
         public Builder withRenderTransformer(RenderTransformer renderTransformer) {
             this.renderTransformer = renderTransformer;
             return this;
         }
 
-        public Builder withLocale(Locale locale){
+        @SuppressWarnings("hiding")
+        public Builder withLocale(Locale locale) {
             Objects.requireNonNull(locale);
             this.locale = locale;
             return this;
@@ -269,6 +282,7 @@ public class TemplateParser {
          * @param defaultTimeZone - value or <code>null<code/>
          * @return this builder
          */
+        @SuppressWarnings("hiding")
         public Builder withDefaultTimeZone(ZoneId defaultTimeZone) {
             this.defaultTimeZone = defaultTimeZone;
             return this;
@@ -289,7 +303,8 @@ public class TemplateParser {
             return this;
         }
 
-        public  Builder withSnippetsFolderName(String snippetsFolderName) {
+        @SuppressWarnings("hiding")
+        public Builder withSnippetsFolderName(String snippetsFolderName) {
             this.snippetsFolderName = snippetsFolderName;
             return this;
         }
@@ -320,6 +335,7 @@ public class TemplateParser {
             return this;
         }
 
+        @SuppressWarnings("hiding")
         public TemplateParser build() {
             Flavor fl = this.flavor;
             if (fl == null) {

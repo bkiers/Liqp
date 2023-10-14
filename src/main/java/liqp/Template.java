@@ -2,11 +2,7 @@ package liqp;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -47,6 +43,7 @@ public class Template {
 
 
     private final long templateSize;
+    private final String sourceName;
 
     private TemplateContext templateContext = null;
 
@@ -63,6 +60,7 @@ public class Template {
         this.templateSize = stream.size();
         LiquidLexer lexer = new LiquidLexer(stream, this.templateParser.isStripSpacesAroundTags(),
                 this.templateParser.isStripSingleLine(), blockNames, tagNames);
+        this.sourceName = IntStream.UNKNOWN_SOURCE_NAME.equals(stream.getSourceName()) ? null : stream.getSourceName();
         try {
             root = parse(lexer);
         } catch (LiquidException e) {
@@ -355,6 +353,7 @@ public class Template {
         variables = templateParser.evaluate(templateParser.mapper, variables);
 
         final NodeVisitor visitor = new NodeVisitor(templateParser.insertions, templateParser.filters, templateParser.liquidStyleInclude);
+        Deque<String> includeStack = null;
         try {
             LNode node = visitor.visit(root);
             if (parent == null) {
@@ -362,6 +361,10 @@ public class Template {
             } else {
                 this.templateContext = parent.newChildContext(variables);
             }
+
+            includeStack = getIncludeStackFromRegistry(templateContext);
+            includeStack.push(sourceName);
+
             if (this.contextHolder != null) {
                 contextHolder.setContext(templateContext);
             }
@@ -375,7 +378,16 @@ public class Template {
             } else {
                 throw new RuntimeException(e);
             }
+        } finally {
+            if (includeStack != null) {
+                includeStack.pop();
+            }
         }
+    }
+
+    public static Deque<String> getIncludeStackFromRegistry(TemplateContext templateContext) {
+        Map<String, Deque<String>> registry = templateContext.getRegistry(TemplateContext.REGISTRY_SOURCE_NAME);
+        return registry.putIfAbsent(TemplateContext.REGISTRY_SOURCE_NAME, new LinkedList<>());
     }
 
     /**

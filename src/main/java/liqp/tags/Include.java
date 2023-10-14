@@ -1,6 +1,7 @@
 package liqp.tags;
 
 import java.io.File;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,11 +14,15 @@ public class Include extends Tag {
 
     @Override
     public Object render(TemplateContext context, LNode... nodes) {
-
+        Deque<String> includeStackFromRegistry = Template.getIncludeStackFromRegistry(context);
+        boolean pushedStack = false;
         try {
             String includeResource = super.asString(nodes[0].render(context), context);
 
             CharStream source = context.getParser().nameResolver.resolve(includeResource);
+
+            includeStackFromRegistry.push(source.getSourceName());
+            pushedStack = true;
 
             Template template = context.getParser().parse(source);
 
@@ -46,6 +51,11 @@ public class Include extends Tag {
                 throw new RuntimeException("problem with evaluating include", e);
             } else {
                 return "";
+            }
+        } finally {
+            // flag variable in case exception is thrown before we push to the stack
+            if (pushedStack) {
+                includeStackFromRegistry.pop();
             }
         }
     }

@@ -7,11 +7,11 @@ import java.util.Objects;
 public class EqNode extends ComparingExpressionNode {
 
     public EqNode(LNode lhs, LNode rhs) {
-        super(lhs, rhs);
+        super(lhs, rhs, false);
     }
 
     @Override
-    Object doCompare(Object a, Object b) {
+    Object doCompare(Object a, Object b, boolean strictTypedExpressions) {
 
         if (a == null) {
             return b == null;

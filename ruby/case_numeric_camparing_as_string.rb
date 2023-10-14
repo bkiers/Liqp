@@ -2,6 +2,17 @@
 
 require_relative '_helpers.rb'
 
+
+
+pp render({}, "{%- assign value = 5.0 | round: 1 -%} {%- if value >= 4.0 and value <= 4.2 -%} Très bien {%- elsif value >= 4.3 and value <= 4.7 -%} Superbe {%- elsif value >= 4.8 and value <= 4.9 -%} Fabuleux {%- elsif value != 5.0 -%} Exceptionnel {% endif %}")
+
+
+first = 98
+second = true
+operator = '>'
+pp "{% if #{first} #{operator} #{second} %}true{% else %}false{% endif %}"
+pp render({}, "{% if #{first} #{operator} #{second} %}true{% else %}false{% endif %}")
+
 # pp render({}, "{% assign comparingValue = 98.0 %}{{ 98 > comparingValue }}")
 # assertEqual("true", render({}, "{% assign comparingValue = 98.0 %}{{ '98' == comparingValue }}"))
 
@@ -27,9 +38,6 @@ require_relative '_helpers.rb'
         first = pair[0][0]
         second = pair[0][1]
         begin
-          # just trigger calculation to raise exception if it will be
-          first.method(operator).(second)
-          # res = first.public_send(operator, second)
 
           if first.class == String then first = "'#{first}'" end
           if first === nil then first = 'nil' end

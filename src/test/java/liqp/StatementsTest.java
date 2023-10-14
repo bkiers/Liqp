@@ -100,9 +100,9 @@ public class StatementsTest {
     @Test
     public void zero_lq_or_equal_one_involving_nilTest() throws Exception {
 
-        assertThat(TemplateParser.DEFAULT.parse(" {% if null <= 0 %} true {% else %} false {% endif %} ").render(), is("  false  "));
+        assertThat(TemplateParser.DEFAULT_JEKYLL.parse(" {% if null <= 0 %} true {% else %} false {% endif %} ").render(), is("  false  "));
 
-        assertThat(TemplateParser.DEFAULT.parse(" {% if 0 <= null %} true {% else %} false {% endif %} ").render(), is("  false  "));
+        assertThat(TemplateParser.DEFAULT_JEKYLL.parse(" {% if 0 <= null %} true {% else %} false {% endif %} ").render(), is("  false  "));
     }
 
     /*

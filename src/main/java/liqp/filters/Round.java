@@ -1,5 +1,6 @@
 package liqp.filters;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
@@ -31,6 +32,6 @@ public class Round extends Filter {
         DecimalFormat formatter = new DecimalFormat(formatBuilder.toString());
         formatter.setRoundingMode(RoundingMode.HALF_UP);
 
-        return formatter.format(number);
+        return new BigDecimal(formatter.format(number));
     }
 }

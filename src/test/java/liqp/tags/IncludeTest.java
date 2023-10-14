@@ -1,27 +1,22 @@
 package liqp.tags;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.antlr.v4.runtime.RecognitionException;
-import org.junit.Test;
-
 import liqp.Template;
 import liqp.TemplateParser;
 import liqp.exceptions.LiquidException;
 import liqp.exceptions.VariableNotExistException;
 import liqp.filters.Filter;
 import liqp.parser.Flavor;
+import org.antlr.v4.runtime.RecognitionException;
+import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.*;
 
 public class IncludeTest {
     @Test
@@ -249,12 +244,13 @@ public class IncludeTest {
         // given
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_without_quotes.html");
-        Template template = Flavor.JEKYLL.defaultParser().parse(index);
-        Map<String, Object> data = new HashMap<String, Object>();
-        data.put(Include.INCLUDES_DIRECTORY_KEY, new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes"));
+        Template template = new TemplateParser.Builder().withFlavor(Flavor.JEKYLL)
+                .withSnippetsFolderName(new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes").toString())
+                .build()
+                .parse(index);
 
         // when
-        String result = template.render(data);
+        String result = template.render();
 
         // then
         assertTrue(result.contains("ALTERNATIVE"));
@@ -266,13 +262,15 @@ public class IncludeTest {
         // given
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_without_quotes.html");
-        Template template = Flavor.JEKYLL.defaultParser().parse(index);
-        Map<String, Object> data = new HashMap<String, Object>();
-        String alternativePath = new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes").getAbsolutePath();
-        data.put(Include.INCLUDES_DIRECTORY_KEY, alternativePath);
+
+
+        Template template = new TemplateParser.Builder().withFlavor(Flavor.JEKYLL)
+                .withSnippetsFolderName(new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes").getAbsolutePath())
+                .build()
+                .parse(index);
 
         // when
-        String result = template.render(data);
+        String result = template.render();
 
         // then
         assertTrue(result.contains("ALTERNATIVE"));
@@ -284,13 +282,14 @@ public class IncludeTest {
         // given
         File jekyll = new File(new File("").getAbsolutePath(), "src/test/jekyll");
         File index = new File(jekyll, "index_without_quotes.html");
-        Template template = Flavor.JEKYLL.defaultParser().parse(index);
-        Map<String, Object> data = new HashMap<String, Object>();
-        String alternativePath = new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes").getAbsolutePath();
-        data.put(Include.INCLUDES_DIRECTORY_KEY, Paths.get(alternativePath));
+
+        Template template = new TemplateParser.Builder().withFlavor(Flavor.JEKYLL)
+                .withSnippetsFolderName(new File(new File("").getAbsolutePath(), "src/test/jekyll/alternative_includes").getAbsolutePath())
+                .build()
+                .parse(index);
 
         // when
-        String result = template.render(data);
+        String result = template.render();
 
         // then
         assertTrue(result.contains("ALTERNATIVE"));

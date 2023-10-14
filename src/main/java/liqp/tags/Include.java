@@ -7,34 +7,19 @@ import java.util.Map;
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.nodes.LNode;
+import org.antlr.v4.runtime.CharStream;
 
 public class Include extends Tag {
-
-    @Deprecated
-    public static final String INCLUDES_DIRECTORY_KEY = "liqp@includes_directory";
-    public static String DEFAULT_EXTENSION = ".liquid";
 
     @Override
     public Object render(TemplateContext context, LNode... nodes) {
 
         try {
             String includeResource = super.asString(nodes[0].render(context), context);
-            String extension = DEFAULT_EXTENSION;
-            if (includeResource.indexOf('.') > 0) {
-                extension = "";
-            }
-            File includeResourceFile;
-            String includesDirectory = (String) context.get(INCLUDES_DIRECTORY_KEY);
 
-            if (includesDirectory != null) {
-                includeResourceFile = new File(includesDirectory, includeResource + extension);
-            } else {
-                includeResourceFile = new File(context.getParser().getSnippetsFolderName(),
-                        includeResource + extension);
-            }
+            CharStream source = context.getParser().nameResolver.resolve(includeResource);
 
-            Template template;
-            template = context.getParser().parse(includeResourceFile);
+            Template template = context.getParser().parse(source);
 
             Map<String, Object> variables = new HashMap<String, Object>();
 

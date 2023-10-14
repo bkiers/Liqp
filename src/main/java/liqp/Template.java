@@ -352,16 +352,6 @@ public class Template {
         if (doClearThreadLocal) {
             BasicTypesSupport.clearReferences();
         }
-        if (variables.containsKey(Include.INCLUDES_DIRECTORY_KEY)) {
-            Object includeDirectory = variables.get(Include.INCLUDES_DIRECTORY_KEY);
-            if (includeDirectory instanceof File) {
-                variables.put(Include.INCLUDES_DIRECTORY_KEY, ((File) includeDirectory)
-                        .getAbsolutePath());
-            } else if (includeDirectory instanceof Path) {
-                variables.put(Include.INCLUDES_DIRECTORY_KEY, ((Path) includeDirectory).toAbsolutePath()
-                        .toString());
-            }
-        }
         variables = templateParser.evaluate(templateParser.mapper, variables);
 
         final NodeVisitor visitor = new NodeVisitor(templateParser.insertions, templateParser.filters, templateParser.liquidStyleInclude);

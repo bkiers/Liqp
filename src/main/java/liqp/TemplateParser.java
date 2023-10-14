@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Consumer;
@@ -14,6 +16,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import liqp.filters.Filter;
 import liqp.filters.Filters;
 import liqp.parser.LiquidSupport;
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 
 import liqp.parser.Flavor;
@@ -78,7 +81,7 @@ public class TemplateParser {
     public final ZoneId defaultTimeZone;
     private final RenderTransformer renderTransformer;
     private final Consumer<Map<String, Object>> environmentMapConfigurator;
-    private final String snippetsFolderName;
+    public final NameResolver nameResolver;
 
 
     private final int limitMaxIterations;
@@ -122,6 +125,31 @@ public class TemplateParser {
         return new LiquidSupport.LiquidSupportFromInspectable(mapper, variable);
     }
 
+    @FunctionalInterface
+    public interface NameResolver {
+        CharStream resolve(String name) throws IOException;
+    }
+
+    public static class LocalFSNameResolver implements NameResolver {
+        public static String DEFAULT_EXTENSION = ".liquid";
+        private final String root;
+        public LocalFSNameResolver(String root) {
+            this.root = root;
+        }
+        @Override
+        public CharStream resolve(String name) throws IOException {
+            Path directPath = Paths.get(name);
+            if (directPath.isAbsolute()) {
+                return CharStreams.fromPath(directPath);
+            }
+            String extension = DEFAULT_EXTENSION;
+            if (name.indexOf('.') > 0) {
+                extension = "";
+            }
+            name = name + extension;
+            return CharStreams.fromPath(Paths.get(root, name));
+        }
+    }
 
     public static class Builder {
 
@@ -152,6 +180,7 @@ public class TemplateParser {
         private Integer limitMaxSizeRenderedString = Integer.MAX_VALUE;
         private Long limitMaxRenderTimeMillis  = Long.MAX_VALUE;
         private Long limitMaxTemplateSizeBytes  = Long.MAX_VALUE;
+        private NameResolver nameResolver;
 
         public Builder() {
         }
@@ -181,6 +210,7 @@ public class TemplateParser {
             this.liquidStyleWhere = parser.liquidStyleWhere;
 
             this.errorMode = parser.errorMode;
+            this.nameResolver = parser.nameResolver;
         }
 
         @SuppressWarnings("hiding")
@@ -343,6 +373,11 @@ public class TemplateParser {
             return this;
         }
 
+        public Builder withNameResolver(NameResolver nameResolver) {
+            this.nameResolver = nameResolver;
+            return this;
+        }
+
         @SuppressWarnings("hiding")
         public TemplateParser build() {
             Flavor fl = this.flavor;
@@ -393,18 +428,21 @@ public class TemplateParser {
             if (snippetsFolderName == null) {
                 snippetsFolderName = fl.snippetsFolderName;
             }
+            if (nameResolver == null) {
+                nameResolver = new LocalFSNameResolver(snippetsFolderName);
+            }
 
             return new TemplateParser(strictVariables, showExceptionsFromInclude, evaluateMode, renderTransformer, locale, defaultTimeZone, environmentMapConfigurator, errorMode, fl, stripSpacesAroundTags, stripSingleLine, mapper,
-                    allInsertions, finalFilters, snippetsFolderName, evaluateInOutputTag, strictTypedExpressions, liquidStyleInclude, liquidStyleWhere, limitMaxIterations, limitMaxSizeRenderedString, limitMaxRenderTimeMillis, limitMaxTemplateSizeBytes);
+                    allInsertions, finalFilters, evaluateInOutputTag, strictTypedExpressions, liquidStyleInclude, liquidStyleWhere, nameResolver, limitMaxIterations, limitMaxSizeRenderedString, limitMaxRenderTimeMillis, limitMaxTemplateSizeBytes);
         }
     }
 
     TemplateParser(boolean strictVariables, boolean showExceptionsFromInclude, EvaluateMode evaluateMode,
                    RenderTransformer renderTransformer, Locale locale, ZoneId defaultTimeZone,
                    Consumer<Map<String, Object>> environmentMapConfigurator, ErrorMode errorMode, Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine,
-                   ObjectMapper mapper, Insertions insertions, Filters filters, String snippetsFolderName, boolean evaluateInOutputTag,
+                   ObjectMapper mapper, Insertions insertions, Filters filters, boolean evaluateInOutputTag,
                    boolean strictTypedExpressions,
-                   boolean liquidStyleInclude, Boolean liquidStyleWhere, int maxIterations, int maxSizeRenderedString, long maxRenderTimeMillis, long maxTemplateSizeBytes) {
+                   boolean liquidStyleInclude, Boolean liquidStyleWhere, NameResolver nameResolver, int maxIterations, int maxSizeRenderedString, long maxRenderTimeMillis, long maxTemplateSizeBytes) {
         this.flavor = flavor;
         this.stripSpacesAroundTags = stripSpacesAroundTags;
         this.stripSingleLine = stripSingleLine;
@@ -425,7 +463,7 @@ public class TemplateParser {
         this.locale = locale;
         this.defaultTimeZone = defaultTimeZone;
         this.environmentMapConfigurator = environmentMapConfigurator;
-        this.snippetsFolderName = snippetsFolderName;
+        this.nameResolver = nameResolver;
 
         this.limitMaxIterations = maxIterations;
         this.limitMaxSizeRenderedString = maxSizeRenderedString;
@@ -447,6 +485,10 @@ public class TemplateParser {
 
     public Template parse(Reader reader) throws IOException {
         return new Template(this, CharStreams.fromReader(reader));
+    }
+
+    public Template parse(CharStream input) {
+        return new Template(this, input);
     }
 
     public int getLimitMaxIterations() {
@@ -493,7 +535,4 @@ public class TemplateParser {
         return environmentMapConfigurator;
     }
 
-    public String getSnippetsFolderName() {
-        return snippetsFolderName;
-    }
 }

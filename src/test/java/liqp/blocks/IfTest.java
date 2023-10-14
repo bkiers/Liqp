@@ -308,15 +308,15 @@ public class IfTest {
     @Test
     public void comparisons_on_nullTest() throws RecognitionException {
 
-        assertThat(TemplateParser.DEFAULT.parse("{% if null < 10 %} NO {% endif %}").render(), is(""));
-        assertThat(TemplateParser.DEFAULT.parse("{% if null <= 10 %} NO {% endif %}").render(), is(""));
-        assertThat(TemplateParser.DEFAULT.parse("{% if null >= 10 %} NO {% endif %}").render(), is(""));
-        assertThat(TemplateParser.DEFAULT.parse("{% if null > 10 %} NO {% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT_JEKYLL.parse("{% if null < 10 %} NO {% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT_JEKYLL.parse("{% if null <= 10 %} NO {% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT_JEKYLL.parse("{% if null >= 10 %} NO {% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT_JEKYLL.parse("{% if null > 10 %} NO {% endif %}").render(), is(""));
 
-        assertThat(TemplateParser.DEFAULT.parse("{% if 10 < null %} NO {% endif %}").render(), is(""));
-        assertThat(TemplateParser.DEFAULT.parse("{% if 10 <= null %} NO {% endif %}").render(), is(""));
-        assertThat(TemplateParser.DEFAULT.parse("{% if 10 >= null %} NO {% endif %}").render(), is(""));
-        assertThat(TemplateParser.DEFAULT.parse("{% if 10 > null %} NO {% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT_JEKYLL.parse("{% if 10 < null %} NO {% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT_JEKYLL.parse("{% if 10 <= null %} NO {% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT_JEKYLL.parse("{% if 10 >= null %} NO {% endif %}").render(), is(""));
+        assertThat(TemplateParser.DEFAULT_JEKYLL.parse("{% if 10 > null %} NO {% endif %}").render(), is(""));
     }
 
     /*

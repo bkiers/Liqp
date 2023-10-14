@@ -3,26 +3,12 @@ package liqp.nodes;
 public class GtEqNode extends ComparingExpressionNode {
 
     public GtEqNode(LNode lhs, LNode rhs) {
-        super(lhs, rhs);
+        super(lhs, rhs, true);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    Object doCompare(Object a, Object b) {
-        if (a == null) {
-            return b == null;
-        }
-        if (b == null) {
-            return false;
-        }
-
-        if (a instanceof Boolean) {
-            return false;
-        }
-        if (b instanceof Boolean) {
-            return false;
-        }
-
+    Object doCompare(Object a, Object b, boolean strictTypedExpressions) {
         if (a instanceof Comparable && a.getClass().isInstance(b)) {
             return ((Comparable<Object>) a).compareTo(b) >= 0;
         } else if (b instanceof Comparable && b.getClass().isInstance(a)) {

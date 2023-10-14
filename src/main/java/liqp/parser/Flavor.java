@@ -11,7 +11,8 @@ public enum Flavor {
             TemplateParser.ErrorMode.STRICT,
             true,
             true,
-            false
+            false,
+            true
     ), //
 
     JEKYLL("_includes",
@@ -20,7 +21,8 @@ public enum Flavor {
             TemplateParser.ErrorMode.WARN,
             false,
             false,
-            false
+            false,
+            true
     ),
 
     LIQP("snippets",
@@ -29,7 +31,8 @@ public enum Flavor {
             TemplateParser.ErrorMode.STRICT,
             true,
             true,
-            true
+            true,
+            false
     );
 
     public final String snippetsFolderName;
@@ -39,6 +42,7 @@ public enum Flavor {
     private final boolean liquidStyleInclude;
     private final boolean liquidStyleWhere;
     private final boolean evaluateInOutputTag;
+    private final boolean strictTypedExpressions;
     private TemplateParser parser;
 
     Flavor(String snippetsFolderName,
@@ -47,7 +51,9 @@ public enum Flavor {
            TemplateParser.ErrorMode errorMode,
            boolean isLiquidStyleInclude,
            boolean isLiquidStyleWhere,
-           boolean evaluateInOutputTag) {
+           boolean evaluateInOutputTag,
+           boolean strictTypedExpressions
+           ) {
         this.snippetsFolderName = snippetsFolderName;
         this.filters = filters;
         this.insertions = insertions;
@@ -55,6 +61,7 @@ public enum Flavor {
         this.liquidStyleInclude = isLiquidStyleInclude;
         this.liquidStyleWhere = isLiquidStyleWhere;
         this.evaluateInOutputTag = evaluateInOutputTag;
+        this.strictTypedExpressions = strictTypedExpressions;
     }
 
     /**
@@ -108,5 +115,15 @@ public enum Flavor {
 
     public boolean isLiquidStyleWhere() {
         return liquidStyleWhere;
+    }
+
+    /**
+     * ruby is strictly typed, so comparing string like '98' and number like 97 will raise exception,
+     * and we must follow this behavior for compatibility in Liquid and Jekyll flavors
+     * but historically in this library and practice from other implementations show that people expect weak-typing in expressions.
+     * So this is a flag that actually control this.
+     */
+    public boolean isStrictTypedExpressions() {
+        return strictTypedExpressions;
     }
 }

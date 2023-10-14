@@ -36,7 +36,7 @@ public class GtEqNodeTest {
 
         for (String[] test : tests) {
 
-            Template template = TemplateParser.DEFAULT.parse(test[0]);
+            Template template = TemplateParser.DEFAULT_JEKYLL.parse(test[0]);
             String rendered = String.valueOf(template.render());
 
             assertThat("template: [" + test[0]+"], expected:["+test[1]+"], real: [" + rendered + "]",rendered, is(test[1]));

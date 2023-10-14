@@ -275,11 +275,14 @@ public abstract class LValue {
         return str.matches("\\d+") ? Long.valueOf(str) : Double.valueOf(str);
     }
 
-    public BigDecimal asStrictNumber(Number number) {
+    public BigDecimal asStrictNumber(Object number) {
         if (number == null) {
             return null;
         }
-        return new BigDecimal(number.toString());
+        if (number instanceof BigDecimal) {
+            return (BigDecimal) number;
+        }
+        return new BigDecimal(number.toString().trim());
     }
 
     // mimic ruby's `BigDecimal.to_f` with standard java capabilities
@@ -456,6 +459,13 @@ public abstract class LValue {
 
     public boolean canBeDouble(Object value) {
         return String.valueOf(value).trim().matches("-?\\d+(\\.\\d*)?");
+    }
+
+    public boolean canBeNumber(Object value) {
+        if (value == null) {
+            return false;
+        }
+        return canBeInteger(value) || canBeDouble(value);
     }
 
     public boolean isMap(Object value) {

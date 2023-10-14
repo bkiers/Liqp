@@ -3,13 +3,18 @@ package liqp.nodes;
 import liqp.LValue;
 import liqp.TemplateContext;
 
+import java.math.BigDecimal;
+import java.util.Optional;
+
 public abstract class ComparingExpressionNode extends LValue implements LNode {
     protected final LNode lhs;
     protected final LNode rhs;
+    private final boolean relative;
 
-    public ComparingExpressionNode(LNode lhs, LNode rhs) {
+    public ComparingExpressionNode(LNode lhs, LNode rhs, boolean realtive) {
         this.lhs = lhs;
         this.rhs = rhs;
+        this.relative = realtive;
     }
 
     @Override
@@ -48,8 +53,63 @@ public abstract class ComparingExpressionNode extends LValue implements LNode {
         if (b instanceof Number) {
             b = asStrictNumber((Number)b);
         }
-        return doCompare(a, b);
+        boolean strictTypedExpressions;
+        if (context != null && context.getParser() != null) {
+            // this variable always set except for tests
+            strictTypedExpressions = context.getParser().strictTypedExpressions;
+        } else {
+            strictTypedExpressions = true;
+        }
+        if (relative) {
+            Optional<Object> common = relativeCompareCommonRules(a, b, strictTypedExpressions);
+            if (common.isPresent()) {
+                return common.get();
+            }
+            if (!strictTypedExpressions) {
+                if (a instanceof Boolean) {
+                    a = booleanToNumber((Boolean) a);
+                }
+                if (b instanceof Boolean) {
+                    b = booleanToNumber((Boolean) b);
+                }
+                if (a == null) {
+                    a = BigDecimal.ZERO;
+                }
+                if (b == null) {
+                    b = BigDecimal.ZERO;
+                }
+            }
+        }
+        if (!strictTypedExpressions) {
+            if ((a instanceof Number && canBeNumber(b)) || (b instanceof Number && canBeNumber(a))) {
+                a = asStrictNumber(a);
+                b = asStrictNumber(b);
+            }
+        }
+        return doCompare(a, b, strictTypedExpressions);
     }
 
-    abstract Object doCompare(Object a, Object b);
+    private Object booleanToNumber(Boolean a) {
+        if  (Boolean.TRUE.equals(a)) {
+            return BigDecimal.ONE;
+        } else {
+            return BigDecimal.ZERO;
+        }
+    }
+
+    abstract Object doCompare(Object a, Object b, boolean strictTypedExpressions);
+
+    protected Optional<Object> relativeCompareCommonRules(Object a, Object b, boolean strictTypedExpressions) {
+        if (strictTypedExpressions) {
+            if (a instanceof Boolean || b instanceof Boolean) {
+                // relative comparing with boolean should be false all the time
+                return Optional.of(false);
+            }
+            if (a == null || b == null) {
+                // relative comparing with null should be false all the time
+                return Optional.of(false);
+            }
+        }
+        return Optional.empty();
+    }
 }

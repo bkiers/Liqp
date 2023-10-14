@@ -59,6 +59,7 @@ public class TemplateParser {
     public final Insertions insertions;
     public final Filters filters;
     public final boolean evaluateInOutputTag;
+    public final boolean strictTypedExpressions;
     public final TemplateParser.ErrorMode errorMode;
     public final boolean liquidStyleInclude;
     public final boolean liquidStyleWhere;
@@ -131,6 +132,7 @@ public class TemplateParser {
         private List<Insertion> insertions = new ArrayList<>();
         private List<Filter> filters = new ArrayList<>();
         private Boolean evaluateInOutputTag;
+        private Boolean strictTypedExpressions;
         private TemplateParser.ErrorMode errorMode;
         private Boolean liquidStyleInclude;
         private Boolean liquidStyleWhere;
@@ -174,6 +176,7 @@ public class TemplateParser {
             this.limitMaxRenderTimeMillis = parser.limitMaxRenderTimeMillis;
             this.limitMaxTemplateSizeBytes = parser.limitMaxTemplateSizeBytes;
             this.evaluateInOutputTag = parser.evaluateInOutputTag;
+            this.strictTypedExpressions = parser.strictTypedExpressions;
             this.liquidStyleInclude = parser.liquidStyleInclude;
             this.liquidStyleWhere = parser.liquidStyleWhere;
 
@@ -229,6 +232,11 @@ public class TemplateParser {
         @SuppressWarnings("hiding")
         public Builder withEvaluateInOutputTag(boolean evaluateInOutputTag) {
             this.evaluateInOutputTag = evaluateInOutputTag;
+            return this;
+        }
+
+        public Builder withStrictTypedExpressions(boolean strictTypedExpressions) {
+            this.strictTypedExpressions = strictTypedExpressions;
             return this;
         }
 
@@ -347,6 +355,11 @@ public class TemplateParser {
                 evaluateInOutputTag = fl.isEvaluateInOutputTag();
             }
 
+            Boolean strictTypedExpressions = this.strictTypedExpressions;
+            if (strictTypedExpressions == null) {
+                strictTypedExpressions = fl.isStrictTypedExpressions();
+            }
+
             Boolean liquidStyleInclude = this.liquidStyleInclude;
             if (liquidStyleInclude == null) {
                 liquidStyleInclude = fl.isLiquidStyleInclude();
@@ -382,14 +395,16 @@ public class TemplateParser {
             }
 
             return new TemplateParser(strictVariables, showExceptionsFromInclude, evaluateMode, renderTransformer, locale, defaultTimeZone, environmentMapConfigurator, errorMode, fl, stripSpacesAroundTags, stripSingleLine, mapper,
-                    allInsertions, finalFilters, snippetsFolderName, evaluateInOutputTag, liquidStyleInclude, liquidStyleWhere, limitMaxIterations, limitMaxSizeRenderedString, limitMaxRenderTimeMillis, limitMaxTemplateSizeBytes);
+                    allInsertions, finalFilters, snippetsFolderName, evaluateInOutputTag, strictTypedExpressions, liquidStyleInclude, liquidStyleWhere, limitMaxIterations, limitMaxSizeRenderedString, limitMaxRenderTimeMillis, limitMaxTemplateSizeBytes);
         }
     }
 
     TemplateParser(boolean strictVariables, boolean showExceptionsFromInclude, EvaluateMode evaluateMode,
                    RenderTransformer renderTransformer, Locale locale, ZoneId defaultTimeZone,
                    Consumer<Map<String, Object>> environmentMapConfigurator, ErrorMode errorMode, Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine,
-                   ObjectMapper mapper, Insertions insertions, Filters filters, String snippetsFolderName, boolean evaluateInOutputTag, boolean liquidStyleInclude, Boolean liquidStyleWhere, int maxIterations, int maxSizeRenderedString, long maxRenderTimeMillis, long maxTemplateSizeBytes) {
+                   ObjectMapper mapper, Insertions insertions, Filters filters, String snippetsFolderName, boolean evaluateInOutputTag,
+                   boolean strictTypedExpressions,
+                   boolean liquidStyleInclude, Boolean liquidStyleWhere, int maxIterations, int maxSizeRenderedString, long maxRenderTimeMillis, long maxTemplateSizeBytes) {
         this.flavor = flavor;
         this.stripSpacesAroundTags = stripSpacesAroundTags;
         this.stripSingleLine = stripSingleLine;
@@ -397,6 +412,7 @@ public class TemplateParser {
         this.insertions = insertions;
         this.filters = filters;
         this.evaluateInOutputTag = evaluateInOutputTag;
+        this.strictTypedExpressions = strictTypedExpressions;
         this.errorMode = errorMode;
         this.liquidStyleInclude = liquidStyleInclude;
         this.liquidStyleWhere = liquidStyleWhere;

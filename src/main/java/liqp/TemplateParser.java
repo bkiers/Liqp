@@ -3,16 +3,16 @@ package liqp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import liqp.antlr.LocalFSNameResolver;
+import liqp.antlr.NameResolver;
 import liqp.filters.Filter;
 import liqp.filters.Filters;
 import liqp.parser.Flavor;
 import liqp.parser.LiquidSupport;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.IntStream;
 
 import java.io.*;
-import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneId;
@@ -121,41 +121,6 @@ public class TemplateParser {
             return ((LiquidSupport) variable);
         }
         return new LiquidSupport.LiquidSupportFromInspectable(mapper, variable);
-    }
-
-    public static class ResolvedStream {
-        public final CharStream stream;
-        public final Path path;
-        public ResolvedStream(CharStream stream, Path path) {
-            this.stream = stream;
-            this.path = path;
-        }
-    }
-    @FunctionalInterface
-    public interface NameResolver {
-        Path resolve(String name) throws IOException;
-    }
-
-    public static class LocalFSNameResolver implements NameResolver {
-        public static String DEFAULT_EXTENSION = ".liquid";
-        private final String root;
-        public LocalFSNameResolver(String root) {
-            this.root = root;
-        }
-        @Override
-        public Path resolve(String name) throws IOException {
-            Path directPath = Paths.get(name);
-            if (directPath.isAbsolute()) {
-                return directPath;
-            }
-            String extension = DEFAULT_EXTENSION;
-            if (name.indexOf('.') > 0) {
-                extension = "";
-            }
-            name = name + extension;
-            Path path = Paths.get(root, name);
-            return path.toAbsolutePath();
-        }
     }
 
     public static class Builder {
@@ -501,7 +466,7 @@ public class TemplateParser {
     }
 
     public Template parse(CharStream input) {
-        Path location = getLocationFromCharStream(input);
+        Path location = NameResolver.getLocationFromCharStream(input);
         return new Template(this, input, Optional.ofNullable(location).orElseGet(TemplateParser::pwd));
     }
 
@@ -561,18 +526,6 @@ public class TemplateParser {
         }
     }
 
-
-    private Path getLocationFromCharStream(CharStream input) {
-        String path = IntStream.UNKNOWN_SOURCE_NAME.equals(input.getSourceName()) ? null : input.getSourceName();
-        if (path != null) {
-            try {
-                return Paths.get(path).toAbsolutePath();
-            } catch (Exception e) {
-                return null;
-            }
-        }
-        return null;
-    }
 
     private static Path pwd() {
         return Paths.get(".").toAbsolutePath();

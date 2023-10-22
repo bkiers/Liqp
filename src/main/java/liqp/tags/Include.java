@@ -1,6 +1,5 @@
 package liqp.tags;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Deque;
 import java.util.HashMap;
@@ -8,9 +7,8 @@ import java.util.Map;
 
 import liqp.Template;
 import liqp.TemplateContext;
-import liqp.TemplateParser;
+import liqp.antlr.CharStreamWithLocation;
 import liqp.nodes.LNode;
-import org.antlr.v4.runtime.CharStream;
 
 public class Include extends Tag {
 
@@ -21,9 +19,9 @@ public class Include extends Tag {
         try {
             String includeResource = super.asString(nodes[0].render(context), context);
 
-            Path source = context.getParser().nameResolver.resolve(includeResource);
+            CharStreamWithLocation source = context.getParser().nameResolver.resolve(includeResource);
 
-            includeStackFromRegistry.push(source);
+            includeStackFromRegistry.push(source.getPath());
             pushedStack = true;
 
             Template template = context.getParser().parse(source);

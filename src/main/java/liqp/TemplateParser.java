@@ -1,25 +1,23 @@
 package liqp;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.ZoneId;
-import java.util.*;
-import java.util.function.Consumer;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import liqp.filters.Filter;
 import liqp.filters.Filters;
+import liqp.parser.Flavor;
 import liqp.parser.LiquidSupport;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.IntStream;
 
-import liqp.parser.Flavor;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * The new main entrance point of this library.
@@ -125,9 +123,17 @@ public class TemplateParser {
         return new LiquidSupport.LiquidSupportFromInspectable(mapper, variable);
     }
 
+    public static class ResolvedStream {
+        public final CharStream stream;
+        public final Path path;
+        public ResolvedStream(CharStream stream, Path path) {
+            this.stream = stream;
+            this.path = path;
+        }
+    }
     @FunctionalInterface
     public interface NameResolver {
-        CharStream resolve(String name) throws IOException;
+        Path resolve(String name) throws IOException;
     }
 
     public static class LocalFSNameResolver implements NameResolver {
@@ -137,17 +143,18 @@ public class TemplateParser {
             this.root = root;
         }
         @Override
-        public CharStream resolve(String name) throws IOException {
+        public Path resolve(String name) throws IOException {
             Path directPath = Paths.get(name);
             if (directPath.isAbsolute()) {
-                return CharStreams.fromPath(directPath);
+                return directPath;
             }
             String extension = DEFAULT_EXTENSION;
             if (name.indexOf('.') > 0) {
                 extension = "";
             }
             name = name + extension;
-            return CharStreams.fromPath(Paths.get(root, name));
+            Path path = Paths.get(root, name);
+            return path.toAbsolutePath();
         }
     }
 
@@ -471,25 +478,33 @@ public class TemplateParser {
         this.limitMaxTemplateSizeBytes = maxTemplateSizeBytes;
     }
 
+    public Template parse(Path path) throws IOException {
+        return new Template(this, CharStreams.fromPath(path), path.toAbsolutePath());
+    }
+
     public Template parse(File file) throws IOException {
-        return new Template(this, CharStreams.fromPath(file.toPath()));
+        Path path = file.toPath();
+        return new Template(this, CharStreams.fromPath(path), path.toAbsolutePath());
     }
 
     public Template parse(String input) {
-        return new Template(this, CharStreams.fromString(input));
+        return new Template(this, CharStreams.fromString(input), pwd());
     }
 
     public Template parse(InputStream input) throws IOException {
-        return new Template(this, CharStreams.fromStream(input));
+        Path location = getLocationFromInputStream(input);
+        return new Template(this, CharStreams.fromStream(input), Optional.ofNullable(location).orElseGet(TemplateParser::pwd));
     }
 
     public Template parse(Reader reader) throws IOException {
-        return new Template(this, CharStreams.fromReader(reader));
+        return new Template(this, CharStreams.fromReader(reader), pwd());
     }
 
     public Template parse(CharStream input) {
-        return new Template(this, input);
+        Path location = getLocationFromCharStream(input);
+        return new Template(this, input, Optional.ofNullable(location).orElseGet(TemplateParser::pwd));
     }
+
 
     public int getLimitMaxIterations() {
         return limitMaxIterations;
@@ -534,5 +549,34 @@ public class TemplateParser {
     public Consumer<Map<String, Object>> getEnvironmentMapConfigurator() {
         return environmentMapConfigurator;
     }
+
+    private Path getLocationFromInputStream(InputStream input) {
+        try {
+            if (input instanceof FileInputStream) {
+                return Paths.get(((FileInputStream) input).getFD().toString()).toAbsolutePath();
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
+    private Path getLocationFromCharStream(CharStream input) {
+        String path = IntStream.UNKNOWN_SOURCE_NAME.equals(input.getSourceName()) ? null : input.getSourceName();
+        if (path != null) {
+            try {
+                return Paths.get(path).toAbsolutePath();
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private static Path pwd() {
+        return Paths.get(".").toAbsolutePath();
+    }
+
 
 }

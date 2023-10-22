@@ -1,12 +1,14 @@
 package liqp.tags;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
 import liqp.Template;
 import liqp.TemplateContext;
+import liqp.TemplateParser;
 import liqp.nodes.LNode;
 import org.antlr.v4.runtime.CharStream;
 
@@ -14,14 +16,14 @@ public class Include extends Tag {
 
     @Override
     public Object render(TemplateContext context, LNode... nodes) {
-        Deque<String> includeStackFromRegistry = Template.getIncludeStackFromRegistry(context);
+        Deque<Path> includeStackFromRegistry = Template.getIncludeStackFromRegistry(context);
         boolean pushedStack = false;
         try {
             String includeResource = super.asString(nodes[0].render(context), context);
 
-            CharStream source = context.getParser().nameResolver.resolve(includeResource);
+            Path source = context.getParser().nameResolver.resolve(includeResource);
 
-            includeStackFromRegistry.push(source.getSourceName());
+            includeStackFromRegistry.push(source);
             pushedStack = true;
 
             Template template = context.getParser().parse(source);

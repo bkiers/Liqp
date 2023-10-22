@@ -43,7 +43,7 @@ public class Template {
 
 
     private final long templateSize;
-    private final String sourceName;
+    private final Path sourceLocation;
 
     private TemplateContext templateContext = null;
 
@@ -51,7 +51,7 @@ public class Template {
 
     private final TemplateParser templateParser;
 
-    Template(TemplateParser templateParser, CharStream stream) {
+    Template(TemplateParser templateParser, CharStream stream, Path location) {
         this.templateParser = templateParser;
 
         Set<String> blockNames = this.templateParser.insertions.getBlockNames();
@@ -60,7 +60,7 @@ public class Template {
         this.templateSize = stream.size();
         LiquidLexer lexer = new LiquidLexer(stream, this.templateParser.isStripSpacesAroundTags(),
                 this.templateParser.isStripSingleLine(), blockNames, tagNames);
-        this.sourceName = IntStream.UNKNOWN_SOURCE_NAME.equals(stream.getSourceName()) ? null : stream.getSourceName();
+        this.sourceLocation = location;
         try {
             root = parse(lexer);
         } catch (LiquidException e) {
@@ -353,7 +353,8 @@ public class Template {
         variables = templateParser.evaluate(templateParser.mapper, variables);
 
         final NodeVisitor visitor = new NodeVisitor(templateParser.insertions, templateParser.filters, templateParser.liquidStyleInclude);
-        Deque<String> includeStack = null;
+        Deque<Path> includeStack = null;
+        boolean includeStackSet = false;
         try {
             LNode node = visitor.visit(root);
             if (parent == null) {
@@ -363,7 +364,8 @@ public class Template {
             }
 
             includeStack = getIncludeStackFromRegistry(templateContext);
-            includeStack.push(sourceName);
+            includeStack.push(sourceLocation);
+            includeStackSet = true;
 
             if (this.contextHolder != null) {
                 contextHolder.setContext(templateContext);
@@ -380,14 +382,17 @@ public class Template {
             }
         } finally {
             if (includeStack != null) {
-                includeStack.pop();
+                if (includeStackSet) {
+                    includeStack.pop();
+                }
             }
         }
     }
 
-    public static Deque<String> getIncludeStackFromRegistry(TemplateContext templateContext) {
-        Map<String, Deque<String>> registry = templateContext.getRegistry(TemplateContext.REGISTRY_SOURCE_NAME);
-        return registry.putIfAbsent(TemplateContext.REGISTRY_SOURCE_NAME, new LinkedList<>());
+    public static Deque<Path> getIncludeStackFromRegistry(TemplateContext templateContext) {
+        Map<String, Deque<Path>> registry = templateContext.getRegistry(TemplateContext.REGISTRY_SOURCE_NAME);
+        registry.putIfAbsent(TemplateContext.REGISTRY_SOURCE_NAME, new LinkedList<>());
+        return registry.get(TemplateContext.REGISTRY_SOURCE_NAME);
     }
 
     /**

@@ -353,8 +353,6 @@ public class Template {
         variables = templateParser.evaluate(templateParser.mapper, variables);
 
         final NodeVisitor visitor = new NodeVisitor(templateParser.insertions, templateParser.filters, templateParser.liquidStyleInclude);
-        Deque<Path> includeStack = null;
-        boolean includeStackSet = false;
         try {
             LNode node = visitor.visit(root);
             if (parent == null) {
@@ -363,9 +361,7 @@ public class Template {
                 this.templateContext = parent.newChildContext(variables);
             }
 
-            includeStack = getIncludeStackFromRegistry(templateContext);
-            includeStack.push(sourceLocation);
-            includeStackSet = true;
+            setRootFolderRegistry(templateContext, sourceLocation);
 
             if (this.contextHolder != null) {
                 contextHolder.setContext(templateContext);
@@ -380,19 +376,14 @@ public class Template {
             } else {
                 throw new RuntimeException(e);
             }
-        } finally {
-            if (includeStack != null) {
-                if (includeStackSet) {
-                    includeStack.pop();
-                }
-            }
         }
     }
 
-    public static Deque<Path> getIncludeStackFromRegistry(TemplateContext templateContext) {
-        Map<String, Deque<Path>> registry = templateContext.getRegistry(TemplateContext.REGISTRY_SOURCE_NAME);
-        registry.putIfAbsent(TemplateContext.REGISTRY_SOURCE_NAME, new LinkedList<>());
-        return registry.get(TemplateContext.REGISTRY_SOURCE_NAME);
+    private void setRootFolderRegistry(TemplateContext templateContext, Path sourceLocation) {
+        if (sourceLocation != null) {
+            Map<String, Object> registry = templateContext.getRegistry(TemplateContext.REGISTRY_ROOT_FOLDER);
+            registry.put(TemplateContext.REGISTRY_ROOT_FOLDER, sourceLocation.getParent());
+        }
     }
 
     /**

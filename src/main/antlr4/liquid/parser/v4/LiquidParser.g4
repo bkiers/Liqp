@@ -79,6 +79,7 @@ tag
  | table_tag
  | capture_tag
  | include_tag
+ | include_relative_tag
  | continue_tag
  | other_tag
  | simple_tag
@@ -203,6 +204,14 @@ capture_tag
 include_tag
  : {isLiquidStyleInclude()}? TagStart liquid=Include expr (With Str)? TagEnd
  | {isJekyllStyleInclude()}? TagStart jekyll=Include file_name_or_output (jekyll_include_params)* TagEnd
+ ;
+
+// include_relative available only in jekyll and uses only jekyll style
+// let's treat the flag 'isJekyllStyleInclude' as also switcher for include_relative
+// so in liquid style it will throw error
+include_relative_tag
+ : {isJekyllStyleInclude()}? TagStart IncludeRelative file_name_or_output (jekyll_include_params)* TagEnd
+ | TagStart IncludeRelative file_name_or_output (jekyll_include_params)* TagEnd { reportTokenError("include_relative is not supported in Liquid Style"); }
  ;
 
 // only valid for Flavor.JEKYLL

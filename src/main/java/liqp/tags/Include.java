@@ -1,5 +1,6 @@
 package liqp.tags;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Deque;
 import java.util.HashMap;
@@ -12,17 +13,19 @@ import liqp.nodes.LNode;
 
 public class Include extends Tag {
 
+    public Include() {
+        super("include");
+    }
+    protected Include(String name) {
+        super(name);
+    }
+
     @Override
     public Object render(TemplateContext context, LNode... nodes) {
-        Deque<Path> includeStackFromRegistry = Template.getIncludeStackFromRegistry(context);
-        boolean pushedStack = false;
         try {
             String includeResource = super.asString(nodes[0].render(context), context);
 
-            CharStreamWithLocation source = context.getParser().nameResolver.resolve(includeResource);
-
-            includeStackFromRegistry.push(source.getPath());
-            pushedStack = true;
+            CharStreamWithLocation source = detectSource(context, includeResource);
 
             Template template = context.getParser().parse(source);
 
@@ -52,11 +55,10 @@ public class Include extends Tag {
             } else {
                 return "";
             }
-        } finally {
-            // flag variable in case exception is thrown before we push to the stack
-            if (pushedStack) {
-                includeStackFromRegistry.pop();
-            }
         }
+    }
+
+    protected CharStreamWithLocation detectSource(TemplateContext context, String includeResource) throws IOException {
+        return context.getParser().nameResolver.resolve(includeResource);
     }
 }

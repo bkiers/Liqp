@@ -527,7 +527,7 @@ public class TemplateParser {
     }
 
 
-    private static Path pwd() {
+    public static Path pwd() {
         return Paths.get(".").toAbsolutePath();
     }
 

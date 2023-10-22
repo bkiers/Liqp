@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import liquid.parser.v4.LiquidParser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
@@ -454,12 +456,7 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
   @Override
   public LNode visitInclude_tag(Include_tagContext ctx) {
     if (ctx.jekyll != null) {
-      Stream<? extends LNode> stream = Stream.concat( //
-          Stream.of(visit(ctx.file_name_or_output())), //
-          ctx.jekyll_include_params().stream().map(this::visitJekyll_include_params) //
-      );
-
-      return new InsertionNode(insertions.get("include"), stream.toArray((n) -> new LNode[n]));
+      return getJekyllIncludeInsertionNode("include", ctx.file_name_or_output(), ctx.jekyll_include_params());
     } else if (ctx.liquid != null) {
       if (ctx.Str() != null) {
         return new InsertionNode(insertions.get("include"), visit(ctx.expr()), new AtomNode(strip(ctx.Str().getText())));
@@ -469,6 +466,22 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
     }
     throw new LiquidException("Unknown syntax of `Include` tag", ctx);
   }
+
+  @Override
+  public LNode visitInclude_relative_tag(LiquidParser.Include_relative_tagContext ctx) {
+    return getJekyllIncludeInsertionNode("include_relative", ctx.file_name_or_output(), ctx.jekyll_include_params());
+  }
+
+
+  private InsertionNode getJekyllIncludeInsertionNode(String name, LiquidParser.File_name_or_outputContext tree, List<Jekyll_include_paramsContext> jekyllIncludeParamsContexts) {
+    Stream<? extends LNode> stream = Stream.concat( //
+            Stream.of(visit(tree)), //
+            jekyllIncludeParamsContexts.stream().map(this::visitJekyll_include_params) //
+    );
+
+    return new InsertionNode(insertions.get(name), stream.toArray((n) -> new LNode[n]));
+  }
+
 
   @Override
   public LNode visitJekyll_include_params(Jekyll_include_paramsContext ctx) {

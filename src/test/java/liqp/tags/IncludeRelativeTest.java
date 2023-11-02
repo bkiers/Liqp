@@ -1,8 +1,11 @@
 package liqp.tags;
 
+import liqp.Insertion;
 import liqp.Template;
+import liqp.TemplateContext;
 import liqp.TemplateParser;
 import liqp.exceptions.LiquidException;
+import liqp.nodes.LNode;
 import liqp.parser.Flavor;
 import org.junit.Test;
 
@@ -44,5 +47,27 @@ public class IncludeRelativeTest {
             fail("include_relative is not supported in liquid");
         } catch (LiquidException ignored) {
         }
+    }
+
+    @Test
+    public void testLiquidWithCustomIncludeShouldAllowOverride() throws IOException {
+        Path root = pwd().resolve("src/test/jekyll/relative_include");
+        Path index = root.resolve("index.liquid");
+
+        TemplateParser parser = new TemplateParser.Builder()
+                .withFlavor(Flavor.JEKYLL)
+                .withInsertion(new Tag("relative_include") {
+                    @Override
+                    public Object render(TemplateContext context, LNode... nodes) {
+                        return "World";
+                    }
+                })
+                .withShowExceptionsFromInclude(false)
+                .build();
+
+        Template template = parser.parse(index);
+        String res = template.render();
+        assertEquals("Hello World!", res);
+
     }
 }

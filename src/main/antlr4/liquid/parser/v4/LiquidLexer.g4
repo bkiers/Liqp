@@ -201,7 +201,21 @@ mode IN_TAG_ID;
   TableEnd        : 'endtablerow' -> popMode;
   Assign          : 'assign' -> popMode;
   Include         : 'include' -> popMode;
-  IncludeRelative : 'include_relative' -> popMode;
+  IncludeRelative : 'include_relative' {
+    // since this is flavour-specific tag, it must be in the tags set for being available
+    // otherwise it is an invalid tag
+    // BUT it also can be programed manually, so even if not supported flavour, we must respect
+    // user-defined tags OR blocks
+    String text = getText();
+    if (blocks.contains(text)) {
+       setType(BlockId);
+       customBlockState.push(text);
+     } else if (tags.contains(text)) {
+       setType(SimpleTagId);
+     } else {
+       setType(InvalidTagId);
+     }
+  } -> popMode;
 
   InvalidTagId : ( Letter | '_' | Digit ) (Letter | '_' | '-' | Digit)* {
     String text = getText();

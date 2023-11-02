@@ -211,7 +211,6 @@ include_tag
 // so in liquid style it will throw error
 include_relative_tag
  : {isJekyllStyleInclude()}? TagStart IncludeRelative file_name_or_output (jekyll_include_params)* TagEnd
- | TagStart IncludeRelative file_name_or_output (jekyll_include_params)* TagEnd { reportTokenError("include_relative is not supported in Liquid Style"); }
  ;
 
 // only valid for Flavor.JEKYLL

@@ -2,10 +2,13 @@ package liqp;
 
 import java.util.Locale;
 
+import liqp.blocks.Block;
 import liqp.nodes.LNode;
+import liqp.tags.Tag;
 
 /**
- * Basic class for both tags and blocks. Most of internal api uses this. 
+ * Basic class for both tags and blocks. Most of internal api uses this.
+ * But for user api it is better to use {@link Tag} or {@link Block} as base class directly.
  */
 public abstract class Insertion extends LValue {
 

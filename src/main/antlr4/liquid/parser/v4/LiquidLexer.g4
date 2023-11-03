@@ -180,27 +180,42 @@ mode IN_TAG_ID;
        )
      ;
 
-  CaptureStart : 'capture' -> popMode;
-  CaptureEnd   : 'endcapture' -> popMode;
-  CommentStart : 'comment' -> popMode;
-  CommentEnd   : 'endcomment' -> popMode;
-  RawStart     : 'raw' WhitespaceChar* '%}' -> popMode, pushMode(IN_RAW);
-  IfStart      : 'if' -> popMode;
-  Elsif        : 'elsif' -> popMode;
-  IfEnd        : 'endif' -> popMode;
-  UnlessStart  : 'unless' -> popMode;
-  UnlessEnd    : 'endunless' -> popMode;
-  Else         : 'else' -> popMode;
-  CaseStart    : 'case' -> popMode;
-  CaseEnd      : 'endcase' -> popMode;
-  When         : 'when' -> popMode;
-  Cycle        : 'cycle' -> popMode;
-  ForStart     : 'for' -> popMode;
-  ForEnd       : 'endfor' -> popMode;
-  TableStart   : 'tablerow' -> popMode;
-  TableEnd     : 'endtablerow' -> popMode;
-  Assign       : 'assign' -> popMode;
-  Include      : 'include' -> popMode;
+  CaptureStart    : 'capture' -> popMode;
+  CaptureEnd      : 'endcapture' -> popMode;
+  CommentStart    : 'comment' -> popMode;
+  CommentEnd      : 'endcomment' -> popMode;
+  RawStart        : 'raw' WhitespaceChar* '%}' -> popMode, pushMode(IN_RAW);
+  IfStart         : 'if' -> popMode;
+  Elsif           : 'elsif' -> popMode;
+  IfEnd           : 'endif' -> popMode;
+  UnlessStart     : 'unless' -> popMode;
+  UnlessEnd       : 'endunless' -> popMode;
+  Else            : 'else' -> popMode;
+  CaseStart       : 'case' -> popMode;
+  CaseEnd         : 'endcase' -> popMode;
+  When            : 'when' -> popMode;
+  Cycle           : 'cycle' -> popMode;
+  ForStart        : 'for' -> popMode;
+  ForEnd          : 'endfor' -> popMode;
+  TableStart      : 'tablerow' -> popMode;
+  TableEnd        : 'endtablerow' -> popMode;
+  Assign          : 'assign' -> popMode;
+  Include         : 'include' -> popMode;
+  IncludeRelative : 'include_relative' {
+    // since this is flavour-specific tag, it must be in the tags set for being available
+    // otherwise it is an invalid tag
+    // BUT it also can be programed manually, so even if not supported flavour, we must respect
+    // user-defined tags OR blocks
+    String text = getText();
+    if (blocks.contains(text)) {
+       setType(BlockId);
+       customBlockState.push(text);
+     } else if (tags.contains(text)) {
+       setType(SimpleTagId);
+     } else {
+       setType(InvalidTagId);
+     }
+  } -> popMode;
 
   InvalidTagId : ( Letter | '_' | Digit ) (Letter | '_' | '-' | Digit)* {
     String text = getText();

@@ -1,5 +1,6 @@
 package liqp;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,6 +18,8 @@ public class TemplateContext {
     public static final String REGISTRY_FOR = "for";
     public static final String REGISTRY_FOR_STACK = "for_stack";
     public static final String REGISTRY_ITERATION_PROTECTOR = "iteration_protector";
+    public static final String REGISTRY_ROOT_FOLDER = "registry_root_folder";
+
 
     protected TemplateContext parent;
 
@@ -164,7 +167,7 @@ public class TemplateContext {
             return parent.getRegistry(registryName);
         }
 
-        if (!Arrays.asList(REGISTRY_CYCLE, REGISTRY_IFCHANGED, REGISTRY_FOR, REGISTRY_FOR_STACK, REGISTRY_ITERATION_PROTECTOR)
+        if (!Arrays.asList(REGISTRY_CYCLE, REGISTRY_IFCHANGED, REGISTRY_FOR, REGISTRY_FOR_STACK, REGISTRY_ITERATION_PROTECTOR, REGISTRY_ROOT_FOLDER)
                 .contains(registryName)) {
             // this checking exists for safety of library, any listed type is expected, not more
             throw new RuntimeException("unknown registry type: " + registryName);
@@ -204,6 +207,11 @@ public class TemplateContext {
 
     public TemplateContext newChildContext() {
         return newChildContext(new HashMap<>());
+    }
+
+    public Path getRootFolder() {
+        Map<String, Object> registry = getRegistry(TemplateContext.REGISTRY_ROOT_FOLDER);
+        return (Path) registry.get(TemplateContext.REGISTRY_ROOT_FOLDER);
     }
 
 }

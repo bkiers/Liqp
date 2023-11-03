@@ -37,8 +37,8 @@ public final class TestUtils {
         LiquidLexer lexer = new LiquidLexer(CharStreams.fromString("{{ " + source + " }}"));
         LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer), templateParser.liquidStyleInclude, templateParser.evaluateInOutputTag, templateParser.errorMode);
 
-        LiquidParser.OutputContext root = parser.output();;
-        NodeVisitor visitor = new NodeVisitor(Insertions.STANDARD_INSERTIONS, templateParser.filters, templateParser.liquidStyleInclude);
+        LiquidParser.OutputContext root = parser.output();
+        NodeVisitor visitor = new NodeVisitor(templateParser.insertions, templateParser.filters, templateParser.liquidStyleInclude);
 
         return visitor.visitOutput(root);
     }

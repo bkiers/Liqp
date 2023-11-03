@@ -1,23 +1,31 @@
 package liqp.tags;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
 import liqp.Template;
 import liqp.TemplateContext;
+import liqp.antlr.CharStreamWithLocation;
 import liqp.nodes.LNode;
-import org.antlr.v4.runtime.CharStream;
 
 public class Include extends Tag {
 
+    public Include() {
+        super("include");
+    }
+    protected Include(String name) {
+        super(name);
+    }
+
     @Override
     public Object render(TemplateContext context, LNode... nodes) {
-
         try {
             String includeResource = super.asString(nodes[0].render(context), context);
 
-            CharStream source = context.getParser().nameResolver.resolve(includeResource);
+            CharStreamWithLocation source = detectSource(context, includeResource);
 
             Template template = context.getParser().parse(source);
 
@@ -48,5 +56,9 @@ public class Include extends Tag {
                 return "";
             }
         }
+    }
+
+    protected CharStreamWithLocation detectSource(TemplateContext context, String includeResource) throws IOException {
+        return context.getParser().nameResolver.resolve(includeResource);
     }
 }

@@ -23,12 +23,7 @@ import liqp.blocks.Raw;
 import liqp.blocks.Tablerow;
 import liqp.blocks.Unless;
 import liqp.filters.Filters;
-import liqp.tags.Assign;
-import liqp.tags.Break;
-import liqp.tags.Continue;
-import liqp.tags.Decrement;
-import liqp.tags.Include;
-import liqp.tags.Increment;
+import liqp.tags.*;
 
 /**
  * An immutable map of {@link Insertion}s.
@@ -64,6 +59,13 @@ public final class Insertions {
             new Tablerow(), //
             new Unless() //
     );
+
+    /**
+     * The standard insertions.
+     */
+    public static final Insertions JEKYLL_INSERTIONS = STANDARD_INSERTIONS.mergeWith(Insertions.of(
+            new IncludeRelative()
+    ));
 
     /**
      * Creates a new {@link Insertions} instance with the given insertions.
@@ -112,14 +114,9 @@ public final class Insertions {
         this.tagNames = Collections.unmodifiableSet(getNames(en -> !(en.getValue() instanceof Block)));
     }
 
-    void writeTo(Map<String, Insertion> target) {
-        target.putAll(map);
-    }
-
     /**
      * Returns a new {@link Filters} instance that combines this instance with the filters of the other
      * instance.
-     * 
      * If there are filters with the same name in both instances, then the {@code other} filter takes
      * precedence.
      * 
@@ -204,12 +201,4 @@ public final class Insertions {
         return Collections.unmodifiableCollection(map.values());
     }
 
-    /**
-     * Returns an unmodifiable map of the stored {@link Insertion} names.
-     *
-     * @return The map.
-     */
-    public Map<String, Insertion> asMap() {
-        return Collections.unmodifiableMap(map);
-    }
 }

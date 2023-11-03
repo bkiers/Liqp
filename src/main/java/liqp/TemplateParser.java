@@ -1,25 +1,23 @@
 package liqp;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import liqp.antlr.LocalFSNameResolver;
+import liqp.antlr.NameResolver;
+import liqp.filters.Filter;
+import liqp.filters.Filters;
+import liqp.parser.Flavor;
+import liqp.parser.LiquidSupport;
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Consumer;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import liqp.filters.Filter;
-import liqp.filters.Filters;
-import liqp.parser.LiquidSupport;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-
-import liqp.parser.Flavor;
 
 /**
  * The new main entrance point of this library.
@@ -123,32 +121,6 @@ public class TemplateParser {
             return ((LiquidSupport) variable);
         }
         return new LiquidSupport.LiquidSupportFromInspectable(mapper, variable);
-    }
-
-    @FunctionalInterface
-    public interface NameResolver {
-        CharStream resolve(String name) throws IOException;
-    }
-
-    public static class LocalFSNameResolver implements NameResolver {
-        public static String DEFAULT_EXTENSION = ".liquid";
-        private final String root;
-        public LocalFSNameResolver(String root) {
-            this.root = root;
-        }
-        @Override
-        public CharStream resolve(String name) throws IOException {
-            Path directPath = Paths.get(name);
-            if (directPath.isAbsolute()) {
-                return CharStreams.fromPath(directPath);
-            }
-            String extension = DEFAULT_EXTENSION;
-            if (name.indexOf('.') > 0) {
-                extension = "";
-            }
-            name = name + extension;
-            return CharStreams.fromPath(Paths.get(root, name));
-        }
     }
 
     public static class Builder {
@@ -471,25 +443,33 @@ public class TemplateParser {
         this.limitMaxTemplateSizeBytes = maxTemplateSizeBytes;
     }
 
+    public Template parse(Path path) throws IOException {
+        return new Template(this, CharStreams.fromPath(path), path.toAbsolutePath());
+    }
+
     public Template parse(File file) throws IOException {
-        return new Template(this, CharStreams.fromPath(file.toPath()));
+        Path path = file.toPath();
+        return new Template(this, CharStreams.fromPath(path), path.toAbsolutePath());
     }
 
     public Template parse(String input) {
-        return new Template(this, CharStreams.fromString(input));
+        return new Template(this, CharStreams.fromString(input), pwd());
     }
 
     public Template parse(InputStream input) throws IOException {
-        return new Template(this, CharStreams.fromStream(input));
+        Path location = getLocationFromInputStream(input);
+        return new Template(this, CharStreams.fromStream(input), Optional.ofNullable(location).orElseGet(TemplateParser::pwd));
     }
 
     public Template parse(Reader reader) throws IOException {
-        return new Template(this, CharStreams.fromReader(reader));
+        return new Template(this, CharStreams.fromReader(reader), pwd());
     }
 
     public Template parse(CharStream input) {
-        return new Template(this, input);
+        Path location = NameResolver.getLocationFromCharStream(input);
+        return new Template(this, input, Optional.ofNullable(location).orElseGet(TemplateParser::pwd));
     }
+
 
     public int getLimitMaxIterations() {
         return limitMaxIterations;
@@ -534,5 +514,22 @@ public class TemplateParser {
     public Consumer<Map<String, Object>> getEnvironmentMapConfigurator() {
         return environmentMapConfigurator;
     }
+
+    private Path getLocationFromInputStream(InputStream input) {
+        try {
+            if (input instanceof FileInputStream) {
+                return Paths.get(((FileInputStream) input).getFD().toString()).toAbsolutePath();
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+
+    public static Path pwd() {
+        return Paths.get(".").toAbsolutePath();
+    }
+
 
 }

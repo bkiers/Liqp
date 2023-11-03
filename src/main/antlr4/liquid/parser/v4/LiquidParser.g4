@@ -81,8 +81,8 @@ tag
  | include_tag
  | include_relative_tag
  | continue_tag
- | other_tag
  | simple_tag
+ | other_tag
  ;
 
 continue_tag

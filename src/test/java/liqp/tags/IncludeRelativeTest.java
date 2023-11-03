@@ -55,8 +55,8 @@ public class IncludeRelativeTest {
         Path index = root.resolve("index.liquid");
 
         TemplateParser parser = new TemplateParser.Builder()
-                .withFlavor(Flavor.JEKYLL)
-                .withInsertion(new Tag("relative_include") {
+                .withFlavor(Flavor.LIQUID)
+                .withInsertion(new Tag("include_relative") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         return "World";

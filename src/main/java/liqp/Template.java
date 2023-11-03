@@ -382,7 +382,7 @@ public class Template {
     private void setRootFolderRegistry(TemplateContext templateContext, Path sourceLocation) {
         if (sourceLocation != null) {
             Map<String, Object> registry = templateContext.getRegistry(TemplateContext.REGISTRY_ROOT_FOLDER);
-            registry.put(TemplateContext.REGISTRY_ROOT_FOLDER, sourceLocation.getParent());
+            registry.putIfAbsent(TemplateContext.REGISTRY_ROOT_FOLDER, sourceLocation.getParent());
         }
     }
 

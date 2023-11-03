@@ -20,7 +20,7 @@ public class IncludeRelativeTest {
     @Test
     public void testSimpleCase() throws IOException {
         Path root = pwd().resolve("src/test/jekyll/relative_include");
-        Path index = root.resolve("index.liquid");
+        Path index = root.resolve("hello.liquid");
 
         TemplateParser parser = new TemplateParser.Builder()
                 .withFlavor(Flavor.JEKYLL)
@@ -35,7 +35,7 @@ public class IncludeRelativeTest {
     @Test
     public void testLiquid() throws IOException {
         Path root = pwd().resolve("src/test/jekyll/relative_include");
-        Path index = root.resolve("index.liquid");
+        Path index = root.resolve("hello.liquid");
 
         TemplateParser parser = new TemplateParser.Builder()
                 .withFlavor(Flavor.LIQUID)
@@ -52,7 +52,7 @@ public class IncludeRelativeTest {
     @Test
     public void testLiquidWithCustomIncludeShouldAllowOverride() throws IOException {
         Path root = pwd().resolve("src/test/jekyll/relative_include");
-        Path index = root.resolve("index.liquid");
+        Path index = root.resolve("hello.liquid");
 
         TemplateParser parser = new TemplateParser.Builder()
                 .withFlavor(Flavor.LIQUID)
@@ -69,5 +69,33 @@ public class IncludeRelativeTest {
         String res = template.render();
         assertEquals("Hello World!", res);
 
+    }
+
+    // Scenario: Include a nested file relative to a post
+    //    Given I have a _posts directory
+    //    And I have a _posts/snippets directory
+    //    And I have a _posts/snippets/welcome_para directory
+    //    And I have the following post:
+    //      | title     | date       | content                                         |
+    //      | Star Wars | 2018-09-02 | {% include_relative snippets/welcome_para.md %} |
+    //    And I have an "_posts/snippets/welcome_para.md" file that contains "{% include_relative snippets/welcome_para/greeting.md %} Dear Reader!"
+    //    And I have an "_posts/snippets/welcome_para/greeting.md" file that contains "Welcome back"
+    //    When I run jekyll build
+    //    Then I should get a zero exit status
+    //    And the _site directory should exist
+    //    And I should see "Welcome back Dear Reader!" in "_site/2018/09/02/star-wars.html"
+    @Test
+    public void testIncludeANestedFileRelativeToAPost() throws IOException {
+        Path root = pwd().resolve("src/test/jekyll/relative_include");
+        Path index = root.resolve("nested_include.liquid");
+
+        TemplateParser parser = new TemplateParser.Builder()
+                .withFlavor(Flavor.JEKYLL)
+                .withShowExceptionsFromInclude(false)
+                .build();
+
+        Template template = parser.parse(index);
+        String res = template.render();
+        assertEquals("Hello Nested and even more nested!!!", res);
     }
 }

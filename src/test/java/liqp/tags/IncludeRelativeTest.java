@@ -1,9 +1,9 @@
 package liqp.tags;
 
-import liqp.Insertion;
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.TemplateParser;
+import liqp.blocks.Block;
 import liqp.exceptions.LiquidException;
 import liqp.nodes.LNode;
 import liqp.parser.Flavor;
@@ -97,5 +97,32 @@ public class IncludeRelativeTest {
         Template template = parser.parse(index);
         String res = template.render();
         assertEquals("Hello Nested and even more nested!!!", res);
+    }
+
+    @Test
+    public void testCustomBlocksStackWithCustomBlockIncludeRelative() {
+        TemplateParser parser = new TemplateParser.Builder()
+                .withFlavor(Flavor.LIQUID)
+                .withInsertion(new Block("another") {
+                    @Override
+                    public Object render(TemplateContext context, LNode... nodes) {
+                        LNode blockNode = nodes[nodes.length - 1];
+                        return "[" + super.asString(blockNode.render(context), context) + "]";
+                    }
+                })
+                .withInsertion(new Block("include_relative") {
+                    @Override
+                    public Object render(TemplateContext context, LNode... nodes) {
+                        return "World";
+                    }
+                })
+                .withShowExceptionsFromInclude(false)
+                .build();
+
+        Template template = parser.parse("{% another %}{% include_relative snippets/welcome_para.md %}{% endinclude_relative %}{% endanother %}");
+
+        String res = template.render();
+        assertEquals("[World]", res);
+
     }
 }

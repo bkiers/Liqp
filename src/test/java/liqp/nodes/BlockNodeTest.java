@@ -19,7 +19,7 @@ public class BlockNodeTest {
      */
     @Test
     public void customTagTest() throws RecognitionException {
-        TemplateParser parser = new TemplateParser.Builder().withInsertion(new Block("testtag"){
+        TemplateParser parser = new TemplateParser.Builder().withBlock(new Block("testtag"){
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 return null;

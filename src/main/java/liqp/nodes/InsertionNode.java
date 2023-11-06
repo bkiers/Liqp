@@ -7,11 +7,11 @@ import java.util.List;
 
 public class InsertionNode implements LNode {
 
-    private Insertion insertion;
-    private LNode[] tokens;
+    private final Insertion insertion;
+    private final LNode[] tokens;
 
     public InsertionNode(Insertion insertion, List<LNode> tokens) {
-        this(insertion.name, insertion, tokens.toArray(new LNode[tokens.size()]));
+        this(insertion.name, insertion, tokens.toArray(new LNode[0]));
     }
 
     public InsertionNode(Insertion insertion, LNode... tokens) {

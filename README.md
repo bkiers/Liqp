@@ -77,7 +77,8 @@ In Ruby, you'd render a template like this:
 With Liqp, the equivalent looks like this:
 
 ```java
-Template template = Template.parse("hi {{name}}");
+TemplateParser parser = new TemplateParser.Builder().build();
+Template template = parser.parse("hi {{name}}");
 String rendered = template.render("name", "tobi");
 System.out.println(rendered);
 /*
@@ -99,8 +100,8 @@ The following examples are equivalent to the previous Liqp example:
 #### Map example
 
 ```java
-Template template = Template.parse("hi {{name}}");
-Map<String, Object> map = new HashMap<String, Object>();
+Template template = new TemplateParser.Builder().build().parse("hi {{name}}");
+Map<String, Object> map = new HashMap<>();
 map.put("name", "tobi");
 String rendered = template.render(map);
 System.out.println(rendered);
@@ -112,7 +113,7 @@ System.out.println(rendered);
 #### JSON example
 
 ```java
-Template template = Template.parse("hi {{name}}");
+Template template = new TemplateParser.Builder().build().parse("hi {{name}}");
 String rendered = template.render("{\"name\" : \"tobi\"}");
 System.out.println(rendered);
 /*
@@ -124,10 +125,10 @@ System.out.println(rendered);
 
 ```java
 class MyParams implements Inspectable {
-  public String name = "tobi";
+    public String name = "tobi";
 };
-Template template = Template.parse("hi {{name}}");
-String rendered =template.render(new MyParams());
+Template template = TemplateParser.DEFAULT.parse("hi {{name}}");
+String rendered = template.render(new MyParams());
 System.out.println(rendered);
 /*
     hi tobi
@@ -142,7 +143,7 @@ class MyLazy implements LiquidSupport {
         return Collections.singletonMap("name", "tobi");
     }
 };
-Template template = Template.parse("hi {{name}}");
+Template template = TemplateParser.DEFAULT.parse("hi {{name}}");
 String rendered = template.render(new MyLazy());
 System.out.println(rendered);
 /*
@@ -150,43 +151,38 @@ System.out.println(rendered);
 */
 ```
 
-#### Strict variables example
+#### Controlling library behavior
+The library has a set of keys to control the parsing/rendering process. All of them are set on `TemplateParser.Builder` class. Here they are:
+* `withFlavor(Flavor flavor)` - flavor of the liquid language. Flavor is nothing else than a predefined set of other settings. Here are supported flavors:
+  * `Flavor.JEKYLL` - flavor that defines all settings, so it tries to behave like jekyll's templates
+  * `Flavor.LIQUID` - the same for liquid's templates
+  * `Flavor.LIQP` (default) - developer of this library found some default behavior of two flavors above somehow weird in selected cases. So this flavor appears.
+* `withStripSingleLine(boolean stripSingleLine)`- if `true` then all blank lines left by outputless tags are removed. Default is `false`.
+* `withStripSpaceAroundTags(boolean stripSpacesAroundTags)` - if `true` then all whitespaces around tags are removed. Default is `false`.
+* `withObjectMapper(ObjectMapper mapper)` - if provided then this mapper is used for converting json strings to objects and internal object conversion. If not provided, then default mapper is used. Default one is good. Also, the default one is always accessible via TemplateContext instance:`context.getParser().getMapper();`
+* `withTag(Tag tag)` - register custom tag to be used in templates.
+* `withBlock(Block block)` - register custom block to be used in templates. The difference between tag and block is that block has open and closing tag and can contain other content like a text, tags and blocks.
+* `withFilter(Filter filter)` - register custom filter to be used in templates. See below for examples.
+* `withEvaluateInOutputTag(boolean evaluateInOutputTag)` - both `Flavor.JEKYLL` and `Flavor.LIQUID` are not allows to evaluate expressions in output tags, simply ignoring the expression and printing out very first token of the expression.  Yes, this: `{{ 97 > 96 }}` will print `97`. This is known [bug/feature](https://github.com/Shopify/liquid/issues/1102) of those temlators. If you want to change this behavior and evaluate those expressions, set this flag to `true`. Also, the default flavor `Flavor.LIQP` has this flag set to `true` already.
+* `withStrictTypedExpressions(boolean strictTypedExpressions)` - ruby is strong-typed language. So comparing different types is not allowed there. This library tries to mimic ruby's type system in a way so all not explicit types (created or manipulated inside of templates) are converted with this schema: `nil` -> `null`; `boolean` -> `boolean`; `string` -> `java.lang.String`; any numbers -> `java.math.BigDecimal`, any datetime -> `java.time.ZonedDateTime`. If you want to change this behavior, and allow comparing in expressions in a less restricted way, set this flag to `true`, then the lax (javascript-like) approach for comparing in expressions will be used. Also, the default flavor `Flavor.LIQP` has this flag set to `true` already, others has it `false` by default.
+* `withLiquidStyleInclude(boolean liquidStyleInclude)` - if `true` then include tag will use [syntax from liquid](https://shopify.dev/docs/api/liquid/tags/include), otherwice [jekyll syntax](https://jekyllrb.com/docs/includes/) will be used. Default depends of flavor. `Flavor.LIQUID` and `Flavor.LIQP` has this flag set to `true` already. `Flavor.JEKYLL` has it `false`.
+* `withStrictVariables(boolean strictVariables)` - if set to `true` then all variables must be defined before usage, if some variable is not defined, the exception will be thrown. If `false` then all undefined variables will be treated as `null`. Default is `false`.
+* `withShowExceptionsFromInclude(boolean showExceptionsFromInclude)` - if set to `true` then all exceptions from included templates will be thrown. If `false` then all exceptions from included templates will be ignored. Default is `true`.
+* `withEvaluateMode(TemplateParser.EvaluateMode evaluateMode)` - there exists two rendering modes: `TemplateParser.EvaluateMode.LAZY` and `TemplateParser.EvaluateMode.EAGER`. By default, the `lazy` one is used. This should do the work in most cases. 
+  * In `lazy` mode the template parameters are evaluating on demand and specific properties are read from there only if they are needed. Each filter/tag trying to do its work with its own parameter object, that can be literally anything.
+  * In `eager` the entire parameter object is converted into plain data tree structure that are made **only** from maps and lists, so tags/filters do know how to work with these kinds of objects. Special case - temporal objects, they are consumed as is.
+* `withRenderTransformer(RenderTransformer renderTransformer)` - even if most of elements (filters/tags/blocks) returns its results most cases as `String`, the task of combining all those strings into a final result is a task of `liqp.RenderTransformer` implementation. The default `liqp.RenderTransformerDefaultImpl` uses `StringBuilder` for that task, so template rendering is fast. Althought, you might have special needs or environment to render the results.
+* `withLocale(Locale locale)` - locale to be used for rendering. Default is `Locale.ENGLISH`. Used mostly for time rendering.
+* `withDefaultTimeZone(ZoneId defaultTimeZone)` - default time zone to be used for rendering. Default is `ZoneId.systemDefault()`. Used mostly for time rendering.
+* `withEnvironmentMapConfigurator(Consumer<Map<String, Object>> configurator)` - if provided then this configurator is called before each template rendering. It can be used to set some global variables for all templates built with given `TemplateParser`. 
+* `withSnippetsFolderName(String snippetsFolderName)` - define folder to be used for searching files by `include` tag. Defaults depend on flavor: `Flavor.LIQUID` and `Flavor.LIQP` has this set to `snippets`; `Flavor.JEKYLL` uses `_includes`.
+* `withNameResolver(NameResolver nameResolver)` - if provided then this resolver is used for resolving names of included files. If not provided, then default resolver is used. Default resolver is `liqp.antlr.LocalFSNameResolver` that uses `java.nio.file.Path` for resolving names in local file system. That can be changed to any other resolver, for example, to resolve names in classpath or in remote file system or even build templates dynamically by name.
+* `withMaxIterations(int maxIterations)` - maximum number of iterations allowed in a template. Default is `Integer.MAX_VALUE`. Used to prevent infinite loops.
+* `withMaxSizeRenderedString(int maxSizeRenderedString)` - maximum size of rendered string. Default is `Integer.MAX_VALUE`. Used to prevent out of memory errors.
+* `withMaxRenderTimeMillis(long maxRenderTimeMillis)` - maximum time allowed for template rendering. Default is `Long.MAX_VALUE`. Used to prevent never-ending rendering.
+* `withMaxTemplateSizeBytes(long maxTemplateSizeBytes)` - maximum size of template. Default is `Long.MAX_VALUE`. Used to prevent out of memory errors.
+* `withErrorMode(ErrorMode errorMode)` - error mode to be used. Default is `ErrorMode.STRICT`. 
 
-Strict variables means that value for every key must be provided, otherwise an exception occurs.
-
-```java
-Template template = Template.parse("hi {{name}}")
-    .withRenderSettings(new RenderSettings.Builder().withStrictVariables(true).build());
-String rendered = template.render(); // no value for "name"
-// exception is thrown
-```
-
-#### Eager and Lazy evaluate mode
-There exists two rendering modes: lazy and eager.
-* In `lazy` mode the template parameters are evaluating on demand and specific properties are read from there only if they are needed. Each filter/tag trying to do its work with its own parameter object, that can be literally anything.
-* In `eager` the entire parameter object is converted into plain data tree structure that are made <strong>only</strong> from maps and lists, so tags/filters do know how to work with these kinds of objects. Special case - temporal objects, they are consumed as is.
-
-By <strong>default</strong>, the `lazy` one is used. This should do the work in most cases.
-
-Switching mode is possible via providing special `RenderSettings`.
-Example usage of `lazy` mode:
-```java
-RenderSettings renderSettings = new RenderSettings.Builder()
-    .withEvaluateMode(RenderSettings.EvaluateMode.EAGER)
-    .build();
-
-Map<String, Object> in = Collections.singletonMap("a", new Object() {
-    public String val = "tobi";
-});
-
-String res = Template.parse("hi {{a.val}}")
-        .withRenderSettings(renderSettings)
-        .render(in);
-System.out.println(res);
-/*
-    hi tobi
-*/
-```
 
 ### 2.1 Custom filters
 

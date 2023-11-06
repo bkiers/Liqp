@@ -117,7 +117,7 @@ public class Examples {
 
     private static void customLoopBlock() {
 
-        TemplateParser parser = new TemplateParser.Builder().withInsertion(new Block("loop") {
+        TemplateParser parser = new TemplateParser.Builder().withBlock(new Block("loop") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
 
@@ -181,7 +181,7 @@ public class Examples {
     }
 
     public static void customRandomTag() {
-        TemplateParser parser = new TemplateParser.Builder().withInsertion(new Tag("rand") {
+        TemplateParser parser = new TemplateParser.Builder().withTag(new Tag("rand") {
             private final Random rand = new Random();
 
             @Override

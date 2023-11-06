@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import liqp.antlr.LocalFSNameResolver;
 import liqp.antlr.NameResolver;
+import liqp.blocks.Block;
 import liqp.filters.Filter;
 import liqp.filters.Filters;
 import liqp.parser.Flavor;
 import liqp.parser.LiquidSupport;
+import liqp.tags.Tag;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 
@@ -127,7 +129,7 @@ public class TemplateParser {
 
         private Flavor flavor;
         private boolean stripSpacesAroundTags = false;
-        private boolean stripSingleLine;
+        private boolean stripSingleLine = false;
         private ObjectMapper mapper;
         private List<Insertion> insertions = new ArrayList<>();
         private List<Filter> filters = new ArrayList<>();
@@ -139,7 +141,7 @@ public class TemplateParser {
 
 
         private boolean strictVariables = false;
-        private boolean showExceptionsFromInclude;
+        private boolean showExceptionsFromInclude = true;
         private EvaluateMode evaluateMode = EvaluateMode.LAZY;
         private Locale locale = DEFAULT_LOCALE;
         private ZoneId defaultTimeZone;
@@ -221,8 +223,13 @@ public class TemplateParser {
             return this;
         }
 
-        public Builder withInsertion(Insertion insertion) {
-            this.insertions.add(insertion);
+        public Builder withBlock(Block block) {
+            this.insertions.add(block);
+            return this;
+        }
+
+        public Builder withTag(Tag tag) {
+            this.insertions.add(tag);
             return this;
         }
 

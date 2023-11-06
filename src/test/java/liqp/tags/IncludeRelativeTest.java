@@ -56,7 +56,7 @@ public class IncludeRelativeTest {
 
         TemplateParser parser = new TemplateParser.Builder()
                 .withFlavor(Flavor.LIQUID)
-                .withInsertion(new Tag("include_relative") {
+                .withTag(new Tag("include_relative") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         return "World";
@@ -103,14 +103,14 @@ public class IncludeRelativeTest {
     public void testCustomBlocksStackWithCustomBlockIncludeRelative() {
         TemplateParser parser = new TemplateParser.Builder()
                 .withFlavor(Flavor.LIQUID)
-                .withInsertion(new Block("another") {
+                .withBlock(new Block("another") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         LNode blockNode = nodes[nodes.length - 1];
                         return "[" + super.asString(blockNode.render(context), context) + "]";
                     }
                 })
-                .withInsertion(new Block("include_relative") {
+                .withBlock(new Block("include_relative") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         return "World";

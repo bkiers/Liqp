@@ -322,6 +322,7 @@ public class IncludeTest {
         File index = new File(jekyll, "index_with_errored_include.html");
         Template template = new TemplateParser.Builder()
                 .withFlavor(Flavor.JEKYLL)
+                .withShowExceptionsFromInclude(false)
                 .build()
                 .parse(index);
 
@@ -348,7 +349,7 @@ public class IncludeTest {
         // when
         template.render();
 
-        // them
+        // then
         fail();
     }
 

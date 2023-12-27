@@ -12,10 +12,10 @@ RUN apk update && apk add --no-cache \
   ruby-json \
   ruby-bundler \
   ruby-bigdecimal \
-	ruby-dev \
-	build-base \
-  libssl1.1 \
-  libc6-compat
+  ruby-dev \
+  build-base \
+  libc6-compat \
+  linux-headers
 
 RUN gem install liquid
 RUN gem install ruby-debug-ide

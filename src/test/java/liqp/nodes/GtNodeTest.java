@@ -15,14 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import liqp.exceptions.LiquidException;
-import liqp.parser.Flavor;
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
 import liqp.Template;
 import liqp.TemplateParser;
 import liqp.TemplateTest;
+import liqp.exceptions.LiquidException;
+import liqp.parser.Flavor;
 import liqp.parser.Inspectable;
 
 public class GtNodeTest {
@@ -125,5 +125,13 @@ public class GtNodeTest {
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("not the same type"));
         }
+    }
+
+    @Test
+    public void testFilterCompare() {
+        String result = new TemplateParser.Builder().withFlavor(Flavor.JEKYLL).build() //
+            .parse("{% assign score = 0 | plus: 1.0 %}{% if score > 0 %}true{% else %}false{% endif %}")
+            .render();
+        assertTrue(Boolean.parseBoolean(result));
     }
 }

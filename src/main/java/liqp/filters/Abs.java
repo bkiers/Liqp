@@ -1,6 +1,6 @@
 package liqp.filters;
 
-import java.math.BigDecimal;
+import liqp.PlainBigDecimal;
 
 public class Abs extends Filter {
 
@@ -29,7 +29,7 @@ public class Abs extends Filter {
         }
 
         if (super.isNumber(value) || super.canBeDouble(value)) {
-            return asFormattedNumber(new BigDecimal(super.asNumber(value).toString()).abs());
+            return asFormattedNumber(new PlainBigDecimal(super.asNumber(value).toString()).abs());
         }
 
         return 0;

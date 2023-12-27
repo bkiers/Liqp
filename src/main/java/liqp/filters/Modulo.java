@@ -2,6 +2,7 @@ package liqp.filters;
 
 import java.math.BigDecimal;
 
+import liqp.PlainBigDecimal;
 import liqp.TemplateContext;
 
 public class Modulo extends Filter {
@@ -26,8 +27,8 @@ public class Modulo extends Filter {
             return super.asNumber(value).longValue() % super.asNumber(rhsObj).longValue();
         }
 
-        BigDecimal first = new BigDecimal(super.asNumber(value).toString());
-        BigDecimal second = new BigDecimal(super.asNumber(rhsObj).toString());
+        BigDecimal first = new PlainBigDecimal(super.asNumber(value).toString());
+        BigDecimal second = new PlainBigDecimal(super.asNumber(rhsObj).toString());
         return asFormattedNumber(first.remainder(second));
     }
 }

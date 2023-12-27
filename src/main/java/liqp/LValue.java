@@ -279,16 +279,16 @@ public abstract class LValue {
         if (number == null) {
             return null;
         }
-        if (number instanceof BigDecimal) {
-            return (BigDecimal) number;
+        if (number instanceof PlainBigDecimal) {
+            return (PlainBigDecimal) number;
         }
-        return new BigDecimal(number.toString().trim());
+        return new PlainBigDecimal(number.toString().trim());
     }
 
     // mimic ruby's `BigDecimal.to_f` with standard java capabilities
     // same time provide expected out for java.math.BigDecimal
-    public static String asFormattedNumber(BigDecimal bd) {
-        return bd.setScale(Math.max(1, bd.stripTrailingZeros().scale()), RoundingMode.UNNECESSARY).toPlainString();
+    public static BigDecimal asFormattedNumber(BigDecimal bd) {
+        return bd.setScale(Math.max(1, bd.stripTrailingZeros().scale()), RoundingMode.UNNECESSARY);
     }
     
     /**

@@ -85,12 +85,12 @@ if isJekyll
       context = jekyllContext({})
     end
     context.scopes[0] = data
-    Liquid::Template.parse(source, "strict_variables" => true).render!(context)
+    Liquid::Template.parse(source, "strict_variables" => true).render!(context, {:strict_variables => true})
   end
 
 else
 
   def render(data = {}, source)
-    Liquid::Template.parse(source, {:strict_variables => true}).render!(data)
+    Liquid::Template.parse(source, {:strict_variables => true}).render!(data, {:strict_variables => true})
   end
 end

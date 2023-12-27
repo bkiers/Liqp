@@ -28,7 +28,10 @@ public class LookupNode implements LNode {
 
     @Override
     public Object render(TemplateContext context) {
+        return render(context, false);
+    }
 
+    public Object render(TemplateContext context, boolean okIfMissing) {
         Object value = null;
 
         String realId;
@@ -51,13 +54,14 @@ public class LookupNode implements LNode {
             }
         }
 
-        boolean foundAllButLastOne = false;
+        boolean foundAllButLastOne = okIfMissing;
         for (Iterator<Indexable> it = indexes.iterator(); it.hasNext();) {
             Indexable index = it.next();
             if (it.hasNext()) {
                 value = index.get(value, context, found);
                 if (value == null) {
                     found.set(false);
+                    foundAllButLastOne = false;
                     break;
                 }
             } else {
@@ -212,7 +216,11 @@ public class LookupNode implements LNode {
                 return null;
             }
 
-            key = expression.render(context);
+            if (expression instanceof LookupNode) {
+                key = ((LookupNode)expression).render(context, true);
+            } else {
+                key = expression.render(context);
+            }
 
             if (key instanceof Number) {
                 int index = ((Number)key).intValue();

@@ -427,23 +427,50 @@ public class IfTest {
                 "{% if obj.missing %}true{% else %}false{% endif %}").render(Collections.singletonMap(
                     "obj", Collections.singletonMap("var", "val")));
         });
+        assertThrows(VariableNotExistException.class, () -> {
+            new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.STRICT).build().parse(
+                "{% if obj.nested.missing %}true{% else %}false{% endif %}").render(Collections.singletonMap(
+                    "obj", Collections.singletonMap("var", "val")));
+        });
+        assertThrows(VariableNotExistException.class, () -> {
+            new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.STRICT).build().parse(
+                "{% if obj[missing] %}true{% else %}false{% endif %}").render(Collections.singletonMap(
+                    "obj", Collections.singletonMap("var", "val")));
+        });
 
         assertThat(new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.SANE).build()
             .parse("{% if obj.missing %}true{% else %}false{% endif %}").render(Collections.singletonMap(
                 "obj", Collections.singletonMap("var", "val"))), is("false"));
-
+        assertThat(new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.SANE).build()
+            .parse("{% if obj[missing] %}true{% else %}false{% endif %}").render(Collections.singletonMap(
+                "obj", Collections.singletonMap("var", "val"))), is("false"));
         assertThrows(VariableNotExistException.class, () -> {
             new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.SANE).build().parse(
                 "{% if obj.nested.missing %}true{% else %}false{% endif %}").render(Collections
+                    .singletonMap("obj", Collections.singletonMap("var", "val")));
+        });
+        assertThrows(VariableNotExistException.class, () -> {
+            new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.SANE).build().parse(
+                "{% if obj[nested].missing %}true{% else %}false{% endif %}").render(Collections
+                    .singletonMap("obj", Collections.singletonMap("var", "val")));
+        });
+        assertThrows(VariableNotExistException.class, () -> {
+            new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.SANE).build().parse(
+                "{% if obj[nested][missing] %}true{% else %}false{% endif %}").render(Collections
                     .singletonMap("obj", Collections.singletonMap("var", "val")));
         });
 
         assertThat(new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.OFF).build()
             .parse("{% if obj.missing %}true{% else %}false{% endif %}").render(Collections.singletonMap(
                 "obj", Collections.singletonMap("var", "val"))), is("false"));
-
         assertThat(new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.OFF).build()
             .parse("{% if obj.nested.missing %}true{% else %}false{% endif %}").render(Collections
+                .singletonMap("obj", Collections.singletonMap("var", "val"))), is("false"));
+        assertThat(new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.OFF).build()
+            .parse("{% if obj[nested].missing %}true{% else %}false{% endif %}").render(Collections
+                .singletonMap("obj", Collections.singletonMap("var", "val"))), is("false"));
+        assertThat(new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.OFF).build()
+            .parse("{% if obj[nested][missing] %}true{% else %}false{% endif %}").render(Collections
                 .singletonMap("obj", Collections.singletonMap("var", "val"))), is("false"));
     }
 }

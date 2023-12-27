@@ -1,5 +1,6 @@
 package liqp.nodes;
 
+import liqp.PlainBigDecimal;
 import liqp.TemplateContext;
 import liqp.TemplateParser;
 import liqp.exceptions.LiquidException;
@@ -51,12 +52,12 @@ public class OutputNode implements LNode {
                  }
                 context.addError(new LiquidException("unexpected output: " + localUnparsed, unparsedline, unparsedPosition, null));
             }
-
         }
 
-        if (value instanceof BigDecimal) {
-            value = ((BigDecimal) value).toPlainString();
+        if (value instanceof BigDecimal && !(value instanceof PlainBigDecimal)) {
+            value = new PlainBigDecimal(value.toString());
         }
+
         return value;
     }
 }

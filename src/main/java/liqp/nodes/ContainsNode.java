@@ -1,11 +1,11 @@
 package liqp.nodes;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import liqp.LValue;
+import liqp.PlainBigDecimal;
 import liqp.TemplateContext;
 import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
@@ -51,7 +51,7 @@ public class ContainsNode extends LValue implements LNode {
 
     private Object toSingleNumberType(Object needle) {
         if (needle instanceof Number) {
-            needle = LValue.asFormattedNumber(new BigDecimal(needle.toString()));
+            needle = LValue.asFormattedNumber(new PlainBigDecimal(needle.toString()));
         }
         return needle;
     }
@@ -60,7 +60,7 @@ public class ContainsNode extends LValue implements LNode {
         ArrayList<Object> res = new ArrayList<>(asList.size());
         for(Object item: asList) {
             if (item instanceof Number) {
-                res.add(LValue.asFormattedNumber(new BigDecimal(item.toString())));
+                res.add(LValue.asFormattedNumber(new PlainBigDecimal(item.toString())));
             } else {
                 res.add(item);
             }

@@ -51,15 +51,46 @@ public class LookupNode implements LNode {
             }
         }
 
-        for(Indexable index : indexes) {
-            value = index.get(value, context, found);
+        boolean foundAllButLastOne = false;
+        for (Iterator<Indexable> it = indexes.iterator(); it.hasNext();) {
+            Indexable index = it.next();
+            if (it.hasNext()) {
+                value = index.get(value, context, found);
+                if (value == null) {
+                    found.set(false);
+                    break;
+                }
+            } else {
+                // last item
+                value = index.get(value, context, found);
+                if (!found.get()) {
+                    foundAllButLastOne = true;
+                }
+            }
         }
 
-        if(value == null && !found.get() && context.getParser().strictVariables) {
-            RuntimeException e = new VariableNotExistException(getVariableName());
-            context.addError(e);
-            if (context.getErrorMode() == TemplateParser.ErrorMode.STRICT) {
-                throw e;
+        if (value == null && !found.get()) {
+            final boolean error;
+            switch (context.getParser().strictVariablesMode) {
+                case OFF:
+                    error = false;
+                    break;
+                case STRICT:
+                    error = true;
+                    break;
+                case SANE:
+                    error = !foundAllButLastOne;
+                    break;
+                default:
+                    throw new UnsupportedOperationException();
+            }
+
+            if (error) {
+                RuntimeException e = new VariableNotExistException(getVariableName());
+                context.addError(e);
+                if (context.getErrorMode() == TemplateParser.ErrorMode.STRICT) {
+                    throw e;
+                }
             }
         }
 

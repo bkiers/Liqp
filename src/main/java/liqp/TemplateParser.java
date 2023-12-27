@@ -53,6 +53,30 @@ public class TemplateParser {
         LAX
     }
 
+    /**
+     * Controls the "strict variables" checking strategy.
+     * 
+     * @see <a href="https://github.com/Shopify/liquid/issues/1034">liquid issue 1034</a>
+     */
+    public enum StrictVariablesMode {
+        /**
+         * No strict variable checking.
+         */
+        OFF,
+
+        /**
+         * Strict variables, but allow checking for the existence of directly-nested variables without
+         * throwing an error (e.g., checking for "object.missing" is acceptable, but
+         * "object.nested.missing" isn't).
+         */
+        SANE,
+
+        /**
+         * Strict variable checking.
+         */
+        STRICT
+    }
+
     public final Flavor flavor;
     public final boolean stripSpacesAroundTags;
     public final boolean stripSingleLine;
@@ -68,8 +92,13 @@ public class TemplateParser {
 
     /**
      * The same as <code>template.render!({}, strict_variables: true)</code> in ruby
+     * 
+     * @see #strictVariablesMode
      */
+    @Deprecated(forRemoval = true)
     public final boolean strictVariables;
+    public final StrictVariablesMode strictVariablesMode;
+
     /**
      * This field doesn't have equivalent in ruby.
      */
@@ -138,7 +167,7 @@ public class TemplateParser {
         private Boolean liquidStyleWhere;
 
 
-        private boolean strictVariables = false;
+        private StrictVariablesMode strictVariablesMode = StrictVariablesMode.OFF;
         private boolean showExceptionsFromInclude;
         private EvaluateMode evaluateMode = EvaluateMode.LAZY;
         private Locale locale = DEFAULT_LOCALE;
@@ -165,7 +194,7 @@ public class TemplateParser {
             this.insertions = new ArrayList<>(parser.insertions.values());
             this.filters = new ArrayList<>(parser.filters.values());
 
-            this.strictVariables = parser.strictVariables;
+            this.strictVariablesMode = parser.strictVariablesMode;
             this.evaluateMode = parser.evaluateMode;
             this.locale = parser.locale;
             this.renderTransformer = parser.renderTransformer;
@@ -248,9 +277,15 @@ public class TemplateParser {
             return this;
         }
 
-        @SuppressWarnings("hiding")
         public Builder withStrictVariables(boolean strictVariables) {
-            this.strictVariables = strictVariables;
+            this.strictVariablesMode = strictVariables ? StrictVariablesMode.STRICT
+                : StrictVariablesMode.OFF;
+            return this;
+        }
+
+        @SuppressWarnings("hiding")
+        public Builder withStrictVariables(StrictVariablesMode strictVariablesMode) {
+            this.strictVariablesMode = Objects.requireNonNull(strictVariablesMode);
             return this;
         }
 
@@ -404,12 +439,12 @@ public class TemplateParser {
                 nameResolver = new LocalFSNameResolver(snippetsFolderName);
             }
 
-            return new TemplateParser(strictVariables, showExceptionsFromInclude, evaluateMode, renderTransformer, locale, defaultTimeZone, environmentMapConfigurator, errorMode, fl, stripSpacesAroundTags, stripSingleLine, mapper,
+            return new TemplateParser(strictVariablesMode, showExceptionsFromInclude, evaluateMode, renderTransformer, locale, defaultTimeZone, environmentMapConfigurator, errorMode, fl, stripSpacesAroundTags, stripSingleLine, mapper,
                     allInsertions, finalFilters, evaluateInOutputTag, strictTypedExpressions, liquidStyleInclude, liquidStyleWhere, nameResolver, limitMaxIterations, limitMaxSizeRenderedString, limitMaxRenderTimeMillis, limitMaxTemplateSizeBytes);
         }
     }
 
-    TemplateParser(boolean strictVariables, boolean showExceptionsFromInclude, EvaluateMode evaluateMode,
+    TemplateParser(StrictVariablesMode strictVariablesMode, boolean showExceptionsFromInclude, EvaluateMode evaluateMode,
                    RenderTransformer renderTransformer, Locale locale, ZoneId defaultTimeZone,
                    Consumer<Map<String, Object>> environmentMapConfigurator, ErrorMode errorMode, Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine,
                    ObjectMapper mapper, Insertions insertions, Filters filters, boolean evaluateInOutputTag,
@@ -427,7 +462,8 @@ public class TemplateParser {
         this.liquidStyleInclude = liquidStyleInclude;
         this.liquidStyleWhere = liquidStyleWhere;
 
-        this.strictVariables = strictVariables;
+        this.strictVariablesMode = strictVariablesMode;
+        this.strictVariables = strictVariablesMode != StrictVariablesMode.OFF;
         this.showExceptionsFromInclude = showExceptionsFromInclude;
         this.evaluateMode = evaluateMode;
         this.renderTransformer = renderTransformer == null ? RenderTransformerDefaultImpl.INSTANCE

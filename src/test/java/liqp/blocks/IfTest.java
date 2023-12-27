@@ -2,13 +2,18 @@ package liqp.blocks;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertThrows;
+
+import java.util.Collections;
 
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
 import liqp.Template;
 import liqp.TemplateParser;
+import liqp.TemplateParser.StrictVariablesMode;
 import liqp.exceptions.LiquidException;
+import liqp.exceptions.VariableNotExistException;
 
 public class IfTest {
 
@@ -409,5 +414,36 @@ public class IfTest {
     public void and_or_evaluation_orderTest() throws RecognitionException {
         assertThat(TemplateParser.DEFAULT.parse("{% if true or false and false %}TRUE{% else %}FALSE{% endif %}").render(), is("TRUE"));
         assertThat(TemplateParser.DEFAULT.parse("{% if true and false and false or true %}TRUE{% else %}FALSE{% endif %}").render(), is("FALSE"));
+    }
+
+    @Test
+    public void strictVariablesTest() throws RecognitionException {
+        assertThat(new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.STRICT).build()
+            .parse("{% if obj.var %}true{% else %}false{% endif %}").render(Collections.singletonMap(
+                "obj", Collections.singletonMap("var", "val"))), is("true"));
+
+        assertThrows(VariableNotExistException.class, () -> {
+            new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.STRICT).build().parse(
+                "{% if obj.missing %}true{% else %}false{% endif %}").render(Collections.singletonMap(
+                    "obj", Collections.singletonMap("var", "val")));
+        });
+
+        assertThat(new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.SANE).build()
+            .parse("{% if obj.missing %}true{% else %}false{% endif %}").render(Collections.singletonMap(
+                "obj", Collections.singletonMap("var", "val"))), is("false"));
+
+        assertThrows(VariableNotExistException.class, () -> {
+            new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.SANE).build().parse(
+                "{% if obj.nested.missing %}true{% else %}false{% endif %}").render(Collections
+                    .singletonMap("obj", Collections.singletonMap("var", "val")));
+        });
+
+        assertThat(new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.OFF).build()
+            .parse("{% if obj.missing %}true{% else %}false{% endif %}").render(Collections.singletonMap(
+                "obj", Collections.singletonMap("var", "val"))), is("false"));
+
+        assertThat(new TemplateParser.Builder().withStrictVariables(StrictVariablesMode.OFF).build()
+            .parse("{% if obj.nested.missing %}true{% else %}false{% endif %}").render(Collections
+                .singletonMap("obj", Collections.singletonMap("var", "val"))), is("false"));
     }
 }

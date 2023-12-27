@@ -7,11 +7,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import liqp.RenderTransformer.ObjectAppender;
 import liqp.exceptions.ExceededMaxIterationsException;
 
 public class TemplateContext {
+    private static final AtomicBoolean FOUND_DUMMY = new AtomicBoolean(false);
 
     public static final String REGISTRY_CYCLE = "cycle";
     public static final String REGISTRY_IFCHANGED = "ifchanged";
@@ -99,20 +101,23 @@ public class TemplateContext {
     }
 
     public Object get(String key) {
+        return get(key, FOUND_DUMMY);
+    }
 
+    public Object get(String key, AtomicBoolean found) {
         // First try to retrieve the key from the local context
-        Object value = this.variables.get(key);
-
-        if (value != null) {
-            return value;
+        if (this.variables.containsKey(key)) {
+            found.set(true);
+            return this.variables.get(key);
         }
 
         if (parent != null) {
             // Not available locally, try the parent context
-            return parent.get(key);
+            return parent.get(key, found);
         }
 
         // Not available
+        found.set(false);
         return null;
     }
 

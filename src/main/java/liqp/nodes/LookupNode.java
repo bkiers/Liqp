@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import liqp.TemplateContext;
 import liqp.TemplateParser;
@@ -13,7 +14,6 @@ import liqp.parser.Inspectable;
 import liqp.parser.LiquidSupport;
 
 public class LookupNode implements LNode {
-
     private final String id;
     private final List<Indexable> indexes;
 
@@ -38,8 +38,11 @@ public class LookupNode implements LNode {
         } else {
             realId = id;
         }
+
+        AtomicBoolean found = new AtomicBoolean(false);
         if (context.containsKey(realId)) {
             value = context.get(realId);
+            found.set(true);
         }
         if (value == null) {
             Map<String, Object> environmentMap = context.getEnvironmentMap();
@@ -49,10 +52,10 @@ public class LookupNode implements LNode {
         }
 
         for(Indexable index : indexes) {
-            value = index.get(value, context);
+            value = index.get(value, context, found);
         }
 
-        if(value == null && context.getParser().strictVariables) {
+        if(value == null && !found.get() && context.getParser().strictVariables) {
             RuntimeException e = new VariableNotExistException(getVariableName());
             context.addError(e);
             if (context.getErrorMode() == TemplateParser.ErrorMode.STRICT) {
@@ -72,7 +75,7 @@ public class LookupNode implements LNode {
     }
 
     public interface Indexable {
-        Object get(Object value, TemplateContext context);
+        Object get(Object value, TemplateContext context, AtomicBoolean found);
     }
 
     public static class Hash implements Indexable {
@@ -84,8 +87,8 @@ public class LookupNode implements LNode {
         }
 
         @Override
-        public Object get(Object value, TemplateContext context) {
-
+        public Object get(Object value, TemplateContext context, AtomicBoolean found) {
+            found.set(true);
             if(value == null) {
                 return null;
             }
@@ -141,10 +144,14 @@ public class LookupNode implements LNode {
                 } else {
                     map = (Map<?,?>) value;
                 }
+                if (!map.containsKey(hash)) {
+                    found.set(false);
+                    return null;
+                }
                 return map.get(hash);
             }
             else if(value instanceof TemplateContext) {
-                return ((TemplateContext)value).get(hash);
+                return ((TemplateContext)value).get(hash, found);
             } else {
                 return null;
             }
@@ -168,8 +175,8 @@ public class LookupNode implements LNode {
         }
 
         @Override
-        public Object get(Object value, TemplateContext context) {
-
+        public Object get(Object value, TemplateContext context, AtomicBoolean found) {
+            found.set(true);
             if(value == null) {
                 return null;
             }
@@ -238,7 +245,7 @@ public class LookupNode implements LNode {
                 }
 
                 String hash = String.valueOf(key);
-                return new Hash(hash).get(value, context);
+                return new Hash(hash).get(value, context, found);
             }
         }
 

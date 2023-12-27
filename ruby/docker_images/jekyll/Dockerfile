@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM ruby:3.3-alpine
 
 RUN mkdir -p /usr/local/etc \
   && { \
@@ -7,18 +7,10 @@ RUN mkdir -p /usr/local/etc \
   } >> /etc/gemrc
 
 RUN apk update && apk add --no-cache \
-  ruby \
-  ruby-irb \
-  ruby-json \
-  ruby-bundler \
-  ruby-bigdecimal \
-	ruby-dev \
-	build-base \
-  libssl1.1 \
+  build-base \
   libc6-compat
 
 RUN gem install jekyll
-RUN gem install ruby-debug-ide
 
 RUN mkdir -p /srv/jekyll
 WORKDIR /srv/jekyll

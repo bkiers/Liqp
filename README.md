@@ -152,7 +152,7 @@ System.out.println(rendered);
 ```
 
 #### Controlling library behavior
-The library has a set of keys to control the parsing/rendering process. All of them are set on `TemplateParser.Builder` class. Here they are:
+The library has a set of keys to control the parsing/rendering process. Even if you might think that's too many of them, the defaults will work for you most cases. All of them are set on `TemplateParser.Builder` class. Here they are:
 * `withFlavor(Flavor flavor)` - flavor of the liquid language. Flavor is nothing else than a predefined set of other settings. Here are supported flavors:
   * `Flavor.JEKYLL` - flavor that defines all settings, so it tries to behave like jekyll's templates
   * `Flavor.LIQUID` - the same for liquid's templates

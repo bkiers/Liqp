@@ -10,7 +10,7 @@ public class H extends Filter {
      * Alias for: escape
      */
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
-        return Filters.COMMON_FILTERS.get("escape").apply(value, context, params);
+    public Object apply(TemplateContext context, Object value, Object... params) {
+        return Filters.COMMON_FILTERS.get("escape").apply(context, value, params);
     }
 }

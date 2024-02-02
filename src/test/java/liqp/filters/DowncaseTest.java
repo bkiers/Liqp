@@ -42,7 +42,7 @@ public class DowncaseTest {
 
         final Filter filter = Filters.COMMON_FILTERS.get("downcase");
         TemplateContext templateContext = new TemplateContext();
-        assertThat(filter.apply("Testing", templateContext), is((Object)"testing"));
-        assertThat(filter.apply(null, templateContext), is((Object)""));
+        assertThat(filter.apply(templateContext, "Testing"), is((Object)"testing"));
+        assertThat(filter.apply(templateContext, null), is((Object)""));
     }
 }

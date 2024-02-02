@@ -1,5 +1,6 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
@@ -8,7 +9,7 @@ import liqp.PlainBigDecimal;
 public class Round extends Filter {
 
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         if (!super.canBeDouble(value)) {
             return 0;

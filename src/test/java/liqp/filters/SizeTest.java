@@ -52,12 +52,12 @@ public class SizeTest {
         final Filter filter = Filters.COMMON_FILTERS.get("size");
         TemplateContext context = new TemplateContext();
 
-        assertThat(filter.apply(new Integer[]{1, 2, 3}, context), is( 3));
-        assertThat(filter.apply(new Object[0], context), is(0));
-        assertThat(filter.apply(null, context), is(0));
-        assertThat(filter.apply(new HashMap<>(), context), is(0));
-        assertThat(filter.apply(Collections.singletonMap("a", 1), context), is(1));
-        assertThat(filter.apply(new Inspectable() {
+        assertThat(filter.apply(context, new Integer[]{1, 2, 3}), is( 3));
+        assertThat(filter.apply(context, new Object[0]), is(0));
+        assertThat(filter.apply(context, null), is(0));
+        assertThat(filter.apply(context, new HashMap<>()), is(0));
+        assertThat(filter.apply(context, Collections.singletonMap("a", 1)), is(1));
+        assertThat(filter.apply(context, new Inspectable() {
             @SuppressWarnings("unused")
             public final String a = "a";
             @SuppressWarnings("unused")
@@ -66,6 +66,6 @@ public class SizeTest {
             public final String c = "c";
             @SuppressWarnings("unused")
             public final String d = "d";
-        }, context), is(4));
+        }), is(4));
     }
 }

@@ -267,7 +267,7 @@ public class TemplateTest {
     @Test
     public void testWithCustomTag() {
         // given
-        TemplateParser parser = new TemplateParser.Builder().withInsertion(new Tag("custom_tag") {
+        TemplateParser parser = new TemplateParser.Builder().withTag(new Tag("custom_tag") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 return "xxx";
@@ -283,7 +283,7 @@ public class TemplateTest {
     @Test
     public void testWithCustomBlock() {
         // given
-        TemplateParser parser = new TemplateParser.Builder().withInsertion(new Block("custom_uppercase_block") {
+        TemplateParser parser = new TemplateParser.Builder().withBlock(new Block("custom_uppercase_block") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 LNode block = nodes[0];
@@ -307,7 +307,7 @@ public class TemplateTest {
         // given
         TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("sum"){
             @Override
-            public Object apply(Object value, TemplateContext context, Object... params) {
+            public Object apply(TemplateContext context, Object value, Object... params) {
                 Object[] numbers = super.asArray(value, context);
                 double sum = 0;
                 for(Object obj : numbers) {

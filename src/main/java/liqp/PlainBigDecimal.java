@@ -11,6 +11,9 @@ import java.math.BigDecimal;
 public final class PlainBigDecimal extends BigDecimal {
     private static final long serialVersionUID = 1L;
 
+    public PlainBigDecimal(BigDecimal val) {
+        super(val.toPlainString());
+    }
     public PlainBigDecimal(String val) {
         super(val);
     }

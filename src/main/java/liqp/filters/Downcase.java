@@ -10,7 +10,7 @@ public class Downcase extends Filter {
      * convert a input string to DOWNCASE
      */
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         return super.asString(value, context).toLowerCase();
     }

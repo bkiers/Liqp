@@ -5,7 +5,7 @@ import liqp.TemplateContext;
 public class Strip extends Filter {
 
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         if (!super.isString(value)) {
             return value;

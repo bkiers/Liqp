@@ -12,7 +12,7 @@ public class Size extends Filter {
      * Return the size of an array or of an string
      */
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         if (value instanceof Inspectable) {
             LiquidSupport evaluated = context.getParser().evaluate(value);

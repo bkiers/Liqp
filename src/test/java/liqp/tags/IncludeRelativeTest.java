@@ -11,15 +11,15 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
-import static liqp.TemplateParser.pwd;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class IncludeRelativeTest {
     @Test
     public void testSimpleCase() throws IOException {
-        Path root = pwd().resolve("src/test/jekyll/relative_include");
+        Path root = Paths.get(".").toAbsolutePath().resolve("src/test/jekyll/relative_include");
         Path index = root.resolve("hello.liquid");
 
         TemplateParser parser = new TemplateParser.Builder()
@@ -34,7 +34,7 @@ public class IncludeRelativeTest {
 
     @Test
     public void testLiquid() throws IOException {
-        Path root = pwd().resolve("src/test/jekyll/relative_include");
+        Path root = Paths.get(".").toAbsolutePath().resolve("src/test/jekyll/relative_include");
         Path index = root.resolve("hello.liquid");
 
         TemplateParser parser = new TemplateParser.Builder()
@@ -51,12 +51,12 @@ public class IncludeRelativeTest {
 
     @Test
     public void testLiquidWithCustomIncludeShouldAllowOverride() throws IOException {
-        Path root = pwd().resolve("src/test/jekyll/relative_include");
+        Path root = Paths.get(".").toAbsolutePath().resolve("src/test/jekyll/relative_include");
         Path index = root.resolve("hello.liquid");
 
         TemplateParser parser = new TemplateParser.Builder()
                 .withFlavor(Flavor.LIQUID)
-                .withInsertion(new Tag("include_relative") {
+                .withTag(new Tag("include_relative") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         return "World";
@@ -86,7 +86,7 @@ public class IncludeRelativeTest {
     //    And I should see "Welcome back Dear Reader!" in "_site/2018/09/02/star-wars.html"
     @Test
     public void testIncludeANestedFileRelativeToAPost() throws IOException {
-        Path root = pwd().resolve("src/test/jekyll/relative_include");
+        Path root = Paths.get(".").toAbsolutePath().resolve("src/test/jekyll/relative_include");
         Path index = root.resolve("nested_include.liquid");
 
         TemplateParser parser = new TemplateParser.Builder()
@@ -103,14 +103,14 @@ public class IncludeRelativeTest {
     public void testCustomBlocksStackWithCustomBlockIncludeRelative() {
         TemplateParser parser = new TemplateParser.Builder()
                 .withFlavor(Flavor.LIQUID)
-                .withInsertion(new Block("another") {
+                .withBlock(new Block("another") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         LNode blockNode = nodes[nodes.length - 1];
                         return "[" + super.asString(blockNode.render(context), context) + "]";
                     }
                 })
-                .withInsertion(new Block("include_relative") {
+                .withBlock(new Block("include_relative") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         return "World";

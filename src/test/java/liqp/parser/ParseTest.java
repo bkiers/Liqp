@@ -2,7 +2,10 @@ package liqp.parser;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
 
+import liqp.Template;
+import liqp.TemplateContext;
 import org.junit.Test;
 
 import liqp.TemplateParser;
@@ -122,5 +125,38 @@ public class ParseTest {
                 TemplateParser.DEFAULT.parse("var2:{{var2}} {%assign var2 = var.end%} var2:{{var2}}")
                         .render(" { \"var\": { \"end\": \"content\" } } "),
                 is("var2:  var2:content"));
+    }
+
+    @Test
+    public void testStripSpaces() {
+        String source = "a \n \n {{ a }} \n \n c";
+
+        // default
+        String res = new TemplateParser.Builder()
+                .build()
+                .parse(source).render("a", "b");
+        assertEquals("a \n \n b \n \n c", res);
+
+
+        // false is default
+        res = new TemplateParser.Builder()
+                .withStripSpaceAroundTags(false)
+                .build()
+                .parse(source).render("a", "b");
+        assertEquals("a \n \n b \n \n c", res);
+
+        // true
+        res = new TemplateParser.Builder()
+                .withStripSpaceAroundTags(true)
+                .build()
+                .parse(source).render("a", "b");
+        assertEquals("abc", res);
+
+        res = new TemplateParser.Builder()
+                .withStripSpaceAroundTags(true)
+                .withStripSingleLine(true)
+                .build()
+                .parse(source).render("a", "b");
+        assertEquals("a \n \nb \n c", res);
     }
 }

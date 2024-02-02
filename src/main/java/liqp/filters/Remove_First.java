@@ -12,7 +12,7 @@ public class Remove_First extends Filter {
      * remove the first occurrences of a substring
      */
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         String original = super.asString(value, context);
 

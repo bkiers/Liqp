@@ -50,7 +50,7 @@ public class Normalize_WhitespaceTest {
                 {"a", " a ", "strip whitespace from beginning and end of string"}
         };
         for (String[] caze: cases) {
-            Object actual = filter.apply(caze[1]);
+            Object actual = filter.apply(null, caze[1]);
             assertEquals(caze[2], caze[0], actual);
         }
    }

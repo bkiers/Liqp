@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import liqp.antlr.LocalFSNameResolver;
 import liqp.antlr.NameResolver;
+import liqp.blocks.Block;
 import liqp.filters.Filter;
 import liqp.filters.Filters;
 import liqp.parser.Flavor;
 import liqp.parser.LiquidSupport;
+import liqp.tags.Tag;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 
@@ -127,7 +129,7 @@ public class TemplateParser {
 
         private Flavor flavor;
         private boolean stripSpacesAroundTags = false;
-        private boolean stripSingleLine;
+        private boolean stripSingleLine = false;
         private ObjectMapper mapper;
         private List<Insertion> insertions = new ArrayList<>();
         private List<Filter> filters = new ArrayList<>();
@@ -139,7 +141,7 @@ public class TemplateParser {
 
 
         private boolean strictVariables = false;
-        private boolean showExceptionsFromInclude;
+        private boolean showExceptionsFromInclude = true;
         private EvaluateMode evaluateMode = EvaluateMode.LAZY;
         private Locale locale = DEFAULT_LOCALE;
         private ZoneId defaultTimeZone;
@@ -221,8 +223,13 @@ public class TemplateParser {
             return this;
         }
 
-        public Builder withInsertion(Insertion insertion) {
-            this.insertions.add(insertion);
+        public Builder withBlock(Block block) {
+            this.insertions.add(block);
+            return this;
+        }
+
+        public Builder withTag(Tag tag) {
+            this.insertions.add(tag);
             return this;
         }
 
@@ -319,6 +326,11 @@ public class TemplateParser {
             return this;
         }
 
+        public Builder withNameResolver(NameResolver nameResolver) {
+            this.nameResolver = nameResolver;
+            return this;
+        }
+
         public Builder withMaxIterations(int maxIterations) {
             this.limitMaxIterations = maxIterations;
             return this;
@@ -345,10 +357,6 @@ public class TemplateParser {
             return this;
         }
 
-        public Builder withNameResolver(NameResolver nameResolver) {
-            this.nameResolver = nameResolver;
-            return this;
-        }
 
         @SuppressWarnings("hiding")
         public TemplateParser build() {
@@ -409,6 +417,9 @@ public class TemplateParser {
         }
     }
 
+    /**
+     * Private constructor. Use: <code>new TemplateParser.Builder().build()</code> instead.
+     */
     TemplateParser(boolean strictVariables, boolean showExceptionsFromInclude, EvaluateMode evaluateMode,
                    RenderTransformer renderTransformer, Locale locale, ZoneId defaultTimeZone,
                    Consumer<Map<String, Object>> environmentMapConfigurator, ErrorMode errorMode, Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine,
@@ -453,21 +464,21 @@ public class TemplateParser {
     }
 
     public Template parse(String input) {
-        return new Template(this, CharStreams.fromString(input), pwd());
+        return new Template(this, CharStreams.fromString(input), Paths.get(".").toAbsolutePath());
     }
 
     public Template parse(InputStream input) throws IOException {
         Path location = getLocationFromInputStream(input);
-        return new Template(this, CharStreams.fromStream(input), Optional.ofNullable(location).orElseGet(TemplateParser::pwd));
+        return new Template(this, CharStreams.fromStream(input), Optional.ofNullable(location).orElseGet(() -> Paths.get(".").toAbsolutePath()));
     }
 
     public Template parse(Reader reader) throws IOException {
-        return new Template(this, CharStreams.fromReader(reader), pwd());
+        return new Template(this, CharStreams.fromReader(reader), Paths.get(".").toAbsolutePath());
     }
 
     public Template parse(CharStream input) {
         Path location = NameResolver.getLocationFromCharStream(input);
-        return new Template(this, input, Optional.ofNullable(location).orElseGet(TemplateParser::pwd));
+        return new Template(this, input, Optional.ofNullable(location).orElseGet(() -> Paths.get(".").toAbsolutePath()));
     }
 
 
@@ -525,11 +536,4 @@ public class TemplateParser {
             return null;
         }
     }
-
-
-    public static Path pwd() {
-        return Paths.get(".").toAbsolutePath();
-    }
-
-
 }

@@ -16,7 +16,7 @@ public class InsertionTest {
     public void testNestedCustomTagsAndBlocks() {
 
         TemplateParser templateParser = new TemplateParser.Builder()
-                .withInsertion(new Block("block") {
+                .withBlock(new Block("block") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         String data = (nodes.length >= 2 ? nodes[1].render(context) : nodes[0].render(
@@ -25,7 +25,7 @@ public class InsertionTest {
                         return "blk[" + data + "]";
                     }
                 })
-                .withInsertion(new Tag("simple") {
+                .withTag(new Tag("simple") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         return "(sim)";
@@ -41,7 +41,7 @@ public class InsertionTest {
     public void testNestedCustomTagsAndBlocksAsOneCollection() {
         String templateString = "{% block %}a{% simple %}b{% block %}c{% endblock %}d{% endblock %}";
         
-        TemplateParser parser = new TemplateParser.Builder().withInsertion(
+        TemplateParser parser = new TemplateParser.Builder().withBlock(
                 new Block("block") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
@@ -50,7 +50,7 @@ public class InsertionTest {
 
                         return "blk[" + data + "]";
                     }
-                }).withInsertion(new Tag("simple") {
+                }).withTag(new Tag("simple") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 return "(sim)";
@@ -64,7 +64,7 @@ public class InsertionTest {
     @Test
     public void testCustomTag() throws RecognitionException {
 
-        TemplateParser parser = new TemplateParser.Builder().withInsertion(new Tag("twice") {
+        TemplateParser parser = new TemplateParser.Builder().withTag(new Tag("twice") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 Double number = super.asNumber(nodes[0].render(context)).doubleValue();
@@ -80,7 +80,7 @@ public class InsertionTest {
 
     @Test
     public void testCustomTagBlock() throws RecognitionException {
-        TemplateParser templateParser = new TemplateParser.Builder().withInsertion(new Block("twice") {
+        TemplateParser templateParser = new TemplateParser.Builder().withBlock(new Block("twice") {
             @Override
             public Object render(TemplateContext context, LNode... nodes) {
                 LNode blockNode = nodes[nodes.length - 1];
@@ -186,7 +186,7 @@ public class InsertionTest {
     @Test
     public void testCustomTagRegistration() {
         TemplateParser parser = new TemplateParser.Builder()
-                .withInsertion(new Tag("custom_tag") {
+                .withTag(new Tag("custom_tag") {
                     @Override
                     public Object render(TemplateContext context, LNode... nodes) {
                         return "xxx";

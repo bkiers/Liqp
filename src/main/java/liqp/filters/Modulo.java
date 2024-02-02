@@ -13,7 +13,7 @@ public class Modulo extends Filter {
      * modulus
      */
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         if(value == null) {
             value = 0L;

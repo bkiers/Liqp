@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 import java.util.regex.Pattern;
 
 public class Normalize_Whitespace extends Filter {
@@ -11,7 +13,7 @@ public class Normalize_Whitespace extends Filter {
     }
 
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
         if (value == null) {
             return "";
         }

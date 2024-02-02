@@ -38,7 +38,7 @@ public class Where_Exp extends Filter {
     }
 
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
         Object[] items = null;
         if (isArray(value)) {
             items = asArray(value, context);

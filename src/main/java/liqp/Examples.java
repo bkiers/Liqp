@@ -51,7 +51,7 @@ public class Examples {
         // first register your custom filter
         TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("b") {
             @Override
-            public Object apply(Object value, TemplateContext context, Object... params) {
+            public Object apply(TemplateContext context, Object value, Object... params) {
                 // create a string from the value
                 String text = super.asString(value, context);
 
@@ -69,7 +69,7 @@ public class Examples {
     private static void demoCustomRepeatFilter() {
         TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("repeat") {
             @Override
-            public Object apply(Object value, TemplateContext context, Object... params) {
+            public Object apply(TemplateContext context, Object value, Object... params) {
 
                 // check if an optional parameter is provided
                 int times = params.length == 0 ? 1 : super.asNumber(params[0]).intValue();
@@ -96,7 +96,7 @@ public class Examples {
     private static void demoCustomSumFilter() {
         TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("sum") {
             @Override
-            public Object apply(Object value, TemplateContext context, Object... params) {
+            public Object apply(TemplateContext context, Object value, Object... params) {
 
                 Object[] numbers = super.asArray(value, context);
 
@@ -147,7 +147,7 @@ public class Examples {
 
         TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("sum") {
             @Override
-            public Object apply(Object value, TemplateContext context, Object... params) {
+            public Object apply(TemplateContext context, Object value, Object... params) {
 
                 Object[] numbers = super.asArray(value, context);
 
@@ -199,7 +199,7 @@ public class Examples {
 
         TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("sum") {
             @Override
-            public Object apply(Object value, TemplateContext context, Object... params) {
+            public Object apply(TemplateContext context, Object value, Object... params) {
 
                 Object[] numbers = super.asArray(value, context);
                 double sum = 0;

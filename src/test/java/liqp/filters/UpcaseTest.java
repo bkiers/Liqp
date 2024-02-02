@@ -42,7 +42,7 @@ public class UpcaseTest {
         TemplateContext context = new TemplateContext();
         final Filter filter = Filters.COMMON_FILTERS.get("upcase");
 
-        assertThat(filter.apply("Testing", context), is((Object)"TESTING"));
-        assertThat(filter.apply(null, context), is((Object)""));
+        assertThat(filter.apply(context, "Testing"), is((Object)"TESTING"));
+        assertThat(filter.apply(context, null), is((Object)""));
     }
 }

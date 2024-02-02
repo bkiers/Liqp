@@ -10,7 +10,7 @@ public class Append extends Filter {
      * add one string to another
      */
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         return super.asString(value, context) + super.asString(super.get(0, params), context);
     }

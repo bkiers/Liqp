@@ -326,6 +326,11 @@ public class TemplateParser {
             return this;
         }
 
+        public Builder withNameResolver(NameResolver nameResolver) {
+            this.nameResolver = nameResolver;
+            return this;
+        }
+
         public Builder withMaxIterations(int maxIterations) {
             this.limitMaxIterations = maxIterations;
             return this;
@@ -352,10 +357,6 @@ public class TemplateParser {
             return this;
         }
 
-        public Builder withNameResolver(NameResolver nameResolver) {
-            this.nameResolver = nameResolver;
-            return this;
-        }
 
         @SuppressWarnings("hiding")
         public TemplateParser build() {
@@ -416,6 +417,9 @@ public class TemplateParser {
         }
     }
 
+    /**
+     * Private constructor. Use: <code>new TemplateParser.Builder().build()</code> instead.
+     */
     TemplateParser(boolean strictVariables, boolean showExceptionsFromInclude, EvaluateMode evaluateMode,
                    RenderTransformer renderTransformer, Locale locale, ZoneId defaultTimeZone,
                    Consumer<Map<String, Object>> environmentMapConfigurator, ErrorMode errorMode, Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine,
@@ -460,21 +464,21 @@ public class TemplateParser {
     }
 
     public Template parse(String input) {
-        return new Template(this, CharStreams.fromString(input), pwd());
+        return new Template(this, CharStreams.fromString(input), Paths.get(".").toAbsolutePath());
     }
 
     public Template parse(InputStream input) throws IOException {
         Path location = getLocationFromInputStream(input);
-        return new Template(this, CharStreams.fromStream(input), Optional.ofNullable(location).orElseGet(TemplateParser::pwd));
+        return new Template(this, CharStreams.fromStream(input), Optional.ofNullable(location).orElseGet(() -> Paths.get(".").toAbsolutePath()));
     }
 
     public Template parse(Reader reader) throws IOException {
-        return new Template(this, CharStreams.fromReader(reader), pwd());
+        return new Template(this, CharStreams.fromReader(reader), Paths.get(".").toAbsolutePath());
     }
 
     public Template parse(CharStream input) {
         Path location = NameResolver.getLocationFromCharStream(input);
-        return new Template(this, input, Optional.ofNullable(location).orElseGet(TemplateParser::pwd));
+        return new Template(this, input, Optional.ofNullable(location).orElseGet(() -> Paths.get(".").toAbsolutePath()));
     }
 
 
@@ -532,11 +536,4 @@ public class TemplateParser {
             return null;
         }
     }
-
-
-    public static Path pwd() {
-        return Paths.get(".").toAbsolutePath();
-    }
-
-
 }

@@ -18,7 +18,7 @@ public class Relative_Url extends Filter {
     public static final String site = "site";
     public static final String baseurl = "baseurl";
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
         String valAsString = asString(value, context);
 
         // fast exit for valid absolute urls

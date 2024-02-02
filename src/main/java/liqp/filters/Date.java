@@ -28,7 +28,7 @@ public class Date extends Filter {
 
 
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
         Locale locale = context.getParser().locale;
 
         if (isArray(value) && asArray(value, context).length ==1) {

@@ -35,13 +35,13 @@ public class ModuloTest {
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid1() {
         TemplateContext context = new TemplateContext();
-        Filters.COMMON_FILTERS.get("modulo").apply(1, context);
+        Filters.COMMON_FILTERS.get("modulo").apply(context, 1);
     }
 
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid2() {
         TemplateContext context = new TemplateContext();
-        Filters.COMMON_FILTERS.get("modulo").apply(1, context, 2, 3);
+        Filters.COMMON_FILTERS.get("modulo").apply(context, 1, 2, 3);
     }
 
 

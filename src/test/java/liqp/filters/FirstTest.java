@@ -45,7 +45,7 @@ public class FirstTest {
         Filter filter = Filters.COMMON_FILTERS.get("first");
 
         TemplateContext context = new TemplateContext();
-        assertThat(filter.apply(new Integer[]{1, 2, 3}, context), is((Object)1));
-        assertThat(filter.apply(new Integer[]{}, context), is((Object)null));
+        assertThat(filter.apply(context, new Integer[]{1, 2, 3}), is((Object)1));
+        assertThat(filter.apply(context, new Integer[]{}), is((Object)null));
     }
 }

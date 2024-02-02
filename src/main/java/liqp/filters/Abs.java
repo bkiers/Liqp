@@ -1,6 +1,8 @@
 package liqp.filters;
 
 import liqp.PlainBigDecimal;
+import liqp.TemplateContext;
+
 
 public class Abs extends Filter {
 
@@ -22,7 +24,7 @@ public class Abs extends Filter {
       end
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         if (super.isInteger(value) || super.canBeInteger(value)) {
             return Math.abs(super.asNumber(value).longValue());

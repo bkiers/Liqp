@@ -11,7 +11,7 @@ public class Escape_Once extends Filter {
      * existing escaped entities
      */
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         String str = super.asString(value, context);
 

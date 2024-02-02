@@ -1,5 +1,7 @@
 package liqp.filters;
 
+import liqp.TemplateContext;
+
 import java.math.BigDecimal;
 
 import liqp.PlainBigDecimal;
@@ -12,7 +14,7 @@ public class Plus extends Filter {
      * addition
      */
     @Override
-    public Object apply(Object value, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         if (!isNumber(value)) {
             value = 0;

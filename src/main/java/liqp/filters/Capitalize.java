@@ -10,7 +10,7 @@ public class Capitalize extends Filter {
      * capitalize words in the input sentence
      */
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         String original = super.asString(value, context);
 

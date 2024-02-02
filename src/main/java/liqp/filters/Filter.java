@@ -48,38 +48,16 @@ public abstract class Filter extends LValue {
     }
 
     /**
-     * Applies the filter on the 'value'.
-     *
-     * @param value
-     *            the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
-     * @param params
-     *            the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
-     *
-     * @deprecated use {@link #apply(Object, TemplateContext, Object...)}
-     * @return the result of the filter.
-     */
-    @Deprecated
-    public Object apply(Object value, Object... params) {
-
-        // Default "no-op" filter.
-        return value;
-    }
-
-    /**
      * Applies the filter on the 'value', with the given 'context'.
      *
-     * @param value
-     *            the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
-     * @param context
-     *            the template context.
-     * @param params
-     *            the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
-     *
+     * @param context the template context.
+     * @param value   the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
+     * @param params  the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
      * @return the result of the filter.
      */
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
-        return apply(value, params);
+        return value;
     }
 
     /**

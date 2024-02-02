@@ -48,6 +48,6 @@ public class RemoveTest {
         TemplateContext context = new TemplateContext();
         Filter filter = Filters.COMMON_FILTERS.get("remove");
 
-        assertThat(filter.apply("a a a a", context, "a"), is((Object)"   "));
+        assertThat(filter.apply(context, "a a a a", "a"), is((Object)"   "));
     }
 }

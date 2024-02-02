@@ -43,7 +43,7 @@ public class FilterNode implements LNode {
             for (LNode node : params) {
                 paramValues.add(node.render(context));
             }
-            return filter.apply(value, context, paramValues.toArray(new Object[0]));
+            return filter.apply(context, value, paramValues.toArray(new Object[0]));
         }
         catch (Exception e) {
             throw new RuntimeException("error on line " + line + ", index " + tokenStartIndex + ": " + e.getMessage(), e);

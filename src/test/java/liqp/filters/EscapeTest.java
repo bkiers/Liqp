@@ -45,6 +45,6 @@ public class EscapeTest {
 
         Filter filter = Filters.COMMON_FILTERS.get("escape");
 
-        assertThat(filter.apply("<strong>", new TemplateContext()), is((Object)"&lt;strong&gt;"));
+        assertThat(filter.apply(new TemplateContext(), "<strong>"), is((Object)"&lt;strong&gt;"));
     }
 }

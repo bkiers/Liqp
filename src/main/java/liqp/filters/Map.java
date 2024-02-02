@@ -15,7 +15,7 @@ public class Map extends Filter {
      * map/collect on a given property
      */
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         if (value == null) {
             return "";

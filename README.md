@@ -43,17 +43,17 @@ To create a parse tree from input source, do the following:
 
 ```java
 String input =
-        "<ul id=\"products\">                                       \n" +
-        "  {% for product in products %}                            \n" +
-        "    <li>                                                   \n" +
-        "      <h2>{{ product.name }}</h2>                          \n" +
-        "      Only {{ product.price | price }}                     \n" +
-        "                                                           \n" +
-        "      {{ product.description | prettyprint | paragraph }}  \n" +
-        "    </li>                                                  \n" +
-        "  {% endfor %}                                             \n" +
-        "</ul>                                                      \n";
-Template template = Template.parse(input);
+        "<ul id=\"products\">                                               \n" +
+                "  {% for product in products %}                            \n" +
+                "    <li>                                                   \n" +
+                "      <h2>{{ product.name }}</h2>                          \n" +
+                "      Only {{ product.price | price }}                     \n" +
+                "                                                           \n" +
+                "      {{ product.description | prettyprint | paragraph }}  \n" +
+                "    </li>                                                  \n" +
+                "  {% endfor %}                                             \n" +
+                "</ul>                                                      \n";
+Template template = TemplateParser.DEFAULT.parse(input);
 
 ParseTree root = template.getParseTree();
 ```
@@ -152,7 +152,7 @@ System.out.println(rendered);
 ```
 
 #### Controlling library behavior
-The library has a set of keys to control the parsing/rendering process. Even if you might think that's too many of them, the defaults will work for you most cases. All of them are set on `TemplateParser.Builder` class. Here they are:
+The library has a set of keys to control the parsing/rendering process. Even if you might think that's too many of them, the defaults will work for you in most cases. All of them are set on `TemplateParser.Builder` class. Here they are:
 * `withFlavor(Flavor flavor)` - flavor of the liquid language. Flavor is nothing else than a predefined set of other settings. Here are supported flavors:
   * `Flavor.JEKYLL` - flavor that defines all settings, so it tries to behave like jekyll's templates
   * `Flavor.LIQUID` - the same for liquid's templates
@@ -163,24 +163,24 @@ The library has a set of keys to control the parsing/rendering process. Even if 
 * `withTag(Tag tag)` - register custom tag to be used in templates.
 * `withBlock(Block block)` - register custom block to be used in templates. The difference between tag and block is that block has open and closing tag and can contain other content like a text, tags and blocks.
 * `withFilter(Filter filter)` - register custom filter to be used in templates. See below for examples.
-* `withEvaluateInOutputTag(boolean evaluateInOutputTag)` - both `Flavor.JEKYLL` and `Flavor.LIQUID` are not allows to evaluate expressions in output tags, simply ignoring the expression and printing out very first token of the expression.  Yes, this: `{{ 97 > 96 }}` will print `97`. This is known [bug/feature](https://github.com/Shopify/liquid/issues/1102) of those temlators. If you want to change this behavior and evaluate those expressions, set this flag to `true`. Also, the default flavor `Flavor.LIQP` has this flag set to `true` already.
-* `withStrictTypedExpressions(boolean strictTypedExpressions)` - ruby is strong-typed language. So comparing different types is not allowed there. This library tries to mimic ruby's type system in a way so all not explicit types (created or manipulated inside of templates) are converted with this schema: `nil` -> `null`; `boolean` -> `boolean`; `string` -> `java.lang.String`; any numbers -> `java.math.BigDecimal`, any datetime -> `java.time.ZonedDateTime`. If you want to change this behavior, and allow comparing in expressions in a less restricted way, set this flag to `true`, then the lax (javascript-like) approach for comparing in expressions will be used. Also, the default flavor `Flavor.LIQP` has this flag set to `true` already, others has it `false` by default.
-* `withLiquidStyleInclude(boolean liquidStyleInclude)` - if `true` then include tag will use [syntax from liquid](https://shopify.dev/docs/api/liquid/tags/include), otherwice [jekyll syntax](https://jekyllrb.com/docs/includes/) will be used. Default depends of flavor. `Flavor.LIQUID` and `Flavor.LIQP` has this flag set to `true` already. `Flavor.JEKYLL` has it `false`.
+* `withEvaluateInOutputTag(boolean evaluateInOutputTag)` - both `Flavor.JEKYLL` and `Flavor.LIQUID` are not allows to evaluate expressions in output tags, simply ignoring the expression and printing out very first token of the expression.  Yes, this: `{{ 97 > 96 }}` will print `97`. This is known [bug/feature](https://github.com/Shopify/liquid/issues/1102) of those templators. If you want to change this behavior and evaluate those expressions, set this flag to `true`. Also, the default flavor `Flavor.LIQP` has this flag set to `true` already.
+* `withStrictTypedExpressions(boolean strictTypedExpressions)` - ruby is strong-typed language. So comparing different types is not allowed there. This library tries to mimic ruby's type system in a way so all not explicit types (created or manipulated inside of templates) are converted with this schema: `nil` -> `null`; `boolean` -> `boolean`; `string` -> `java.lang.String`; any numbers -> `java.math.BigDecimal`, any datetime -> `java.time.ZonedDateTime`. If you want to change this behavior, and allow comparing in expressions in a less restricted way, set this flag to `true`, then the lax (javascript-like) approach for comparing in expressions will be used. Also, the default flavor `Flavor.LIQP` has this flag set to `true` already, others have it `false` by default.
+* `withLiquidStyleInclude(boolean liquidStyleInclude)` - if `true` then include tag will use [syntax from liquid](https://shopify.dev/docs/api/liquid/tags/include), otherwice [jekyll syntax](https://jekyllrb.com/docs/includes/) will be used. Default depends on flavor. `Flavor.LIQUID` and `Flavor.LIQP` has this flag set to `true` already. `Flavor.JEKYLL` has it `false`.
 * `withStrictVariables(boolean strictVariables)` - if set to `true` then all variables must be defined before usage, if some variable is not defined, the exception will be thrown. If `false` then all undefined variables will be treated as `null`. Default is `false`.
 * `withShowExceptionsFromInclude(boolean showExceptionsFromInclude)` - if set to `true` then all exceptions from included templates will be thrown. If `false` then all exceptions from included templates will be ignored. Default is `true`.
 * `withEvaluateMode(TemplateParser.EvaluateMode evaluateMode)` - there exists two rendering modes: `TemplateParser.EvaluateMode.LAZY` and `TemplateParser.EvaluateMode.EAGER`. By default, the `lazy` one is used. This should do the work in most cases. 
   * In `lazy` mode the template parameters are evaluating on demand and specific properties are read from there only if they are needed. Each filter/tag trying to do its work with its own parameter object, that can be literally anything.
-  * In `eager` the entire parameter object is converted into plain data tree structure that are made **only** from maps and lists, so tags/filters do know how to work with these kinds of objects. Special case - temporal objects, they are consumed as is.
-* `withRenderTransformer(RenderTransformer renderTransformer)` - even if most of elements (filters/tags/blocks) returns its results most cases as `String`, the task of combining all those strings into a final result is a task of `liqp.RenderTransformer` implementation. The default `liqp.RenderTransformerDefaultImpl` uses `StringBuilder` for that task, so template rendering is fast. Althought, you might have special needs or environment to render the results.
+  * In `eager` the entire parameter object is converted into plain data tree structure made **only** from maps and lists, so tags/filters do know how to work with these kinds of objects. Special case - temporal objects, they are consumed as is.
+* `withRenderTransformer(RenderTransformer renderTransformer)` - even if most of elements (filters/tags/blocks) returns its results most cases as `String`, the task of combining all those strings into a final result is a task of `liqp.RenderTransformer` implementation. The default `liqp.RenderTransformerDefaultImpl` uses `StringBuilder` for that task, so template rendering is fast. Although, you might have special needs or environment to render the results.
 * `withLocale(Locale locale)` - locale to be used for rendering. Default is `Locale.ENGLISH`. Used mostly for time rendering.
 * `withDefaultTimeZone(ZoneId defaultTimeZone)` - default time zone to be used for rendering. Default is `ZoneId.systemDefault()`. Used mostly for time rendering.
 * `withEnvironmentMapConfigurator(Consumer<Map<String, Object>> configurator)` - if provided then this configurator is called before each template rendering. It can be used to set some global variables for all templates built with given `TemplateParser`. 
 * `withSnippetsFolderName(String snippetsFolderName)` - define folder to be used for searching files by `include` tag. Defaults depend on flavor: `Flavor.LIQUID` and `Flavor.LIQP` has this set to `snippets`; `Flavor.JEKYLL` uses `_includes`.
 * `withNameResolver(NameResolver nameResolver)` - if provided then this resolver is used for resolving names of included files. If not provided, then default resolver is used. Default resolver is `liqp.antlr.LocalFSNameResolver` that uses `java.nio.file.Path` for resolving names in local file system. That can be changed to any other resolver, for example, to resolve names in classpath or in remote file system or even build templates dynamically by name.
-* `withMaxIterations(int maxIterations)` - maximum number of iterations allowed in a template. Default is `Integer.MAX_VALUE`. Used to prevent infinite loops.
-* `withMaxSizeRenderedString(int maxSizeRenderedString)` - maximum size of rendered string. Default is `Integer.MAX_VALUE`. Used to prevent out of memory errors.
-* `withMaxRenderTimeMillis(long maxRenderTimeMillis)` - maximum time allowed for template rendering. Default is `Long.MAX_VALUE`. Used to prevent never-ending rendering.
-* `withMaxTemplateSizeBytes(long maxTemplateSizeBytes)` - maximum size of template. Default is `Long.MAX_VALUE`. Used to prevent out of memory errors.
+* `withMaxIterations(int maxIterations)` - maximum number of iterations allowed in a template. Default is `Integer.MAX_VALUE`. Used to prevent infinite loops. Example use: evaluate templates from untrusted sources.
+* `withMaxSizeRenderedString(int maxSizeRenderedString)` - maximum size of rendered string. Default is `Integer.MAX_VALUE`. Used to prevent out of memory errors. Example use: evaluate templates from untrusted sources.
+* `withMaxRenderTimeMillis(long maxRenderTimeMillis)` - maximum time allowed for template rendering. Default is `Long.MAX_VALUE`. Used to prevent never-ending rendering. Example use: evaluate templates from untrusted sources.
+* `withMaxTemplateSizeBytes(long maxTemplateSizeBytes)` - maximum size of template. Default is `Long.MAX_VALUE`. Used to prevent out of memory errors. Example use: evaluate templates from untrusted sources.
 * `withErrorMode(ErrorMode errorMode)` - error mode to be used. Default is `ErrorMode.STRICT`. 
 
 
@@ -192,20 +192,20 @@ Let's say you want to create a custom filter, called `b`, that changes a string 
 You can do that as follows:
 
 ```java
-// first register your custom filter
-Filter.registerFilter(new Filter("b"){
+ // first create template parser with new filter
+TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("b") {
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
-        // create a string from the  value
+    public Object apply(TemplateContext context, Object value, Object... params) {
+        // create a string from the value
         String text = super.asString(value, context);
 
         // replace and return *...* with <strong>...</strong>
         return text.replaceAll("\\*(\\w(.*?\\w)?)\\*", "<strong>$1</strong>");
     }
-});
+}).build();
 
 // use your filter
-Template template = Template.parse("{{ wiki | b }}");
+Template template = parser.parse("{{ wiki | b }}");
 String rendered = template.render("{\"wiki\" : \"Some *bold* text *in here*.\"}");
 System.out.println(rendered);
 /*
@@ -215,11 +215,10 @@ System.out.println(rendered);
 And to use an optional parameter in your filter, do something like this:
 
 ```java
-// first register your custom filter
-Filter.registerFilter(new Filter("repeat"){
+// first create template parser with your filter
+TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("repeat"){
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
-
+    public Object apply(TemplateContext context, Object value, Object... params) {
         // get the text of the value
         String text = super.asString(value, context);
 
@@ -234,23 +233,23 @@ Filter.registerFilter(new Filter("repeat"){
 
         return builder.toString();
     }
-});
+}).build();
 
 // use your filter
-Template template = Template.parse("{{ 'a' | repeat }}\n{{ 'b' | repeat:5 }}");
+Template template = parser.parse("{{ 'a' | repeat }}\n{{ 'b' | repeat:5 }}");
 String rendered = template.render();
 System.out.println(rendered);
 /*
-    a
-    bbbbb
+a
+bbbbb
 */
 ```
 You can use an array (or list) as well, and can also return a numerical value:
 
 ```java
-Filter.registerFilter(new Filter("sum"){
+TemplateParser parser = new TemplateParser.Builder().withFilter((new Filter("sum"){
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         Object[] numbers = super.asArray(value, context);
 
@@ -262,25 +261,25 @@ Filter.registerFilter(new Filter("sum"){
 
         return sum;
     }
-});
+})).build();
 
-Template template = Template.parse("{{ numbers | sum }}");
+Template template = parser.parse("{{ numbers | sum }}");
 String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
 System.out.println(rendered);
 /*
     15.0
 */
 ```
-In short, override one of the `apply()` methods of the `Filter` class to create your own custom filter behaviour.
+In short, override one of the `apply()` methods of the `Filter` class to create your own custom filter behavior.
 
 
 
 ### 2.2 Tags and blocks
 Both blocks and tags are kinds of insertions. Literally: `Block extends Insertion` and `Tag extends Insertion`. Class `Insertion` used as basic abstraction for parser. 
-Let's define the difference between tags and blocks. 
+Below is defined the difference between tags and blocks. 
 
 #### Tags
-Tag is simple insertion in the template that will be processed and the result of it will be replaced in output, if any. Example is `include` tag: 
+Tag is a simple insertion in the template that will be processed and the result of it will be replaced in output, if any. Example is `include` tag: 
 ```liquid
 See these data: {% include data.liquid %}
 ```
@@ -292,20 +291,19 @@ Hello {{name}}!
 It has no input but still is an insertion.
 
 #### Blocks
-Block is a kind of insertions that wraps some text and/or other blocks or tags and perform some operations on the given input. Blocks have opening and closing tags. Example of block is `if`:
+Block is a kind of insertions that wraps some text and/or other blocks or tags and performs some operations on the given input. Blocks have opening and closing tags. Example of block is `if`:
 ```liquid
 {% if user %} Hello {{ user.name }} {% endif %}"
 ```
 where `{% if user %}` is opening tag and `{% endif %}` is closing one. The `user` in this sample is just a parameter for given block.
 
 #### Custom Tags and Blocks
-Let's say you would like to create a block that makes it easy to loop for a fixed amount of times,
-executing a block of Liquid code.
+Let's say you would like to create a block that makes it easy to loop for a fixed number of times executing a block of Liquid code.
 
 Here's a way to create, and use, such a custom `loop` block:
 
 ```java
-Block.registerBlock(new Block("loop"){
+TemplateParser parser = new TemplateParser.Builder().withBlock(new Block("loop"){
     @Override
     public Object render(TemplateContext context, LNode... nodes) {
         int n = super.asNumber(nodes[0].render(context)).intValue();
@@ -316,9 +314,9 @@ Block.registerBlock(new Block("loop"){
         }
         return builder.toString();
     }
-});
+}).build();
 
-Template template = Template.parse("{% loop 5 %}looping!\n{% endloop %}");
+Template template = parser.parse("{% loop 5 %}looping!\n{% endloop %}");
 String rendered = template.render();
 System.out.println(rendered);
 /*
@@ -329,94 +327,8 @@ System.out.println(rendered);
     looping!
 */
 ```
-Note: `Block.registerBlock` is just a fluent shortcut for `Insertion.registerInsertion`.
-For registering custom Tags there exists equivalent `Tags.registerTag` function (that also wraps `Insertion.registerInsertion`). 
 
-Note that all of:
- * `Insertion.registerInsertion(Insertion)`
- * `Block.registerBlock(Block)`
- * `Tag.registerTag(Tag)`
- * `Filer.registerFilter(Filter)` 
-
-will add tags, blocks and filters per JVM instance. If you want templates to use specific filters, create your `Template` instance as follows:
-
-```java
-
-
-Template.parse(source, new ParseSettings.Builder()
-                .with(tag)
-                .build());
-
-Template.parse(source, new ParseSettings.Builder()
-                .with(block)
-                .build());
-
-Template.parse(source, new ParseSettings.Builder()
-                .with(filter)
-                .build());
-
-// Or combine them:
-Template.parse(source, new ParseSettings.Builder()
-                .with(filter)
-                .with(tag)
-                .build());
-```
-
-For example, using the `sum` filter for just 1 template, would look like this:
-
-```java
-Template template = Template.parse("{{ numbers | sum }}", new ParseSettings.Builder()
-                .with(new Filter("sum"){
-                    @Override
-                    public Object apply(Object value, TemplateContext context, Object... params) {
-
-                        Object[] numbers = super.asArray(value, context);
-                        double sum = 0;
-
-                        for(Object obj : numbers) {
-                            sum += super.asNumber(obj).doubleValue();
-                        }
-
-                        return sum;
-                    }
-                }).build());
-
-        String rendered = template.render("{\"numbers\" : [1, 2, 3, 4, 5]}");
-        System.out.println(rendered);
-/*
-    15.0
-*/
-```
-Also note that `ParseSettings` object have unmodifiable fields and so can be shared across templates without side effects.
-
-### 2.3 Guards
-
-If you're evaluating templates from untrusted sources, there are a couple of
-ways you can guard against unwanted input.
-
-For example, if you'd like the input template to be no larger than 125 characters,
-the templating engine should not perform more than 15 iterations in total,
-the generated string should not exceed 300 characters and the total rendering (and parsing!)
-time should not exceed 100 milliseconds, you could do something like this:
-
-```java
-ProtectionSettings protectionSettings = new ProtectionSettings.Builder()
-        .withMaxSizeRenderedString(300)
-        .withMaxIterations(15)
-        .withMaxRenderTimeMillis(100L)
-        .withMaxTemplateSizeBytes(125)
-        .build();
-
-String rendered = Template.parse("{% for i in (1..10) %}{{ text }}{% endfor %}")
-        .withProtectionSettings(protectionSettings)
-        .render("{\"text\": \"abcdefghijklmnopqrstuvwxyz\"}");
-
-System.out.println(rendered);
-```
-
-Note that not providing a `ProtectionSettings`, is the same as not having any guards in
-place (or better, very large limits).
-
+For registering custom Tags there exists equivalent `Builder.withTag` function.
 
 ## Build and Release
 

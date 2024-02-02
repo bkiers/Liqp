@@ -13,7 +13,7 @@ public class Replace_First extends Filter {
      * Replace the first occurrences of a string with another
      */
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         String original = super.asString(value, context);
 

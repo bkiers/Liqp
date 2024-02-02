@@ -10,7 +10,7 @@ public class Last extends Filter {
      * Get the last element of the passed in array
      */
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         Object[] array = super.asArray(value, context);
 

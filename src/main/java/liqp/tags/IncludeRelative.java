@@ -2,13 +2,10 @@ package liqp.tags;
 
 import liqp.TemplateContext;
 import liqp.antlr.CharStreamWithLocation;
-import liqp.nodes.LNode;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Map;
-
-import static liqp.TemplateParser.pwd;
+import java.nio.file.Paths;
 
 /**
  * <pre>
@@ -44,7 +41,7 @@ public class IncludeRelative extends Include {
     protected CharStreamWithLocation detectSource(TemplateContext context, String includeResource) throws IOException {
         Path rootPath = context.getRootFolder();
         if (rootPath == null) {
-            rootPath = pwd();
+            rootPath = Paths.get(".").toAbsolutePath();
         }
         Path includePath = rootPath.resolve(includeResource);
         return new CharStreamWithLocation(includePath);

@@ -44,7 +44,7 @@ public class JoinTest {
         TemplateContext context = new TemplateContext();
         Filter filter = Filters.COMMON_FILTERS.get("join");
 
-        assertThat(filter.apply(new Integer[]{1,2,3,4}, context), is((Object)"1 2 3 4"));
-        assertThat(filter.apply(new Integer[]{1,2,3,4}, context, " - "), is((Object)"1 - 2 - 3 - 4"));
+        assertThat(filter.apply(context, new Integer[]{1,2,3,4}), is((Object)"1 2 3 4"));
+        assertThat(filter.apply(context, new Integer[]{1,2,3,4}, " - "), is((Object)"1 - 2 - 3 - 4"));
     }
 }

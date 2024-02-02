@@ -10,7 +10,7 @@ public class Newline_To_Br extends Filter {
      * Add <br /> tags in front of all newlines in input string
      */
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         return super.asString(value, context).replaceAll("[\n]", "<br />\n");
     }

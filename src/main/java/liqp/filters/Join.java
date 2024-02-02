@@ -11,7 +11,7 @@ public class Join extends Filter {
      * Join elements of the array with certain character between them
      */
     @Override
-    public Object apply(Object value, TemplateContext context, Object... params) {
+    public Object apply(TemplateContext context, Object value, Object... params) {
 
         if (value == null) {
             return "";

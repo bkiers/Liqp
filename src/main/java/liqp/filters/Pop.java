@@ -16,7 +16,7 @@ import liqp.TemplateContext;
 public class Pop extends Filter {
 
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
         if (!super.isArray(value)) {
             return value;
         }

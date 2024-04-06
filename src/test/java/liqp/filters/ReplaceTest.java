@@ -53,6 +53,6 @@ public class ReplaceTest {
         TemplateContext context = new TemplateContext();
         Filter filter = Filters.COMMON_FILTERS.get("replace");
 
-        assertThat(filter.apply(context, "a a a a", "a", "b"), is((Object)"b b b b"));
+        assertThat(filter.apply("a a a a", context, "a", "b"), is((Object)"b b b b"));
     }
 }

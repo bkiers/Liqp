@@ -14,7 +14,7 @@ public class Split extends Filter {
      * E.g. {{ "a~b" | split:'~' | first }} #=> 'a'
      */
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         String original = super.asString(value, context);
         if (original.isEmpty()) {

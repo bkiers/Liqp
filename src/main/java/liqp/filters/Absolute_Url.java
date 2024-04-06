@@ -27,7 +27,7 @@ public class Absolute_Url extends Relative_Url {
      */
 
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
         String valAsString = asString(value, context);
         if (isValidAbsoluteUrl(valAsString)) {
             return valAsString;

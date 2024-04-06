@@ -5,8 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.math.BigDecimal;
-
 import org.antlr.v4.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -42,13 +40,13 @@ public class TimesTest {
     @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid1() {
-        Filters.COMMON_FILTERS.get("times").apply(null, 1);
+        Filters.COMMON_FILTERS.get("times").apply(1, null);
     }
 
     @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid2() {
-        Filters.COMMON_FILTERS.get("times").apply(null, 1, 2, 3);
+        Filters.COMMON_FILTERS.get("times").apply(1, null, 2, 3);
     }
 
     /*
@@ -69,11 +67,11 @@ public class TimesTest {
 
         Filter filter = Filters.COMMON_FILTERS.get("times");
 
-        assertThat(filter.apply(null, 3L, 4L), is((Object)12L));
+        assertThat(filter.apply(3L, null, 4L), is((Object)12L));
         // assert_template_result "0", "{{ 'foo' | times:4 }}" // see: applyTest()
-        assertTrue(String.valueOf(filter.apply(null, 2.1, 3L)).matches("6[.,]3"));
-        assertEquals(new PlainBigDecimal("7.25"), LValue.asFormattedNumber((PlainBigDecimal) filter.apply(null, 0.0725, 100)));
-        assertEquals(new PlainBigDecimal("-7.25"), LValue.asFormattedNumber((PlainBigDecimal) filter.apply(null, -0.0725, 100)));
-        assertEquals(new PlainBigDecimal("7.25"), LValue.asFormattedNumber((PlainBigDecimal) filter.apply(null, -0.0725, -100)));
+        assertTrue(String.valueOf(filter.apply(2.1, null, 3L)).matches("6[.,]3"));
+        assertEquals(new PlainBigDecimal("7.25"), LValue.asFormattedNumber((PlainBigDecimal) filter.apply(0.0725, null, 100)));
+        assertEquals(new PlainBigDecimal("-7.25"), LValue.asFormattedNumber((PlainBigDecimal) filter.apply(-0.0725, null, 100)));
+        assertEquals(new PlainBigDecimal("7.25"), LValue.asFormattedNumber((PlainBigDecimal) filter.apply(-0.0725, null, -100)));
     }
 }

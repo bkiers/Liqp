@@ -105,7 +105,7 @@ public class ReadmeSamplesTest {
         // first create template parser with new filter
         TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("b") {
             @Override
-            public Object apply(TemplateContext context, Object value, Object... params) {
+            public Object apply(Object value, TemplateContext context, Object... params) {
                 // create a string from the value
                 String text = super.asString(value, context);
 
@@ -128,7 +128,7 @@ public class ReadmeSamplesTest {
     public void testFilerWithOptionalParams() {
         TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("repeat"){
             @Override
-            public Object apply(TemplateContext context, Object value, Object... params) {
+            public Object apply(Object value, TemplateContext context, Object... params) {
                 // get the text of the value
                 String text = super.asString(value, context);
 
@@ -159,7 +159,7 @@ public class ReadmeSamplesTest {
     public void testFilterCanBeAnything() {
         TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("sum"){
             @Override
-            public Object apply(TemplateContext context, Object value, Object... params) {
+            public Object apply(Object value, TemplateContext context, Object... params) {
 
                 Object[] numbers = super.asArray(value, context);
 

@@ -53,12 +53,12 @@ public class MapTest {
         Filter filter = Filters.COMMON_FILTERS.get("map");
 
         Object[] rendered = (Object[]) filter.apply(
-                new TemplateContext(), new java.util.Map<?,?>[]{
+                new java.util.Map<?,?>[]{
                     Collections.singletonMap("a", 1),
                     Collections.singletonMap("a", 2),
                     Collections.singletonMap("a", 3),
                     Collections.singletonMap("a", 4),
-                },
+                }, new TemplateContext(),
                 "a"
         );
 

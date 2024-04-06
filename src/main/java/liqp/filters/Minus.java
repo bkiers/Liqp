@@ -14,7 +14,7 @@ public class Minus extends Filter {
      * subtraction
      */
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         if (!isNumber(value)) {
             value = 0;

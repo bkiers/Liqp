@@ -195,7 +195,7 @@ You can do that as follows:
  // first create template parser with new filter
 TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("b") {
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
         // create a string from the value
         String text = super.asString(value, context);
 
@@ -218,7 +218,7 @@ And to use an optional parameter in your filter, do something like this:
 // first create template parser with your filter
 TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("repeat"){
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
         // get the text of the value
         String text = super.asString(value, context);
 
@@ -249,7 +249,7 @@ You can use an array (or list) as well, and can also return a numerical value:
 ```java
 TemplateParser parser = new TemplateParser.Builder().withFilter((new Filter("sum"){
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         Object[] numbers = super.asArray(value, context);
 

@@ -10,7 +10,7 @@ public class Divided_By extends Filter {
      * division
      */
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         if(value == null) {
             value = 0L;

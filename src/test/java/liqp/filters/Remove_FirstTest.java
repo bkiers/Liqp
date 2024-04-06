@@ -48,7 +48,7 @@ public class Remove_FirstTest {
         TemplateContext context = new TemplateContext();
         Filter filter = Filters.COMMON_FILTERS.get("remove_first");
 
-        assertThat(filter.apply(context, "a a a a", "a "), is((Object)"a a a"));
+        assertThat(filter.apply("a a a a", context, "a "), is((Object)"a a a"));
         assertThat(TemplateParser.DEFAULT.parse("{{ 'a a a a' | remove_first: 'a ' }}").render(), is((Object)"a a a"));
     }
 }

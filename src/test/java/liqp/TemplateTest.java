@@ -307,7 +307,7 @@ public class TemplateTest {
         // given
         TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("sum"){
             @Override
-            public Object apply(TemplateContext context, Object value, Object... params) {
+            public Object apply(Object value, TemplateContext context, Object... params) {
                 Object[] numbers = super.asArray(value, context);
                 double sum = 0;
                 for(Object obj : numbers) {

@@ -11,7 +11,7 @@ public class Strip_HTML extends Filter {
      * Remove all HTML tags from the string
      */
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         String html = super.asString(value, context);
 

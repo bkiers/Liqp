@@ -153,7 +153,7 @@ public class RenderSettingsTest {
 
         TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("secret") {
                     @Override
-                    public Object apply(TemplateContext context, Object value, Object... params) {
+                    public Object apply(Object value, TemplateContext context, Object... params) {
                         ObjectAppender.Controller sb = context.newObjectAppender(3);
                         sb.append(value);
                         sb.append(" ");

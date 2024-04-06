@@ -13,7 +13,7 @@ public class Normalize_Whitespace extends Filter {
     }
 
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
         if (value == null) {
             return "";
         }

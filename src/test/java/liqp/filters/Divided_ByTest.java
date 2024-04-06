@@ -36,19 +36,19 @@ public class Divided_ByTest {
     @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid1() {
-        Filters.COMMON_FILTERS.get("divided_by").apply(null, 1);
+        Filters.COMMON_FILTERS.get("divided_by").apply(1, null);
     }
 
     @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid2() {
-        Filters.COMMON_FILTERS.get("divided_by").apply(null, 1, 2, 3);
+        Filters.COMMON_FILTERS.get("divided_by").apply(1, null, 2, 3);
     }
 
     @SuppressWarnings("deprecation")
     @Test(expected=RuntimeException.class)
     public void applyTestInvalid3() {
-        Filters.COMMON_FILTERS.get("divided_by").apply(null, 15L, 0L);
+        Filters.COMMON_FILTERS.get("divided_by").apply(15L, null, 0L);
     }
 
     /*
@@ -69,9 +69,9 @@ public class Divided_ByTest {
 
         Filter filter = Filters.COMMON_FILTERS.get("divided_by");
 
-        assertThat(filter.apply(null, 12L, 3L), is((Object)4L));
-        assertThat(filter.apply(null, 14L, 3L), is((Object)4L));
-        assertTrue(String.valueOf(filter.apply(null, 14L, 3.0)).matches("4[,.]6{10,}7"));
+        assertThat(filter.apply(12L, null, 3L), is((Object)4L));
+        assertThat(filter.apply(14L, null, 3L), is((Object)4L));
+        assertTrue(String.valueOf(filter.apply(14L, null, 3.0)).matches("4[,.]6{10,}7"));
 
         // see: applyTestInvalid3()
         // assert_template_result "Liquid error: divided by 0", "{{ 5 | divided_by:0 }}"

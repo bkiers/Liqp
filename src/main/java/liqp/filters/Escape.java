@@ -10,7 +10,7 @@ public class Escape extends Filter {
      * escape a string
      */
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         String str = super.asString(value, context);
 

@@ -47,10 +47,10 @@ public class Escape_OnceTest {
         final Filter filter = Filters.COMMON_FILTERS.get("escape_once");
 
         TemplateContext context = new TemplateContext();
-        assertThat(filter.apply(context, Filters.COMMON_FILTERS.get("escape").apply(context, "<strong>")
+        assertThat(filter.apply(Filters.COMMON_FILTERS.get("escape").apply("<strong>", context), context
         ), is((Object) "&lt;strong&gt;"));
 
         // the same test:
-        assertThat(filter.apply(context, "&lt;strong&gt;"), is((Object)"&lt;strong&gt;"));
+        assertThat(filter.apply("&lt;strong&gt;", context), is((Object)"&lt;strong&gt;"));
     }
 }

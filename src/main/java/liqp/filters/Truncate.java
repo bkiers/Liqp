@@ -10,7 +10,7 @@ public class Truncate extends Filter {
      * Truncate a string down to x characters
      */
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         if (value == null) {
             return "";

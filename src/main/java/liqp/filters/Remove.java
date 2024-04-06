@@ -10,7 +10,7 @@ public class Remove extends Filter {
      * remove a substring
      */
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         String original = super.asString(value, context);
 

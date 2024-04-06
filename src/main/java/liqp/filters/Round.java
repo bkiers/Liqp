@@ -9,7 +9,7 @@ import liqp.PlainBigDecimal;
 public class Round extends Filter {
 
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         if (!super.canBeDouble(value)) {
             return 0;

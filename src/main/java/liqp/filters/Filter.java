@@ -50,12 +50,12 @@ public abstract class Filter extends LValue {
     /**
      * Applies the filter on the 'value', with the given 'context'.
      *
-     * @param context the template context.
      * @param value   the string value `AAA` in: `{{ 'AAA' | f:1,2,3 }}`
+     * @param context the template context.
      * @param params  the values [1, 2, 3] in: `{{ 'AAA' | f:1,2,3 }}`
      * @return the result of the filter.
      */
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         return value;
     }

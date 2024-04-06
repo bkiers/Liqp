@@ -18,7 +18,7 @@ public class FilterTest {
 
         TemplateParser parser = new TemplateParser.Builder().withFilter(new Filter("textilize") {
             @Override
-            public Object apply(TemplateContext context, Object value, Object... params) {
+            public Object apply(Object value, TemplateContext context, Object... params) {
                 String s = super.asString(value, context).trim();
                 return "<b>" + s.substring(1, s.length() - 1) + "</b>";
             }

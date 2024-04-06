@@ -7,7 +7,7 @@ import java.util.Arrays;
 public class Slice extends Filter {
 
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         super.checkParams(params,1, 2);
 

@@ -47,9 +47,9 @@ public class Strip_HTMLTest {
         TemplateContext context = new TemplateContext();
         Filter filter = Filters.COMMON_FILTERS.get("strip_html");
 
-        assertThat(filter.apply(context, "<div>test</div>"), is((Object)"test"));
-        assertThat(filter.apply(context, "<div id='test'>test</div>"), is((Object)"test"));
-        assertThat(filter.apply(context, "<script type='text/javascript'>document.write('some stuff');</script>"), is((Object)""));
-        assertThat(filter.apply(context, null), is((Object)""));
+        assertThat(filter.apply("<div>test</div>", context), is((Object)"test"));
+        assertThat(filter.apply("<div id='test'>test</div>", context), is((Object)"test"));
+        assertThat(filter.apply("<script type='text/javascript'>document.write('some stuff');</script>", context), is((Object)""));
+        assertThat(filter.apply(null, context), is((Object)""));
     }
 }

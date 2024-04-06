@@ -51,9 +51,9 @@ public class TruncateTest {
         TemplateContext context = new TemplateContext();
         final Filter filter = Filters.COMMON_FILTERS.get("truncate");
 
-        assertThat(filter.apply(context, "1234567890", 7), is((Object)"1234..."));
-        assertThat(filter.apply(context, "1234567890", 20), is((Object)"1234567890"));
-        assertThat(filter.apply(context, "1234567890", 0), is((Object)"..."));
-        assertThat(filter.apply(context, "1234567890"), is((Object)"1234567890"));
+        assertThat(filter.apply("1234567890", context, 7), is((Object)"1234..."));
+        assertThat(filter.apply("1234567890", context, 20), is((Object)"1234567890"));
+        assertThat(filter.apply("1234567890", context, 0), is((Object)"..."));
+        assertThat(filter.apply("1234567890", context), is((Object)"1234567890"));
     }
 }

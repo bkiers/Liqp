@@ -29,7 +29,7 @@ public class Where extends Filter {
     }
 
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
         WhereImpl delegate;
         if (context.getParser().liquidStyleInclude) {
             checkParams(params, 1, 2);

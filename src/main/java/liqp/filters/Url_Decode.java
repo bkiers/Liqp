@@ -7,7 +7,7 @@ import java.net.URLDecoder;
 public class Url_Decode extends Filter {
 
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         try {
             return URLDecoder.decode(super.asString(value, context), "UTF-8");

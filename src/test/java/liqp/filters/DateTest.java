@@ -117,34 +117,34 @@ public class DateTest {
         TemplateContext context = new TemplateContext();
         final Filter filter = dateFilterSetting.filters.get("date");
 
-        assertThat(filter.apply(context, "Fri Jul 16 01:00:00 2004", "%m/%d/%Y"), is((Object)"07/16/2004"));
+        assertThat(filter.apply("Fri Jul 16 01:00:00 2004", context, "%m/%d/%Y"), is((Object)"07/16/2004"));
 
-        assertThat(filter.apply(context, "Fri Jul 16 01:00 2004", "%m/%d/%Y"), is((Object)"07/16/2004"));
+        assertThat(filter.apply("Fri Jul 16 01:00 2004", context, "%m/%d/%Y"), is((Object)"07/16/2004"));
 
-        assertThat(filter.apply(context, seconds("2006-05-05 10:00:00"), "%B"), is((Object)"May"));
-        assertThat(filter.apply(context, seconds("2006-06-05 10:00:00"), "%B"), is((Object)"June"));
-        assertThat(filter.apply(context, seconds("2006-07-05 10:00:00"), "%B"), is((Object)"July"));
+        assertThat(filter.apply(seconds("2006-05-05 10:00:00"), context, "%B"), is((Object)"May"));
+        assertThat(filter.apply(seconds("2006-06-05 10:00:00"), context, "%B"), is((Object)"June"));
+        assertThat(filter.apply(seconds("2006-07-05 10:00:00"), context, "%B"), is((Object)"July"));
 
-        assertThat(filter.apply(context, "2006-05-05 10:00:00", "%B"), is((Object)"May"));
-        assertThat(filter.apply(context, "2006-06-05 10:00:00", "%B"), is((Object)"June"));
-        assertThat(filter.apply(context, "2006-07-05 10:00:00", "%B"), is((Object)"July"));
+        assertThat(filter.apply("2006-05-05 10:00:00", context, "%B"), is((Object)"May"));
+        assertThat(filter.apply("2006-06-05 10:00:00", context, "%B"), is((Object)"June"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context, "%B"), is((Object)"July"));
 
-        assertThat(filter.apply(context, "2006-07-05 10:00:00", ""), is((Object)"2006-07-05 10:00:00"));
-        assertThat(filter.apply(context, "2006-07-05 10:00:00"), is((Object)"2006-07-05 10:00:00"));
-        assertThat(filter.apply(context, "2006-07-05 10:00:00", (Object)null), is((Object)"2006-07-05 10:00:00"));
-        assertThat(filter.apply(context, "2006-07-05 10:00:00", (Object[])null), is((Object)"2006-07-05 10:00:00"));
-        assertThat(filter.apply(context, "2006-07-05 10:00:00", new Object[0]), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context, ""), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context, (Object)null), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context, (Object[])null), is((Object)"2006-07-05 10:00:00"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context, new Object[0]), is((Object)"2006-07-05 10:00:00"));
 
-        assertThat(filter.apply(context, "2006-07-05 10:00:00", "%m/%d/%Y"), is((Object)"07/05/2006"));
+        assertThat(filter.apply("2006-07-05 10:00:00", context, "%m/%d/%Y"), is((Object)"07/05/2006"));
 
-        assertThat(filter.apply(context, null, "%B"), is((Object)null));
+        assertThat(filter.apply(null, context, "%B"), is((Object)null));
 
-        assertThat(filter.apply(context, 1152098955, "%m/%d/%Y"), is((Object)"07/05/2006"));
-        assertThat(filter.apply(context, "1152098955", "%m/%d/%Y"), is((Object)"07/05/2006"));
+        assertThat(filter.apply(1152098955, context, "%m/%d/%Y"), is((Object)"07/05/2006"));
+        assertThat(filter.apply("1152098955", context, "%m/%d/%Y"), is((Object)"07/05/2006"));
         TemplateParser parser = new TemplateParser.Builder().withFlavor(Flavor.LIQUID).withDefaultTimeZone(ZoneOffset.UTC).build();
         TemplateContext anotherZone = new TemplateContext(parser, new LinkedHashMap<>());
-        assertThat(filter.apply(anotherZone, "1152098955", "%H"), is((Object)"11"));
-        assertThat(filter.apply(anotherZone, 1152098955, "%H"), is((Object)"11"));
+        assertThat(filter.apply("1152098955", anotherZone, "%H"), is((Object)"11"));
+        assertThat(filter.apply(1152098955, anotherZone, "%H"), is((Object)"11"));
     }
 
     private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
@@ -188,7 +188,7 @@ public class DateTest {
 
         // then
         TemplateContext context = new TemplateContext();
-        assertThat(parser.filters.get("date").apply(context, customDate, "%m/%d/%Y"), is(
+        assertThat(parser.filters.get("date").apply(customDate, context, "%m/%d/%Y"), is(
                 (Object) "07/05/2006"));
     }
 
@@ -199,7 +199,7 @@ public class DateTest {
         // String val = "2021-01-27 00:00:00 EST";
 
         // when
-        Object res = dateFilterSetting.filters.get("date").apply(new TemplateContext(), val,
+        Object res = dateFilterSetting.filters.get("date").apply(val, new TemplateContext(),
                 "%Y-%m-%d %H:%M:%S %z");
 
         // then

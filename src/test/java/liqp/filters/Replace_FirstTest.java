@@ -53,7 +53,7 @@ public class Replace_FirstTest {
         TemplateContext context = new TemplateContext();
         Filter filter = Filters.COMMON_FILTERS.get("replace_first");
 
-        assertThat(filter.apply(context, "a a a a", "a", "b"), is((Object)"b a a a"));
+        assertThat(filter.apply("a a a a", context, "a", "b"), is((Object)"b a a a"));
         assertThat(TemplateParser.DEFAULT.parse("{{ 'a a a a' | replace_first: 'a', 'b' }}").render(), is("b a a a"));
     }
 }

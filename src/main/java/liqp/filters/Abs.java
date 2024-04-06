@@ -24,7 +24,7 @@ public class Abs extends Filter {
       end
      */
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         if (super.isInteger(value) || super.canBeInteger(value)) {
             return Math.abs(super.asNumber(value).longValue());

@@ -44,7 +44,7 @@ public class LastTest {
         TemplateContext context = new TemplateContext();
         Filter filter = Filters.COMMON_FILTERS.get("last");
 
-        assertThat(filter.apply(context, new Integer[]{1, 2, 3}), is((Object)3));
-        assertThat(filter.apply(context, new Integer[]{}), is((Object)null));
+        assertThat(filter.apply(new Integer[]{1, 2, 3}, context), is((Object)3));
+        assertThat(filter.apply(new Integer[]{}, context), is((Object)null));
     }
 }

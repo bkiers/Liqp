@@ -39,7 +39,7 @@ public class CapitalizeTest {
         Filter filter = Filters.COMMON_FILTERS.get("capitalize");
 
         TemplateContext context = new TemplateContext();
-        assertThat(filter.apply(context, "testing"), is((Object)"Testing"));
-        assertThat(filter.apply(context, null), is((Object)""));
+        assertThat(filter.apply("testing", context), is((Object)"Testing"));
+        assertThat(filter.apply(null, context), is((Object)""));
     }
 }

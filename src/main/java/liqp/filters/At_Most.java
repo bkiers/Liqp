@@ -5,7 +5,7 @@ import liqp.TemplateContext;
 public class At_Most extends Filter {
 
     @Override
-    public Object apply(TemplateContext context, Object value, Object... params) {
+    public Object apply(Object value, TemplateContext context, Object... params) {
 
         if (params == null || params.length == 0) {
             return value;

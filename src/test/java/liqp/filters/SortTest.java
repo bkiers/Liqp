@@ -59,7 +59,7 @@ public class SortTest {
 
         Filter filter = Filters.COMMON_FILTERS.get("sort");
 
-        assertThat(filter.apply(context, new Integer[]{4,3,2,1}), is((Object)new Integer[]{1,2,3,4}));
+        assertThat(filter.apply(new Integer[]{4,3,2,1}, context), is((Object)new Integer[]{1,2,3,4}));
 
         java.util.Map<?,?>[] unsorted = new java.util.Map[]{
             Collections.singletonMap("a", 4),
@@ -68,7 +68,7 @@ public class SortTest {
             Collections.singletonMap("a", 1),
         };
 
-        java.util.Map<?,?>[] sorted = (Sort.SortableMap[])filter.apply(context, unsorted, "a");
+        java.util.Map<?,?>[] sorted = (Sort.SortableMap[])filter.apply(unsorted, context, "a");
 
         java.util.Map<?,?>[] expected = new java.util.Map[]{
             Collections.singletonMap("a", 1),
@@ -104,7 +104,7 @@ public class SortTest {
                 new Pojo(4), new Pojo(3), new Pojo(2), new Pojo(1)
         };
 
-        java.util.Map<?,?>[] sorted = (Sort.SortableMap[]) filter.apply(context, unsortedIns, "a");
+        java.util.Map<?,?>[] sorted = (Sort.SortableMap[]) filter.apply(unsortedIns, context, "a");
         java.util.Map<?,?>[] expected = new java.util.Map[]{
             Collections.singletonMap("a", 1),
             Collections.singletonMap("a", 2),
@@ -136,7 +136,7 @@ public class SortTest {
                 new PojoWithSupport(4), new PojoWithSupport(3), new PojoWithSupport(2), new PojoWithSupport(1)
         };
 
-        java.util.Map<?,?>[] sorted = (Sort.SortableMap[]) filter.apply(context, unsortedIns, "a");
+        java.util.Map<?,?>[] sorted = (Sort.SortableMap[]) filter.apply(unsortedIns, context, "a");
         java.util.Map<?,?>[] expected = new java.util.Map[]{
             Collections.singletonMap("a", 1),
             Collections.singletonMap("a", 2),

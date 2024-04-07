@@ -78,6 +78,9 @@ public class TemplateParser {
     public final boolean showExceptionsFromInclude;
     public final TemplateParser.EvaluateMode evaluateMode;
     public final Locale locale;
+    /**
+     * Never null, if empty - system default timezone is used.
+     */
     public final ZoneId defaultTimeZone;
     private final RenderTransformer renderTransformer;
     private final Consumer<Map<String, Object>> environmentMapConfigurator;

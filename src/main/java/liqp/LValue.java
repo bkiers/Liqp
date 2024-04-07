@@ -7,6 +7,7 @@ import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
+import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -194,7 +195,23 @@ public abstract class LValue {
         return new Object[]{sec, min, hour, day, month, year, wday, yday, isdst, zone};
     }
 
-    public static ZonedDateTime asTemporal(Object value, TemplateContext context) {
+    /**
+     * This one keeps an original temporal type as is, while `asRubyDate` converts it to ZonedDateTime.
+     */
+    public static TemporalAccessor asTemporal(Object value, TemplateContext context) {
+        ZonedDateTime time = ZonedDateTime.now();
+        if (value instanceof TemporalAccessor) {
+            return (TemporalAccessor) value;
+        } else if (CustomDateFormatRegistry.isCustomDateType(value)) {
+            time = CustomDateFormatRegistry.getFromCustomType(value);
+        }
+        return time;
+    }
+
+    /**
+     * Ruby have a single date type, and its equivalent is ZonedDateTime.
+     */
+    public static ZonedDateTime asRubyDate(Object value, TemplateContext context) {
         ZonedDateTime time = ZonedDateTime.now();
         if (value instanceof TemporalAccessor) {
             time = getZonedDateTimeFromTemporalAccessor((TemporalAccessor) value, context.getParser().defaultTimeZone);
@@ -306,7 +323,7 @@ public abstract class LValue {
         }
 
         if (isTemporal(value)) {
-            ZonedDateTime time = asTemporal(value, context);
+            ZonedDateTime time = asRubyDate(value, context);
             return rubyDateTimeFormat.format(time);
         }
 
@@ -339,7 +356,7 @@ public abstract class LValue {
         }
 
         if (isTemporal(value)) {
-            ZonedDateTime time = asTemporal(value, context);
+            ZonedDateTime time = asRubyDate(value, context);
             return rubyDateTimeFormat.format(time);
         }
 
@@ -380,7 +397,7 @@ public abstract class LValue {
      * @return true iff `value` is a whole number (Integer or Long).
      */
     public boolean isInteger(Object value) {
-        return value != null && (value instanceof Long || value instanceof Integer);
+        return (value instanceof Long || value instanceof Integer);
     }
 
     /**

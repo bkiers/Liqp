@@ -9,6 +9,7 @@ import ua.co.k.strftime.StrftimeFormatter;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 
 import static liqp.filters.date.Parser.datePatterns;
@@ -35,7 +36,7 @@ public class Date extends Filter {
             value = asArray(value, context)[0];
         }
         try {
-            final ZonedDateTime compatibleDate;
+            final TemporalAccessor compatibleDate;
             String valAsString = super.asString(value, context);
             if ("now".equals(valAsString) || "today".equals(valAsString)) {
                 compatibleDate = ZonedDateTime.now();

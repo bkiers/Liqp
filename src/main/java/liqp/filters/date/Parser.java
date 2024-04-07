@@ -1,8 +1,6 @@
 package liqp.filters.date;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.TemporalAccessor;
@@ -12,13 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
-import static java.time.temporal.ChronoField.HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
-import static java.time.temporal.ChronoField.NANO_OF_SECOND;
-import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
-import static java.time.temporal.ChronoField.YEAR;
+import static java.time.temporal.ChronoField.*;
+import static java.time.temporal.ChronoField.INSTANT_SECONDS;
 
 public class Parser {
 
@@ -37,28 +30,74 @@ public class Parser {
     public static List<String> datePatterns = new ArrayList<>();
 
     static {
-        datePatterns.add("yyyy-MM-dd HH:mm:ss");
-        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss");
-        datePatterns.add("yyyy-MM-dd HH:mm:ss Z");
-        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss Z");
-        datePatterns.add("yyyy-MM-dd HH:mm:ss X");
-        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss X");
-        datePatterns.add("yyyy-MM-dd HH:mm:ss z");
-        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss z");
+
         datePatterns.add("EEE MMM dd hh:mm:ss yyyy");
-
-        datePatterns.add("yyyy-MM-dd HH:mm");
-        datePatterns.add("yyyy-MM-dd'T'HH:mm");
-        datePatterns.add("yyyy-MM-dd HH:mm Z");
-        datePatterns.add("yyyy-MM-dd'T'HH:mm Z");
-        datePatterns.add("yyyy-MM-dd HH:mm X");
-        datePatterns.add("yyyy-MM-dd'T'HH:mm X");
-        datePatterns.add("yyyy-MM-dd HH:mm z");
-        datePatterns.add("yyyy-MM-dd'T'HH:mm z");
         datePatterns.add("EEE MMM dd hh:mm yyyy");
-
         datePatterns.add("yyyy-MM-dd");
         datePatterns.add("dd-MM-yyyy");
+
+        // this is section without `T`, change here and do same change in section below with `T`
+        datePatterns.add("yyyy-MM-dd HH:mm");
+        datePatterns.add("yyyy-MM-dd HH:mm X");
+        datePatterns.add("yyyy-MM-dd HH:mm Z");
+        datePatterns.add("yyyy-MM-dd HH:mm z");
+        datePatterns.add("yyyy-MM-dd HH:mm'Z'");
+
+        datePatterns.add("yyyy-MM-dd HH:mm:ss");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss X");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss Z");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss z");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss'Z'");
+
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSS");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSS X");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSS Z");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSS z");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSS'Z'");
+
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSSSSS");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSSSSS X");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSSSSS Z");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSSSSS z");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSSSSS'Z'");
+
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSSSSSSSS");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSSSSSSSS X");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSSSSSSSS Z");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSSSSSSSS z");
+        datePatterns.add("yyyy-MM-dd HH:mm:ss.SSSSSSSSS'Z'");
+
+        // this is section with `T`
+        datePatterns.add("yyyy-MM-dd'T'HH:mm");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm X");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm Z");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm z");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm'Z'");
+
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss X");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss Z");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss z");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSS X");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSS Z");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSS z");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSSSSS X");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSSSSS Z");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSSSSS z");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'");
+
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS X");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS Z");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS z");
+        datePatterns.add("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'");
+
     }
 
     public static ZonedDateTime parse(String str, Locale locale, ZoneId defaultZone) {
@@ -86,31 +125,46 @@ public class Parser {
      * Follow ruby rules: if some datetime part is missing,
      * the default is taken from `now` with default zone
      */
-    public static ZonedDateTime getZonedDateTimeFromTemporalAccessor(TemporalAccessor temporalAccessor, ZoneId defaultZone) {
-        if (temporalAccessor instanceof ZonedDateTime) {
-            return (ZonedDateTime) temporalAccessor;
+    public static ZonedDateTime getZonedDateTimeFromTemporalAccessor(TemporalAccessor temporal, ZoneId defaultZone) {
+        if (temporal == null) {
+            return ZonedDateTime.now(defaultZone);
         }
-        LocalDateTime now = LocalDateTime.now();
-        TemporalField[] copyThese = new TemporalField[]{
-                YEAR,
-                MONTH_OF_YEAR,
-                DAY_OF_MONTH,
-                HOUR_OF_DAY,
-                MINUTE_OF_HOUR,
-                SECOND_OF_MINUTE,
-                NANO_OF_SECOND
-        };
-        for (TemporalField tf: copyThese) {
-            if (temporalAccessor.isSupported(tf)) {
-                now = now.with(tf, temporalAccessor.get(tf));
-            }
+        if (temporal instanceof ZonedDateTime) {
+            return (ZonedDateTime) temporal;
+        }
+        if (temporal instanceof Instant) {
+            return ZonedDateTime.ofInstant((Instant) temporal, defaultZone);
         }
 
-        ZoneId zoneId = temporalAccessor.query(TemporalQueries.zone());
+        ZoneId zoneId = temporal.query(TemporalQueries.zone());
         if (zoneId == null) {
-            zoneId = defaultZone;
-        }
+            LocalDate date = temporal.query(TemporalQueries.localDate());
+            LocalTime time = temporal.query(TemporalQueries.localTime());
 
-        return now.atZone(zoneId);
+            if (date == null) {
+                date = LocalDate.now(defaultZone);
+            }
+            if (time == null) {
+                time = LocalTime.now(defaultZone);
+            }
+            return ZonedDateTime.of(date, time, defaultZone);
+        } else {
+            LocalDateTime now = LocalDateTime.now(zoneId);
+            TemporalField[] copyThese = new TemporalField[]{
+                    YEAR,
+                    MONTH_OF_YEAR,
+                    DAY_OF_MONTH,
+                    HOUR_OF_DAY,
+                    MINUTE_OF_HOUR,
+                    SECOND_OF_MINUTE,
+                    NANO_OF_SECOND
+            };
+            for (TemporalField tf: copyThese) {
+                if (temporal.isSupported(tf)) {
+                    now = now.with(tf, temporal.get(tf));
+                }
+            }
+            return now.atZone(zoneId);
+        }
     }
 }

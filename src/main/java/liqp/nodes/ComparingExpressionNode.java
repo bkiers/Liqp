@@ -11,10 +11,18 @@ public abstract class ComparingExpressionNode extends LValue implements LNode {
     protected final LNode rhs;
     private final boolean relative;
 
-    public ComparingExpressionNode(LNode lhs, LNode rhs, boolean realtive) {
+    /**
+     *
+     * @param lhs - left-hand side
+     * @param rhs - right-hand side
+     * @param relative - expressions are two kinds:
+     *                 relative(>, >=, <, <=)
+     *                 and equality (==, <>, !=) and rules for comparing them different.
+     */
+    public ComparingExpressionNode(LNode lhs, LNode rhs, boolean relative) {
         this.lhs = lhs;
         this.rhs = rhs;
-        this.relative = realtive;
+        this.relative = relative;
     }
 
     @Override
@@ -41,10 +49,10 @@ public abstract class ComparingExpressionNode extends LValue implements LNode {
         Object a = lhs.render(context);
         Object b = rhs.render(context);
         if (isTemporal(a)) {
-            a = asTemporal(a, context);
+            a = asRubyDate(a, context);
         }
         if (isTemporal(b)) {
-            b = asTemporal(b, context);
+            b = asRubyDate(b, context);
         }
 
         if (a instanceof Number) {

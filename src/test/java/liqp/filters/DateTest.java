@@ -225,4 +225,12 @@ public class DateTest {
         assertEquals("10-13", TemplateParser.DEFAULT.parse("{{ \"2022-10-13\" | date: \"%m-%e\" }}").render());
         assertEquals("10-13", TemplateParser.DEFAULT.parse("{{ \"13-10-2022\" | date: \"%m-%e\" }}").render());
     }
+
+    @Test
+    public void test298InstantWhenEpochBeginAtUTC() {
+        Instant instant = Instant.ofEpochSecond(0);
+        TemplateParser parser = new TemplateParser.Builder().withDefaultTimeZone(ZoneOffset.UTC).build();
+        String res = parser.parse("{{ val }}").render("val", instant);
+        assertEquals("1970-01-01 00:00:00 Z", res);
+    }
 }

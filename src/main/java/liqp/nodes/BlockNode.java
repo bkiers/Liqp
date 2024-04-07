@@ -1,17 +1,13 @@
 package liqp.nodes;
 
-import static liqp.LValue.BREAK;
-import static liqp.LValue.CONTINUE;
-import static liqp.LValue.asTemporal;
-import static liqp.LValue.isTemporal;
-import static liqp.LValue.rubyDateTimeFormat;
-
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import liqp.RenderTransformer.ObjectAppender;
 import liqp.TemplateContext;
+
+import static liqp.LValue.*;
 
 public class BlockNode implements LNode {
 
@@ -67,7 +63,7 @@ public class BlockNode implements LNode {
 
     private Object postprocess(Object value, TemplateContext context) {
         if (isTemporal(value)) {
-            ZonedDateTime time = asTemporal(value, context);
+            ZonedDateTime time = asRubyDate(value, context);
             return rubyDateTimeFormat.format(time);
         } else {
             return value;

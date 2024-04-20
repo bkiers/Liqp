@@ -374,6 +374,16 @@ public class LiquidParserTest {
         );
 
         assertThat(
+                texts("{% include some-file.ext with mu %}", "include_tag", true),
+                equalTo(array("{%", "include", "some-file.ext", "with", "mu", "%}"))
+        );
+
+        assertThat(
+                texts("{% include 'some-file.ext' with 'mu' %}", "include_tag", true),
+                equalTo(array("{%", "include", "'some-file.ext'", "with", "'mu'", "%}"))
+        );
+
+        assertThat(
                 texts("{% include {{variable}} %}", "include_tag", false),
                 equalTo(array("{%", "include", "{{variable}}", "%}"))
         );

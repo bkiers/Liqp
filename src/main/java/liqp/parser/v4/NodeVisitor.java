@@ -458,10 +458,10 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
     if (ctx.jekyll != null) {
       return getJekyllIncludeInsertionNode("include", ctx.file_name_or_output(), ctx.jekyll_include_params());
     } else if (ctx.liquid != null) {
-      if (ctx.Str() != null) {
-        return new InsertionNode(insertions.get("include"), visit(ctx.expr()), new AtomNode(strip(ctx.Str().getText())));
+      if (ctx.With() != null) {
+        return new InsertionNode(insertions.get("include"), visit(ctx.expr(0)), visit(ctx.expr(1)));
       } else {
-        return new InsertionNode(insertions.get("include"), visit(ctx.expr()));
+        return new InsertionNode(insertions.get("include"), visit(ctx.expr(0)));
       }
     }
     throw new LiquidException("Unknown syntax of `Include` tag", ctx);

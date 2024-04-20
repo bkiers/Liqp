@@ -202,7 +202,7 @@ capture_tag
  ;
 
 include_tag
- : {isLiquidStyleInclude()}? TagStart liquid=Include expr (With Str)? TagEnd
+ : {isLiquidStyleInclude()}? TagStart liquid=Include expr (With expr)? TagEnd
  | {isJekyllStyleInclude()}? TagStart jekyll=Include file_name_or_output (jekyll_include_params)* TagEnd
  ;
 

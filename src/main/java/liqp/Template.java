@@ -58,7 +58,7 @@ public class Template {
         Set<String> tagNames = this.templateParser.insertions.getTagNames();
 
         this.templateSize = stream.size();
-        LiquidLexer lexer = new LiquidLexer(stream, this.templateParser.isStripSpacesAroundTags(),
+        LiquidLexer lexer = new LiquidLexer(stream, this.templateParser.liquidStyleInclude, this.templateParser.isStripSpacesAroundTags(),
                 this.templateParser.isStripSingleLine(), blockNames, tagNames);
         this.sourceLocation = location;
         try {

@@ -34,7 +34,7 @@ public final class TestUtils {
     public static LNode getNode(String source, String rule, TemplateParser templateParser)
         throws Exception {
 
-        LiquidLexer lexer = new LiquidLexer(CharStreams.fromString("{{ " + source + " }}"));
+        LiquidLexer lexer = new LiquidLexer(CharStreams.fromString("{{ " + source + " }}"), templateParser.liquidStyleInclude, templateParser.stripSpacesAroundTags);
         LiquidParser parser = new LiquidParser(new CommonTokenStream(lexer), templateParser.liquidStyleInclude, templateParser.evaluateInOutputTag, templateParser.errorMode);
 
         LiquidParser.OutputContext root = parser.output();

@@ -1,6 +1,7 @@
 lexer grammar LiquidLexer;
 
 @lexer::members {
+  private boolean liquidStyleInclude = true;
   private boolean stripSpacesAroundTags = false;
   private boolean stripSingleLine = false;
   private java.util.LinkedList<Token> tokens = new java.util.LinkedList<>();
@@ -8,16 +9,25 @@ lexer grammar LiquidLexer;
   private java.util.Set<String> tags = new java.util.HashSet<String>();
   private java.util.Stack<String> customBlockState = new java.util.Stack<String>();
 
-  public LiquidLexer(CharStream charStream, boolean stripSpacesAroundTags, java.util.Set<String> blocks, java.util.Set<String> tags) {
-    this(charStream, stripSpacesAroundTags, false, blocks, tags);
+  private boolean isLiquidStyleInclude(){
+    return liquidStyleInclude;
   }
 
-  public LiquidLexer(CharStream charStream, boolean stripSpacesAroundTags) {
-    this(charStream, stripSpacesAroundTags, false, new java.util.HashSet<String>(), new java.util.HashSet<String>());
+  private boolean isJekyllStyleInclude(){
+    return !liquidStyleInclude;
   }
 
-  public LiquidLexer(CharStream charStream, boolean stripSpacesAroundTags, boolean stripSingleLine, java.util.Set<String> blocks, java.util.Set<String> tags) {
+  public LiquidLexer(CharStream charStream, boolean isLiquidStyleInclude, boolean stripSpacesAroundTags, java.util.Set<String> blocks, java.util.Set<String> tags) {
+    this(charStream, isLiquidStyleInclude, stripSpacesAroundTags, false, blocks, tags);
+  }
+
+  public LiquidLexer(CharStream charStream, boolean isLiquidStyleInclude, boolean stripSpacesAroundTags) {
+    this(charStream, isLiquidStyleInclude, stripSpacesAroundTags, false, new java.util.HashSet<String>(), new java.util.HashSet<String>());
+  }
+
+  public LiquidLexer(CharStream charStream, boolean isLiquidStyleInclude, boolean stripSpacesAroundTags, boolean stripSingleLine, java.util.Set<String> blocks, java.util.Set<String> tags) {
     this(charStream);
+    this.liquidStyleInclude = isLiquidStyleInclude;
     this.stripSpacesAroundTags = stripSpacesAroundTags;
     this.stripSingleLine = stripSingleLine;
     this.blocks = blocks;
@@ -206,14 +216,16 @@ mode IN_TAG_ID;
     // otherwise it is an invalid tag
     // BUT it also can be programed manually, so even if not supported flavour, we must respect
     // user-defined tags OR blocks
-    String text = getText();
-    if (blocks.contains(text)) {
-       setType(BlockId);
-       customBlockState.push(text);
-     } else if (tags.contains(text)) {
-       setType(SimpleTagId);
-     } else {
-       setType(InvalidTagId);
+    if (isLiquidStyleInclude()) {
+      String text = getText();
+      if (blocks.contains(text)) {
+         setType(BlockId);
+         customBlockState.push(text);
+       } else if (tags.contains(text)) {
+         setType(SimpleTagId);
+       } else {
+         setType(InvalidTagId);
+       }
      }
   } -> popMode;
 

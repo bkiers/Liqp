@@ -68,6 +68,19 @@ public class LiquidParserTest {
         );
 
         assertThat(
+                "tag parameters are concatenated into one String by texts()",
+                texts("{% mu for foo as bar %}", "simple_tag", emptySet, muSet),
+                equalTo(array("{%", "mu", "forfooasbar", "%}"))
+        );
+
+        ParseTree tree = parse("{% mu for foo as bar %}", "simple_tag", emptySet, muSet);
+        assertThat(
+                "tag parameters are parsed as separate nodes",
+                texts(tree.getChild(2).getChild(0)),
+                equalTo(array("for", "foo", "as", "bar"))
+        );
+
+        assertThat(
                 texts("{% mu %} . {% endmu %}", "other_tag", muSet, emptySet),
                 equalTo(array("{%", "mu", "%}", " . ", "{%", "endmu", "%}"))
         );

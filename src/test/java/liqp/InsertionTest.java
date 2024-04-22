@@ -79,6 +79,24 @@ public class InsertionTest {
     }
 
     @Test
+    public void testCustomTagParameters() throws RecognitionException {
+
+        TemplateParser parser = new TemplateParser.Builder().withTag(new Tag("multiply") {
+            @Override
+            public Object render(TemplateContext context, LNode... nodes) {
+                Double number1 = super.asNumber(nodes[0].render(context)).doubleValue();
+                Double number2 = super.asNumber(nodes[1].render(context)).doubleValue();
+                return number1 * number2;
+            }
+        }).build();
+
+        Template template = parser.parse("{% multiply 2 4 %}");
+        String rendered = String.valueOf(template.render());
+
+        assertThat(rendered, is("8.0"));
+    }
+
+    @Test
     public void testCustomTagBlock() throws RecognitionException {
         TemplateParser templateParser = new TemplateParser.Builder().withBlock(new Block("twice") {
             @Override

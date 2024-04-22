@@ -16,6 +16,7 @@ import java.util.stream.Stream;
 import liquid.parser.v4.LiquidParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import liqp.Insertion;
@@ -194,9 +195,10 @@ public class NodeVisitor extends LiquidParserBaseVisitor<LNode> {
     List<LNode> expressions = new ArrayList<LNode>();
 
     if (ctx.other_tag_parameters() != null) {
-      expressions.add(new AtomNode(ctx.other_tag_parameters().getText()));
+      for (ParseTree child : ctx.other_tag_parameters().other_than_tag_end().children) {
+        expressions.add(new AtomNode(child.getText()));
+      }
     }
-
     return new InsertionNode(insertions.get(ctx.SimpleTagId().getText()), expressions.toArray(new LNode[expressions.size()]));
   }
 

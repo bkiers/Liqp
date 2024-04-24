@@ -493,6 +493,23 @@ public class LiquidLexerTest {
         assertThat(tokenise("{%include").get(1).getType(), is(LiquidLexer.Include));
     }
 
+    // IncludeRelative : 'include_relative' { conditional };
+    @Test
+    public void testIncludeRelative() {
+        assertThat("tag 'include_relative' is defined only in Jekyll style",
+            tokenise("{%include_relative").get(1).getType(), is(LiquidLexer.InvalidTagId));
+    }
+
+    @Test
+    public void testIncludeRelativeCustomTag() {
+        HashSet<String> tags = new HashSet<>();
+        tags.add("include_relative");
+        List<Token> tokens = tokenise("{%include_relative%}", new HashSet<String>(), tags);
+
+        assertThat("Custom tag or block 'include_relative' can be defined in Liquid style",
+            tokens.get(1).getType(), is(LiquidLexer.SimpleTagId));
+    }
+
     //   With         : 'with';
     @Test
     public void testWith() {
@@ -598,26 +615,9 @@ public class LiquidLexerTest {
         return tokens;
     }
 
-    static CommonTokenStream commonTokenStream(String source) {
-        return commonTokenStream(source, false);
-    }
-
     static CommonTokenStream commonTokenStream(String source, boolean stripSpacesAroundTags, Set<String> blocks, Set<String> tags) {
-
-        LiquidLexer lexer = new LiquidLexer(CharStreams.fromString(source), stripSpacesAroundTags, blocks, tags);
-
-        lexer.addErrorListener(new BaseErrorListener(){
-            @Override
-            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        return new CommonTokenStream(lexer);
-    }
-
-    static CommonTokenStream commonTokenStream(String source, boolean stripSpacesAroundTags) {
-        LiquidLexer lexer = new LiquidLexer(CharStreams.fromString(source), stripSpacesAroundTags);
+        boolean isLiquidStyleInclude = true; // No tests for Jekyll style of includes, yet
+        LiquidLexer lexer = new LiquidLexer(CharStreams.fromString(source), isLiquidStyleInclude, stripSpacesAroundTags, blocks, tags);
 
         lexer.addErrorListener(new BaseErrorListener(){
             @Override
@@ -628,4 +628,5 @@ public class LiquidLexerTest {
 
         return new CommonTokenStream(lexer);
     }
+
 }

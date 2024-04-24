@@ -28,7 +28,9 @@ public class IncludeTest {
                 "{% include 'color' with 'red' %}\n" +
                 "{% include 'color' with 'blue' %}\n" +
                 "{% assign shape = 'square' %}\n" +
-                "{% include 'color' with 'red' %}";
+                "{% include 'color' with 'red' %}\n" +
+                "{%- assign cVar = 'yellow' %}\n" +
+                "{% include 'color' with cVar %}";
 
         Template template = TemplateParser.DEFAULT.parse(source);
 
@@ -43,6 +45,8 @@ public class IncludeTest {
                 "shape: 'circle'\n" +
                 "\n" +
                 "color: 'red'\n" +
+                "shape: 'square'\n" +
+                "color: 'yellow'\n" +
                 "shape: 'square'"));
     }
 
@@ -105,6 +109,23 @@ public class IncludeTest {
         String render = template.render();
 
         assertEquals("color: 'red'\nshape: ''", render);
+    }
+
+    @Test
+    public void renderWithVariableShouldWorkInLiquid() throws RecognitionException {
+        TemplateParser parser = new TemplateParser.Builder() //
+                .withFlavor(Flavor.LIQUID)
+                .withShowExceptionsFromInclude(true)
+                .withErrorMode(TemplateParser.ErrorMode.STRICT)
+                .build();
+
+        Template template = parser.parse("{% assign c = 'blue' %}{% include 'color' with c %}");
+        String render = template.render();
+        assertEquals("color: 'blue'\nshape: ''", render);
+
+        template = parser.parse("{% include 'color' with theme.color %}");
+        render = template.render("{ \"theme\": {\"color\": \"orange\"}}");
+        assertEquals("color: 'orange'\nshape: ''", render);
     }
 
     @Test

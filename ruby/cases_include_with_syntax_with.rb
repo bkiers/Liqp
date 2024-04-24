@@ -32,6 +32,8 @@ if isJekyll
 else
   Liquid::Template.file_system = Liquid::LocalFileSystem.new("cases_variable_inside_import/_includes", "%s.liquid")
   assertEqual("color: 'red'", render({"var" => "there"}, "{% include 'color' with 'red' %}"))
+  assertEqual("color: 'blue'", render({"clr" => "blue"}, "{% include 'color' with clr %}"))
+  assertEqual("color: 'yellow'", render({}, "{% assign clr = 'yellow' %}{% include 'color' with clr %}"))
   # liquid variable evaluate
   assertEqual("there", render({"var" => "there", "tmpl" => "include_read_var"}, "{% include tmpl %}"))
 end

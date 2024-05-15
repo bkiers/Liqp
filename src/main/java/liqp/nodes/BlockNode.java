@@ -5,6 +5,8 @@ import liqp.TemplateContext;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static liqp.LValue.BREAK;
 import static liqp.LValue.CONTINUE;
@@ -78,6 +80,20 @@ public class BlockNode implements LNode {
         if (isTemporal(value)) {
             ZonedDateTime time = asTemporal(value, context);
             return rubyDateTimeFormat.format(time);
+        } else {
+            return getValueAsString(value);
+        }
+    }
+
+    private String mapToString(Map<Object, Object> map) {
+        return map.entrySet().stream()
+                .map(entry -> entry.getKey() + ": " + getValueAsString(entry.getValue()))
+                .collect(Collectors.joining(", ", "{", "}"));
+    }
+
+    private String getValueAsString(Object value) {
+        if (value instanceof Map) {
+            return mapToString((Map<Object, Object>) value);
         } else {
             return String.valueOf(value);
         }

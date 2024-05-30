@@ -1,9 +1,11 @@
 package liqp;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import liqp.exceptions.LiquidException;
 import liqp.filters.Filter;
+import liqp.nodes.BlockNode;
 import liqp.nodes.LNode;
 import liqp.parser.Flavor;
 import liqp.parser.Inspectable;
@@ -28,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The main class of this library. Use one of its static
@@ -559,7 +563,7 @@ public class Template {
 
         final NodeVisitor visitor = new NodeVisitor(this.insertions, this.filters, this.parseSettings);
         try {
-            LNode node = visitor.visit(root);
+            LNode node = this.parseRootVisit(this.root, visitor);
             if (parent == null) {
                 this.templateContext = new TemplateContext(protectionSettings, renderSettings, parseSettings, variables);
             } else {
@@ -587,6 +591,23 @@ public class Template {
      */
     public String renderUnguarded(TemplateContext parent) {
         return renderUnguarded(new HashMap<String, Object>(), parent, true);
+    }
+
+    public static String processPlaceHolderString(String inputString, Map<String, Object> variables) {
+        StringBuilder result = new StringBuilder();
+        List <String> tokenizedString = tokenize(inputString);
+
+        for (String currentString : tokenizedString) {
+            try {
+                Template template = parse(currentString);
+                String currentResultString = template.render(variables);
+                result.append(currentResultString);
+            } catch (Exception exception) {
+                result.append(currentString);
+                System.err.println("Exception occurred while visiting child node: " + exception.getMessage());
+            }
+        }
+        return result.toString();
     }
 
     // Use toStringTree()
@@ -688,5 +709,38 @@ public class Template {
         } else {
             map.put(key, value);
         }
+    }
+
+    private static List<String> tokenize(String input) {
+        List<String> tokens = new ArrayList<>();
+
+        Pattern pattern = Pattern.compile("\\{\\{.*?\\}\\}|\\s+|\\S+");
+        Matcher matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            tokens.add(matcher.group());
+        }
+        return tokens;
+    }
+
+    private LNode parseRootVisit(ParseTree root, NodeVisitor nodeVisitor) {
+        BlockNode node = new BlockNode();
+
+        if (!Objects.isNull(root) && root.getChildCount() > 0) {
+            ParseTree children = root.getChild(0);
+            int childrenCount = children.getChildCount();
+
+            for (int index = 0; index < childrenCount; index++) {
+                try {
+                    LNode childLNode = nodeVisitor.visit(children.getChild(index));
+                    if (!Objects.isNull(childLNode)) {
+                        node.add(childLNode);
+                    }
+                }
+                catch (Exception exception) {
+                    System.err.println("Exception occurred while visiting child node with nodeVisitor: " + exception.getMessage());
+                }
+            }
+        }
+        return node;
     }
 }

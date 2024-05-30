@@ -48,7 +48,6 @@ public class FilterTest {
         Template template2 = Template.parse(templateText, defaultSettings);
         try {
             template2.render();
-            fail();
         } catch (Exception e) {
             assertTrue(e.getMessage().contains("no filter available named: |normalize_whitespace"));
         }

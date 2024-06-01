@@ -63,7 +63,8 @@ public final class Filters {
             new Upcase(), //
             new Url_Decode(), //
             new Url_Encode(), //
-            new Where() //
+            new Where(), //
+            new Json() //
     );
 
     static Filters JEKYLL_EXTRA_FILTERS = Filters.of( //

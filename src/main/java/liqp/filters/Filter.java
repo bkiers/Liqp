@@ -79,6 +79,7 @@ public abstract class Filter extends LValue {
         registerFilter(new Upcase());
         registerFilter(new Url_Decode());
         registerFilter(new Url_Encode());
+        registerFilter(new Json());
 
         Filter nWSFilter = new Normalize_Whitespace();
         JEKYLL_FILTERS.put(nWSFilter.name, nWSFilter);

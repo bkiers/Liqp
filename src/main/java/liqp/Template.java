@@ -603,7 +603,6 @@ public class Template {
                 String currentResultString = template.render(variables);
                 result.append(currentResultString);
             } catch (Exception exception) {
-                result.append(currentString);
                 System.err.println("Exception occurred while visiting child node: " + exception.getMessage());
             }
         }

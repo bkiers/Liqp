@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static liqp.LValue.BREAK;
@@ -54,16 +55,19 @@ public class BlockNode implements LNode {
             } else if (value instanceof List) {
 
                 List<?> list = (List<?>) value;
-
+                List<String> tempResultStrings = new ArrayList<>();
                 for (Object obj : list) {
-                    builder.append(asString(obj, context));
+                    tempResultStrings.add(asString(obj, context));
                 }
+                builder.append("[").append(String.join(", ", tempResultStrings)).append("]");
             } else if (value.getClass().isArray()) {
 
                 Object[] array = (Object[]) value;
+                List<String> tempResultStrings = new ArrayList<>();
                 for (Object obj : array) {
-                    builder.append(asString(obj, context));
+                    tempResultStrings.add(asString(obj, context));
                 }
+                builder.append("[").append(String.join(", ", tempResultStrings)).append("]");
             } else {
                 builder.append(asString(value, context));
             }
@@ -81,19 +85,38 @@ public class BlockNode implements LNode {
             ZonedDateTime time = asTemporal(value, context);
             return rubyDateTimeFormat.format(time);
         } else {
-            return getValueAsString(value);
+            return getValueAsString(value, false);
         }
     }
+
     private String mapToString(Map<Object, Object> map) {
         return map.entrySet().stream()
-                .map(entry -> entry.getKey() + ": " + getValueAsString(entry.getValue()))
+                .map(entry -> "\"" + entry.getKey() + "\": " + getValueAsString(entry.getValue(), true))
                 .collect(Collectors.joining(", ", "{", "}"));
     }
 
-    private String getValueAsString(Object value) {
+    private String listToString(List<Object> list) {
+        return list.stream()
+                .map(entry -> getValueAsString(entry, true))
+                .collect(Collectors.joining(", ", "[", "]"));
+    }
+
+    private String getValueAsString(Object value, boolean mapString) {
         if (value instanceof Map) {
             return mapToString((Map<Object, Object>) value);
+        } else if (value instanceof List || value.getClass().isArray()) {
+            return listToString((List<Object>) value);
         } else {
+            String stringValue = String.valueOf(value);
+            return (mapString) ? getValueWithChecks(value) : stringValue;
+        }
+    }
+
+    private String getValueWithChecks(Object value) {
+        if (!Objects.isNull(value) && value instanceof String) {
+            return "\"" + String.valueOf(value) + "\"";
+        }
+        else {
             return String.valueOf(value);
         }
     }

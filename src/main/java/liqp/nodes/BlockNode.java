@@ -102,6 +102,9 @@ public class BlockNode implements LNode {
     }
 
     private String getValueAsString(Object value, boolean mapString) {
+        if (Objects.isNull(value)) {
+            return "null";
+        }
         if (value instanceof Map) {
             return mapToString((Map<Object, Object>) value);
         } else if (value instanceof List || value.getClass().isArray()) {
@@ -113,6 +116,9 @@ public class BlockNode implements LNode {
     }
 
     private String getValueWithChecks(Object value) {
+        if (Objects.isNull(value)) {
+            return "null";
+        }
         if (!Objects.isNull(value) && value instanceof String) {
             return "\"" + String.valueOf(value) + "\"";
         }

@@ -21,6 +21,12 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Node;
+//import org.jsoup.select.NodeVisitor;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -573,7 +579,7 @@ public class Template {
                 contextHolder.setContext(templateContext);
             }
             Object rendered = node.render(this.templateContext);
-            return rendered == null ? "" : String.valueOf(rendered);
+            return (rendered == null || rendered == "null") ? "null" : String.valueOf(rendered);
         }
         catch (Exception e) {
             if (e instanceof RuntimeException) {
@@ -594,19 +600,8 @@ public class Template {
     }
 
     public static String processPlaceHolderString(String inputString, Map<String, Object> variables) {
-        StringBuilder result = new StringBuilder();
-        List <String> tokenizedString = tokenize(inputString);
-
-        for (String currentString : tokenizedString) {
-            try {
-                Template template = parse(currentString);
-                String currentResultString = template.render(variables);
-                result.append(currentResultString);
-            } catch (Exception exception) {
-                System.err.println("Exception occurred while visiting child node: " + exception.getMessage());
-            }
-        }
-        return result.toString();
+        StringBuilder str = tokenize(inputString, variables);
+        return str.toString();
     }
 
     // Use toStringTree()
@@ -710,7 +705,7 @@ public class Template {
         }
     }
 
-    private static List<String> tokenize(String input) {
+    private static List<String> tokenizeString(String input) {
         List<String> tokens = new ArrayList<>();
 
         Pattern pattern = Pattern.compile("\\{\\{.*?\\}\\}|\\s+|\\S+");
@@ -719,6 +714,36 @@ public class Template {
             tokens.add(matcher.group());
         }
         return tokens;
+    }
+
+    private static StringBuilder tokenize(String input, Map<String, Object> variables) {
+        StringBuilder result = new StringBuilder();
+
+        Pattern pattern = Pattern.compile("\\{\\{[^{}]*\\}\\}");
+        Matcher matcher = pattern.matcher(input);
+
+        int lastMatchEnd = 0;
+
+        // Iterate through matches and modify them
+        while (matcher.find()) {
+            try {
+                result.append(input, lastMatchEnd, matcher.start());
+                String placeholder = matcher.group();
+
+                Template template = parse(placeholder);
+                String currentResultString = template.render(variables);
+
+                result.append(currentResultString);
+                lastMatchEnd = matcher.end();
+            }
+            catch (Exception exception) {
+                String emptyString = new String();
+                result.replace(matcher.start(), matcher.end(), emptyString);
+                System.err.println("Exception occurred while searching for parsing placeholder strings: " + exception.getMessage());
+            }
+        }
+        result.append(input.substring(lastMatchEnd));
+        return result;
     }
 
     private LNode parseRootVisit(ParseTree root, NodeVisitor nodeVisitor) {

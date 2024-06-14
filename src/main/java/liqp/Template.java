@@ -30,8 +30,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * The main class of this library. Use one of its static
@@ -593,9 +596,54 @@ public class Template {
         return renderUnguarded(new HashMap<String, Object>(), parent, true);
     }
 
+    /**
+     * Returns the processed placeholder input string post parsing and rending.
+     *
+     * @param inputString: input string that contains 0 or multiple pre-processed placeholder strings.
+     * @param variables: contains the mapping of the placeholders and is used for
+     *                 mapping of the placeholder strings while rendering the input string.
+     */
     public static String processPlaceHolderString(String inputString, Map<String, Object> variables) {
-        StringBuilder str = tokenize(inputString, variables);
-        return str.toString();
+        StringBuilder result = new StringBuilder();
+
+        Pattern pattern = Pattern.compile("\\{\\{[^{}]*\\}\\}");
+        Matcher matcher = pattern.matcher(inputString);
+        AtomicInteger lastMatchEnd = new AtomicInteger();
+
+        List<String> matches = matcher.results()
+                .map(MatchResult::group)
+                .collect(Collectors.toList());
+
+        matches.forEach(placeholder -> {
+            try {
+                // Find the index of the current match in the input string
+                int matchStart = inputString.indexOf(placeholder, lastMatchEnd.get());
+                int matchEnd = matchStart + placeholder.length();
+
+                // Append the substring from the end of the last match to the start of the current match
+                result.append(inputString, lastMatchEnd.get(), matchStart);
+
+                // Parse and render the placeholder
+                Template template = parse(placeholder);
+                String currentResultString = template.render(variables);
+
+                // Append the rendered result
+                result.append(currentResultString);
+
+                // Update the last match end index
+                lastMatchEnd.set(matchEnd);
+            } catch (Exception exception) {
+                String emptyString = "";
+                // Replace the placeholder with an empty string if an exception occurs
+                result.replace(matcher.start(), matcher.end(), emptyString);
+                System.err.println("Exception occurred while searching for parsing placeholder strings: " + exception.getMessage());
+            }
+        });
+
+        // Append the remaining substring after the last match
+        result.append(inputString.substring(lastMatchEnd.get()));
+
+        return result.toString();
     }
 
     // Use toStringTree()
@@ -699,58 +747,23 @@ public class Template {
         }
     }
 
-    private static List<String> tokenizeString(String input) {
-        List<String> tokens = new ArrayList<>();
-
-        Pattern pattern = Pattern.compile("\\{\\{.*?\\}\\}|\\s+|\\S+");
-        Matcher matcher = pattern.matcher(input);
-        while (matcher.find()) {
-            tokens.add(matcher.group());
-        }
-        return tokens;
-    }
-
-    private static StringBuilder tokenize(String input, Map<String, Object> variables) {
-        StringBuilder result = new StringBuilder();
-
-        Pattern pattern = Pattern.compile("\\{\\{[^{}]*\\}\\}");
-        Matcher matcher = pattern.matcher(input);
-
-        int lastMatchEnd = 0;
-
-        // Iterate through matches and modify them
-        while (matcher.find()) {
-            try {
-                result.append(input, lastMatchEnd, matcher.start());
-                String placeholder = matcher.group();
-
-                Template template = parse(placeholder);
-                String currentResultString = template.render(variables);
-
-                result.append(currentResultString);
-                lastMatchEnd = matcher.end();
-            }
-            catch (Exception exception) {
-                String emptyString = new String();
-                result.replace(matcher.start(), matcher.end(), emptyString);
-                System.err.println("Exception occurred while searching for parsing placeholder strings: " + exception.getMessage());
-            }
-        }
-        result.append(input.substring(lastMatchEnd));
-        return result;
-    }
-
+    /**
+     * Parse the ParseTree object and create a meaningful expression from the root.
+     *
+     * @return BlockNode object that contains the parsed expression which will be used for rendering
+     *          the actual string.
+     */
     private LNode parseRootVisit(ParseTree root, NodeVisitor nodeVisitor) {
         BlockNode node = new BlockNode();
 
-        if (!Objects.isNull(root) && root.getChildCount() > 0) {
+        if (Objects.nonNull(root) && root.getChildCount() > 0) {
             ParseTree children = root.getChild(0);
             int childrenCount = children.getChildCount();
 
             for (int index = 0; index < childrenCount; index++) {
                 try {
                     LNode childLNode = nodeVisitor.visit(children.getChild(index));
-                    if (!Objects.isNull(childLNode)) {
+                    if (Objects.nonNull(childLNode)) {
                         node.add(childLNode);
                     }
                 }

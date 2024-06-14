@@ -1,6 +1,8 @@
 package liqp.nodes;
 
 import liqp.TemplateContext;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import static liqp.LValue.CONTINUE;
 import static liqp.LValue.asTemporal;
 import static liqp.LValue.isTemporal;
 import static liqp.LValue.rubyDateTimeFormat;
+import static liqp.constants.Constants.EMPTY_STRING;
 
 public class BlockNode implements LNode {
 
@@ -53,21 +56,11 @@ public class BlockNode implements LNode {
             if(value == BREAK || value == CONTINUE) {
                 return value;
             } else if (value instanceof List) {
-
-                List<?> list = (List<?>) value;
-                List<String> tempResultStrings = new ArrayList<>();
-                for (Object obj : list) {
-                    tempResultStrings.add(asString(obj, context));
-                }
-                builder.append("[").append(String.join(", ", tempResultStrings)).append("]");
+                List<Object> list = (List<Object>) value;
+                builder.append(listToString(list));
             } else if (value.getClass().isArray()) {
-
                 Object[] array = (Object[]) value;
-                List<String> tempResultStrings = new ArrayList<>();
-                for (Object obj : array) {
-                    tempResultStrings.add(asString(obj, context));
-                }
-                builder.append("[").append(String.join(", ", tempResultStrings)).append("]");
+                builder.append(listToString(List.of(array)));
             } else {
                 builder.append(asString(value, context));
             }
@@ -85,45 +78,49 @@ public class BlockNode implements LNode {
             ZonedDateTime time = asTemporal(value, context);
             return rubyDateTimeFormat.format(time);
         } else {
-            return getValueAsString(value, false);
+            return getValueAsString(value);
         }
     }
 
     private String mapToString(Map<Object, Object> map) {
-        return map.entrySet().stream()
-                .map(entry -> "\"" + entry.getKey() + "\": " + getValueAsString(entry.getValue(), true))
-                .collect(Collectors.joining(", ", "{", "}"));
+        try {
+            JSONObject jsonObject = new JSONObject(map);
+            return jsonObject.toJSONString();
+        }
+        catch (Exception exception) {
+            System.err.println("Exception occurred converting map to a JSONObject. Returning empty string: " + exception.getMessage());
+            return EMPTY_STRING;
+        }
     }
 
     private String listToString(List<Object> list) {
-        return list.stream()
-                .map(entry -> getValueAsString(entry, true))
-                .collect(Collectors.joining(", ", "[", "]"));
-    }
-
-    private String getValueAsString(Object value, boolean mapString) {
-        if (Objects.isNull(value)) {
-            return "null";
+        try {
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.addAll(list);
+            return jsonArray.toJSONString();
         }
-        if (value instanceof Map) {
-            return mapToString((Map<Object, Object>) value);
-        } else if (value instanceof List || value.getClass().isArray()) {
-            return listToString((List<Object>) value);
-        } else {
-            String stringValue = String.valueOf(value);
-            return (mapString) ? getValueWithChecks(value) : stringValue;
+        catch (Exception exception) {
+            System.err.println("Exception occurred converting list to a JSONObject. Returning empty string: " + exception.getMessage());
+            return EMPTY_STRING;
         }
     }
 
-    private String getValueWithChecks(Object value) {
-        if (Objects.isNull(value)) {
-            return "null";
+    private String getValueAsString(Object value) {
+        try {
+            if (Objects.isNull(value)) {
+                return "null";
+            }
+            if (value instanceof Map) {
+                return mapToString((Map<Object, Object>) value);
+            } else if (value instanceof List || value.getClass().isArray()) {
+                return listToString((List<Object>) value);
+            } else {
+                return String.valueOf(value);
+            }
         }
-        if (!Objects.isNull(value) && value instanceof String) {
-            return "\"" + String.valueOf(value) + "\"";
-        }
-        else {
-            return String.valueOf(value);
+        catch (Exception exception) {
+            System.err.println("Exception occurred converting value to a string. Returning empty string: " + exception.getMessage());
+            return EMPTY_STRING;
         }
     }
 }

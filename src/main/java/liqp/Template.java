@@ -21,12 +21,6 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-//import org.jsoup.select.NodeVisitor;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

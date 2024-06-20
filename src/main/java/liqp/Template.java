@@ -603,48 +603,45 @@ public class Template {
      * @param variables: contains the mapping of the placeholders and is used for
      *                 mapping of the placeholder strings while rendering the input string.
      */
-    public static String processPlaceHolderString(String inputString, Map<String, Object> variables) {
-        StringBuilder result = new StringBuilder();
+        public static String processPlaceHolderString(String inputString, Map<String, Object> variables) {
+            StringBuilder result = new StringBuilder();
 
-        Pattern pattern = Pattern.compile("\\{\\{[^{}]*\\}\\}");
-        Matcher matcher = pattern.matcher(inputString);
-        AtomicInteger lastMatchEnd = new AtomicInteger();
+            int lastMatchEnd = 0;
+            Matcher matcher = null;
+            Pattern pattern;
 
-        List<String> matches = matcher.results()
-                .map(MatchResult::group)
-                .collect(Collectors.toList());
-
-        matches.forEach(placeholder -> {
             try {
-                // Find the index of the current match in the input string
-                int matchStart = inputString.indexOf(placeholder, lastMatchEnd.get());
-                int matchEnd = matchStart + placeholder.length();
-
-                // Append the substring from the end of the last match to the start of the current match
-                result.append(inputString, lastMatchEnd.get(), matchStart);
-
-                // Parse and render the placeholder
-                Template template = parse(placeholder);
-                String currentResultString = template.render(variables);
-
-                // Append the rendered result
-                result.append(currentResultString);
-
-                // Update the last match end index
-                lastMatchEnd.set(matchEnd);
+                pattern = Pattern.compile("\\{\\{[^{}]*\\}\\}");
+                matcher = pattern.matcher(inputString);
             } catch (Exception exception) {
-                String emptyString = "";
-                // Replace the placeholder with an empty string if an exception occurs
-                result.replace(matcher.start(), matcher.end(), emptyString);
-                System.err.println("Exception occurred while searching for parsing placeholder strings: " + exception.getMessage());
+                System.err.println("Returning empty string. Exception occurred while searching for parsing placeholder strings: " + exception.getMessage());
+                return "";
             }
-        });
 
-        // Append the remaining substring after the last match
-        result.append(inputString.substring(lastMatchEnd.get()));
+            // Iterate through matches and modify them
+            while (Objects.nonNull(matcher) && matcher.find()) {
+                try {
+                    result.append(inputString, lastMatchEnd, matcher.start());
+                    String placeholder = matcher.group();
 
-        return result.toString();
-    }
+                    Template template = parse(placeholder);
+                    String currentResultString = template.render(variables);
+
+                    result.append(currentResultString);
+                    lastMatchEnd = matcher.end();
+                } catch (Exception exception) {
+                    String emptyString = new String();
+                    result.append(emptyString);
+                    lastMatchEnd = matcher.end();
+                    System.err.println("Exception occurred while searching for parsing placeholder strings: " +
+                            exception.getMessage());
+                }
+            }
+            result.append(inputString.substring(lastMatchEnd));
+
+            return result.toString();
+        }
+
 
     // Use toStringTree()
     @Deprecated

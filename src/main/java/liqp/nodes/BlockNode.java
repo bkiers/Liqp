@@ -56,11 +56,16 @@ public class BlockNode implements LNode {
             if(value == BREAK || value == CONTINUE) {
                 return value;
             } else if (value instanceof List) {
-                List<Object> list = (List<Object>) value;
-                builder.append(listToString(list));
+                List<?> list = (List<?>) value;
+
+                for (Object obj : list) {
+                    builder.append(asString(obj, context));
+                }
             } else if (value.getClass().isArray()) {
                 Object[] array = (Object[]) value;
-                builder.append(listToString(List.of(array)));
+                for (Object obj : array) {
+                    builder.append(asString(obj, context));
+                }
             } else {
                 builder.append(asString(value, context));
             }

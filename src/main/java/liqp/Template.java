@@ -603,44 +603,44 @@ public class Template {
      * @param variables: contains the mapping of the placeholders and is used for
      *                 mapping of the placeholder strings while rendering the input string.
      */
-        public static String processPlaceHolderString(String inputString, Map<String, Object> variables) {
-            StringBuilder result = new StringBuilder();
+    public static String processPlaceHolderString(String inputString, Map<String, Object> variables) {
+        StringBuilder result = new StringBuilder();
 
-            int lastMatchEnd = 0;
-            Matcher matcher = null;
-            Pattern pattern;
+        int lastMatchEnd = 0;
+        Matcher matcher = null;
+        Pattern pattern;
 
-            try {
-                pattern = Pattern.compile("\\{\\{[^{}]*\\}\\}");
-                matcher = pattern.matcher(inputString);
-            } catch (Exception exception) {
-                System.err.println("Returning empty string. Exception occurred while searching for parsing placeholder strings: " + exception.getMessage());
-                return "";
-            }
-
-            // Iterate through matches and modify them
-            while (Objects.nonNull(matcher) && matcher.find()) {
-                try {
-                    result.append(inputString, lastMatchEnd, matcher.start());
-                    String placeholder = matcher.group();
-
-                    Template template = parse(placeholder);
-                    String currentResultString = template.render(variables);
-
-                    result.append(currentResultString);
-                    lastMatchEnd = matcher.end();
-                } catch (Exception exception) {
-                    String emptyString = new String();
-                    result.append(emptyString);
-                    lastMatchEnd = matcher.end();
-                    System.err.println("Exception occurred while searching for parsing placeholder strings: " +
-                            exception.getMessage());
-                }
-            }
-            result.append(inputString.substring(lastMatchEnd));
-
-            return result.toString();
+        try {
+            pattern = Pattern.compile("\\{\\{[^{}]*\\}\\}");
+            matcher = pattern.matcher(inputString);
+        } catch (Exception exception) {
+            System.err.println("Returning empty string. Exception occurred while searching for parsing placeholder strings: " + exception.getMessage());
+            return "";
         }
+
+        // Iterate through matches and modify them
+        while (Objects.nonNull(matcher) && matcher.find()) {
+            try {
+                result.append(inputString, lastMatchEnd, matcher.start());
+                String placeholder = matcher.group();
+
+                Template template = parse(placeholder);
+                String currentResultString = template.render(variables);
+
+                result.append(currentResultString);
+                lastMatchEnd = matcher.end();
+            } catch (Exception exception) {
+                String emptyString = new String();
+                result.append(emptyString);
+                lastMatchEnd = matcher.end();
+                System.err.println("Exception occurred while searching for parsing placeholder strings: " +
+                        exception.getMessage());
+            }
+        }
+        result.append(inputString.substring(lastMatchEnd));
+
+        return result.toString();
+    }
 
 
     // Use toStringTree()

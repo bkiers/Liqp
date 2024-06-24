@@ -758,8 +758,6 @@ public class Template {
                 result.append(currentResultString);
                 lastMatchEnd = placeholderMatcher.end();
             } catch (Exception exception) {
-                String emptyString = new String();
-                result.append(emptyString);
                 lastMatchEnd = placeholderMatcher.end();
                 logError("Exception occurred while searching for parsing placeholder strings: ", exception.getMessage());
             }

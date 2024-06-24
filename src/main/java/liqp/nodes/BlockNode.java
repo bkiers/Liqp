@@ -111,21 +111,15 @@ public class BlockNode implements LNode {
     }
 
     private String getValueAsString(Object value) {
-        try {
-            if (Objects.isNull(value)) {
-                return "null";
-            }
-            if (value instanceof Map) {
-                return mapToString((Map<Object, Object>) value);
-            } else if (value instanceof List || value.getClass().isArray()) {
-                return listToString((List<Object>) value);
-            } else {
-                return String.valueOf(value);
-            }
+        if (Objects.isNull(value)) {
+            return "";
         }
-        catch (Exception exception) {
-            System.err.println("Exception occurred converting value to a string. Returning empty string: " + exception.getMessage());
-            return EMPTY_STRING;
+        if (value instanceof Map) {
+            return mapToString((Map<Object, Object>) value);
+        } else if (value instanceof List || value.getClass().isArray()) {
+            return listToString((List<Object>) value);
+        } else {
+            return String.valueOf(value);
         }
     }
 }

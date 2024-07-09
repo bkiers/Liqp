@@ -1,9 +1,13 @@
 package liqp;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+
+import liqp.constants.Constants;
 import liqp.exceptions.LiquidException;
 import liqp.filters.Filter;
+import liqp.nodes.BlockNode;
 import liqp.nodes.LNode;
 import liqp.parser.Flavor;
 import liqp.parser.Inspectable;
@@ -28,6 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The main class of this library. Use one of its static
@@ -559,7 +565,7 @@ public class Template {
 
         final NodeVisitor visitor = new NodeVisitor(this.insertions, this.filters, this.parseSettings);
         try {
-            LNode node = visitor.visit(root);
+            LNode node = this.parseRootVisit(this.root, visitor);
             if (parent == null) {
                 this.templateContext = new TemplateContext(protectionSettings, renderSettings, parseSettings, variables);
             } else {
@@ -587,6 +593,25 @@ public class Template {
      */
     public String renderUnguarded(TemplateContext parent) {
         return renderUnguarded(new HashMap<String, Object>(), parent, true);
+    }
+
+    /**
+     * Returns the processed placeholder input string post parsing and rending.
+     *
+     * @param inputString: input string that contains 0 or multiple pre-processed placeholder strings.
+     * @param variables: contains the mapping of the placeholders and is used for
+     *                 mapping of the placeholder strings while rendering the input string.
+     */
+    public static String processPlaceHolderString(String inputString, Map<String, Object> variables) {
+        Matcher placeholderMatcher = null;
+
+        try {
+            placeholderMatcher = matchPlaceholders(inputString);
+        } catch (Exception exception) {
+            logError("Returning empty string. Exception occurred while searching for placeholder strings: ", exception.getMessage());
+            return "";
+        }
+        return processPlaceholders(inputString, placeholderMatcher, variables);
     }
 
     // Use toStringTree()
@@ -688,5 +713,65 @@ public class Template {
         } else {
             map.put(key, value);
         }
+    }
+
+    /**
+     * Parse the ParseTree object and create a meaningful expression from the root.
+     *
+     * @return BlockNode object that contains the parsed expression which will be used for rendering
+     *          the actual string.
+     */
+    private LNode parseRootVisit(ParseTree root, NodeVisitor nodeVisitor) {
+        BlockNode node = new BlockNode();
+
+        if (Objects.nonNull(root) && root.getChildCount() > 0) {
+            ParseTree children = root.getChild(0);
+            int childrenCount = children.getChildCount();
+
+            for (int index = 0; index < childrenCount; index++) {
+                try {
+                    LNode childLNode = nodeVisitor.visit(children.getChild(index));
+                    if (Objects.nonNull(childLNode)) {
+                        node.add(childLNode);
+                    }
+                }
+                catch (Exception exception) {
+                    logError("Exception occurred while visiting child node with nodeVisitor: ", exception.getMessage());
+                }
+            }
+        }
+        return node;
+    }
+
+    private static String processPlaceholders(String inputString, Matcher placeholderMatcher, Map<String, Object> variables) {
+        StringBuilder result = new StringBuilder();
+        int lastMatchEnd = 0;
+
+        while (Objects.nonNull(placeholderMatcher) && placeholderMatcher.find()) {
+            try {
+                result.append(inputString, lastMatchEnd, placeholderMatcher.start());
+                String placeholder = placeholderMatcher.group();
+
+                Template template = parse(placeholder);
+                String currentResultString = template.render(variables);
+
+                result.append(currentResultString);
+                lastMatchEnd = placeholderMatcher.end();
+            } catch (Exception exception) {
+                lastMatchEnd = placeholderMatcher.end();
+                logError("Exception occurred while searching for parsing placeholder strings: ", exception.getMessage());
+            }
+        }
+        result.append(inputString.substring(lastMatchEnd));
+        return result.toString();
+    }
+
+    private static void logError(String message, String exceptionMessage) {
+        System.err.println(message + exceptionMessage);
+    }
+
+    private static Matcher matchPlaceholders(String inputString) {
+        Pattern pattern = Pattern.compile(Constants.PLACEHOLDER_PATTERN);
+        return pattern.matcher(inputString);
     }
 }

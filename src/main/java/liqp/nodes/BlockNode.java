@@ -1,16 +1,22 @@
 package liqp.nodes;
 
 import liqp.TemplateContext;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static liqp.LValue.BREAK;
 import static liqp.LValue.CONTINUE;
 import static liqp.LValue.asTemporal;
 import static liqp.LValue.isTemporal;
 import static liqp.LValue.rubyDateTimeFormat;
+import static liqp.constants.Constants.EMPTY_STRING;
 
 public class BlockNode implements LNode {
 
@@ -50,14 +56,12 @@ public class BlockNode implements LNode {
             if(value == BREAK || value == CONTINUE) {
                 return value;
             } else if (value instanceof List) {
-
                 List<?> list = (List<?>) value;
 
                 for (Object obj : list) {
                     builder.append(asString(obj, context));
                 }
             } else if (value.getClass().isArray()) {
-
                 Object[] array = (Object[]) value;
                 for (Object obj : array) {
                     builder.append(asString(obj, context));
@@ -78,6 +82,42 @@ public class BlockNode implements LNode {
         if (isTemporal(value)) {
             ZonedDateTime time = asTemporal(value, context);
             return rubyDateTimeFormat.format(time);
+        } else {
+            return getValueAsString(value);
+        }
+    }
+
+    private String mapToString(Map<Object, Object> map) {
+        try {
+            JSONObject jsonObject = new JSONObject(map);
+            return jsonObject.toJSONString();
+        }
+        catch (Exception exception) {
+            System.err.println("Exception occurred converting map to a JSONObject. Returning empty string: " + exception.getMessage());
+            return EMPTY_STRING;
+        }
+    }
+
+    private String listToString(List<Object> list) {
+        try {
+            JSONArray jsonArray = new JSONArray();
+            jsonArray.addAll(list);
+            return jsonArray.toJSONString();
+        }
+        catch (Exception exception) {
+            System.err.println("Exception occurred converting list to a JSONObject. Returning empty string: " + exception.getMessage());
+            return EMPTY_STRING;
+        }
+    }
+
+    private String getValueAsString(Object value) {
+        if (Objects.isNull(value)) {
+            return "";
+        }
+        if (value instanceof Map) {
+            return mapToString((Map<Object, Object>) value);
+        } else if (value instanceof List || value.getClass().isArray()) {
+            return listToString((List<Object>) value);
         } else {
             return String.valueOf(value);
         }

@@ -1,5 +1,7 @@
 package liqp.nodes;
 
+import liqp.exceptions.IncompatibleTypeComparisonException;
+
 public class GtEqNode extends ComparingExpressionNode {
 
     public GtEqNode(LNode lhs, LNode rhs) {
@@ -14,8 +16,10 @@ public class GtEqNode extends ComparingExpressionNode {
         } else if (b instanceof Comparable && b.getClass().isInstance(a)) {
             return ((Comparable<Object>) b).compareTo(a) < 0;
         }
-        String aType = a == null ? "null" : a.getClass().getName();
-        String bType = b == null ? "null" : b.getClass().getName();
-        throw new RuntimeException("Cannot compare " + a + " with " + b + " because they are not the same type: " + aType + " vs " + bType);
+
+        if (strictTypedExpressions) {
+            throw new IncompatibleTypeComparisonException(a, b);
+        }
+        return false;
     }
 }

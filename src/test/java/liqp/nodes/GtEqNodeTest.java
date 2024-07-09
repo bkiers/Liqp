@@ -80,4 +80,18 @@ public class GtEqNodeTest {
         value = TemplateParser.DEFAULT.parse("{% if a >= c %}yes{% else %}no{% endif %}").render(data);
         assertEquals("no", value);
     }
+
+    @Test
+    public void testStrictModeDisabled() {
+        String[][] tests = {
+                {"{% if 0 >= 'A' %}yes{% else %}no{% endif %}", "no"},
+                {"{% if 'A' >= 0 %}yes{% else %}no{% endif %}", "no"},
+                {"{% if false >= 1 %}yes{% else %}no{% endif %}", "no"},
+        };
+        TemplateParser templateParser = new TemplateParser.Builder().withStrictTypedExpressions(false).build();
+        for (String[] test : tests) {
+            String rendered = templateParser.parse(test[0]).render();
+            assertThat(rendered, is(test[1]));
+        }
+    }
 }

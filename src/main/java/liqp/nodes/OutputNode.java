@@ -4,11 +4,12 @@ import liqp.PlainBigDecimal;
 import liqp.TemplateContext;
 import liqp.TemplateParser;
 import liqp.exceptions.LiquidException;
-import org.jsoup.internal.StringUtil;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import static liqp.LValue.isBlank;
 
 public class OutputNode implements LNode {
 
@@ -40,7 +41,7 @@ public class OutputNode implements LNode {
         }
         if (context != null && context.getParser().errorMode == TemplateParser.ErrorMode.WARN) {
             String localUnparsed = unparsed;
-            if (!StringUtil.isBlank(localUnparsed)) {
+            if (!isBlank(localUnparsed)) {
                 if (localUnparsed.length() > 30) {
                     localUnparsed = localUnparsed.substring(0, 30) + "...";
                 }

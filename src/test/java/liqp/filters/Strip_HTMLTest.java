@@ -52,4 +52,20 @@ public class Strip_HTMLTest {
         assertThat(filter.apply("<script type='text/javascript'>document.write('some stuff');</script>", context), is((Object)""));
         assertThat(filter.apply(null, context), is((Object)""));
     }
+
+
+    @Test
+    public void testIssue306() {
+        // given
+        // {{ "<em>test</em>" | escape }} --> &lt;em&gt;test&lt;/em&gt;
+        TemplateContext context = new TemplateContext();
+        Filter filter = Filters.COMMON_FILTERS.get("strip_html");
+
+        // when
+        Object result = filter.apply("&lt;em&gt;test&lt;/em&gt;", context);
+
+
+        // then
+        assertThat(result, is("&lt;em&gt;test&lt;/em&gt;"));
+    }
 }

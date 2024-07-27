@@ -493,4 +493,19 @@ public abstract class LValue {
     public Map<String, Object> asMap(Object value) {
         return (Map<String, Object>)value;
     }
+
+    public static boolean isBlank(final String string) {
+        if (string == null || string.length() == 0)
+            return true;
+
+        int l = string.length();
+        for (int i = 0; i < l; i++) {
+            if (!isWhitespace(string.codePointAt(i)))
+                return false;
+        }
+        return true;
+    }
+    private static boolean isWhitespace(int c){
+        return c == ' ' || c == '\t' || c == '\n' || c == '\f' || c == '\r';
+    }
 }

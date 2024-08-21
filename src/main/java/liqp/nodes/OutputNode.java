@@ -9,6 +9,7 @@ public class OutputNode implements LNode {
 
     private LNode expression;
     private List<FilterNode> filters;
+    private final String EMPTY_STRING = "";
 
     public OutputNode(LNode expression) {
         this.expression = expression;
@@ -21,13 +22,16 @@ public class OutputNode implements LNode {
 
     @Override
     public Object render(TemplateContext context) {
+        try {
+            Object value = expression.render(context);
 
-        Object value = expression.render(context);
+            for (FilterNode node : filters) {
+                value = node.apply(value, context);
+            }
 
-        for (FilterNode node : filters) {
-            value = node.apply(value, context);
+            return value;
+        } catch (Exception ex) {
+            return EMPTY_STRING;
         }
-
-        return value;
     }
 }

@@ -124,10 +124,6 @@ comment_tag
  : TagStart CommentStart TagEnd .*? TagStart CommentEnd TagEnd
  ;
 
-other_than_tag_start
- : ~( TagStart )*
- ;
-
 if_tag
  : TagStart IfStart expr TagEnd block elsif_tag* else_tag? TagStart IfEnd TagEnd
  ;
@@ -239,10 +235,7 @@ output
 // `( ~OutEnd )+`, it ran in about 8000-8500 ms on average. With the individual tokens specified in the `IN_TAG` mode,
 // the average runtime was around 3000-3200 ms.
 not_out_end
- : ( OutStart2 | TagEnd | Str | DotDot | Dot | NEq | Eq | EqSign | GtEq | Gt | LtEq | Lt | Minus | Pipe
-   | Col | Comma | OPar | CPar | OBr | CBr | QMark | PathSep | DoubleNum | LongNum | Contains | In | And
-   | Or | True | False | Nil | With | Offset | Continue | Reversed | Empty | Blank | IdChain | Id
-   )+
+ : other_than_tag_end
  ;
 
 filter
@@ -345,7 +338,10 @@ other_tag_parameters
  ;
 
 other_than_tag_end
- : ~TagEnd+
+ : ( OutStart2 | TagEnd | Str | DotDot | Dot | NEq | Eq | EqSign | GtEq | Gt | LtEq | Lt | Minus | Pipe
+   | Col | Comma | OPar | CPar | OBr | CBr | QMark | PathSep | DoubleNum | LongNum | Contains | In | And
+   | Or | True | False | Nil | With | Offset | Continue | Reversed | Empty | Blank | IdChain | Id
+   )+
  ;
 
 filename

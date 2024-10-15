@@ -124,10 +124,6 @@ comment_tag
  : TagStart CommentStart TagEnd .*? TagStart CommentEnd TagEnd
  ;
 
-other_than_tag_start
- : ~( TagStart )*
- ;
-
 if_tag
  : TagStart IfStart expr TagEnd block elsif_tag* else_tag? TagStart IfEnd TagEnd
  ;
@@ -230,8 +226,21 @@ output
  | {isWarn() || isLax()}? outStart term filter* unparsed=not_out_end? OutEnd
  ;
 
+// When doing `( ~OutEnd )+`, it appears ANTLR is much slower on large input text. Even when `isStrict() == true` the
+// parser will never get here, but the prediction algorithm still tries this branch and takes too much time when the
+// much too large set `( ~OutEnd )+` is used. The tokens below are all tokens that are possible when the lexer is in
+// the `IN_TAG` mode.
+//
+// The input from https://github.com/bkiers/Liqp/issues/310 is tested by parsing it 100 times. When this rule contains
+// `( ~OutEnd )+`, it ran in about 8000-8500 ms on average. With the individual tokens specified in the `IN_TAG` mode,
+// the average runtime was around 3000-3200 ms.
+//
+// All tokens in the `IN_TAG` mode _except_ the `OutEnd` token
 not_out_end
- : ( ~OutEnd )+
+ : ( TagEnd | OutStart2 | Str | DotDot | Dot | NEq | Eq | EqSign | GtEq | Gt | LtEq | Lt | Minus | Pipe
+   | Col | Comma | OPar | CPar | OBr | CBr | QMark | PathSep | DoubleNum | LongNum | Contains | In | And
+   | Or | True | False | Nil | With | Offset | Continue | Reversed | Empty | Blank | IdChain | Id
+   )+
  ;
 
 filter
@@ -333,8 +342,12 @@ other_tag_parameters
  : other_than_tag_end
  ;
 
+// All tokens in the `IN_TAG` mode _except_ the `TagEnd` token
 other_than_tag_end
- : ~TagEnd+
+ : ( OutEnd | OutStart2 | Str | DotDot | Dot | NEq | Eq | EqSign | GtEq | Gt | LtEq | Lt | Minus | Pipe
+   | Col | Comma | OPar | CPar | OBr | CBr | QMark | PathSep | DoubleNum | LongNum | Contains | In | And
+   | Or | True | False | Nil | With | Offset | Continue | Reversed | Empty | Blank | IdChain | Id
+   )+
  ;
 
 filename

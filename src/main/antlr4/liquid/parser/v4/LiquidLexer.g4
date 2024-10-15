@@ -104,6 +104,8 @@ fragment LineBreak      : '\r'? '\n' | '\r';
 fragment Letter         : [a-zA-Z];
 fragment Digit          : [0-9];
 
+// Note that when adding tokens to this `IN_TAG` mode, be sure to include them in the parser
+// rules `not_out_end` and/or `other_tag_parameters` as well!
 mode IN_TAG;
 
   OutStart2 : '{{' -> pushMode(IN_TAG);

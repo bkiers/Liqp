@@ -22,6 +22,7 @@ import java.util.Locale;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class DateTest {
 
@@ -118,6 +119,7 @@ public class DateTest {
         final Filter filter = dateFilterSetting.filters.get("date");
 
         assertThat(filter.apply("Fri Jul 16 01:00:00 2004", context, "%m/%d/%Y"), is((Object)"07/16/2004"));
+        assertThat(filter.apply("Fri Jul 9 01:00:00 2004", context, "%m/%d/%Y"), is((Object)"07/09/2004"));
 
         assertThat(filter.apply("Fri Jul 16 01:00 2004", context, "%m/%d/%Y"), is((Object)"07/16/2004"));
 
@@ -232,5 +234,56 @@ public class DateTest {
         TemplateParser parser = new TemplateParser.Builder().withDefaultTimeZone(ZoneOffset.UTC).build();
         String res = parser.parse("{{ val }}").render("val", instant);
         assertEquals("1970-01-01 00:00:00 Z", res);
+    }
+
+    // https://github.com/bkiers/Liqp/issues/309
+    @Test
+    public void testSupportedDateStrings() {
+        String[] tests = {
+                "now",
+                "today",
+                "1 March",
+                "MAR",
+                "MARCH",
+                "2024 MAR",
+                "2 mar",
+                "2 MAR",
+                "march 2nd",
+                "MARCH 2",
+                "MARCH 2nd",
+                "MARCH 3RD",
+                "MARCH 4th",
+                "MARCH 5th",
+                "MARCH 10th",
+                "2010-10-31",
+                "Aug 2000",
+                "Aug 31",
+                "Wed Nov 28 14:33:20 2001",
+                "Wed, 05 Oct 2011 22:26:12 -0400",
+                "Wed, 05 Oct 2011 02:26:12 GMT",
+                "Nov 29 14:33:20 2001",
+                "05 Oct 2011 22:26:12 -0400",
+                "06 Oct 2011 02:26:12 GMT",
+                "2011-10-05T22:26:12-04:00",
+                "0:00",
+                "1:00",
+                "01:00",
+                "12:00",
+                "16:30",
+                "3/2024",
+                "01/03",
+                "03/31",
+                "2001/03",
+                "01/2003",
+                "70-10-31"
+        };
+
+        for (String test : tests) {
+            // Parse every test date. If this fails, the rendering engine will just return the
+            // string. The '%s' will convert the date into a timestamp we check that what is
+            // returned is a sequence of digits.
+            String rendered = TemplateParser.DEFAULT.parse("{% assign d = '" + test + "' | date: '%s' %}{{ d }}").render();
+            assertTrue("Failed to parse: '" + test + "'", rendered.matches("\\d+"));
+        }
     }
 }

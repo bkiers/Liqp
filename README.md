@@ -341,7 +341,7 @@ Use Maven 3.5.0 and run build with
 mvn clean install
 ````
 
-Release process into the [Central Repository](http://central.sonatype.org) is
+Release process into the [Central Repository](https://oss.sonatype.org/#welcome) is
 performed with
 
 ```

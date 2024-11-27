@@ -8,6 +8,8 @@ import liqp.antlr.NameResolver;
 import liqp.blocks.Block;
 import liqp.filters.Filter;
 import liqp.filters.Filters;
+import liqp.filters.date.BasicDateParser;
+import liqp.filters.date.Parser;
 import liqp.parser.Flavor;
 import liqp.parser.LiquidSupport;
 import liqp.tags.Tag;
@@ -35,7 +37,6 @@ public class TemplateParser {
     public static final TemplateParser DEFAULT = DEFAULT_FLAVOR.defaultParser();
 
     public static final TemplateParser DEFAULT_JEKYLL = Flavor.JEKYLL.defaultParser();
-
 
     /**
      * Equivalent of
@@ -91,6 +92,7 @@ public class TemplateParser {
     private final int limitMaxSizeRenderedString;
     private final long limitMaxRenderTimeMillis;
     private final long limitMaxTemplateSizeBytes;
+    private final BasicDateParser dateParser;
 
     public enum EvaluateMode {
         LAZY,
@@ -158,6 +160,7 @@ public class TemplateParser {
         private Long limitMaxRenderTimeMillis  = Long.MAX_VALUE;
         private Long limitMaxTemplateSizeBytes  = Long.MAX_VALUE;
         private NameResolver nameResolver;
+        private BasicDateParser dateParser;
 
         public Builder() {
         }
@@ -188,6 +191,7 @@ public class TemplateParser {
 
             this.errorMode = parser.errorMode;
             this.nameResolver = parser.nameResolver;
+            this.dateParser = parser.dateParser;
         }
 
         @SuppressWarnings("hiding")
@@ -360,6 +364,11 @@ public class TemplateParser {
             return this;
         }
 
+        public Builder withDateParser(BasicDateParser dateParser) {
+            this.dateParser = dateParser;
+            return this;
+        }
+
 
         @SuppressWarnings("hiding")
         public TemplateParser build() {
@@ -415,8 +424,12 @@ public class TemplateParser {
                 nameResolver = new LocalFSNameResolver(snippetsFolderName);
             }
 
+            if (dateParser == null) {
+                dateParser = new Parser();
+            }
+
             return new TemplateParser(strictVariables, showExceptionsFromInclude, evaluateMode, renderTransformer, locale, defaultTimeZone, environmentMapConfigurator, errorMode, fl, stripSpacesAroundTags, stripSingleLine, mapper,
-                    allInsertions, finalFilters, evaluateInOutputTag, strictTypedExpressions, liquidStyleInclude, liquidStyleWhere, nameResolver, limitMaxIterations, limitMaxSizeRenderedString, limitMaxRenderTimeMillis, limitMaxTemplateSizeBytes);
+                    allInsertions, finalFilters, evaluateInOutputTag, strictTypedExpressions, liquidStyleInclude, liquidStyleWhere, nameResolver, limitMaxIterations, limitMaxSizeRenderedString, limitMaxRenderTimeMillis, limitMaxTemplateSizeBytes, dateParser);
         }
     }
 
@@ -428,7 +441,8 @@ public class TemplateParser {
                    Consumer<Map<String, Object>> environmentMapConfigurator, ErrorMode errorMode, Flavor flavor, boolean stripSpacesAroundTags, boolean stripSingleLine,
                    ObjectMapper mapper, Insertions insertions, Filters filters, boolean evaluateInOutputTag,
                    boolean strictTypedExpressions,
-                   boolean liquidStyleInclude, Boolean liquidStyleWhere, NameResolver nameResolver, int maxIterations, int maxSizeRenderedString, long maxRenderTimeMillis, long maxTemplateSizeBytes) {
+                   boolean liquidStyleInclude, Boolean liquidStyleWhere, NameResolver nameResolver, int maxIterations, int maxSizeRenderedString, long maxRenderTimeMillis, long maxTemplateSizeBytes,
+                   BasicDateParser dateParser) {
         this.flavor = flavor;
         this.stripSpacesAroundTags = stripSpacesAroundTags;
         this.stripSingleLine = stripSingleLine;
@@ -455,6 +469,7 @@ public class TemplateParser {
         this.limitMaxSizeRenderedString = maxSizeRenderedString;
         this.limitMaxRenderTimeMillis = maxRenderTimeMillis;
         this.limitMaxTemplateSizeBytes = maxTemplateSizeBytes;
+        this.dateParser = dateParser;
     }
 
     public Template parse(Path path) throws IOException {
@@ -527,6 +542,11 @@ public class TemplateParser {
 
     public Consumer<Map<String, Object>> getEnvironmentMapConfigurator() {
         return environmentMapConfigurator;
+    }
+
+
+    public BasicDateParser getDateParser() {
+        return dateParser;
     }
 
     private Path getLocationFromInputStream(InputStream input) {

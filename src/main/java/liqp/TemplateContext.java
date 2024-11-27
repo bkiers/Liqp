@@ -10,6 +10,7 @@ import java.util.Map;
 
 import liqp.RenderTransformer.ObjectAppender;
 import liqp.exceptions.ExceededMaxIterationsException;
+import liqp.filters.date.BasicDateParser;
 
 public class TemplateContext {
 
@@ -65,6 +66,10 @@ public class TemplateContext {
 
     public TemplateParser getParser() {
         return parser;
+    }
+
+    public BasicDateParser getDateParser() {
+        return parser.getDateParser();
     }
 
     public void addError(Exception exception) {

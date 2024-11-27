@@ -2,6 +2,7 @@ package liqp.filters;
 
 import liqp.LValue;
 import liqp.TemplateContext;
+import liqp.filters.date.BasicDateParser;
 import liqp.filters.date.CustomDateFormatRegistry;
 import liqp.filters.date.CustomDateFormatSupport;
 import liqp.filters.date.Parser;
@@ -46,7 +47,7 @@ public class Date extends Filter {
                 // No need to divide this by 1000, the param is expected to be in seconds already!
                 compatibleDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(super.asNumber(value).longValue() * 1000), context.getParser().defaultTimeZone);
             } else {
-                compatibleDate = Parser.parse(valAsString, locale, context.getParser().defaultTimeZone);
+                compatibleDate = context.getDateParser().parse(valAsString, locale, context.getParser().defaultTimeZone);
             }
             if (compatibleDate == null) {
                 return value;

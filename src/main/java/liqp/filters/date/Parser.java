@@ -6,13 +6,11 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalQueries;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 import static java.time.temporal.ChronoField.*;
 
-public class Parser {
+public class Parser extends BasicDateParser {
 
     /**
      * In case if anyone interesting about full set
@@ -30,7 +28,18 @@ public class Parser {
 
     // Since Liquid supports dates like `March 1st`, this list will
     // hold strings that will be removed from the input string.
-    private static final String[] toBeRemoved = new String[] { "st", "nd", "rd", "th" };
+    private static final Map<String, String> toBeReplaced = new HashMap<String, String>() {{
+            this.put("1st", "1");
+            this.put("2nd", "2");
+            this.put("3rd", "3");
+            this.put("4th", "4");
+            this.put("5th", "5");
+            this.put("6th", "6");
+            this.put("7th", "7");
+            this.put("8th", "8");
+            this.put("9th", "9");
+            this.put("0th", "0");
+    }};
 
     static {
 
@@ -147,77 +156,17 @@ public class Parser {
         datePatterns.add("H:mm:ss");
     }
 
-    public static ZonedDateTime parse(String str, Locale locale, ZoneId defaultZone) {
 
+    public Parser() {
+        super(datePatterns);
+    }
+
+    public ZonedDateTime parse(String str, Locale locale, ZoneId defaultZone) {
         String normalized = str.toLowerCase();
-
-        for(String value : toBeRemoved) {
-            normalized = normalized.replace(value, "");
+        for(Map.Entry<String, String> kv : toBeReplaced.entrySet()) {
+            normalized = normalized.replace(kv.getKey(), kv.getValue());
         }
-
-        for(String pattern : datePatterns) {
-            try {
-
-                DateTimeFormatter timeFormatter = new DateTimeFormatterBuilder()
-                        .parseCaseInsensitive()
-                        .appendPattern(pattern)
-                        .toFormatter(locale);
-
-                TemporalAccessor temporalAccessor = timeFormatter.parse(normalized);
-                return getZonedDateTimeFromTemporalAccessor(temporalAccessor, defaultZone);
-            } catch (Exception e) {
-                // ignore
-            }
-        }
-
-        // Could not parse the string into a meaningful date, return null.
-        return null;
+        return parseUsingCachedPatterns(normalized, locale, defaultZone);
     }
 
-    /**
-     * Follow ruby rules: if some datetime part is missing,
-     * the default is taken from `now` with default zone
-     */
-    public static ZonedDateTime getZonedDateTimeFromTemporalAccessor(TemporalAccessor temporal, ZoneId defaultZone) {
-        if (temporal == null) {
-            return ZonedDateTime.now(defaultZone);
-        }
-        if (temporal instanceof ZonedDateTime) {
-            return (ZonedDateTime) temporal;
-        }
-        if (temporal instanceof Instant) {
-            return ZonedDateTime.ofInstant((Instant) temporal, defaultZone);
-        }
-
-        ZoneId zoneId = temporal.query(TemporalQueries.zone());
-        if (zoneId == null) {
-            LocalDate date = temporal.query(TemporalQueries.localDate());
-            LocalTime time = temporal.query(TemporalQueries.localTime());
-
-            if (date == null) {
-                date = LocalDate.now(defaultZone);
-            }
-            if (time == null) {
-                time = LocalTime.now(defaultZone);
-            }
-            return ZonedDateTime.of(date, time, defaultZone);
-        } else {
-            LocalDateTime now = LocalDateTime.now(zoneId);
-            TemporalField[] copyThese = new TemporalField[]{
-                    YEAR,
-                    MONTH_OF_YEAR,
-                    DAY_OF_MONTH,
-                    HOUR_OF_DAY,
-                    MINUTE_OF_HOUR,
-                    SECOND_OF_MINUTE,
-                    NANO_OF_SECOND
-            };
-            for (TemporalField tf: copyThese) {
-                if (temporal.isSupported(tf)) {
-                    now = now.with(tf, temporal.get(tf));
-                }
-            }
-            return now.atZone(zoneId);
-        }
-    }
 }

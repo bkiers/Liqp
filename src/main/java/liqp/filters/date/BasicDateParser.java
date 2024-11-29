@@ -1,20 +1,52 @@
 package liqp.filters.date;
 
-import java.time.*;
+import static java.time.temporal.ChronoField.YEAR;
+
+import java.text.DateFormatSymbols;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalField;
-import java.time.temporal.TemporalQueries;
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-
-import static java.time.temporal.ChronoField.*;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.BiFunction;
 
 public abstract class BasicDateParser {
 
-    private final List<String> cachedPatterns = new ArrayList<>();
+    // Since Liquid supports dates like `March 1st`, this list will
+    // hold strings that will be removed from the input string.
+    private static final Map<String, String> toBeReplaced = new LinkedHashMap<>();
+    static {
+        toBeReplaced.put("11th", "11");
+        toBeReplaced.put("12th", "12");
+        toBeReplaced.put("13th", "13");
+        toBeReplaced.put("1st", "1");
+        toBeReplaced.put("2nd", "2");
+        toBeReplaced.put("3rd", "3");
+        toBeReplaced.put("4th", "4");
+        toBeReplaced.put("5th", "5");
+        toBeReplaced.put("6th", "6");
+        toBeReplaced.put("7th", "7");
+        toBeReplaced.put("8th", "8");
+        toBeReplaced.put("9th", "9");
+        toBeReplaced.put("0th", "0");
+    }
+
+    public static String removeSequentialSuffixes(String input) {
+        for (Map.Entry<String, String> entry : toBeReplaced.entrySet()) {
+            input = input.replaceAll("(?i)"+entry.getKey(), entry.getValue());
+        }
+        return input;
+    }
+
+
+    protected final List<String> cachedPatterns = new CopyOnWriteArrayList<>();
+    private final ArrayToRegexp arrayToRegexp = new ArrayToRegexp();
+    protected final BiFunction<TemporalAccessor, ZoneId, ZonedDateTime> fullDateFromTemporalProducer = new FullDateFromTemporalProducer();
 
     protected BasicDateParser() {
 
@@ -34,7 +66,7 @@ public abstract class BasicDateParser {
         for(String pattern : cachedPatterns) {
             try {
                 TemporalAccessor temporalAccessor = parseUsingPattern(str, pattern, locale);
-                return getZonedDateTimeFromTemporalAccessor(temporalAccessor, defaultZone);
+                return fullDateFromTemporalProducer.apply(temporalAccessor, defaultZone);
             } catch (Exception e) {
                 // ignore
             }
@@ -43,60 +75,60 @@ public abstract class BasicDateParser {
         return null;
     }
 
-    protected TemporalAccessor parseUsingPattern(String normalized, String pattern, Locale locale) {
-        DateTimeFormatter timeFormatter = new DateTimeFormatterBuilder()
-                .parseCaseInsensitive()
-                .appendPattern(pattern)
-                .toFormatter(locale);
-
-        return timeFormatter.parse(normalized);
-    }
-
-
-    /**
-     * Follow ruby rules: if some datetime part is missing,
-     * the default is taken from `now` with default zone
-     */
-    public static ZonedDateTime getZonedDateTimeFromTemporalAccessor(TemporalAccessor temporal, ZoneId defaultZone) {
-        if (temporal == null) {
-            return ZonedDateTime.now(defaultZone);
-        }
-        if (temporal instanceof ZonedDateTime) {
-            return (ZonedDateTime) temporal;
-        }
-        if (temporal instanceof Instant) {
-            return ZonedDateTime.ofInstant((Instant) temporal, defaultZone);
+    protected TemporalAccessor parseUsingPattern(String normalizedInput, String patternToMatch, Locale locale) {
+        if (dayOfWeekIsRedundant(patternToMatch)) {
+            patternToMatch = patternToMatch.replace("EEEE", "");
+            patternToMatch = patternToMatch.replace("EEE", "");
+            normalizedInput = normalizedInput.replaceAll("(?i)" + getFullDaysOfWeekForReplaceRegexp(locale), "");
+            normalizedInput = normalizedInput.replaceAll("(?i)" + getShortDaysOfWeekForReplaceRegexp(locale), "");
         }
 
-        ZoneId zoneId = temporal.query(TemporalQueries.zone());
-        if (zoneId == null) {
-            LocalDate date = temporal.query(TemporalQueries.localDate());
-            LocalTime time = temporal.query(TemporalQueries.localTime());
-
-            if (date == null) {
-                date = LocalDate.now(defaultZone);
-            }
-            if (time == null) {
-                time = LocalTime.now(defaultZone);
-            }
-            return ZonedDateTime.of(date, time, defaultZone);
+        DateTimeFormatter timeFormatter;
+        if (isTwoDigitYear(patternToMatch)) {
+            timeFormatter = withTwoDigitYearWithBase1950(patternToMatch, locale);
         } else {
-            LocalDateTime now = LocalDateTime.now(zoneId);
-            TemporalField[] copyThese = new TemporalField[]{
-                    YEAR,
-                    MONTH_OF_YEAR,
-                    DAY_OF_MONTH,
-                    HOUR_OF_DAY,
-                    MINUTE_OF_HOUR,
-                    SECOND_OF_MINUTE,
-                    NANO_OF_SECOND
-            };
-            for (TemporalField tf: copyThese) {
-                if (temporal.isSupported(tf)) {
-                    now = now.with(tf, temporal.get(tf));
-                }
-            }
-            return now.atZone(zoneId);
+            timeFormatter = new DateTimeFormatterBuilder()
+                    .parseCaseInsensitive()
+                    .appendPattern(patternToMatch)
+                    .toFormatter(locale);
         }
+
+        return timeFormatter.parse(normalizedInput);
     }
+
+    private String getShortDaysOfWeekForReplaceRegexp(Locale locale) {
+        return arrayToRegexp.apply(new DateFormatSymbols(locale).getShortWeekdays(), locale);
+    }
+
+    private String getFullDaysOfWeekForReplaceRegexp(Locale locale) {
+        return arrayToRegexp.apply(new DateFormatSymbols(locale).getWeekdays(), locale);
+    }
+
+    private DateTimeFormatter withTwoDigitYearWithBase1950(String patternToMatch, Locale locale) {
+        String[] partsAroundYear = patternToMatch.split("yy");
+        DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
+                .parseCaseInsensitive();
+        if (partsAroundYear.length > 0 && !partsAroundYear[0].isEmpty()) {
+            builder.appendPattern(partsAroundYear[0]);
+        }
+        if (!patternToMatch.contains("GG")) {
+            builder.appendValueReduced(YEAR, 2, 2, 1950);
+        } else {
+            builder.appendValue(YEAR);
+        }
+        if (partsAroundYear.length > 1 && !partsAroundYear[1].isEmpty()) {
+            builder.appendPattern(partsAroundYear[1]);
+        }
+        return builder.toFormatter(locale);
+    }
+
+    private static boolean isTwoDigitYear(String patternToMatch) {
+        return patternToMatch.contains("yy") && !patternToMatch.contains("yyyy");
+    }
+
+    private static boolean dayOfWeekIsRedundant(String pattern) {
+        return pattern.contains("yy") && pattern.contains("MM") && pattern.contains("dd")
+                && pattern.contains("EEE");
+    }
+
 }

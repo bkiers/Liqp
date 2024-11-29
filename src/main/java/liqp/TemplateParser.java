@@ -10,6 +10,7 @@ import liqp.filters.Filter;
 import liqp.filters.Filters;
 import liqp.filters.date.BasicDateParser;
 import liqp.filters.date.Parser;
+import liqp.filters.date.fuzzy.FuzzyDateParser;
 import liqp.parser.Flavor;
 import liqp.parser.LiquidSupport;
 import liqp.tags.Tag;
@@ -425,7 +426,7 @@ public class TemplateParser {
             }
 
             if (dateParser == null) {
-                dateParser = new Parser();
+                dateParser = new FuzzyDateParser();
             }
 
             return new TemplateParser(strictVariables, showExceptionsFromInclude, evaluateMode, renderTransformer, locale, defaultTimeZone, environmentMapConfigurator, errorMode, fl, stripSpacesAroundTags, stripSingleLine, mapper,

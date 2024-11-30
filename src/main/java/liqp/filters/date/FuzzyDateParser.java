@@ -135,6 +135,12 @@ public class FuzzyDateParser extends BasicDateParser {
         private static String[] withoutNulls(String[] shortMonths) {
             return Arrays.stream(shortMonths)
                     .filter(month -> month != null && !month.isEmpty())
+                    .map(el -> {
+                        while (el.endsWith(".")) {
+                            el = el.substring(0, el.length() - 1);
+                        }
+                        return el;
+                    })
                     .toArray(String[]::new);
         }
     }

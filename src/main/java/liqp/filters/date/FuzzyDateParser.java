@@ -136,11 +136,15 @@ public class FuzzyDateParser extends BasicDateParser {
             return Arrays.stream(shortMonths)
                     .filter(month -> month != null && !month.isEmpty())
                     .map(el -> {
+                        // after jdk 9 it's normal (not counted as a bug)
+                        // so here need to check version and work around
+                        // https://bugs.openjdk.org/browse/JDK-8194289
                         while (el.endsWith(".")) {
                             el = el.substring(0, el.length() - 1);
                         }
                         return el;
                     })
+                    .map(Pattern::quote)
                     .toArray(String[]::new);
         }
     }

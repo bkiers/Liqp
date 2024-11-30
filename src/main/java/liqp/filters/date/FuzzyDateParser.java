@@ -1,9 +1,11 @@
 package liqp.filters.date;
 
+import java.text.DateFormatSymbols;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -20,7 +22,7 @@ public class FuzzyDateParser extends BasicDateParser {
             return zonedDateTime;
         }
 
-        String pattern = guessPattern(normalized);
+        String pattern = guessPattern(normalized, locale);
 
         TemporalAccessor temporalAccessor = parseUsingPattern(normalized, pattern, locale);
         if (temporalAccessor == null) {
@@ -30,10 +32,10 @@ public class FuzzyDateParser extends BasicDateParser {
         return getZonedDateTimeFromTemporalAccessor(temporalAccessor, defaultZone);
     }
 
-    String guessPattern(String normalized) {
+    String guessPattern(String normalized, Locale locale) {
         List<Part> parts = new ArrayList<>();
         // we start as one big single unparsed part
-        DateParseContext ctx = new DateParseContext();
+        DateParseContext ctx = new DateParseContext(locale);
         parts.add(new UnparsedPart(0, normalized.length(), normalized));
 
         while (haveUnparsed(parts)) {
@@ -55,19 +57,108 @@ public class FuzzyDateParser extends BasicDateParser {
     }
 
     static class DateParseContext {
+
+        private final Locale locale;
         Boolean hasYear;
-    }
+        Boolean hasMonthName;
+        Boolean hasTime;
 
-    static class PatternPair {
-        final Pattern pattern;
-        final String formatterPattern;
-
-        PatternPair(Pattern pattern, String formatterPattern) {
-            this.pattern = pattern;
-            this.formatterPattern = formatterPattern;
+        public DateParseContext(Locale locale) {
+            this.locale = locale;
         }
     }
-    static final PatternPair plainYearPair = new PatternPair(Pattern.compile(".*\\b?(\\d{4})\\b?.*"), "yyyy");
+    static class PartExtractorResult {
+        boolean found;
+        int start;
+        int end;
+    }
+    interface PartExtractor {
+        PartExtractorResult extract(String source);
+        String formatterPattern();
+    }
+    static class RegexPartExtractor implements PartExtractor {
+        private final Pattern pattern;
+        private final String formatterPattern;
+
+        RegexPartExtractor(String regex, String formatterPattern) {
+            this.pattern = Pattern.compile(regex);
+            this.formatterPattern = formatterPattern;
+        }
+
+        @Override
+        public PartExtractorResult extract(String source) {
+            Matcher matcher = pattern.matcher(source);
+            if (matcher.find()) {
+                PartExtractorResult result = new PartExtractorResult();
+                result.found = true;
+                result.start = matcher.start(1);
+                result.end = matcher.end(1);
+                return result;
+            }
+            return new PartExtractorResult();
+        }
+
+        @Override
+        public String formatterPattern() {
+            return formatterPattern;
+        }
+    }
+    PartExtractor plainYearExtractor = new RegexPartExtractor(".*\\b?(\\d{4})\\b?.*", "yyyy");
+
+    static class PartExtractorDelegate implements PartExtractor {
+        private PartExtractor delegate;
+
+        @Override
+        public PartExtractorResult extract(String source) {
+            return delegate.extract(source);
+        }
+
+        @Override
+        public String formatterPattern() {
+            return delegate.formatterPattern();
+        }
+    }
+    static class FullMonthExtractor extends PartExtractorDelegate {
+        public FullMonthExtractor(Locale locale, String formatterPattern) {
+            if (locale == null || Locale.ROOT.equals(locale)) {
+                locale = Locale.US;
+            }
+            String[] months = withoutNulls(getMonthsNamesFromLocale(locale));
+            String monthPattern = String.join("|", months);
+            super.delegate = new RegexPartExtractor(".*\\b?(" + monthPattern + ")\\b?.*", formatterPattern);
+        }
+
+        protected String[] getMonthsNamesFromLocale(Locale locale) {
+            return new DateFormatSymbols(locale).getMonths();
+        }
+
+        private static String[] withoutNulls(String[] shortMonths) {
+            return Arrays.stream(shortMonths)
+                    .filter(month -> month != null && !month.isEmpty())
+                    .toArray(String[]::new);
+        }
+    }
+
+    private PartExtractor fullMonthExtractor(Locale locale) {
+        return new FullMonthExtractor(locale, "MMMM");
+    }
+
+    static class ShortMonthExtractor extends FullMonthExtractor {
+        public ShortMonthExtractor(Locale locale) {
+            super(locale, "MMM");
+        }
+
+        @Override
+        protected String[] getMonthsNamesFromLocale(Locale locale) {
+            return new DateFormatSymbols(locale).getShortMonths();
+        }
+    }
+
+    private PartExtractor shortMonthExtractor(Locale locale) {
+        return new ShortMonthExtractor(locale);
+    }
+
+
     static class LookupResult {
         final List<Part> parts;
         final boolean found;
@@ -78,16 +169,40 @@ public class FuzzyDateParser extends BasicDateParser {
     }
     private List<Part> parsePart(List<Part> parts, DateParseContext ctx) {
         if (notSet(ctx.hasYear)) {
-            LookupResult result = lookup(parts, plainYearPair);
+            LookupResult result = lookup(parts, plainYearExtractor);
             if (result.found) {
                 ctx.hasYear = true;
                 return result.parts;
-            } else {
-                ctx.hasYear = false;
             }
+            ctx.hasYear = false;
+        }
+        if (notSet(ctx.hasMonthName)) {
+            LookupResult result = lookup(parts, fullMonthExtractor(ctx.locale));
+            if (result.found) {
+                ctx.hasMonthName = true;
+                return result.parts;
+            }
+
+            result = lookup(parts, shortMonthExtractor(ctx.locale));
+            if (result.found) {
+                ctx.hasMonthName = true;
+                return result.parts;
+            }
+
+            ctx.hasMonthName = false;
+        }
+
+        if (notSet(ctx.hasTime)) {
+            LookupResult result = new LookupResult(parts, false);
+            if (result.found) {
+                ctx.hasTime = true;
+                return result.parts;
+            }
+            ctx.hasTime = false;
         }
         return markAsUnrecognized(parts);
     }
+
 
     private List<Part> markAsUnrecognized(List<Part> parts) {
         return parts.stream().map(p -> {
@@ -104,26 +219,26 @@ public class FuzzyDateParser extends BasicDateParser {
     }
 
 
-    private LookupResult lookup(List<Part> parts, PatternPair patternPair) {
+    private LookupResult lookup(List<Part> parts, PartExtractor partExtractor) {
         for (int i = 0; i < parts.size(); i++) {
             Part part = parts.get(i);
 
             if (part.state() == PartState.UNPARSED) {
                 String source = part.source();
-                Matcher matcher = patternPair.pattern.matcher(source);
-                if (matcher.find()) {
+                PartExtractorResult per = partExtractor.extract(source);
+                if (per.found) {
                     parts.remove(i);
 
-                    if (matcher.end(1) != source.length()) {
-                        UnparsedPart after = new UnparsedPart(part.start() + matcher.end(1), part.end(), source.substring(matcher.end(1)));
+                    if (per.end != source.length()) {
+                        UnparsedPart after = new UnparsedPart(part.start() + per.end, part.end(), source.substring(per.end));
                         parts.add(i, after);
                     }
 
-                    ParsedPart parsed = new ParsedPart(part.start() + matcher.start(1), part.start() + matcher.end(1), patternPair.formatterPattern);
+                    ParsedPart parsed = new ParsedPart(part.start() + per.start, part.start() + per.end, partExtractor.formatterPattern());
                     parts.add(i, parsed);
 
-                    if (matcher.start(1) != 0) {
-                        UnparsedPart before = new UnparsedPart(part.start(), part.start() + matcher.start(1), source.substring(0, matcher.start(1)));
+                    if (per.start != 0) {
+                        UnparsedPart before = new UnparsedPart(part.start(), part.start() + per.start, source.substring(0, per.start));
                         parts.add(i, before);
                     }
 

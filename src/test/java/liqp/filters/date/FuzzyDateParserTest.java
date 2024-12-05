@@ -1,50 +1,22 @@
 package liqp.filters.date;
 
-import java.util.Locale;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-@RunWith(Parameterized.class)
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import liqp.filters.date.FuzzyDateParser.PartExtractor;
+import liqp.filters.date.FuzzyDateParser.PartExtractorResult;
+import org.junit.Test;
+
 public class FuzzyDateParserTest {
-    private final String input;
-    private final String expectedPattern;
-    private final Locale locale;
-
-    @Parameterized.Parameters
-    public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][] {
-                {null,  "1995", "yyyy" },
-                {null,  " 1995 ", " yyyy "},
-                {null,  " 1995", " yyyy"},
-                {null,  "1995  ", "yyyy  "},
-                {null, "January 1995", "MMMM yyyy"},
-                {null, "January 1995 ", "MMMM yyyy "},
-                {null, " January  1995", " MMMM  yyyy"},
-                {null, "  1995   January", "  yyyy   MMMM"},
-                {null, "Jan 1995", "MMM yyyy"},
-                {null, "1995    Jan ", "yyyy    MMM "},
-                {Locale.GERMAN, "1995    Mai", "yyyy    MMMM"},
-                {Locale.GERMAN, "??1995-----Dez!", "??yyyy-----MMM!"},
-        });
-    }
-
-    public FuzzyDateParserTest(Locale locale, String input, String expectedPattern) {
-        this.locale = locale;
-        this.input = input;
-        this.expectedPattern = expectedPattern;
-    }
-
     @Test
-    public void shouldParse() {
-        final FuzzyDateParser parser = new FuzzyDateParser();
-        String pattern = parser.guessPattern(input, locale);
-        assertEquals(expectedPattern, pattern);
+    public void testTimeRegexp() {
+        PartExtractor partExtractor = FuzzyDateParser.regularTimeExtractor;
+        PartExtractorResult result = partExtractor.extract(" 12:34 ");
+        assertTrue(result.found);
+        assertEquals( 1, result.start);
+        assertEquals( 6, result.end);
+        assertEquals(result.formatterPattern, "HH:mm");
     }
-
 }

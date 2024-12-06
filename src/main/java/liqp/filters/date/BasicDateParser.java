@@ -6,15 +6,15 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalQueries;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static java.time.temporal.ChronoField.*;
 
 public abstract class BasicDateParser {
 
-    private final List<String> cachedPatterns = new ArrayList<>();
+    private final List<String> cachedPatterns = new CopyOnWriteArrayList<>();
 
     protected BasicDateParser() {
 

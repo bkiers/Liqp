@@ -35,6 +35,12 @@ public class FuzzyDateParser extends BasicDateParser {
 
     @Override
     public ZonedDateTime parse(String valAsString, Locale locale, ZoneId defaultZone) {
+        if (locale == null) {
+            locale = Locale.ROOT;
+        }
+        if (defaultZone == null) {
+            defaultZone = ZoneId.systemDefault();
+        }
         String normalized = valAsString.toLowerCase();
         ZonedDateTime zonedDateTime = parseUsingCachedPatterns(normalized, locale, defaultZone);
         if (zonedDateTime != null) {
@@ -65,6 +71,20 @@ public class FuzzyDateParser extends BasicDateParser {
     }
 
     private List<Part> parsePart(List<Part> parts, DateParseContext ctx) {
+
+        if (notSet(ctx.weekDay)) {
+            LookupResult result = lookup(parts, fullWeekdaysExtractor(ctx.locale));
+            if (result.found) {
+                ctx.weekDay = true;
+                return result.parts;
+            }
+            result = lookup(parts, shortWeekdaysExtractor(ctx.locale));
+            if (result.found) {
+                ctx.weekDay = true;
+                return result.parts;
+            }
+            ctx.weekDay = false;
+        }
 
         if (notSet(ctx.hasYear)) {
             LookupResult result = lookup(parts, yearWithEraExtractor);
@@ -127,9 +147,13 @@ public class FuzzyDateParser extends BasicDateParser {
         private final Locale locale;
         Boolean hasYear;
         Boolean hasMonthName;
+        Boolean weekDay;
         Boolean hasTime;
 
         public DateParseContext(Locale locale) {
+            if (locale == null) {
+                locale = Locale.ROOT;
+            }
             this.locale = locale;
         }
     }
@@ -213,43 +237,52 @@ public class FuzzyDateParser extends BasicDateParser {
             return delegate.extract(source);
         }
     }
-    static class FullMonthExtractor extends PartExtractorDelegate {
-        public FullMonthExtractor(Locale locale, String formatterPattern) {
+    static abstract class EnumExtractor extends PartExtractorDelegate {
+        public EnumExtractor(Locale locale, String formatterPattern) {
             if (locale == null || Locale.ROOT.equals(locale)) {
                 locale = Locale.US;
             }
-            String[] months = withoutNulls(getMonthsNamesFromLocale(locale));
-            String monthPattern = String.join("|", months);
-            super.delegate = new RegexPartExtractor(".*\\b?(" + monthPattern + ")\\b?.*", formatterPattern);
+            String[] values = withoutNulls(getEnumValues(locale));
+            String valuesPattern = String.join("|", values);
+            super.delegate = new RegexPartExtractor(".*\\b?(" + valuesPattern + ")\\b?.*", formatterPattern);
         }
 
-        protected String[] getMonthsNamesFromLocale(Locale locale) {
-            return new DateFormatSymbols(locale).getMonths();
-        }
+        abstract protected String[] getEnumValues(Locale locale);
 
-        protected String[] withoutNulls(String[] shortMonths) {
-            return Arrays.stream(shortMonths)
-                    .filter(month -> month != null && !month.isEmpty())
+        protected String[] withoutNulls(String[] enumValues) {
+            return Arrays.stream(enumValues)
+                    .filter(val -> val != null && !val.isEmpty())
                     .map(Pattern::quote)
-                    .map(this::convertMonthName)
+                    .map(this::convertValName)
                     .toArray(String[]::new);
         }
-        protected String convertMonthName(String monthName) {
-            return monthName;
+        protected String convertValName(String val) {
+            return val;
+        }
+    }
+
+    static class FullMonthExtractor extends EnumExtractor {
+        public FullMonthExtractor(Locale locale) {
+            super(locale, "MMMM");
+        }
+
+        @Override
+        protected String[] getEnumValues(Locale locale) {
+            return new DateFormatSymbols(locale).getMonths();
         }
     }
 
     private PartExtractor fullMonthExtractor(Locale locale) {
-        return new FullMonthExtractor(locale, "MMMM");
+        return new FullMonthExtractor(locale);
     }
 
-    static class ShortMonthExtractor extends FullMonthExtractor {
+    static class ShortMonthExtractor extends EnumExtractor {
         public ShortMonthExtractor(Locale locale) {
             super(locale, "MMM");
         }
 
         @Override
-        protected String[] getMonthsNamesFromLocale(Locale locale) {
+        protected String[] getEnumValues(Locale locale) {
             return new DateFormatSymbols(locale).getShortMonths();
         }
     }
@@ -328,6 +361,23 @@ public class FuzzyDateParser extends BasicDateParser {
     }
 
     static PartExtractor regularTimeExtractor = new RegularTimeExtractor();
+
+    PartExtractor shortWeekdaysExtractor(Locale locale) {
+        return new EnumExtractor(locale, "EEE") {
+            @Override
+            protected String[] getEnumValues(Locale locale) {
+                return new DateFormatSymbols(locale).getShortWeekdays();
+            }
+        };
+    }
+    PartExtractor fullWeekdaysExtractor(Locale locale) {
+        return new EnumExtractor(locale, "EEEE") {
+            @Override
+            protected String[] getEnumValues(Locale locale) {
+                return new DateFormatSymbols(locale).getWeekdays();
+            }
+        };
+    }
 
     static class LookupResult {
         final List<Part> parts;

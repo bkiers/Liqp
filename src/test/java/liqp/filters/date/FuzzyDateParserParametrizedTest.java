@@ -69,9 +69,32 @@ public class FuzzyDateParserParametrizedTest {
                 {null, " 12  Anno Domini  ", " yyyy  GGGG  "},
                 {null, " 12345  Before Christ  ", " yyyy  GGGG  "},
                 {null, " 0  BC  ", " yyyy  GG  "},
+                {null, "12 January", "12 MMMM"},
+                {null, " 12  January  ", " 12  MMMM  "},
+                {null, "12 Jan", "12 MMM"},
+                {null, " 12  Jan  ", " 12  MMM  "},
 
                 {null, " 12  BC  12 Jan 01:23:45.678 ", " yyyy  GG  12 MMM HH:mm:ss.SSS "},
                 {null, "12 Jan 01:23:45.678  12  Anno Domini", "12 MMM HH:mm:ss.SSS  yyyy  GGGG"},
+                {null, "Monday", "EEEE"},
+                {null, " Monday ", " EEEE "},
+                {null, "Monday  ", "EEEE  "},
+                {null, "  Monday", "  EEEE"},
+                {null, "Mon", "EEE"},
+                {null, " Mon ", " EEE "},
+                {null, " Mon", " EEE"},
+                {null, "Mon  ", "EEE  "},
+                {Locale.GERMAN, "Montag", "EEEE"},
+                {Locale.GERMAN, " Montag ", " EEEE "},
+                {Locale.GERMAN, "Montag  ", "EEEE  "},
+                {Locale.GERMAN, "  Montag", "  EEEE"},
+                FuzzyDateParser.CLDR_LOADED ?
+                        new Object[]{
+                                Locale.GERMAN, "Mo.", "EEE"}
+                        : new Object[]{
+                                Locale.GERMAN, "Mo", "EEE"}
+                ,
+                {null, "Monday 17th September 1999 BC at 12:34:56.000 AM", "EEEE 17th MMMM yyyy GG at h:mm:ss.SSS a"},
         });
     }
 

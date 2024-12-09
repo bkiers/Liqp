@@ -3,6 +3,7 @@ package liqp.filters.date;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalQueries;
@@ -70,33 +71,24 @@ public abstract class BasicDateParser {
 
         ZoneId zoneId = temporal.query(TemporalQueries.zone());
         if (zoneId == null) {
-            LocalDate date = temporal.query(TemporalQueries.localDate());
-            LocalTime time = temporal.query(TemporalQueries.localTime());
-
-            if (date == null) {
-                date = LocalDate.now(defaultZone);
-            }
-            if (time == null) {
-                time = LocalTime.now(defaultZone);
-            }
-            return ZonedDateTime.of(date, time, defaultZone);
-        } else {
-            LocalDateTime now = LocalDateTime.now(zoneId);
-            TemporalField[] copyThese = new TemporalField[]{
-                    YEAR,
-                    MONTH_OF_YEAR,
-                    DAY_OF_MONTH,
-                    HOUR_OF_DAY,
-                    MINUTE_OF_HOUR,
-                    SECOND_OF_MINUTE,
-                    NANO_OF_SECOND
-            };
-            for (TemporalField tf: copyThese) {
-                if (temporal.isSupported(tf)) {
-                    now = now.with(tf, temporal.get(tf));
-                }
-            }
-            return now.atZone(zoneId);
+            zoneId = defaultZone;
         }
+
+        LocalDateTime now = LocalDateTime.now(zoneId);
+        TemporalField[] copyThese = new TemporalField[]{
+                YEAR,
+                MONTH_OF_YEAR,
+                DAY_OF_MONTH,
+                HOUR_OF_DAY,
+                MINUTE_OF_HOUR,
+                SECOND_OF_MINUTE,
+                NANO_OF_SECOND
+        };
+        for (TemporalField tf: copyThese) {
+            if (temporal.isSupported(tf)) {
+                now = now.with(tf, temporal.get(tf));
+            }
+        }
+        return now.atZone(zoneId);
     }
 }

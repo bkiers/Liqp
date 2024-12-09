@@ -1,7 +1,8 @@
-package liqp.filters.date;
+package liqp.filters.date.fuzzy;
 
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.regex.Pattern;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -35,9 +36,9 @@ public class FuzzyDateParserParametrizedTest {
                 {Locale.GERMAN, "1995    Mai", "yyyy    MMMM"},
                 FuzzyDateParser.CLDR_LOADED ?
                         new Object[]{
-                            Locale.GERMAN, "??1995-----Dez.!", "??yyyy-----MMM!"}
+                            Locale.GERMAN, "??1995-----Dez.!", "'??'yyyy-----MMM'!'"}
                         : new Object[]{
-                            Locale.GERMAN, "??1995-----Dez!", "??yyyy-----MMM!"}
+                            Locale.GERMAN, "??1995-----Dez!", "'??'yyyy-----MMM'!'"}
                 ,
                 {null, "1:23", "H:mm"},
                 {null, "01:23", "HH:mm"},
@@ -54,8 +55,8 @@ public class FuzzyDateParserParametrizedTest {
                 {null, "1:23:45.67890123", "H:mm:ss.SSSSSSSS"},
                 {null, "1:23:45.678901234", "H:mm:ss.SSSSSSSSS"},
                 {null, "1:23:45.678901234am", "h:mm:ss.SSSSSSSSSa"}, // correct
-                {null, "1:23:45.678901234a", "H:mm:ss.SSSSSSSSSa"},  // incorrect
-                {null, "1:23:45.678901234p", "H:mm:ss.SSSSSSSSSp"},  // incorrect
+                {null, "1:23:45.678901234a", "H:mm:ss.SSSSSSSSS'a'"},  // incorrect
+                {null, "1:23:45.678901234p", "H:mm:ss.SSSSSSSSS'p'"},  // incorrect
                 {null, "1:23:45.678901234pm", "h:mm:ss.SSSSSSSSSa"}, // correct
                 {null, "1:23:45.678901234   pm", "h:mm:ss.SSSSSSSSS   a"}, // correct
                 {null, " 1:23:45.678", " H:mm:ss.SSS"},
@@ -63,19 +64,19 @@ public class FuzzyDateParserParametrizedTest {
                 {null, " 01:23:45.678  ", " HH:mm:ss.SSS  "},
                 {null, " 1:23:45.678 am ", " h:mm:ss.SSS a "},
                 {null, " 1:23:45.678    PM ", " h:mm:ss.SSS    a "},
-                {null, "12 Jan 1995T01:23:45.678", "12 MMM yyyyTHH:mm:ss.SSS"},
+                {null, "12 Jan 1995T01:23:45.678", "'12' MMM yyyyTHH:mm:ss.SSS"},
                 {null, "12  AD", "yyyy  GG"},
                 {null, " 12  AD ", " yyyy  GG "},
                 {null, " 12  Anno Domini  ", " yyyy  GGGG  "},
                 {null, " 12345  Before Christ  ", " yyyy  GGGG  "},
                 {null, " 0  BC  ", " yyyy  GG  "},
-                {null, "12 January", "12 MMMM"},
-                {null, " 12  January  ", " 12  MMMM  "},
-                {null, "12 Jan", "12 MMM"},
-                {null, " 12  Jan  ", " 12  MMM  "},
+                {null, "12 January", "'12' MMMM"},
+                {null, " 12  January  ", " '12'  MMMM  "},
+                {null, "12 Jan", "'12' MMM"},
+                {null, " 12  Jan  ", " '12'  MMM  "},
 
-                {null, " 12  BC  12 Jan 01:23:45.678 ", " yyyy  GG  12 MMM HH:mm:ss.SSS "},
-                {null, "12 Jan 01:23:45.678  12  Anno Domini", "12 MMM HH:mm:ss.SSS  yyyy  GGGG"},
+                {null, " 12  BC  12 Jan 01:23:45.678 ", " yyyy  GG  '12' MMM HH:mm:ss.SSS "},
+                {null, "12 Jan 01:23:45.678  12  Anno Domini", "'12' MMM HH:mm:ss.SSS  yyyy  GGGG"},
                 {null, "Monday", "EEEE"},
                 {null, " Monday ", " EEEE "},
                 {null, "Monday  ", "EEEE  "},
@@ -94,21 +95,35 @@ public class FuzzyDateParserParametrizedTest {
                         : new Object[]{
                                 Locale.GERMAN, "Mo", "EEE"}
                 ,
-                {null, "Monday 17th September 1999 BC at 12:34:56.000 AM", "EEEE 17th MMMM yyyy GG at h:mm:ss.SSS a"},
+                {null, "Monday 17th September 1999 BC at 12:34:56.000 AM", "EEEE '17th' MMMM yyyy GG 'at' h:mm:ss.SSS a"},
+                {null, "2021-11-23", "yyyy-MM-dd"},
+                {null, "2024-1-5 08:15 ", "yyyy-MM-d HH:mm"},
+                {null, "2024-12-25 14:45 ", "yyyy-MM-d HH:mm"},
+
         });
     }
 
     public FuzzyDateParserParametrizedTest(Locale locale, String input, String expectedPattern) {
-        this.locale = locale;
+        this.locale = locale == null ? Locale.ENGLISH : locale;
         this.input = input;
         this.expectedPattern = expectedPattern;
     }
 
     @Test
     public void shouldParse() {
-        final FuzzyDateParser parser = new FuzzyDateParser();
-        String pattern = parser.guessPattern(input, locale);
-        assertEquals(expectedPattern, pattern);
+        ZonedDateTime parsed = null;
+        String pattern = null;
+        try {
+            final FuzzyDateParser parser = new FuzzyDateParser();
+            pattern = parser.guessPattern(input, locale);
+            assertEquals(expectedPattern, pattern);
+            parsed = parser.parse(input, locale, null);
+            String formatted = parsed.format(DateTimeFormatter.ofPattern(pattern, locale)).toLowerCase(locale);
+            assertEquals(String.format("input is: [%s], expected pattern: [%s], real pattern: [%s], real date: [%s]", input, expectedPattern, pattern, parsed),
+                    input.toLowerCase(locale), formatted);
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("input is: [%s], expected pattern: [%s], real pattern: [%s], real date: [%s]", input, expectedPattern, pattern, parsed), e);
+        }
     }
 
 

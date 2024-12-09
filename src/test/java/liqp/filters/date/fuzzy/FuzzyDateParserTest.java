@@ -1,4 +1,4 @@
-package liqp.filters.date;
+package liqp.filters.date.fuzzy;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -6,14 +6,14 @@ import static org.junit.Assert.assertTrue;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.Callable;
-import liqp.filters.date.FuzzyDateParser.PartExtractor;
-import liqp.filters.date.FuzzyDateParser.PartExtractorResult;
+import liqp.filters.date.fuzzy.extractors.Extractors;
+import liqp.filters.date.fuzzy.extractors.PartExtractorResult;
 import org.junit.Test;
 
 public class FuzzyDateParserTest {
     @Test
     public void testTimeRegexp() {
-        PartExtractor partExtractor = FuzzyDateParser.regularTimeExtractor;
+        PartExtractor partExtractor = Extractors.regularTimeExtractor.get(null);
         PartExtractorResult result = partExtractor.extract(" 12:34 ");
         assertTrue(result.found);
         assertEquals( 1, result.start);

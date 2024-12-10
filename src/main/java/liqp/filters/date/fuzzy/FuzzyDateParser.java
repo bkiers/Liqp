@@ -39,14 +39,13 @@ public class FuzzyDateParser extends BasicDateParser {
     private static final PartRecognizer partRecognizer = new PartRecognizer();
 
     @Override
-    public ZonedDateTime parse(String valAsString, Locale locale, ZoneId defaultZone) {
+    public ZonedDateTime parse(String normalized, Locale locale, ZoneId defaultZone) {
         if (locale == null) {
             locale = Locale.ENGLISH;
         }
         if (defaultZone == null) {
             defaultZone = ZoneId.systemDefault();
         }
-        String normalized = valAsString.toLowerCase();
         ZonedDateTime zonedDateTime = parseUsingCachedPatterns(normalized, locale, defaultZone);
         if (zonedDateTime != null) {
             return zonedDateTime;
@@ -68,7 +67,6 @@ public class FuzzyDateParser extends BasicDateParser {
         }
         List<Part> parts = new ArrayList<>();
         DatePatternRecognizingContext ctx = new DatePatternRecognizingContext(locale);
-        normalized = normalized.toLowerCase(locale);
         parts.add(new NewPart(0, normalized.length(), normalized));
 
         while (haveUnrecognized(parts)) {

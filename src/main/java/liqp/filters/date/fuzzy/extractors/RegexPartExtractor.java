@@ -10,7 +10,7 @@ class RegexPartExtractor implements PartExtractor {
     protected final String formatterPattern;
 
     public RegexPartExtractor(String regex, String formatterPattern) {
-        this.pattern = Pattern.compile(regex);
+        this.pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         this.formatterPattern = formatterPattern;
     }
 

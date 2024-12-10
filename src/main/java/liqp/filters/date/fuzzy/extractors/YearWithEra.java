@@ -1,6 +1,7 @@
 package liqp.filters.date.fuzzy.extractors;
 
 import static liqp.LValue.isBlank;
+import static liqp.filters.date.fuzzy.extractors.RegularTimeExtractor.repeat;
 
 import java.util.regex.Matcher;
 
@@ -18,7 +19,7 @@ class YearWithEra extends RegexPartExtractor {
             PartExtractorResult result = new PartExtractorResult();
             result.found = true;
             result.start = matcher.start("year");
-            result.formatterPattern = "yyyy";
+            result.formatterPattern = repeat("y", matcher.group("year").length());
             String era = matcher.group("era");
             if (!isBlank(era)) {
                 String eraSeparator = matcher.group("eraSeparator");

@@ -145,10 +145,9 @@ public class PartRecognizer {
 
     private List<Part> markAsUnrecognized(List<Part> parts) {
         List<Part> newParts = new ArrayList<>();
-        for (int i = 0; i < parts.size(); i++) {
-            Part p = parts.get(i);
+        for (Part p : parts) {
             if (p.state() == Part.PartState.NEW) {
-                newParts.addAll(i, categorizeUnrecognized(p));
+                newParts.addAll(categorizeUnrecognized(p));
             } else {
                 newParts.add(p);
             }

@@ -18,7 +18,7 @@ import static java.time.temporal.ChronoField.*;
 
 public abstract class BasicDateParser {
 
-    private final List<String> cachedPatterns = new CopyOnWriteArrayList<>();
+    protected final List<String> cachedPatterns = new CopyOnWriteArrayList<>();
 
     protected BasicDateParser() {
 

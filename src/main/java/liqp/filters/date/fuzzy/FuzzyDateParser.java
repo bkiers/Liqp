@@ -7,7 +7,9 @@ import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import liqp.filters.date.BasicDateParser;
 import liqp.filters.date.fuzzy.Part.NewPart;
 import liqp.filters.date.fuzzy.Part.RecognizedPart;
@@ -51,17 +53,37 @@ public class FuzzyDateParser extends BasicDateParser {
             return date;
         }
 
-        String pattern = guessPattern(normalized, locale);
-
-        TemporalAccessor temporalAccessor = parseUsingPattern(normalized, pattern, locale);
-        if (temporalAccessor == null) {
+        GuessingResult guessingResult = guessPattern(normalized, locale, defaultZone);
+        if (guessingResult == null) {
             return null;
         }
-        storePattern(pattern);
-        return getFullDateIfPossible(temporalAccessor, defaultZone);
+        storePattern(guessingResult.pattern);
+        return getFullDateIfPossible(guessingResult.temporalAccessor, defaultZone);
     }
 
-    String guessPattern(String normalized, Locale locale) {
+    GuessingResult guessPattern(String normalized, Locale locale, ZoneId defaultZone) {
+        Stream<String> guessingStream = getGuessingStream(cachedPatterns, normalized, locale, defaultZone);
+        return getGuessingResult(guessingStream, normalized, locale, defaultZone);
+    }
+
+    private Stream<String> getGuessingStream(List<String> cachedPatterns, String normalized,
+            Locale locale, ZoneId defaultZone) {
+        // [1, 2][1][1][1] => ["1111"], ["2111"]
+        List<List<String>> fullPattern = guessVariants(normalized, locale);
+
+        return fullPattern.stream()
+                .reduce(
+                        Stream.of(""), // Initial
+                        (stream, list) -> stream.flatMap(
+                                combination -> list.stream().map(element -> combination + element)
+                        ),
+                        Stream::concat
+                )
+                .filter(p -> !cachedPatterns.contains(p));
+    }
+
+
+    protected List<List<String>> guessVariants(String normalized, Locale locale) {
         if (locale == null) {
             locale = Locale.ENGLISH;
         }
@@ -76,19 +98,51 @@ public class FuzzyDateParser extends BasicDateParser {
         return reconstructPattern(parts);
     }
 
-    private boolean haveUnrecognized(List<Part> parts) {
-        return parts.stream().anyMatch(p -> p.state() == Part.PartState.NEW);
-    }
-
-    private String reconstructPattern(List<Part> parts) {
+    private List<List<String>> reconstructPattern(List<Part> parts) {
         return parts.stream().map(p -> {
             if (p.state() == Part.PartState.RECOGNIZED) {
-                return ((RecognizedPart) p).getPattern();
+                return ((RecognizedPart) p).getPatterns();
             } else if (p.state() == Part.PartState.PUNCTUATION) {
-                return p.source();
+                return newList(p.source());
             } else {
-                return "'" + p.source() + "'";
+                return newList("'" + p.source() + "'");
             }
-        }).collect(Collectors.joining());
+        }).collect(Collectors.toList());
+    }
+
+    private List<String> newList(String pattern) {
+        List<String> res = new ArrayList<>();
+        res.add(pattern);
+        return res;
+    }
+
+    private GuessingResult getGuessingResult(Stream<String> guessingStream, String normalized, Locale locale, ZoneId defaultZone) {
+        return guessingStream
+                .map(pattern -> {
+                    TemporalAccessor temporalAccessor = parseUsingPattern(normalized, pattern, locale);
+                    if (temporalAccessor != null) {
+                        GuessingResult result = new GuessingResult();
+                        result.pattern = pattern;
+                        result.temporalAccessor = temporalAccessor;
+                        return result;
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null);
+    }
+
+    static class GuessingResult {
+        String pattern;
+        TemporalAccessor temporalAccessor;
+    }
+    private TemporalAccessor getTemporalAccessor(String normalized, Locale locale,
+            ZoneId defaultZone, Stream<String> guessingStream) {
+        return null;
+    }
+
+    private boolean haveUnrecognized(List<Part> parts) {
+        return parts.stream().anyMatch(p -> p.state() == Part.PartState.NEW);
     }
 }

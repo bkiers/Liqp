@@ -1,5 +1,8 @@
 package liqp.filters.date.fuzzy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface Part {
     enum PartState {
         NEW,
@@ -129,6 +132,11 @@ public interface Part {
 
         public String getPattern() {
             return pattern;
+        }
+        public List<String> getPatterns() {
+            ArrayList<String> res = new ArrayList<>();
+            res.add(pattern);
+            return res;
         }
 
         @Override

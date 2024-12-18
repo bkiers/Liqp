@@ -32,6 +32,14 @@ import liqp.filters.date.fuzzy.Part.RecognizedPart;
  * See their tests: <a href="https://github.com/ruby/date/blob/master/test/date/test_date_parse.rb">ruby date parse tests</a>
  * and the code: <a href="https://github.com/ruby/date/blob/master/ext/date/date_parse.c">ruby date parse</a>
  *
+ *
+ * Some refs:
+ * https://github.com/pixa-pics/pixa-pics.github.io/blob/main/src/js/utils/time.js
+ * https://github.com/ruby-rdf/rdf-tabular/blob/develop/spec/uax35_spec.rb
+ * https://ielts.idp.com/prepare/article-how-to-write-the-date-correctly
+ * https://en.wikipedia.org/wiki/Date_format_by_country
+ * https://en.wikipedia.org/wiki/Date_and_time_notation_in_Germany
+ * https://en.wikipedia.org/wiki/Date_and_time_representation_by_country
  */
 public class FuzzyDateParser extends BasicDateParser {
 

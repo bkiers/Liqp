@@ -46,9 +46,9 @@ public class FuzzyDateParser extends BasicDateParser {
         if (defaultZone == null) {
             defaultZone = ZoneId.systemDefault();
         }
-        ZonedDateTime zonedDateTime = parseUsingCachedPatterns(normalized, locale, defaultZone);
-        if (zonedDateTime != null) {
-            return zonedDateTime;
+        ZonedDateTime date = parseUsingCachedPatterns(normalized, locale, defaultZone);
+        if (date != null) {
+            return date;
         }
 
         String pattern = guessPattern(normalized, locale);
@@ -58,7 +58,7 @@ public class FuzzyDateParser extends BasicDateParser {
             return null;
         }
         storePattern(pattern);
-        return getZonedDateTimeFromTemporalAccessor(temporalAccessor, defaultZone);
+        return getFullDateIfPossible(temporalAccessor, defaultZone);
     }
 
     String guessPattern(String normalized, Locale locale) {

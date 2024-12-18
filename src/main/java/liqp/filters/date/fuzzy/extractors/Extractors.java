@@ -83,17 +83,25 @@ public enum Extractors {
      *
      */
     ISO8601YMDPatternExtractor {
-        private final PartExtractor partExtractor = new RegexPartExtractor("(?:^|.*?\\D)"
-                + "(\\d{4}-\\d{2}-\\d{2})"
-                + "(?:$|\\D.*?)", "yyyy-MM-dd");
+        private final PartExtractor partExtractor = new ISO8601YMDPatternExtractor();
         @Override
         public PartExtractor get(Locale locale) {
             return partExtractor;
         }
-    }
+    },
+
+    englishDateExtractor {
+        private final PartExtractor partExtractor = new EnglishDMYPatternExtractor();
+        @Override
+        public PartExtractor get(Locale locale) {
+            return partExtractor;
+        }
+    },
     ;
+
     public abstract PartExtractor get(Locale locale);
-//
+
+    //
 //    /**
 //     * [Mon, ]17 Sep 2019 12:34[:56] [+HHMM/GMT]
 //     * weekDay is optional

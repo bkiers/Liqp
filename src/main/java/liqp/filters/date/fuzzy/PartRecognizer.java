@@ -1,7 +1,7 @@
 package liqp.filters.date.fuzzy;
 
-import static liqp.LValue.isBlank;
 import static liqp.filters.date.fuzzy.extractors.Extractors.ISO8601YMDPatternExtractor;
+import static liqp.filters.date.fuzzy.extractors.Extractors.englishDateExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.fullMonthExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.fullWeekdaysExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.plainYearExtractor;
@@ -11,13 +11,11 @@ import static liqp.filters.date.fuzzy.extractors.Extractors.shortWeekdaysExtract
 import static liqp.filters.date.fuzzy.extractors.Extractors.yearWithEraExtractor;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import liqp.filters.date.fuzzy.Part.NewPart;
 import liqp.filters.date.fuzzy.Part.PunctuationPart;
 import liqp.filters.date.fuzzy.Part.RecognizedPart;
-import liqp.filters.date.fuzzy.Part.NewPart;
 import liqp.filters.date.fuzzy.Part.UnrecognizedPart;
 import liqp.filters.date.fuzzy.extractors.PartExtractorResult;
 
@@ -58,6 +56,13 @@ public class PartRecognizer {
         }
         if (notSet(ctx.hasYear)) {
             LookupResult result = lookup(parts, ISO8601YMDPatternExtractor.get(ctx.locale));
+            if (result.found) {
+                ctx.hasYear = true;
+                ctx.hasMonth = true;
+                ctx.hasDay = true;
+                return result.parts;
+            }
+            result = lookup(parts, englishDateExtractor.get(ctx.locale));
             if (result.found) {
                 ctx.hasYear = true;
                 ctx.hasMonth = true;

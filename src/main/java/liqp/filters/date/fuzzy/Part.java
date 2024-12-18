@@ -130,13 +130,8 @@ public interface Part {
             throw new IllegalStateException("Parsed part has no source");
         }
 
-        public String getPattern() {
-            return pattern;
-        }
         public List<String> getPatterns() {
-            ArrayList<String> res = new ArrayList<>();
-            res.add(pattern);
-            return res;
+            return patterns;
         }
 
         @Override
@@ -144,7 +139,7 @@ public interface Part {
             return "RecognizedPart{" +
                     "start=" + start +
                     ", end=" + end +
-                    ", pattern='" + pattern + '\'' +
+                    ", pattern='" + patterns + '\'' +
                     '}';
         }
     }

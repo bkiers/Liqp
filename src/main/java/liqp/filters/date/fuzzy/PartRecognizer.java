@@ -133,7 +133,7 @@ public class PartRecognizer {
                         parts.add(i, after);
                     }
 
-                    RecognizedPart recognized = new RecognizedPart(part.start() + per.start, part.start() + per.end, per.formatterPattern);
+                    RecognizedPart recognized = new RecognizedPart(part.start() + per.start, part.start() + per.end, per.formatterPatterns);
                     parts.add(i, recognized);
 
                     if (per.start != 0) {

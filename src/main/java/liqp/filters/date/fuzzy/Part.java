@@ -102,12 +102,12 @@ public interface Part {
     class RecognizedPart implements Part {
         final int start;
         final int end;
-        private final String pattern;
+        private final List<String> patterns;
 
-        RecognizedPart(int start, int end, String pattern) {
+        RecognizedPart(int start, int end, List<String> patterns) {
             this.start = start;
             this.end = end;
-            this.pattern = pattern;
+            this.patterns = patterns;
         }
 
         @Override

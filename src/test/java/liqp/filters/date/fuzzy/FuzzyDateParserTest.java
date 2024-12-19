@@ -18,7 +18,7 @@ public class FuzzyDateParserTest {
         assertTrue(result.found);
         assertEquals( 1, result.start);
         assertEquals( 6, result.end);
-        assertEquals("HH:mm", result.formatterPattern);
+        assertEquals("HH:mm", result.formatterPatterns.get(0));
     }
 
     @Test

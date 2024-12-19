@@ -19,22 +19,23 @@ class YearWithEra extends RegexPartExtractor {
             PartExtractorResult result = new PartExtractorResult();
             result.found = true;
             result.start = matcher.start("year");
-            result.formatterPattern = repeat("y", matcher.group("year").length());
+            String resPattern = repeat("y", matcher.group("year").length());
             String era = matcher.group("era");
             if (!isBlank(era)) {
                 String eraSeparator = matcher.group("eraSeparator");
                 if (eraSeparator != null) {
-                    result.formatterPattern += eraSeparator;
+                    resPattern += eraSeparator;
                 }
                 result.end = matcher.end("era");
                 if (era.length() == 2) {
-                    result.formatterPattern += "GG";
+                    resPattern += "GG";
                 } else {
-                    result.formatterPattern += "GGGG";
+                    resPattern += "GGGG";
                 }
             } else {
                 result.end = matcher.end("year");
             }
+            result.formatterPatterns = newList(resPattern);
             return result;
         }
         return new PartExtractorResult();

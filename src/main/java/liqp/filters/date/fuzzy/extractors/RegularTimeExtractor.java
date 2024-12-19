@@ -47,25 +47,27 @@ class RegularTimeExtractor extends RegexPartExtractor {
             }
 
             r.start = m.start("hours");
+            String resPattern;
             if (m.group("milliseconds") != null) {
                 int millisecondsLength = m.group("milliseconds").length();
                 r.end = m.end("milliseconds");
-                r.formatterPattern =
+                resPattern = 
                         hourPart + ":mm:ss." + repeat("S", millisecondsLength);
             } else if (m.group("seconds") != null) {
                 r.end = m.end("seconds");
-                r.formatterPattern = hourPart + ":mm:ss";
+                resPattern = hourPart + ":mm:ss";
             } else if (m.group("minutes") != null) {
                 r.end = m.end("minutes");
-                r.formatterPattern = hourPart + ":mm";
+                resPattern = hourPart + ":mm";
             } else {
                 r.end = m.end("hours");
-                r.formatterPattern = hourPart;
+                resPattern = hourPart;
             }
             if (hasAmPm) {
-                r.formatterPattern += ampmPart;
+                resPattern += ampmPart;
                 r.end = m.end("ampm");
             }
+            r.formatterPatterns = newList(resPattern);
             return r;
         }
         return new PartExtractorResult();

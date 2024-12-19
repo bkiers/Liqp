@@ -18,7 +18,7 @@ class ISO8601YMDPatternExtractor extends RegexPartExtractor {
             result.found = true;
             result.start = matcher.start("year");
             result.end = matcher.end("date");
-            result.formatterPattern = getPattern(matcher);
+            result.formatterPatterns = newList(getPattern(matcher));
             return result;
         }
         return new PartExtractorResult();

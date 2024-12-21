@@ -1,7 +1,6 @@
 package liqp.filters.date.fuzzy;
 
-import static liqp.filters.date.fuzzy.extractors.Extractors.ISO8601YMDPatternExtractor;
-import static liqp.filters.date.fuzzy.extractors.Extractors.englishDateExtractor;
+import static liqp.filters.date.fuzzy.extractors.Extractors.allYMDPatternExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.fullMonthExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.fullWeekdaysExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.plainYearExtractor;
@@ -55,14 +54,7 @@ public class PartRecognizer {
             ctx.hasTime = false;
         }
         if (notSet(ctx.hasYear)) {
-            LookupResult result = lookup(parts, ISO8601YMDPatternExtractor.get(ctx.locale));
-            if (result.found) {
-                ctx.hasYear = true;
-                ctx.hasMonth = true;
-                ctx.hasDay = true;
-                return result.parts;
-            }
-            result = lookup(parts, englishDateExtractor.get(ctx.locale));
+            LookupResult result = lookup(parts, allYMDPatternExtractor.get(ctx.locale));
             if (result.found) {
                 ctx.hasYear = true;
                 ctx.hasMonth = true;

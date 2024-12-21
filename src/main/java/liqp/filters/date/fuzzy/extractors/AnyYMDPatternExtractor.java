@@ -7,22 +7,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 
-abstract class AnyYMDPatternExtractor extends RegexPartExtractor {
+class AnyYMDPatternExtractor extends RegexPartExtractor {
 
     public enum RuleType {
         Y, M, D, PUNCTUATION;
     }
     public static class RulePart {
         private final RuleType type;
-        private final Integer[] length;
+        private final Integer length;
         private final String content;
         private RulePart(RuleType type, String content) {
             this.type = type;
             this.content = content;
-            this.length = new Integer[0];
+            this.length = null;
         }
 
-        private RulePart(RuleType type, Integer[] length) {
+        private RulePart(RuleType type, Integer length) {
             this.type = type;
             this.length = length;
             this.content = null;
@@ -32,17 +32,17 @@ abstract class AnyYMDPatternExtractor extends RegexPartExtractor {
     static RulePart pp(String content) {
         return new RulePart(RuleType.PUNCTUATION, content);
     }
-    static RulePart pY(Integer length) {
-        return new RulePart(RuleType.Y, new Integer[]{length});
+    static RulePart pY4() {
+        return new RulePart(RuleType.Y, 4);
     }
-    static RulePart pY(Integer length1, Integer length2) {
-        return new RulePart(RuleType.Y, new Integer[]{length1, length2});
+    static RulePart pY2() {
+        return new RulePart(RuleType.Y, 2);
     }
     static RulePart pM() {
-        return new RulePart(RuleType.M, (Integer[])null);
+        return new RulePart(RuleType.M, (Integer)null);
     }
     static RulePart pD() {
-        return new RulePart(RuleType.D, (Integer[])null);
+        return new RulePart(RuleType.D, (Integer)null);
     }
     private final RulePart[] partsInOrder;
     protected AnyYMDPatternExtractor(RulePart... partsInOrder) {
@@ -54,18 +54,17 @@ abstract class AnyYMDPatternExtractor extends RegexPartExtractor {
         StringBuilder sb = new StringBuilder("(?:^|.*?\\D)");
         for (RulePart part : partsInOrder) {
             if (part.type == RuleType.PUNCTUATION) {
-                sb.append(part.content);
+                if (".".equals(part.content)) {
+                    sb.append("\\.");
+                } else {
+                    sb.append(part.content);
+                }
             } else {
                 if (part.type == RuleType.Y) {
-                    if (part.length == null || part.length.length == 0) {
+                    if (part.length == null) {
                         throw new IllegalArgumentException("Year part must have length");
                     }
-                    if (part.length.length == 1) {
-                        sb.append("(?<year>\\d{").append(part.length[0]).append("})");
-                    } else {
-                        sb.append("(?<year>\\d{").append(part.length[0]).append("}|\\d{")
-                                .append(part.length[1]).append("})");
-                    }
+                    sb.append("(?<year>\\d{").append(part.length).append("})");
                 } else if (part.type == RuleType.M) {
                     sb.append("(?<month>0?[1-9]|1[0-2])");
                 } else if (part.type == RuleType.D) {

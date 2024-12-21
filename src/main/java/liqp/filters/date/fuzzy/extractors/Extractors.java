@@ -82,21 +82,14 @@ public enum Extractors {
      * BASIC_ISO_DATE = 20111203 (yyyyMMdd)
      *
      */
-    ISO8601YMDPatternExtractor {
-        private final PartExtractor partExtractor = new ISO8601YMDPatternExtractor();
+    allYMDPatternExtractor {
+        private final PartExtractor partExtractor = new AllYMDPatternExtractor();
         @Override
         public PartExtractor get(Locale locale) {
             return partExtractor;
         }
     },
 
-    englishDateExtractor {
-        private final PartExtractor partExtractor = new EnglishDMYPatternExtractor();
-        @Override
-        public PartExtractor get(Locale locale) {
-            return partExtractor;
-        }
-    },
     ;
 
     public abstract PartExtractor get(Locale locale);

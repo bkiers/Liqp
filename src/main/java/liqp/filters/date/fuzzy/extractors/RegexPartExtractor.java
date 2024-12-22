@@ -6,10 +6,12 @@ import liqp.filters.date.fuzzy.PartExtractor;
 
 class RegexPartExtractor implements PartExtractor {
 
+    protected final String name;
     protected final Pattern pattern;
     protected final String formatterPattern;
 
-    public RegexPartExtractor(String regex, String formatterPattern) {
+    public RegexPartExtractor(String name, String regex, String formatterPattern) {
+        this.name = name;
         this.pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         this.formatterPattern = formatterPattern;
     }
@@ -18,12 +20,12 @@ class RegexPartExtractor implements PartExtractor {
     public PartExtractorResult extract(String source) {
         Matcher matcher = pattern.matcher(source);
         if (matcher.find()) {
-            PartExtractorResult result = new PartExtractorResult(formatterPattern);
+            PartExtractorResult result = new PartExtractorResult(name, formatterPattern);
             result.found = true;
             result.start = matcher.start(1);
             result.end = matcher.end(1);
             return result;
         }
-        return new PartExtractorResult();
+        return new PartExtractorResult(name);
     }
 }

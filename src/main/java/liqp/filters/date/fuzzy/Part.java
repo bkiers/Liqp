@@ -103,11 +103,13 @@ public interface Part {
         final int start;
         final int end;
         private final List<String> patterns;
+        public final String source;
 
-        RecognizedPart(int start, int end, List<String> patterns) {
+        RecognizedPart(int start, int end, List<String> patterns, String source) {
             this.start = start;
             this.end = end;
             this.patterns = patterns;
+            this.source = source;
         }
 
         @Override

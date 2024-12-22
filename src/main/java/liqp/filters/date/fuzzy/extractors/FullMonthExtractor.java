@@ -6,7 +6,7 @@ import java.util.Locale;
 class FullMonthExtractor extends EnumExtractor {
 
     public FullMonthExtractor(Locale locale) {
-        super(locale, "MMMM");
+        super("FullMonthExtractor", locale, "MMMM");
     }
 
     @Override

@@ -6,13 +6,13 @@ import java.util.regex.Pattern;
 
 abstract class EnumExtractor extends PartExtractorDelegate {
 
-    public EnumExtractor(Locale locale, String formatterPattern) {
+    public EnumExtractor(String name, Locale locale, String formatterPattern) {
         if (locale == null || Locale.ROOT.equals(locale)) {
             locale = Locale.US;
         }
         String[] values = withoutNulls(getEnumValues(locale), locale);
         String valuesPattern = String.join("|", values);
-        super.delegate = new RegexPartExtractor("(?:^|.*?[^\\w_])(" + valuesPattern + ")(?:$|[^\\w_].*?)",
+        super.delegate = new RegexPartExtractor(name,"(?:^|.*?[^\\w_])(" + valuesPattern + ")(?:$|[^\\w_].*?)",
                 formatterPattern);
     }
 

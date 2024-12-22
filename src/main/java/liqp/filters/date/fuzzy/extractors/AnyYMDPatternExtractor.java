@@ -44,9 +44,10 @@ class AnyYMDPatternExtractor extends RegexPartExtractor {
     static RulePart pD() {
         return new RulePart(RuleType.D, (Integer)null);
     }
+
     private final RulePart[] partsInOrder;
-    protected AnyYMDPatternExtractor(RulePart... partsInOrder) {
-        super(reconstructPattern(partsInOrder), null);
+    protected AnyYMDPatternExtractor(String name, RulePart... partsInOrder) {
+        super(name, reconstructPattern(partsInOrder), null);
         this.partsInOrder = partsInOrder;
     }
 
@@ -80,14 +81,14 @@ class AnyYMDPatternExtractor extends RegexPartExtractor {
     public PartExtractorResult extract(String source) {
         Matcher matcher = pattern.matcher(source);
         if (matcher.find()) {
-            PartExtractorResult result = new PartExtractorResult();
+            PartExtractorResult result = new PartExtractorResult(name);
             result.found = true;
             result.start = matcher.start(findFirstGroupName());
             result.end = matcher.end(findLastGroupName());
             result.formatterPatterns = getPatterns(matcher);
             return result;
         }
-        return new PartExtractorResult();
+        return new PartExtractorResult(name);
     }
 
     private String findLastGroupName() {

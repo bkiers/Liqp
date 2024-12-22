@@ -102,13 +102,13 @@ public class FuzzyDateParserParametrizedTest {
                 {null, "2024-1-5 08:15 ", "yyyy-M-d HH:mm "},
                 {null, "2024-12-25 14:45 ", "yyyy-MM-dd HH:mm "},
                 {null, "2024-12-25 14:45:30 ", "yyyy-MM-dd HH:mm:ss "},
-                {null, "1/1/23 ", "d/M/yy "},
-                {null, "1/1/2023 ", "d/M/yyyy "},
-                {null, "01/01/23 ", "dd/MM/yy "},
-                {null, "01/01/2023 ", "dd/MM/yyyy "},
-                {null, "1/1/23 12:34 ", "d/M/yy HH:mm "},
-                {null, "1/1/2023 12:34 ", "d/M/yyyy HH:mm "},
-                {null, "01/01/23 12:34 ", "dd/MM/yy HH:mm "},
+                {null, "1/1/23 ", "M/d/yy "},
+                {null, "1/1/2023 ", "M/d/yyyy "},
+                {null, "01/01/23 ", "MM/dd/yy "},
+                {null, "01/01/2023 ", "MM/dd/yyyy "},
+                {null, "1/1/23 12:34 ", "M/d/yy HH:mm "},
+                {null, "1/1/2023 12:34 ", "M/d/yyyy HH:mm "},
+                {null, "01/01/23 12:34 ", "MM/dd/yy HH:mm "},
 
         });
     }

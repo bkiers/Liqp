@@ -125,7 +125,7 @@ public class PartRecognizer {
                         parts.add(i, after);
                     }
 
-                    RecognizedPart recognized = new RecognizedPart(part.start() + per.start, part.start() + per.end, per.formatterPatterns);
+                    RecognizedPart recognized = new RecognizedPart(part.start() + per.start, part.start() + per.end, per.formatterPatterns, source.substring(per.start, per.end));
                     parts.add(i, recognized);
 
                     if (per.start != 0) {
@@ -133,11 +133,11 @@ public class PartRecognizer {
                         parts.add(i, before);
                     }
 
-                    return new LookupResult(parts, true);
+                    return new LookupResult(per.extractorName, parts, true);
                 }
             }
         }
-        return new LookupResult(parts, false);
+        return new LookupResult("<none>", parts, false);
     }
 
     private List<Part> markAsUnrecognized(List<Part> parts) {

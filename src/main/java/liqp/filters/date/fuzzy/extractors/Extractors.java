@@ -11,7 +11,7 @@ public enum Extractors {
         private final Map<Locale, PartExtractor> extractors = new HashMap<>();
         @Override
         public PartExtractor get(Locale locale) {
-            return extractors.computeIfAbsent(locale, l -> new EnumExtractor(locale, "EEEE") {
+            return extractors.computeIfAbsent(locale, l -> new EnumExtractor("fullWeekdaysExtractor", locale, "EEEE") {
                 @Override
                 protected String[] getEnumValues(Locale locale) {
                     return new DateFormatSymbols(locale).getWeekdays();
@@ -23,7 +23,7 @@ public enum Extractors {
         private final Map<Locale, PartExtractor> extractors = new HashMap<>();
         @Override
         public PartExtractor get(Locale locale) {
-            return extractors.computeIfAbsent(locale, l -> new EnumExtractor(locale, "EEE") {
+            return extractors.computeIfAbsent(locale, l -> new EnumExtractor("shortWeekdaysExtractor", locale, "EEE") {
                 @Override
                 protected String[] getEnumValues(Locale locale) {
                     return new DateFormatSymbols(locale).getShortWeekdays();
@@ -46,7 +46,7 @@ public enum Extractors {
         }
     },
     plainYearExtractor{
-        private final PartExtractor partExtractor = new RegexPartExtractor(".*\\b?(\\d{4})\\b?.*", "yyyy");
+        private final PartExtractor partExtractor = new RegexPartExtractor("plainYearExtractor", ".*\\b?(\\d{4})\\b?.*", "yyyy");
         @Override
         public PartExtractor get(Locale locale) {
             return partExtractor;

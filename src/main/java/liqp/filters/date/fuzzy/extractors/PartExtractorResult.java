@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PartExtractorResult {
-    public PartExtractorResult(){}
-    public PartExtractorResult(List<String> formatterPatterns){
-        this.formatterPatterns = formatterPatterns;
+
+    public final String extractorName;
+
+    public PartExtractorResult(String extractorName){
+        this.extractorName = extractorName;
+        this.formatterPatterns = new ArrayList<>();
     }
-    public PartExtractorResult(String formatterPattern){
+    public PartExtractorResult(String extractorName, String formatterPattern){
+        this.extractorName = extractorName;
         this.formatterPatterns = new ArrayList<>();
         this.formatterPatterns.add(formatterPattern);
     }

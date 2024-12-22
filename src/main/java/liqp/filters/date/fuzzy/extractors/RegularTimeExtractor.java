@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 class RegularTimeExtractor extends RegexPartExtractor {
 
     public RegularTimeExtractor() {
-        super("(?:^|.*?\\D)"
+        super("RegularTimeExtractor", "(?:^|.*?\\D)"
                 + "("
                 + "(?<hours>(\\d|0\\d|1\\d|2[0-3]))"
                 + ":"
@@ -23,7 +23,7 @@ class RegularTimeExtractor extends RegexPartExtractor {
     public PartExtractorResult extract(String source) {
         Matcher m = pattern.matcher(source);
         if (m.matches()) {
-            PartExtractorResult r = new PartExtractorResult();
+            PartExtractorResult r = new PartExtractorResult("RegularTimeExtractor");
             r.found = true;
 
             String ampmPart = "";
@@ -70,7 +70,7 @@ class RegularTimeExtractor extends RegexPartExtractor {
             r.formatterPatterns = newList(resPattern);
             return r;
         }
-        return new PartExtractorResult();
+        return new PartExtractorResult("RegularTimeExtractor");
     }
 
     static String repeat(String key, int count) {

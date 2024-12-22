@@ -8,7 +8,7 @@ import java.util.regex.Matcher;
 class YearWithEra extends RegexPartExtractor {
 
     public YearWithEra() {
-        super("(?:^|.*?\\D)(?<year>\\d+)(?<eraSeparator>\\s*)(?<era>AD|BC|Anno Domini|Before Christ)(?:$|\\D.*?)",
+        super("YearWithEra", "(?:^|.*?\\D)(?<year>\\d+)(?<eraSeparator>\\s*)(?<era>AD|BC|Anno Domini|Before Christ)(?:$|\\D.*?)",
                 null);
     }
 
@@ -16,7 +16,7 @@ class YearWithEra extends RegexPartExtractor {
     public PartExtractorResult extract(String source) {
         Matcher matcher = pattern.matcher(source);
         if (matcher.find()) {
-            PartExtractorResult result = new PartExtractorResult();
+            PartExtractorResult result = new PartExtractorResult("YearWithEra");
             result.found = true;
             result.start = matcher.start("year");
             String resPattern = repeat("y", matcher.group("year").length());
@@ -38,6 +38,6 @@ class YearWithEra extends RegexPartExtractor {
             result.formatterPatterns = newList(resPattern);
             return result;
         }
-        return new PartExtractorResult();
+        return new PartExtractorResult("YearWithEra");
     }
 }

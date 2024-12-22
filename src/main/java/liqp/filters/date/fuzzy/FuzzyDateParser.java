@@ -145,10 +145,6 @@ public class FuzzyDateParser extends BasicDateParser {
         String pattern;
         TemporalAccessor temporalAccessor;
     }
-    private TemporalAccessor getTemporalAccessor(String normalized, Locale locale,
-            ZoneId defaultZone, Stream<String> guessingStream) {
-        return null;
-    }
 
     private boolean haveUnrecognized(List<Part> parts) {
         return parts.stream().anyMatch(p -> p.state() == Part.PartState.NEW);

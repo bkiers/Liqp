@@ -252,6 +252,7 @@ public class DateTest {
                 "MARCH 2",
                 "MARCH 2nd",
                 "MARCH 3RD",
+                "MARCH 3rD",
                 "MARCH 4th",
                 "MARCH 5th",
                 "MARCH 10th",

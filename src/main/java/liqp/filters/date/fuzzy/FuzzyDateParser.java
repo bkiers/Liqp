@@ -56,6 +56,7 @@ public class FuzzyDateParser extends BasicDateParser {
         if (defaultZone == null) {
             defaultZone = ZoneId.systemDefault();
         }
+        normalized = removeSequentialSuffixes(normalized);
         ZonedDateTime date = parseUsingCachedPatterns(normalized, locale, defaultZone);
         if (date != null) {
             return date;

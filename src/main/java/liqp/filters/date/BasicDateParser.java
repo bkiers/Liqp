@@ -8,6 +8,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalQueries;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -17,6 +18,31 @@ import java.util.function.Function;
 import static java.time.temporal.ChronoField.*;
 
 public abstract class BasicDateParser {
+
+    // Since Liquid supports dates like `March 1st`, this list will
+    // hold strings that will be removed from the input string.
+    private static final Map<String, String> toBeReplaced = new LinkedHashMap<String, String>() {{
+        this.put("11th", "11");
+        this.put("12th", "12");
+        this.put("13th", "13");
+        this.put("1st", "1");
+        this.put("2nd", "2");
+        this.put("3rd", "3");
+        this.put("4th", "4");
+        this.put("5th", "5");
+        this.put("6th", "6");
+        this.put("7th", "7");
+        this.put("8th", "8");
+        this.put("9th", "9");
+        this.put("0th", "0");
+    }};
+    protected String removeSequentialSuffixes(String input) {
+        for (Map.Entry<String, String> entry : toBeReplaced.entrySet()) {
+            input = input.replaceAll("(?i)"+entry.getKey(), entry.getValue());
+        }
+        return input;
+    }
+
 
     protected final List<String> cachedPatterns = new CopyOnWriteArrayList<>();
 

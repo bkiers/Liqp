@@ -1,5 +1,6 @@
 package liqp.filters.date.fuzzy;
 
+import static liqp.filters.date.fuzzy.Part.PunctuationPart.punctuationChars;
 import static liqp.filters.date.fuzzy.extractors.Extractors.allYMDPatternExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.fullWeekdaysExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.monthDateExtractor;
@@ -20,8 +21,6 @@ import liqp.filters.date.fuzzy.Part.UnrecognizedPart;
 import liqp.filters.date.fuzzy.extractors.PartExtractorResult;
 
 public class PartRecognizer {
-
-    private static final String punctuationChars = "-:., /";
 
     List<Part> recognizePart(List<Part> parts, DatePatternRecognizingContext ctx) {
 

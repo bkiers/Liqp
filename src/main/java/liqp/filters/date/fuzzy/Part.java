@@ -80,6 +80,7 @@ public interface Part {
     }
 
     class PunctuationPart extends NewPart {
+        public static final String punctuationChars = "-:., /";
         public PunctuationPart(int start, int end, String source) {
             super(start, end, source);
         }

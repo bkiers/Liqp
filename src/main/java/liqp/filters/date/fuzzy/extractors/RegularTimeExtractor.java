@@ -1,6 +1,8 @@
 package liqp.filters.date.fuzzy.extractors;
 
+import java.util.List;
 import java.util.regex.Matcher;
+import liqp.filters.date.fuzzy.Part;
 
 class RegularTimeExtractor extends RegexPartExtractor {
 
@@ -20,7 +22,7 @@ class RegularTimeExtractor extends RegexPartExtractor {
     }
 
     @Override
-    public PartExtractorResult extract(String source) {
+    public PartExtractorResult extract(String source, List<Part> parts, int i) {
         Matcher m = pattern.matcher(source);
         if (m.matches()) {
             PartExtractorResult r = new PartExtractorResult("RegularTimeExtractor");

@@ -6,6 +6,12 @@ import java.util.List;
 public class PartExtractorResult {
 
     public final String extractorName;
+    public boolean found;
+    public int start;
+    public int end;
+    public List<String> formatterPatterns;
+    public boolean isMonthName;
+
 
     public PartExtractorResult(String extractorName){
         this.extractorName = extractorName;
@@ -16,9 +22,4 @@ public class PartExtractorResult {
         this.formatterPatterns = new ArrayList<>();
         this.formatterPatterns.add(formatterPattern);
     }
-
-    public boolean found;
-    public int start;
-    public int end;
-    public List<String> formatterPatterns;
 }

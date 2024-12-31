@@ -4,12 +4,12 @@ import java.util.Locale;
 
 public class DatePatternRecognizingContext {
 
-    final Locale locale;
-    Boolean hasYear;
-    Boolean hasMonth;
-    Boolean hasDay;
-    Boolean weekDay;
-    Boolean hasTime;
+    public final Locale locale;
+    public Boolean hasYear;
+    public Boolean hasMonth;
+    public Boolean hasDate;
+    public Boolean weekDay;
+    public Boolean hasTime;
 
     public DatePatternRecognizingContext(Locale locale) {
         if (locale == null) {

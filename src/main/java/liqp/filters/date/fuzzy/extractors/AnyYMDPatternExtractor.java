@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
+import liqp.filters.date.fuzzy.Part;
 
 class AnyYMDPatternExtractor extends RegexPartExtractor {
 
@@ -78,7 +79,7 @@ class AnyYMDPatternExtractor extends RegexPartExtractor {
     }
 
     @Override
-    public PartExtractorResult extract(String source) {
+    public PartExtractorResult extract(String source, List<Part> parts, int i) {
         Matcher matcher = pattern.matcher(source);
         if (matcher.find()) {
             PartExtractorResult result = new PartExtractorResult(name);

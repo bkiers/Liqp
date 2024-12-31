@@ -36,7 +36,7 @@ public abstract class BasicDateParser {
         this.put("9th", "9");
         this.put("0th", "0");
     }};
-    protected String removeSequentialSuffixes(String input) {
+    public static String removeSequentialSuffixes(String input) {
         for (Map.Entry<String, String> entry : toBeReplaced.entrySet()) {
             input = input.replaceAll("(?i)"+entry.getKey(), entry.getValue());
         }

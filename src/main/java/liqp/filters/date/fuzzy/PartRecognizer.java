@@ -1,11 +1,11 @@
 package liqp.filters.date.fuzzy;
 
 import static liqp.filters.date.fuzzy.extractors.Extractors.allYMDPatternExtractor;
-import static liqp.filters.date.fuzzy.extractors.Extractors.fullMonthExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.fullWeekdaysExtractor;
+import static liqp.filters.date.fuzzy.extractors.Extractors.monthDateExtractor;
+import static liqp.filters.date.fuzzy.extractors.Extractors.monthExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.plainYearExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.regularTimeExtractor;
-import static liqp.filters.date.fuzzy.extractors.Extractors.shortMonthExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.shortWeekdaysExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.yearWithEraExtractor;
 
@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import liqp.filters.date.fuzzy.Part.NewPart;
 import liqp.filters.date.fuzzy.Part.PunctuationPart;
+import liqp.filters.date.fuzzy.Part.RecognizedMonthNamePart;
 import liqp.filters.date.fuzzy.Part.RecognizedPart;
 import liqp.filters.date.fuzzy.Part.UnrecognizedPart;
 import liqp.filters.date.fuzzy.extractors.PartExtractorResult;
@@ -58,7 +59,7 @@ public class PartRecognizer {
             if (result.found) {
                 ctx.hasYear = true;
                 ctx.hasMonth = true;
-                ctx.hasDay = true;
+                ctx.hasDate = true;
                 return result.parts;
             }
         }
@@ -72,39 +73,30 @@ public class PartRecognizer {
             // last "year check" and since we are here - there is no year
             ctx.hasYear = false;
         }
+
         if (notSet(ctx.hasMonth)) {
-            LookupResult result = lookup(parts, fullMonthExtractor.get(ctx.locale));
+            LookupResult result = lookup(parts, monthExtractor.get(ctx.locale));
             if (result.found) {
                 ctx.hasMonth = true;
                 return result.parts;
             }
-
-            result = lookup(parts, shortMonthExtractor.get(ctx.locale));
-            if (result.found) {
-                ctx.hasMonth = true;
-                return result.parts;
-            }
-
             ctx.hasMonth = false;
         }
 
-        if (notSet(ctx.hasDay)) {
-            LookupResult result = lookup(parts, fullMonthExtractor.get(ctx.locale));
+        if (isTrue(ctx.hasMonth) && notSet(ctx.hasDate)) {
+            LookupResult result = lookup(parts, monthDateExtractor.get(ctx.locale));
             if (result.found) {
-                ctx.hasDay = true;
+                ctx.hasDate = true;
                 return result.parts;
             }
-
-            result = lookup(parts, shortMonthExtractor.get(ctx.locale));
-            if (result.found) {
-                ctx.hasDay = true;
-                return result.parts;
-            }
-
-            ctx.hasDay = false;
+            ctx.hasDate = false;
         }
 
         return markAsUnrecognized(parts);
+    }
+
+    private boolean isTrue(Boolean hasMonth) {
+        return hasMonth != null && hasMonth;
     }
 
     private boolean notSet(Boolean val) {
@@ -116,7 +108,7 @@ public class PartRecognizer {
 
             if (part.state() == Part.PartState.NEW) {
                 String source = part.source();
-                PartExtractorResult per = partExtractor.extract(source);
+                PartExtractorResult per = partExtractor.extract(source, parts, i);
                 if (per.found) {
                     parts.remove(i);
 
@@ -125,7 +117,12 @@ public class PartRecognizer {
                         parts.add(i, after);
                     }
 
-                    RecognizedPart recognized = new RecognizedPart(part.start() + per.start, part.start() + per.end, per.formatterPatterns, source.substring(per.start, per.end));
+                    RecognizedPart recognized;
+                    if (per.isMonthName) {
+                        recognized = new RecognizedMonthNamePart(part.start() + per.start, part.start() + per.end, per.formatterPatterns, source.substring(per.start, per.end));
+                    } else {
+                        recognized = new RecognizedPart(part.start() + per.start, part.start() + per.end, per.formatterPatterns, source.substring(per.start, per.end));
+                    }
                     parts.add(i, recognized);
 
                     if (per.start != 0) {

@@ -1,7 +1,9 @@
 package liqp.filters.date.fuzzy.extractors;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import liqp.filters.date.fuzzy.Part;
 import liqp.filters.date.fuzzy.PartExtractor;
 
 class RegexPartExtractor implements PartExtractor {
@@ -17,7 +19,7 @@ class RegexPartExtractor implements PartExtractor {
     }
 
     @Override
-    public PartExtractorResult extract(String source) {
+    public PartExtractorResult extract(String source, List<Part> parts, int i) {
         Matcher matcher = pattern.matcher(source);
         if (matcher.find()) {
             PartExtractorResult result = new PartExtractorResult(name, formatterPattern);

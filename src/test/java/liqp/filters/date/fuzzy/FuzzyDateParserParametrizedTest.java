@@ -64,19 +64,19 @@ public class FuzzyDateParserParametrizedTest {
                 {null, " 01:23:45.678  ", " HH:mm:ss.SSS  "},
                 {null, " 1:23:45.678 am ", " h:mm:ss.SSS a "},
                 {null, " 1:23:45.678    PM ", " h:mm:ss.SSS    a "},
-                {null, "12 Jan 1995T01:23:45.678", "'12' MMM yyyy'T'HH:mm:ss.SSS"},
+                {null, "12 Jan 1995T01:23:45.678", "dd MMM yyyy'T'HH:mm:ss.SSS"},
                 {null, "12  AD", "yy  GG"},
                 {null, " 12  AD ", " yy  GG "},
                 {null, " 12  Anno Domini  ", " yy  GGGG  "},
                 {null, " 12345  Before Christ  ", " yyyyy  GGGG  "},
                 {null, " 1  BC  ", " y  GG  "},
-                {null, "12 January", "'12' MMMM"},
-                {null, " 12  January  ", " '12'  MMMM  "},
-                {null, "12 Jan", "'12' MMM"},
-                {null, " 12  Jan  ", " '12'  MMM  "},
+                {null, "12 January", "dd MMMM"},
+                {null, " 12  January  ", " dd  MMMM  "},
+                {null, "12 Jan", "dd MMM"},
+                {null, " 12  Jan  ", " dd  MMM  "},
 
-                {null, " 12  BC  12 Jan 01:23:45.678 ", " yy  GG  '12' MMM HH:mm:ss.SSS "},
-                {null, "12 Jan 01:23:45.678  12  Anno Domini", "'12' MMM HH:mm:ss.SSS  yy  GGGG"},
+                {null, " 12  BC  12 Jan 01:23:45.678 ", " yy  GG  dd MMM HH:mm:ss.SSS "},
+                {null, "12 Jan 01:23:45.678  12  Anno Domini", "dd MMM HH:mm:ss.SSS  yy  GGGG"},
                 {null, "Monday", "EEEE"},
                 {null, " Monday ", " EEEE "},
                 {null, "Monday  ", "EEEE  "},
@@ -95,7 +95,7 @@ public class FuzzyDateParserParametrizedTest {
                         : new Object[]{
                                 Locale.GERMAN, "Mo", "EEE"}
                 ,
-//                {null, "Monday 17th September 1999 BC at 12:34:56.000 AM", "EEEE '17th' MMMM yyyy GG 'at' h:mm:ss.SSS a"},
+                {null, "Tuesday 31st December 2024 AD at 12:34:56.000 AM", "EEEE dd MMMM yyyy GG 'at' h:mm:ss.SSS a"},
                 {null, "2021-1-2", "yyyy-M-d"},
                 {null, "2021-01-2", "yyyy-MM-d"},
                 {null, "2021-1-02", "yyyy-M-dd"},
@@ -109,13 +109,17 @@ public class FuzzyDateParserParametrizedTest {
                 {null, "1/1/23 12:34 ", "M/d/yy HH:mm "},
                 {null, "1/1/2023 12:34 ", "M/d/yyyy HH:mm "},
                 {null, "01/01/23 12:34 ", "MM/dd/yy HH:mm "},
-
+                {null, "11 31st   of  december  1996 ", "'11' dd   'of'  MMMM  yyyy "},
+                {null, "december.31st", "MMMM.dd"},
+                {null, " 11 december 11", " dd MMMM '11'"}, // incorrect
+                {null, " 11 december, 11 ", " dd MMMM, '11' "}, // incorrect, comma should have less priority
+                {null, " 11, december 11 ", " dd, MMMM '11' "}, // incorrect, comma should have less priority
         });
     }
 
     public FuzzyDateParserParametrizedTest(Locale locale, String input, String expectedPattern) {
         this.locale = locale == null ? Locale.ENGLISH : locale;
-        this.input = input;
+        this.input = FuzzyDateParser.removeSequentialSuffixes(input);
         this.expectedPattern = expectedPattern;
     }
 

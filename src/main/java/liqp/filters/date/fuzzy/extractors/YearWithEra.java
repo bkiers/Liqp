@@ -3,7 +3,9 @@ package liqp.filters.date.fuzzy.extractors;
 import static liqp.LValue.isBlank;
 import static liqp.filters.date.fuzzy.extractors.RegularTimeExtractor.repeat;
 
+import java.util.List;
 import java.util.regex.Matcher;
+import liqp.filters.date.fuzzy.Part;
 
 class YearWithEra extends RegexPartExtractor {
 
@@ -13,7 +15,7 @@ class YearWithEra extends RegexPartExtractor {
     }
 
     @Override
-    public PartExtractorResult extract(String source) {
+    public PartExtractorResult extract(String source, List<Part> parts, int i) {
         Matcher matcher = pattern.matcher(source);
         if (matcher.find()) {
             PartExtractorResult result = new PartExtractorResult("YearWithEra");

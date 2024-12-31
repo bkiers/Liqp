@@ -13,4 +13,8 @@ class LookupResult {
         this.parts = parts;
         this.found = found;
     }
+
+    public String getName() {
+        return name;
+    }
 }

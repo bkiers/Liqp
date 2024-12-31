@@ -102,7 +102,7 @@ public interface Part {
     class RecognizedPart implements Part {
         final int start;
         final int end;
-        private final List<String> patterns;
+        protected final List<String> patterns;
         public final String source;
 
         RecognizedPart(int start, int end, List<String> patterns, String source) {
@@ -139,6 +139,21 @@ public interface Part {
         @Override
         public String toString() {
             return "RecognizedPart{" +
+                    "start=" + start +
+                    ", end=" + end +
+                    ", pattern='" + patterns + '\'' +
+                    '}';
+        }
+    }
+
+    class RecognizedMonthNamePart extends RecognizedPart {
+        RecognizedMonthNamePart(int start, int end, List<String> patterns, String source) {
+            super(start, end, patterns, source);
+        }
+
+        @Override
+        public String toString() {
+            return "RecognizedMonthNamePart{" +
                     "start=" + start +
                     ", end=" + end +
                     ", pattern='" + patterns + '\'' +

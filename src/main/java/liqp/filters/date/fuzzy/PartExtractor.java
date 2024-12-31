@@ -1,6 +1,5 @@
 package liqp.filters.date.fuzzy;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
@@ -9,7 +8,7 @@ import liqp.filters.date.fuzzy.extractors.PartExtractorResult;
 
 public interface PartExtractor {
 
-    PartExtractorResult extract(String source);
+    PartExtractorResult extract(String source, List<Part> parts, int i);
 
     default List<String> newList(String... el) {
         return Arrays.asList(el);

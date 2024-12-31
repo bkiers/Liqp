@@ -8,6 +8,7 @@ import static liqp.filters.date.fuzzy.extractors.AnyYMDPatternExtractor.pp;
 
 import java.util.ArrayList;
 import java.util.List;
+import liqp.filters.date.fuzzy.Part;
 import liqp.filters.date.fuzzy.PartExtractor;
 
 public class AllYMDPatternExtractor implements PartExtractor {
@@ -51,9 +52,9 @@ public class AllYMDPatternExtractor implements PartExtractor {
     }
 
     @Override
-    public PartExtractorResult extract(String source) {
+    public PartExtractorResult extract(String source, List<Part> parts, int i) {
         for (AnyYMDPatternExtractor extractor : extractors) {
-            PartExtractorResult result = extractor.extract(source);
+            PartExtractorResult result = extractor.extract(source, parts, i);
             if (result.found) {
                 return result;
             }

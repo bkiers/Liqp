@@ -14,7 +14,7 @@ public class FuzzyDateParserTest {
     @Test
     public void testTimeRegexp() {
         PartExtractor partExtractor = Extractors.regularTimeExtractor.get(null);
-        PartExtractorResult result = partExtractor.extract(" 12:34 ");
+        PartExtractorResult result = partExtractor.extract(" 12:34 ", null, -1);
         assertTrue(result.found);
         assertEquals( 1, result.start);
         assertEquals( 6, result.end);

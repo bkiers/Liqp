@@ -24,6 +24,7 @@ public class FuzzyDateParserParametrizedErrorsTest {
         return Arrays.asList(new Object[][]{
                 {null, " 11 december 11", RuntimeException.class},
                 {null, " 11 -december- 11", RuntimeException.class},
+                {null, "december - monday 11 2024", RuntimeException.class}, // numbers should not be leftover
         });
     }
 
@@ -37,8 +38,8 @@ public class FuzzyDateParserParametrizedErrorsTest {
     public void shouldParse() {
         try {
             final FuzzyDateParser parser = new FuzzyDateParser();
-            parser.guessPattern(input, locale, null);
-            fail(String.format("input is: [%s] and should be wrong", input));
+            String pattern = parser.guessPattern(input, locale, null).pattern;
+            fail(String.format("input is: [%s] and should be wrong but was recognized as [%s]", input, pattern));
         } catch (Exception e) {
             if (!exceptionClass.isInstance(e)) {
                 fail(String.format("for input %s exception class should be %s, but it was %s instead", input, exceptionClass, e.getClass()));

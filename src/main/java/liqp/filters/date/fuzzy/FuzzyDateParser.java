@@ -40,6 +40,8 @@ import liqp.filters.date.fuzzy.Part.RecognizedPart;
  * https://en.wikipedia.org/wiki/Date_format_by_country
  * https://en.wikipedia.org/wiki/Date_and_time_notation_in_Germany
  * https://en.wikipedia.org/wiki/Date_and_time_representation_by_country
+ *
+ * author: Vasyl Khrystiuk
  */
 public class FuzzyDateParser extends BasicDateParser {
 

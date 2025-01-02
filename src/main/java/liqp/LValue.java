@@ -494,7 +494,7 @@ public abstract class LValue {
     }
 
     public static boolean isBlank(final String string) {
-        if (string == null || string.length() == 0)
+        if (string == null || string.isEmpty())
             return true;
 
         int l = string.length();

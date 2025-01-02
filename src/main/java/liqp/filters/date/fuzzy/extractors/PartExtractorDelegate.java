@@ -4,7 +4,7 @@ import java.util.List;
 import liqp.filters.date.fuzzy.Part;
 import liqp.filters.date.fuzzy.PartExtractor;
 
-public class PartExtractorDelegate implements PartExtractor {
+public class PartExtractorDelegate extends PartExtractor {
 
     protected PartExtractor delegate;
 

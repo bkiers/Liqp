@@ -102,38 +102,7 @@ public class PartRecognizer {
         return val == null;
     }
     private LookupResult lookup(List<Part> parts, PartExtractor partExtractor) {
-        for (int i = 0; i < parts.size(); i++) {
-            Part part = parts.get(i);
-
-            if (part.state() == Part.PartState.NEW) {
-                String source = part.source();
-                PartExtractorResult per = partExtractor.extract(source, parts, i);
-                if (per.found) {
-                    parts.remove(i);
-
-                    if (per.end != source.length()) {
-                        NewPart after = new NewPart(part.start() + per.end, part.end(), source.substring(per.end));
-                        parts.add(i, after);
-                    }
-
-                    RecognizedPart recognized;
-                    if (per.isMonthName) {
-                        recognized = new RecognizedMonthNamePart(part.start() + per.start, part.start() + per.end, per.formatterPatterns, source.substring(per.start, per.end));
-                    } else {
-                        recognized = new RecognizedPart(part.start() + per.start, part.start() + per.end, per.formatterPatterns, source.substring(per.start, per.end));
-                    }
-                    parts.add(i, recognized);
-
-                    if (per.start != 0) {
-                        NewPart before = new NewPart(part.start(), part.start() + per.start, source.substring(0, per.start));
-                        parts.add(i, before);
-                    }
-
-                    return new LookupResult(per.extractorName, parts, true);
-                }
-            }
-        }
-        return new LookupResult("<none>", parts, false);
+        return partExtractor.extract(parts);
     }
 
     private List<Part> markAsUnrecognized(List<Part> parts) {

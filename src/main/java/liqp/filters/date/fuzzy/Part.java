@@ -21,7 +21,7 @@ public interface Part {
         final int end;
         protected final String source;
 
-        NewPart(int start, int end, String source) {
+        public NewPart(int start, int end, String source) {
             this.start = start;
             this.end = end;
             this.source = source;
@@ -106,7 +106,7 @@ public interface Part {
         protected final List<String> patterns;
         public final String source;
 
-        RecognizedPart(int start, int end, List<String> patterns, String source) {
+        public RecognizedPart(int start, int end, List<String> patterns, String source) {
             this.start = start;
             this.end = end;
             this.patterns = patterns;
@@ -148,7 +148,7 @@ public interface Part {
     }
 
     class RecognizedMonthNamePart extends RecognizedPart {
-        RecognizedMonthNamePart(int start, int end, List<String> patterns, String source) {
+        public RecognizedMonthNamePart(int start, int end, List<String> patterns, String source) {
             super(start, end, patterns, source);
         }
 

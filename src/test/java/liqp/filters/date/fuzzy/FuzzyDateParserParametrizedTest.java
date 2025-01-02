@@ -111,9 +111,8 @@ public class FuzzyDateParserParametrizedTest {
                 {null, "01/01/23 12:34 ", "MM/dd/yy HH:mm "},
                 {null, "11 31st   of  december  1996 ", "'11' dd   'of'  MMMM  yyyy "},
                 {null, "december.31st", "MMMM.dd"},
-                {null, " 11 december 11", " dd MMMM '11'"}, // incorrect
-                {null, " 11 december, 11 ", " dd MMMM, '11' "}, // incorrect, comma should have less priority
-                {null, " 11, december 11 ", " dd, MMMM '11' "}, // incorrect, comma should have less priority
+                {null, " 11 december, 11 ", " dd MMMM, '11' "},
+                {null, " 11, december 11 ", " '11', MMMM dd "},
         });
     }
 

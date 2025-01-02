@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import liqp.filters.date.fuzzy.Part;
 import liqp.filters.date.fuzzy.PartExtractor;
 
-class RegexPartExtractor implements PartExtractor {
+class RegexPartExtractor extends PartExtractor {
 
     protected final String name;
     protected final Pattern pattern;

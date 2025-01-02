@@ -11,7 +11,7 @@ import java.util.List;
 import liqp.filters.date.fuzzy.Part;
 import liqp.filters.date.fuzzy.PartExtractor;
 
-public class AllYMDPatternExtractor implements PartExtractor {
+public class AllYMDPatternExtractor extends PartExtractor {
 
     private final List<AnyYMDPatternExtractor> extractors = new ArrayList<>();
 

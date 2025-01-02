@@ -2,13 +2,13 @@ package liqp.filters.date.fuzzy;
 
 import java.util.List;
 
-class LookupResult {
+public class LookupResult {
 
     private final String name;
     final List<Part> parts;
-    final boolean found;
+    final public boolean found;
 
-    LookupResult(String name, List<Part> parts, boolean found) {
+    public LookupResult(String name, List<Part> parts, boolean found) {
         this.name = name;
         this.parts = parts;
         this.found = found;

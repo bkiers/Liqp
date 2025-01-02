@@ -7,7 +7,7 @@ import java.util.Locale;
 import liqp.filters.date.fuzzy.Part;
 import liqp.filters.date.fuzzy.PartExtractor;
 
-public class MonthExtractor implements PartExtractor {
+public class MonthExtractor extends PartExtractor {
     private final List<EnumExtractor> monthExtractors;
 
     public MonthExtractor(Locale locale) {

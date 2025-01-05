@@ -3,6 +3,7 @@ package liqp.filters.date;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
@@ -97,16 +98,6 @@ public abstract class BasicDateParser {
         if (temporal instanceof Instant) {
             return ZonedDateTime.ofInstant((Instant) temporal, defaultZone);
         }
-        TemporalField[] copyThese = new TemporalField[]{
-                YEAR,
-                MONTH_OF_YEAR,
-                DAY_OF_MONTH,
-                HOUR_OF_DAY,
-                MINUTE_OF_HOUR,
-                SECOND_OF_MINUTE,
-                NANO_OF_SECOND
-        };
-
 
         ZoneId zoneId = temporal.query(TemporalQueries.zone());
         if (zoneId == null) {
@@ -114,6 +105,16 @@ public abstract class BasicDateParser {
         }
 
         final LocalDateTime now = LocalDateTime.now(zoneId);
+
+        TemporalField[] copyThese = new TemporalField[]{
+                NANO_OF_SECOND,
+                SECOND_OF_MINUTE,
+                MINUTE_OF_HOUR,
+                HOUR_OF_DAY,
+                DAY_OF_MONTH,
+                MONTH_OF_YEAR,
+                YEAR,
+        };
 
         if ("java.time.format.Parsed".equals(temporal.getClass().getName())) {
             Map<TemporalField, Function<TemporalAccessor, LocalDateTime>> factories = new HashMap<>();
@@ -124,11 +125,25 @@ public abstract class BasicDateParser {
             }
         }
 
-
-        LocalDateTime res = now.with(TemporalAdjusters.ofDateAdjuster(date -> date));
+        LocalDateTime res = now;
+        boolean zeroField = true;
         for (TemporalField tf: copyThese) {
-            if (temporal.isSupported(tf)) {
-                res = res.with(tf, temporal.get(tf));
+            if (zeroField && temporal.isSupported(tf)) {
+                zeroField = false;
+            }
+            if (zeroField) {
+                if (temporal.isSupported(tf)) {
+                    long minimum = temporal.range(tf).getMinimum();
+                    res = res.with(tf, minimum);
+                } else {
+                    res = res.with(tf, tf.range().getMinimum());
+                }
+            } else {
+                if (temporal.isSupported(tf)) {
+                    res = res.with(tf, temporal.get(tf));
+                } else {
+                    res = res.with(tf, now.get(tf));
+                }
             }
         }
         return res.atZone(zoneId);

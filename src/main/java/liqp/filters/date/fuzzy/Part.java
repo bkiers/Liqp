@@ -161,4 +161,18 @@ public interface Part {
                     '}';
         }
     }
+    class RecognizedYearWithoutEraPart extends RecognizedPart {
+        public RecognizedYearWithoutEraPart(int start, int end, List<String> patterns, String source) {
+            super(start, end, patterns, source);
+        }
+
+        @Override
+        public String toString() {
+            return "RecognizedYearWithoutEraPart{" +
+                    "start=" + start +
+                    ", end=" + end +
+                    ", pattern='" + patterns + '\'' +
+                    '}';
+        }
+    }
 }

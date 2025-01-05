@@ -7,10 +7,11 @@ import java.util.Locale;
 import liqp.filters.date.fuzzy.Part;
 import liqp.filters.date.fuzzy.PartExtractor;
 
-public class MonthExtractor extends PartExtractor {
+public class MonthNameExtractor extends PartExtractor {
     private final List<EnumExtractor> monthExtractors;
 
-    public MonthExtractor(Locale locale) {
+    public MonthNameExtractor(Locale locale) {
+        super("MonthNameExtractor");
         this.monthExtractors = new ArrayList<>();
         this.monthExtractors.add(new EnumExtractor("FullMonthExtractor", locale, "MMMM") {
             @Override
@@ -28,7 +29,7 @@ public class MonthExtractor extends PartExtractor {
     }
     @Override
     public PartExtractorResult extract(String source, List<Part> parts, int i) {
-        PartExtractorResult res  = new PartExtractorResult("MonthDayExtractor");
+        PartExtractorResult res  = new PartExtractorResult(this.name);
         for (EnumExtractor monthExtractor : monthExtractors) {
             PartExtractorResult monthResult = monthExtractor.extract(source, parts, i);
             if (monthResult.found) {

@@ -5,6 +5,7 @@ import static liqp.filters.date.fuzzy.extractors.RegularTimeExtractor.repeat;
 
 import java.util.List;
 import java.util.regex.Matcher;
+import liqp.filters.date.fuzzy.LookupResult;
 import liqp.filters.date.fuzzy.Part;
 
 class YearWithEra extends RegexPartExtractor {
@@ -12,6 +13,11 @@ class YearWithEra extends RegexPartExtractor {
     public YearWithEra() {
         super("YearWithEra", "(?:^|.*?\\D)(?<year>\\d+)(?<eraSeparator>\\s*)(?<era>AD|BC|Anno Domini|Before Christ)(?:$|\\D.*?)",
                 null);
+    }
+
+    @Override
+    public LookupResult extract(List<Part> parts) {
+        return super.extract(parts);
     }
 
     @Override

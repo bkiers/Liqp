@@ -2,9 +2,10 @@ package liqp.filters.date.fuzzy;
 
 import static liqp.filters.date.fuzzy.Part.PunctuationPart.punctuationChars;
 import static liqp.filters.date.fuzzy.extractors.Extractors.allYMDPatternExtractor;
+import static liqp.filters.date.fuzzy.extractors.Extractors.eraAfterYearExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.fullWeekdaysExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.monthDateExtractor;
-import static liqp.filters.date.fuzzy.extractors.Extractors.monthExtractor;
+import static liqp.filters.date.fuzzy.extractors.Extractors.monthNameExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.plainYearExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.regularTimeExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.shortWeekdaysExtractor;
@@ -13,12 +14,8 @@ import static liqp.filters.date.fuzzy.extractors.Extractors.yearWithEraExtractor
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import liqp.filters.date.fuzzy.Part.NewPart;
 import liqp.filters.date.fuzzy.Part.PunctuationPart;
-import liqp.filters.date.fuzzy.Part.RecognizedMonthNamePart;
-import liqp.filters.date.fuzzy.Part.RecognizedPart;
 import liqp.filters.date.fuzzy.Part.UnrecognizedPart;
-import liqp.filters.date.fuzzy.extractors.PartExtractorResult;
 
 public class PartRecognizer {
 
@@ -38,13 +35,6 @@ public class PartRecognizer {
             ctx.weekDay = false;
         }
 
-        if (notSet(ctx.hasYear)) {
-            LookupResult result = lookup(parts, yearWithEraExtractor.get(ctx.locale));
-            if (result.found) {
-                ctx.hasYear = true;
-                return result.parts;
-            }
-        }
         if (notSet(ctx.hasTime)) {
             LookupResult result = lookup(parts, regularTimeExtractor.get(ctx.locale));
             if (result.found) {
@@ -61,20 +51,30 @@ public class PartRecognizer {
                 ctx.hasDate = true;
                 return result.parts;
             }
-        }
-
-        if (notSet(ctx.hasYear)) {
-            LookupResult result = lookup(parts, plainYearExtractor.get(ctx.locale));
+            result = lookup(parts, yearWithEraExtractor.get(ctx.locale));
+            if (result.found) {
+                ctx.hasYear = true;
+                ctx.hasEra = true;
+                return result.parts;
+            }
+            result = lookup(parts, plainYearExtractor.get(ctx.locale));
             if (result.found) {
                 ctx.hasYear = true;
                 return result.parts;
             }
-            // last "year check" and since we are here - there is no year
-            ctx.hasYear = false;
+        }
+
+        if (isTrue(ctx.hasYear) && notSet(ctx.hasEra)) {
+            LookupResult result = lookup(parts, eraAfterYearExtractor.get(ctx.locale));
+            if (result.found) {
+                ctx.hasEra = true;
+                return result.parts;
+            }
+            ctx.hasEra = false;
         }
 
         if (notSet(ctx.hasMonth)) {
-            LookupResult result = lookup(parts, monthExtractor.get(ctx.locale));
+            LookupResult result = lookup(parts, monthNameExtractor.get(ctx.locale));
             if (result.found) {
                 ctx.hasMonth = true;
                 return result.parts;
@@ -90,6 +90,14 @@ public class PartRecognizer {
             }
             ctx.hasDate = false;
         }
+//
+//        if (notSet(ctx.hasYear)) {
+//            LookupResult result = lookup(parts, twoDigitYearExtractor.get(ctx.locale));
+//            if (result.found) {
+//                ctx.hasYear = true;
+//                return result.parts;
+//            }
+//        }
 
         return markAsUnrecognized(parts);
     }

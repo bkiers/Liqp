@@ -130,7 +130,12 @@ public class FuzzyDateParser extends BasicDateParser {
     private GuessingResult getGuessingResult(Stream<String> guessingStream, String normalized, Locale locale, ZoneId defaultZone) {
         return guessingStream
                 .map(pattern -> {
-                    TemporalAccessor temporalAccessor = parseUsingPattern(normalized, pattern, locale);
+                    TemporalAccessor temporalAccessor = null;
+                    try {
+                        temporalAccessor = parseUsingPattern(normalized, pattern, locale);
+                    } catch (Exception e) {
+                        // ignore
+                    }
                     if (temporalAccessor != null) {
                         GuessingResult result = new GuessingResult();
                         result.pattern = pattern;

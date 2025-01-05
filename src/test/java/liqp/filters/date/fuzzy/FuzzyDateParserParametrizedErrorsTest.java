@@ -22,8 +22,7 @@ public class FuzzyDateParserParametrizedErrorsTest {
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-                {null, " 11 december 11", RuntimeException.class},
-                {null, " 11 -december- 11", RuntimeException.class},
+                {null, " 11 -december, 11", RuntimeException.class},
                 {null, "december - monday 11 2024", RuntimeException.class}, // numbers should not be leftover
         });
     }

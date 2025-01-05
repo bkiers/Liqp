@@ -1,5 +1,7 @@
 package liqp.filters.date.fuzzy;
 
+import static liqp.LValue.isBlank;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
@@ -7,9 +9,19 @@ import java.util.stream.Collectors;
 import liqp.filters.date.fuzzy.Part.NewPart;
 import liqp.filters.date.fuzzy.Part.RecognizedMonthNamePart;
 import liqp.filters.date.fuzzy.Part.RecognizedPart;
+import liqp.filters.date.fuzzy.Part.RecognizedYearWithoutEraPart;
 import liqp.filters.date.fuzzy.extractors.PartExtractorResult;
 
 public abstract class PartExtractor {
+
+    /**
+     * for debugging purposes
+     */
+    protected final String name;
+
+    public PartExtractor(String name) {
+        this.name = name;
+    }
 
     public PartExtractorResult extract(String source, List<Part> parts, int i) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -51,28 +63,58 @@ public abstract class PartExtractor {
 
         parts.remove(i);
 
+        int recognizedEnd = part.start() + per.end;
         if (per.end != source.length()) {
-            NewPart after = new NewPart(part.start() + per.end, part.end(), source.substring(per.end));
+            NewPart after = new NewPart(recognizedEnd, part.end(), source.substring(per.end));
             parts.add(i, after);
         }
 
         RecognizedPart recognized;
-        if (per.isMonthName) {
-            recognized = new RecognizedMonthNamePart(part.start() + per.start, part.start() + per.end, per.formatterPatterns, source.substring(
-                    per.start, per.end));
+        int recognizedStart = part.start() + per.start;
+        String recognizedSource = source.substring(per.start, per.end);
+        if (per.yearWithoutEra) {
+            recognized = new RecognizedYearWithoutEraPart(recognizedStart, recognizedEnd, per.formatterPatterns, recognizedSource);
+        } else if (per.isMonthName) {
+            recognized = new RecognizedMonthNamePart(recognizedStart, recognizedEnd, per.formatterPatterns, recognizedSource);
         } else {
-            recognized = new RecognizedPart(part.start() + per.start, part.start() + per.end, per.formatterPatterns, source.substring(
-                    per.start, per.end));
+            recognized = new RecognizedPart(recognizedStart, recognizedEnd, per.formatterPatterns, recognizedSource);
         }
         parts.add(i, recognized);
 
         if (per.start != 0) {
             NewPart before = new NewPart(
-                    part.start(), part.start() + per.start, source.substring(0, per.start));
+                    part.start(), recognizedStart, source.substring(0, per.start));
             parts.add(i, before);
         }
 
         return new LookupResult(per.extractorName, parts, true);
     }
 
+    protected int getIndexByPartType(List<Part> parts, Class<? extends Part> partType) {
+        for (int i = 0; i < parts.size(); i++) {
+            Part part = parts.get(i);
+            if (partType.isInstance(part)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    protected LookupResult locatePart(List<Part> parts, PartExtractor extractor, int index) {
+        Part part = parts.get(index);
+        if (part instanceof RecognizedPart) {
+            return new LookupResult(this.name, parts, false);
+        }
+        if (part instanceof NewPart) {
+            NewPart newPart = (NewPart) part;
+            String source = newPart.source();
+            if (!isBlank(source) && extractor != null) {
+                PartExtractorResult result = extractor.extract(source, parts, index);
+                if (result.found) {
+                    return getLookupResult(parts, index, result);
+                }
+            }
+        }
+        return null;
+    }
 }

@@ -8,12 +8,11 @@ import liqp.filters.date.fuzzy.PartExtractor;
 
 class RegexPartExtractor extends PartExtractor {
 
-    protected final String name;
     protected final Pattern pattern;
     protected final String formatterPattern;
 
     public RegexPartExtractor(String name, String regex, String formatterPattern) {
-        this.name = name;
+        super(name);
         this.pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         this.formatterPattern = formatterPattern;
     }

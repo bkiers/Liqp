@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 abstract class EnumExtractor extends PartExtractorDelegate {
 
     public EnumExtractor(String name, Locale locale, String formatterPattern) {
+        super(name);
         if (locale == null || Locale.ROOT.equals(locale)) {
             locale = Locale.US;
         }

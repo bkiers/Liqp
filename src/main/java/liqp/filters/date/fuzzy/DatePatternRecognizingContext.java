@@ -6,6 +6,7 @@ public class DatePatternRecognizingContext {
 
     public final Locale locale;
     public Boolean hasYear;
+    public Boolean hasEra;
     public Boolean hasMonth;
     public Boolean hasDate;
     public Boolean weekDay;

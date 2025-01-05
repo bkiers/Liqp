@@ -45,19 +45,19 @@ public enum Extractors {
             return partExtractor;
         }
     },
-    plainYearExtractor{
+    plainYearExtractor {
         private final PartExtractor partExtractor = new RegexPartExtractor("plainYearExtractor", ".*\\b?(\\d{4})\\b?.*", "yyyy");
         @Override
         public PartExtractor get(Locale locale) {
             return partExtractor;
         }
     },
-    monthExtractor {
+    monthNameExtractor {
         private final Map<Locale, PartExtractor> extractors = new HashMap<>();
 
         @Override
         public PartExtractor get(Locale locale) {
-            return extractors.computeIfAbsent(locale, l -> new MonthExtractor(locale));
+            return extractors.computeIfAbsent(locale, l -> new MonthNameExtractor(locale));
         }
     },
     monthDateExtractor {
@@ -67,6 +67,20 @@ public enum Extractors {
             return partExtractor;
         }
     },
+    eraAfterYearExtractor {
+        private final PartExtractor partExtractor = new EraAfterYearExtractor();
+        @Override
+        public PartExtractor get(Locale locale) {
+            return partExtractor;
+        }
+    },
+//    twoDigitYearExtractor {
+//        private final PartExtractor partExtractor = new RegexPartExtractor("twoDigitYearExtractor", ".*\\b?(\\d{2})\\b?.*", "yy");
+//        @Override
+//        public PartExtractor get(Locale locale) {
+//            return partExtractor;
+//        }
+//    },
 //    fullMonthExtractor {
 //        private final Map<Locale, PartExtractor> extractors = new HashMap<>();
 //        @Override

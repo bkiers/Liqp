@@ -17,6 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 
 import static java.time.temporal.ChronoField.*;
+import static liqp.LValue.isBlank;
 
 public abstract class BasicDateParser {
 
@@ -75,10 +76,36 @@ public abstract class BasicDateParser {
     }
 
     protected TemporalAccessor parseUsingPattern(String normalized, String pattern, Locale locale) {
-        DateTimeFormatter timeFormatter = new DateTimeFormatterBuilder()
-                .parseCaseInsensitive()
-                .appendPattern(pattern)
-                .toFormatter(locale);
+        if (pattern.contains("yy") && pattern.contains("MM") && pattern.contains("dd") && pattern.contains("EEE")) {
+            pattern = pattern.replace("EEEE", "");
+            pattern = pattern.replace("EEE", "");
+            normalized = normalized.replaceAll("Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday", "");
+            normalized = normalized.replaceAll("Mon|Tue|Wed|Thu|Fri|Sat|Sun", "");
+        }
+
+        DateTimeFormatter timeFormatter;
+        if (pattern.contains("yy") && !pattern.contains("yyyy")) {
+            String[] partsAroundYear = pattern.split("yy");
+            DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
+                    .parseCaseInsensitive();
+            if (partsAroundYear.length > 0 && !partsAroundYear[0].isEmpty()) {
+                builder.appendPattern(partsAroundYear[0]);
+            }
+            if (!pattern.contains("GG")) {
+                builder.appendValueReduced(YEAR, 2, 2, 1950);
+            } else {
+                builder.appendValue(YEAR);
+            }
+            if (partsAroundYear.length > 1 && !partsAroundYear[1].isEmpty()) {
+                builder.appendPattern(partsAroundYear[1]);
+            }
+            timeFormatter = builder.toFormatter(locale);
+        } else {
+            timeFormatter = new DateTimeFormatterBuilder()
+                    .parseCaseInsensitive()
+                    .appendPattern(pattern)
+                    .toFormatter(locale);
+        }
 
         return timeFormatter.parse(normalized);
     }

@@ -21,8 +21,9 @@ public class StandardsTest {
      */
     @Test
     public void testRFC822() {
-        String[] samples = {
-//            "Sun, 06 Nov 1994 08:49:37 GMT",
+        FuzzyDateParser parser = new FuzzyDateParser();
+        String[] samplesWithSeconds = {
+            "Sun, 06 Nov 1994 08:49:37 GMT",
             "Sun, 06 Nov 94 08:49:37 GMT",
             "Sun, 6 Nov 1994 08:49:37 GMT",
             "Sun, 6 Nov 94 08:49:37 GMT",
@@ -30,25 +31,41 @@ public class StandardsTest {
             "Sun, 06 Nov 94 8:49:37 GMT",
             "Sun, 6 Nov 1994 8:49:37 GMT",
             "Sun, 6 Nov 94 8:49:37 GMT",
-            "Sun, 06 Nov 1994 08:49 GMT",
-            "Sun, 06 Nov 94 08:49 GMT",
-            "Sun, 6 Nov 1994 08:49 GMT",
-            "Sun, 6 Nov 94 08:49 GMT",
-            "Sun, 06 Nov 1994 8:49 GMT",
-            "Sun, 06 Nov 94 8:49 GMT",
-            "Sun, 6 Nov 1994 8:49 GMT",
-            "Sun, 6 Nov 94 8:49 GMT",
-            "Sun, 06 Nov 1994",
-            "Sun, 06 Nov 94",
-            "Sun, 6 Nov 1994",
-            "Sun, 6 Nov 94"
         };
 
-        FuzzyDateParser parser = new FuzzyDateParser();
-        for (String sample : samples) {
+        for (String sample : samplesWithSeconds) {
             ZonedDateTime datetime = parser.parse(sample, null, ZoneOffset.UTC);
             assertEquals("wrong sample:[" + sample + "]", ZonedDateTime.of(1994, 11, 6, 8, 49, 37, 0, ZoneOffset.UTC), datetime);
         }
+
+        String[] samplesWithoutSeconds = {
+                "Sun, 06 Nov 1994 08:49 GMT",
+                "Sun, 06 Nov 94 08:49 GMT",
+                "Sun, 6 Nov 1994 08:49 GMT",
+                "Sun, 6 Nov 94 08:49 GMT",
+                "Sun, 06 Nov 1994 8:49 GMT",
+                "Sun, 06 Nov 94 8:49 GMT",
+                "Sun, 6 Nov 1994 8:49 GMT",
+                "Sun, 6 Nov 94 8:49 GMT",
+        };
+
+        for (String sample : samplesWithoutSeconds) {
+            ZonedDateTime datetime = parser.parse(sample, null, ZoneOffset.UTC);
+            assertEquals("wrong sample:[" + sample + "]", ZonedDateTime.of(1994, 11, 6, 8, 49, 0, 0, ZoneOffset.UTC), datetime);
+        }
+
+        String[] samplesWithoutTime = {
+                "Sun, 06 Nov 1994",
+                "Sun, 06 Nov 94",
+                "Sun, 6 Nov 1994",
+                "Sun, 6 Nov 94"
+        };
+
+        for (String sample : samplesWithoutTime) {
+            ZonedDateTime datetime = parser.parse(sample, null, ZoneOffset.UTC);
+            assertEquals("wrong sample:[" + sample + "]", ZonedDateTime.of(1994, 11, 6, 0, 0, 0, 0, ZoneOffset.UTC), datetime);
+        }
+
     }
 
     /**

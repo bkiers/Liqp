@@ -134,7 +134,7 @@ public class FuzzyDateParser extends BasicDateParser {
                     try {
                         temporalAccessor = parseUsingPattern(normalized, pattern, locale);
                     } catch (Exception e) {
-                        // ignore
+                        e.printStackTrace();
                     }
                     if (temporalAccessor != null) {
                         GuessingResult result = new GuessingResult();

@@ -44,9 +44,11 @@ if isJekyll
   pp render({"a" => 'September 1969'}, "{{ a | date: '%Y-%m-%d %H:%M:%S %z'}}") # "1969-09-01 00:00:00 +0300"
   pp render({"a" => '06 Nov 04'}, "{{ a | date: '%Y-%m-%d %H:%M:%S %z'}}") # "2004-11-06 00:00:00 +0200"
   pp render({"a" => '1994-11-06T08'}, "{{ a | date: '%Y-%m-%d %H:%M:%S %z'}}") # "1994-11-06 00:00:00 +0200"
+  pp render({"a" => 'Sun, 06 Nov 24 08:49:37 GMT'}, "{{ a | date: '%Y-%m-%d %H:%M:%S %z %a'}}") # if default century is 20 then weekday wrong
 
   # target is string representation, source is iterated as collection(and so = match in "year" part)
   assertEqual("target is string representation: 2007-11-01 15:25:00 +0900", render({"a" => [{ "time" => t }], "b" => "2007"}, "target is string representation: {{ a | where: 'time', b | map: 'time'}}"))
+
 
 
   assertEqual(Time.now.to_s, render({"a" => [{ "time" => tn }], "b" => tn.year.to_s}, "{{ a | where: 'time', b | map: 'time'}}"))

@@ -16,6 +16,11 @@ public enum Extractors {
                 protected String[] getEnumValues(Locale locale) {
                     return new DateFormatSymbols(locale).getWeekdays();
                 }
+
+                @Override
+                protected void visitPER(PartExtractorResult per) {
+                    per.isWeekDay = true;
+                }
             });
         }
     },
@@ -27,6 +32,10 @@ public enum Extractors {
                 @Override
                 protected String[] getEnumValues(Locale locale) {
                     return new DateFormatSymbols(locale).getShortWeekdays();
+                }
+                @Override
+                protected void visitPER(PartExtractorResult per) {
+                    per.isWeekDay = true;
                 }
             });
         }

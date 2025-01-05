@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import liqp.filters.date.fuzzy.Part.NewPart;
 import liqp.filters.date.fuzzy.Part.RecognizedMonthNamePart;
 import liqp.filters.date.fuzzy.Part.RecognizedPart;
+import liqp.filters.date.fuzzy.Part.RecognizedWeekDayPart;
 import liqp.filters.date.fuzzy.Part.RecognizedYearWithoutEraPart;
 import liqp.filters.date.fuzzy.extractors.PartExtractorResult;
 
@@ -48,12 +49,17 @@ public abstract class PartExtractor {
             if (part.state() == Part.PartState.NEW) {
                 String source = part.source();
                 PartExtractorResult per = extract(source, parts, i);
+                visitPER(per);
                 if (per.found) {
                     return getLookupResult(parts, i, per);
                 }
             }
         }
         return new LookupResult("<none>", parts, false);
+    }
+
+    protected void visitPER(PartExtractorResult per) {
+
     }
 
     protected LookupResult getLookupResult(List<Part> parts, int i, PartExtractorResult per) {
@@ -72,7 +78,9 @@ public abstract class PartExtractor {
         RecognizedPart recognized;
         int recognizedStart = part.start() + per.start;
         String recognizedSource = source.substring(per.start, per.end);
-        if (per.yearWithoutEra) {
+        if (per.isWeekDay) {
+            recognized = new RecognizedWeekDayPart(recognizedStart, recognizedEnd, per.formatterPatterns, recognizedSource);
+        } else if (per.yearWithoutEra) {
             recognized = new RecognizedYearWithoutEraPart(recognizedStart, recognizedEnd, per.formatterPatterns, recognizedSource);
         } else if (per.isMonthName) {
             recognized = new RecognizedMonthNamePart(recognizedStart, recognizedEnd, per.formatterPatterns, recognizedSource);

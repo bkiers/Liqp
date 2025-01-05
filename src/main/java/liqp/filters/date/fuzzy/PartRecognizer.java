@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import liqp.filters.date.fuzzy.Part.PunctuationPart;
+import liqp.filters.date.fuzzy.Part.RecognizedWeekDayPart;
 import liqp.filters.date.fuzzy.Part.UnrecognizedPart;
 
 public class PartRecognizer {
@@ -99,6 +100,11 @@ public class PartRecognizer {
 //            }
 //        }
 
+        // remove weekday so it may be incorrect like in ruby (ignored)
+        // but this has to be done in both pattern and input
+        if ((isTrue(ctx.hasYear) && isTrue(ctx.hasMonth) && isTrue(ctx.hasDate)) && isTrue(ctx.weekDay)) {
+
+        }
         return markAsUnrecognized(parts);
     }
 

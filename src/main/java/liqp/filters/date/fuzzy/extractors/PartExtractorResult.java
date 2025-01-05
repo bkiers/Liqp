@@ -12,6 +12,7 @@ public class PartExtractorResult {
     public List<String> formatterPatterns;
     public boolean isMonthName;
     public boolean yearWithoutEra;
+    public boolean isWeekDay;
 
 
     public PartExtractorResult(String extractorName){

@@ -175,4 +175,19 @@ public interface Part {
                     '}';
         }
     }
+
+    class RecognizedWeekDayPart extends RecognizedPart {
+        public RecognizedWeekDayPart(int start, int end, List<String> patterns, String source) {
+            super(start, end, patterns, source);
+        }
+
+        @Override
+        public String toString() {
+            return "RecognizedWeekDayPart{" +
+                    "start=" + start +
+                    ", end=" + end +
+                    ", pattern='" + patterns + '\'' +
+                    '}';
+        }
+    }
 }

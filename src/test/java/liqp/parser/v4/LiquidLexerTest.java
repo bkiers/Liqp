@@ -577,6 +577,28 @@ public class LiquidLexerTest {
         assertThat(tokenise("{%raw%}?").get(2).getType(), is(LiquidLexer.OtherRaw));
     }
 
+    @Test
+    public void testInlineComment() {
+
+        // single lines
+        assertThat(tokenise("{% # content %}").get(2).getText(), is("# content "));
+        assertThat(tokenise("{% # content -%}").get(2).getText(), is("# content "));
+        assertThat(tokenise("{%\n# content \n%}").get(2).getText(), is("# content \n"));
+
+        // multi line
+        String source = "{%\n" +
+                "  ###############################-\n" +
+                "  #- This is a comment\n" +
+                "  #- across multiple lines\n" +
+                "  ###############################-\n" +
+                "%}";
+
+        assertThat(tokenise(source).get(2).getText(), is("###############################-\n" +
+                "  #- This is a comment\n" +
+                "  #- across multiple lines\n" +
+                "  ###############################-\n"));
+    }
+
     private static Token singleToken(String source) {
         return singleToken(source, false, true);
     }

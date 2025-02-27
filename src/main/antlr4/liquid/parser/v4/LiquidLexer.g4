@@ -65,6 +65,12 @@ lexer grammar LiquidLexer;
 	}
   }
 
+  // Returns true if the next string in the `_input` charstream is either a linebreak, or a closing tag
+  private boolean linebreakOrTagEndAhead() {
+    return (_input.LA(1) == '\r' || _input.LA(1) == '\n') ||                    // linebreak ahead
+           (_input.LA(1) == '%' && _input.LA(2) == '}') ||                      // "%}" ahead
+           (_input.LA(1) == '-' && _input.LA(2) == '%' && _input.LA(3) == '}'); // "-%}" ahead
+  }
 }
 
 // public automatically generated constructor is busted because it doesn't allow for setting block or tags
@@ -109,6 +115,8 @@ fragment Digit          : [0-9];
 mode IN_TAG;
 
   OutStart2 : '{{' -> pushMode(IN_TAG);
+
+  CommentInTag : ( '#' ( {!linebreakOrTagEndAhead()}? . )* [ \t\r\n]* )+ -> channel(HIDDEN);
 
   OutEnd
    : ( '}}' SpaceOrTab* LineBreak? {stripSpacesAroundTags && stripSingleLine}?
@@ -179,6 +187,8 @@ mode IN_TAG;
 
 mode IN_TAG_ID;
   WS2 : WhitespaceChar+ -> channel(HIDDEN);
+
+  CommentInTagId : ( '#' ( {!linebreakOrTagEndAhead()}? . )* [ \t\r\n]* )+ -> channel(HIDDEN);
 
   InvalidEndTag
      : ( '}}' SpaceOrTab* LineBreak? {stripSpacesAroundTags && stripSingleLine}?

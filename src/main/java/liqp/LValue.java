@@ -1,13 +1,12 @@
 package liqp;
 
-import static liqp.filters.date.Parser.getZonedDateTimeFromTemporalAccessor;
+import static liqp.filters.date.Parser.getFullDateIfPossible;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
-import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -214,7 +213,7 @@ public abstract class LValue {
     public static ZonedDateTime asRubyDate(Object value, TemplateContext context) {
         ZonedDateTime time = ZonedDateTime.now();
         if (value instanceof TemporalAccessor) {
-            time = getZonedDateTimeFromTemporalAccessor((TemporalAccessor) value, context.getParser().defaultTimeZone);
+            time = getFullDateIfPossible((TemporalAccessor) value, context.getParser().defaultTimeZone);
         } else if (CustomDateFormatRegistry.isCustomDateType(value)) {
             time = CustomDateFormatRegistry.getFromCustomType(value);
         }
@@ -495,7 +494,7 @@ public abstract class LValue {
     }
 
     public static boolean isBlank(final String string) {
-        if (string == null || string.length() == 0)
+        if (string == null || string.isEmpty())
             return true;
 
         int l = string.length();

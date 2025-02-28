@@ -3,18 +3,50 @@ package liqp.filters.date;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalAdjusters;
 import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalQueries;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Function;
 
 import static java.time.temporal.ChronoField.*;
+import static liqp.LValue.isBlank;
 
 public abstract class BasicDateParser {
 
-    private final List<String> cachedPatterns = new ArrayList<>();
+    // Since Liquid supports dates like `March 1st`, this list will
+    // hold strings that will be removed from the input string.
+    private static final Map<String, String> toBeReplaced = new LinkedHashMap<String, String>() {{
+        this.put("11th", "11");
+        this.put("12th", "12");
+        this.put("13th", "13");
+        this.put("1st", "1");
+        this.put("2nd", "2");
+        this.put("3rd", "3");
+        this.put("4th", "4");
+        this.put("5th", "5");
+        this.put("6th", "6");
+        this.put("7th", "7");
+        this.put("8th", "8");
+        this.put("9th", "9");
+        this.put("0th", "0");
+    }};
+    public static String removeSequentialSuffixes(String input) {
+        for (Map.Entry<String, String> entry : toBeReplaced.entrySet()) {
+            input = input.replaceAll("(?i)"+entry.getKey(), entry.getValue());
+        }
+        return input;
+    }
+
+
+    protected final List<String> cachedPatterns = new CopyOnWriteArrayList<>();
 
     protected BasicDateParser() {
 
@@ -34,7 +66,7 @@ public abstract class BasicDateParser {
         for(String pattern : cachedPatterns) {
             try {
                 TemporalAccessor temporalAccessor = parseUsingPattern(str, pattern, locale);
-                return getZonedDateTimeFromTemporalAccessor(temporalAccessor, defaultZone);
+                return getFullDateIfPossible(temporalAccessor, defaultZone);
             } catch (Exception e) {
                 // ignore
             }
@@ -44,20 +76,46 @@ public abstract class BasicDateParser {
     }
 
     protected TemporalAccessor parseUsingPattern(String normalized, String pattern, Locale locale) {
-        DateTimeFormatter timeFormatter = new DateTimeFormatterBuilder()
-                .parseCaseInsensitive()
-                .appendPattern(pattern)
-                .toFormatter(locale);
+        if (pattern.contains("yy") && pattern.contains("MM") && pattern.contains("dd") && pattern.contains("EEE")) {
+            pattern = pattern.replace("EEEE", "");
+            pattern = pattern.replace("EEE", "");
+            normalized = normalized.replaceAll("Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday", "");
+            normalized = normalized.replaceAll("Mon|Tue|Wed|Thu|Fri|Sat|Sun", "");
+        }
+
+        DateTimeFormatter timeFormatter;
+        if (pattern.contains("yy") && !pattern.contains("yyyy")) {
+            String[] partsAroundYear = pattern.split("yy");
+            DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
+                    .parseCaseInsensitive();
+            if (partsAroundYear.length > 0 && !partsAroundYear[0].isEmpty()) {
+                builder.appendPattern(partsAroundYear[0]);
+            }
+            if (!pattern.contains("GG")) {
+                builder.appendValueReduced(YEAR, 2, 2, 1950);
+            } else {
+                builder.appendValue(YEAR);
+            }
+            if (partsAroundYear.length > 1 && !partsAroundYear[1].isEmpty()) {
+                builder.appendPattern(partsAroundYear[1]);
+            }
+            timeFormatter = builder.toFormatter(locale);
+        } else {
+            timeFormatter = new DateTimeFormatterBuilder()
+                    .parseCaseInsensitive()
+                    .appendPattern(pattern)
+                    .toFormatter(locale);
+        }
 
         return timeFormatter.parse(normalized);
     }
 
 
     /**
-     * Follow ruby rules: if some datetime part is missing,
-     * the default is taken from `now` with default zone
+     * Follow ruby rules: if some datetime part is missing, the default is taken from `now` with
+     * default zone
      */
-    public static ZonedDateTime getZonedDateTimeFromTemporalAccessor(TemporalAccessor temporal, ZoneId defaultZone) {
+    public static ZonedDateTime getFullDateIfPossible(TemporalAccessor temporal, ZoneId defaultZone) {
         if (temporal == null) {
             return ZonedDateTime.now(defaultZone);
         }
@@ -70,33 +128,69 @@ public abstract class BasicDateParser {
 
         ZoneId zoneId = temporal.query(TemporalQueries.zone());
         if (zoneId == null) {
-            LocalDate date = temporal.query(TemporalQueries.localDate());
-            LocalTime time = temporal.query(TemporalQueries.localTime());
+            zoneId = defaultZone;
+        }
 
-            if (date == null) {
-                date = LocalDate.now(defaultZone);
+        final LocalDateTime now = LocalDateTime.now(zoneId);
+
+        TemporalField[] copyThese = new TemporalField[]{
+                NANO_OF_SECOND,
+                SECOND_OF_MINUTE,
+                MINUTE_OF_HOUR,
+                HOUR_OF_DAY,
+                DAY_OF_MONTH,
+                MONTH_OF_YEAR,
+                YEAR,
+        };
+
+        if ("java.time.format.Parsed".equals(temporal.getClass().getName())) {
+            Map<TemporalField, Function<TemporalAccessor, LocalDateTime>> factories = new HashMap<>();
+            factories.put(DAY_OF_WEEK, t -> now.with(TemporalAdjusters.previousOrSame(DayOfWeek.from(t))));
+            TemporalAccessor onlyField = onlyField(temporal, factories, copyThese);
+            if (onlyField != null) {
+                return getFullDateIfPossible(onlyField, zoneId);
             }
-            if (time == null) {
-                time = LocalTime.now(defaultZone);
+        }
+
+        LocalDateTime res = now;
+        boolean zeroField = true;
+        for (TemporalField tf: copyThese) {
+            if (zeroField && temporal.isSupported(tf)) {
+                zeroField = false;
             }
-            return ZonedDateTime.of(date, time, defaultZone);
-        } else {
-            LocalDateTime now = LocalDateTime.now(zoneId);
-            TemporalField[] copyThese = new TemporalField[]{
-                    YEAR,
-                    MONTH_OF_YEAR,
-                    DAY_OF_MONTH,
-                    HOUR_OF_DAY,
-                    MINUTE_OF_HOUR,
-                    SECOND_OF_MINUTE,
-                    NANO_OF_SECOND
-            };
-            for (TemporalField tf: copyThese) {
+            if (zeroField) {
                 if (temporal.isSupported(tf)) {
-                    now = now.with(tf, temporal.get(tf));
+                    long minimum = temporal.range(tf).getMinimum();
+                    res = res.with(tf, minimum);
+                } else {
+                    res = res.with(tf, tf.range().getMinimum());
+                }
+            } else {
+                if (temporal.isSupported(tf)) {
+                    res = res.with(tf, temporal.get(tf));
+                } else {
+                    res = res.with(tf, now.get(tf));
                 }
             }
-            return now.atZone(zoneId);
         }
+        return res.atZone(zoneId);
+    }
+
+    private static TemporalAccessor onlyField(TemporalAccessor temporal, Map<TemporalField, Function<TemporalAccessor, LocalDateTime>> factories,
+            TemporalField[] butThese) {
+        if (factories == null || factories.isEmpty()) {
+            return null;
+        }
+        for (TemporalField tf: butThese) {
+            if (temporal.isSupported(tf)) {
+                return null;
+            }
+        }
+        for (Map.Entry<TemporalField, Function<TemporalAccessor, LocalDateTime>> entry: factories.entrySet()) {
+            if (temporal.isSupported(entry.getKey())) {
+                return entry.getValue().apply(temporal);
+            }
+        }
+        return null;
     }
 }

@@ -2,12 +2,10 @@ package liqp;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import liqp.RenderTransformer.ObjectAppender;
 import liqp.exceptions.ExceededMaxIterationsException;
 import liqp.filters.date.BasicDateParser;
@@ -153,7 +151,7 @@ public class TemplateContext {
     }
 
     public Map<String, Object> getVariables() {
-        return new LinkedHashMap<String, Object>(this.variables);
+        return new LinkedHashMap<>(this.variables);
     }
 
     public Map<String, Object> getEnvironmentMap() {
@@ -170,12 +168,6 @@ public class TemplateContext {
     public <T extends Map<String, ?>> T getRegistry(String registryName) {
         if (parent != null) {
             return parent.getRegistry(registryName);
-        }
-
-        if (!Arrays.asList(REGISTRY_CYCLE, REGISTRY_IFCHANGED, REGISTRY_FOR, REGISTRY_FOR_STACK, REGISTRY_ITERATION_PROTECTOR, REGISTRY_ROOT_FOLDER)
-                .contains(registryName)) {
-            // this checking exists for safety of library, any listed type is expected, not more
-            throw new RuntimeException("unknown registry type: " + registryName);
         }
         if (registry == null) {
             registry = new HashMap<>();

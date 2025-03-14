@@ -21,7 +21,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import liquid.parser.v4.LiquidLexer;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Token;
 import org.junit.Test;
 
 import liqp.blocks.Block;
@@ -325,6 +329,34 @@ public class TemplateTest {
         assertEquals("15.0", rendered);
     }
 
+    // https://github.com/bkiers/Liqp/issues/317
+    @Test
+    public void testInlineComment() {
+
+        String source =
+                "{% # this is a comment %}\n" +
+                "\n" +
+                "{% # for i in (1..3) -%}\n" +
+                "  i={{ i }}\n" +
+                "{% # endfor %}\n" +
+                "\n" +
+                "{%\n" +
+                "  ###############################\n" +
+                "  # This is a comment\n" +
+                "  # across multiple lines\n" +
+                "  ###############################\n" +
+                "%}";
+
+        String expected =
+                "\n" +
+                "\n" +
+                "i=\n" +
+                "\n" +
+                "\n";
+
+        assertThat(TemplateParser.DEFAULT.parse(source).render(), is(expected));
+    }
+
     private Map<String, Object> getDeepData() {
         Map<String, Object> data = new HashMap<>();
         Map<?,?> secondIndex = Collections.singletonMap("e", "ok");
@@ -355,5 +387,4 @@ public class TemplateTest {
         String res = TemplateParser.DEFAULT.parse("{{foo.a}}").toStringTree();
         assertNotNull(res);
     }
-
 }

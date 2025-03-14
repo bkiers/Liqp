@@ -82,6 +82,7 @@ tag
  | include_relative_tag
  | continue_tag
  | simple_tag
+ | empty_tag
  | other_tag
  ;
 
@@ -111,6 +112,11 @@ error_other_tag
 simple_tag
   : TagStart SimpleTagId other_tag_parameters? TagEnd
   ;
+
+// A tag like `{% # inline comment %}` is considered empty: `{% %}`
+empty_tag
+ : TagStart TagEnd
+ ;
 
 raw_tag
  : TagStart RawStart raw_body RawEnd TagEnd

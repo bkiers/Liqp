@@ -577,6 +577,7 @@ public class LiquidLexerTest {
         assertThat(tokenise("{%raw%}?").get(2).getType(), is(LiquidLexer.OtherRaw));
     }
 
+    // https://github.com/bkiers/Liqp/issues/317
     @Test
     public void testInlineComment() {
 
@@ -597,6 +598,48 @@ public class LiquidLexerTest {
                 "  #- This is a comment\n" +
                 "  #- across multiple lines\n" +
                 "  ###############################-\n"));
+    }
+
+    // https://github.com/bkiers/Liqp/issues/317
+    @Test
+    public void testInlineCommentInTag() {
+        String source =
+                "{% # for i in (1..3) -%}\n" +
+                "{{ i }}\n" +
+                "{% # endfor %}";
+
+        List<Token> tokens = tokenise(source);
+
+        assertThat(tokens.size(), is(14));
+
+        Object[][] expected = {
+                new Object[] { LiquidLexer.TagStart, "{%"},
+                new Object[] { LiquidLexer.WS2, " "},
+                new Object[] { LiquidLexer.CommentInTagId, "# for i in (1..3) "},
+                new Object[] { LiquidLexer.TagEnd, "-%}\n"},
+                new Object[] { LiquidLexer.OutStart, "{{"},
+                new Object[] { LiquidLexer.WS, " "},
+                new Object[] { LiquidLexer.Id, "i"},
+                new Object[] { LiquidLexer.WS, " "},
+                new Object[] { LiquidLexer.OutEnd, "}}"},
+                new Object[] { LiquidLexer.Other, "\n"},
+                new Object[] { LiquidLexer.TagStart, "{%"},
+                new Object[] { LiquidLexer.WS2, " "},
+                new Object[] { LiquidLexer.CommentInTagId, "# endfor "},
+                new Object[] { LiquidLexer.TagEnd, "%}"}
+        };
+
+        int index = 0;
+
+        for (Object[] test : expected) {
+
+            Token token = tokens.get(index);
+
+            assertThat(token.getType(), is(test[0]));
+            assertThat(token.getText(), is(test[1]));
+
+            index++;
+        }
     }
 
     private static Token singleToken(String source) {

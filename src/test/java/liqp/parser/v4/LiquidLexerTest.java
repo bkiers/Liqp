@@ -610,8 +610,6 @@ public class LiquidLexerTest {
 
         List<Token> tokens = tokenise(source);
 
-        assertThat(tokens.size(), is(14));
-
         Object[][] expected = {
                 new Object[] { LiquidLexer.TagStart, "{%"},
                 new Object[] { LiquidLexer.WS2, " "},
@@ -628,6 +626,8 @@ public class LiquidLexerTest {
                 new Object[] { LiquidLexer.CommentInTagId, "# endfor "},
                 new Object[] { LiquidLexer.TagEnd, "%}"}
         };
+
+        assertThat(tokens.size(), is(expected.length));
 
         int index = 0;
 

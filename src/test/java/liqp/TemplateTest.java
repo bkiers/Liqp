@@ -21,11 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import liquid.parser.v4.LiquidLexer;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
-import org.antlr.v4.runtime.Token;
 import org.junit.Test;
 
 import liqp.blocks.Block;

@@ -5,6 +5,7 @@ import java.util.Locale;
 public class DatePatternRecognizingContext {
 
     public final Locale locale;
+    private final String input;
     public Boolean hasYear;
     public Boolean hasEra;
     public Boolean hasMonth;
@@ -12,10 +13,12 @@ public class DatePatternRecognizingContext {
     public Boolean weekDay;
     public Boolean hasTime;
 
-    public DatePatternRecognizingContext(Locale locale) {
+    public DatePatternRecognizingContext(Locale locale, String input) {
+        this.input = input;
         if (locale == null) {
             locale = Locale.ROOT;
         }
         this.locale = locale;
     }
+
 }

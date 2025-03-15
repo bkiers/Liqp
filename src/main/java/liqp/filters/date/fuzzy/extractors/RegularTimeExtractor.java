@@ -16,7 +16,7 @@ class RegularTimeExtractor extends RegexPartExtractor {
                 + ":(?<seconds>[0-5]\\d)"
                 + "(?:\\.(?<milliseconds>\\d{1,9})?)?"
                 + ")?" // end of seconds
-                + "(?<ampm>\\s*[AaPp][Mm])?"
+                + "(?<ampm>\\s*[AaPp][Mm](?![A-Za-z]))?"
                 + ")" // end of main group
                 + "(?:$|\\D.*?)", null);
     }

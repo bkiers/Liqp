@@ -109,7 +109,7 @@ public class FuzzyDateParser extends BasicDateParser {
             locale = Locale.ENGLISH;
         }
         List<Part> parts = new ArrayList<>();
-        DatePatternRecognizingContext ctx = new DatePatternRecognizingContext(locale);
+        DatePatternRecognizingContext ctx = new DatePatternRecognizingContext(locale, normalized);
         parts.add(new NewPart(0, normalized.length(), normalized));
 
         while (haveUnrecognized(parts)) {

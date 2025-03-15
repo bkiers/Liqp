@@ -56,6 +56,14 @@ public class AllYMDPatternExtractor extends PartExtractor {
                 pD(), pp1(" "), pMn(), pp2(" "), pY4())); // dd MMMM yyyy
         extractors.add(new AnyYMDPatternExtractor("RFC822Y2MDPatternExtractor",
                 pD(), pp1(" "), pMn(), pp2(" "), pY2())); // dd MMMM yy
+        extractors.add(new AnyYMDPatternExtractor("D/MPatternExtractor",
+                pY4(), pp1("/"), pM())); // dd/MM
+        extractors.add(new AnyYMDPatternExtractor("D/MPatternExtractor",
+                pM(), pp1("/"), pY4())); // dd/MM
+        extractors.add(new AnyYMDPatternExtractor("M/DPatternExtractor",
+                pM(), pp1("/"), pD())); // MM/dd
+        extractors.add(new AnyYMDPatternExtractor("D/MPatternExtractor",
+                pD(), pp1("/"), pM())); // dd/MM
     }
 
     @Override

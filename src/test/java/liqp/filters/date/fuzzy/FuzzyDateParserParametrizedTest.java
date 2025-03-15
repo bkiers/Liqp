@@ -124,6 +124,7 @@ public class FuzzyDateParserParametrizedTest {
                 {null, "11 - December 10", "y - MMMM dd"},
                 {null, "11 , December - 10", "y , MMMM - dd"},
                 {null, "11 - December , 10", "dd - MMMM , y"},
+                {null, " 01/03 ", " MM/dd "},
 
         });
     }

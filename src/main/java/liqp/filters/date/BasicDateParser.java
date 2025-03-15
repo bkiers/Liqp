@@ -85,7 +85,7 @@ public abstract class BasicDateParser {
 
         DateTimeFormatter timeFormatter;
         if (isTwoDigitYear(patternToMatch)) {
-            timeFormatter = withTwoDigitYearWithBase1950(patternToMatch, locale);
+            timeFormatter = withTwoDigitYearWithBase2000(patternToMatch, locale);
         } else {
             timeFormatter = new DateTimeFormatterBuilder()
                     .parseCaseInsensitive()
@@ -104,15 +104,20 @@ public abstract class BasicDateParser {
         return arrayToRegexp.apply(new DateFormatSymbols(locale).getWeekdays(), locale);
     }
 
-    private DateTimeFormatter withTwoDigitYearWithBase1950(String patternToMatch, Locale locale) {
-        String[] partsAroundYear = patternToMatch.split("yy");
+    private DateTimeFormatter withTwoDigitYearWithBase2000(String patternToMatch, Locale locale) {
+        String[] partsAroundYear;
+        if (patternToMatch.contains("yy")) {
+            partsAroundYear = patternToMatch.split("yy");
+        } else {
+            partsAroundYear = patternToMatch.split("y");
+        }
         DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
                 .parseCaseInsensitive();
         if (partsAroundYear.length > 0 && !partsAroundYear[0].isEmpty()) {
             builder.appendPattern(partsAroundYear[0]);
         }
         if (!patternToMatch.contains("GG")) {
-            builder.appendValueReduced(YEAR, 2, 2, 1950);
+            builder.appendValueReduced(YEAR, 2, 2, 2000);
         } else {
             builder.appendValue(YEAR);
         }
@@ -123,11 +128,15 @@ public abstract class BasicDateParser {
     }
 
     private static boolean isTwoDigitYear(String patternToMatch) {
-        return patternToMatch.contains("yy") && !patternToMatch.contains("yyyy");
+        return  (patternToMatch.contains("yy") || patternToMatch.contains("y"))
+                &&
+                !patternToMatch.contains("yyyy");
     }
 
     private static boolean dayOfWeekIsRedundant(String pattern) {
-        return pattern.contains("yy") && pattern.contains("MM") && pattern.contains("dd")
+        return (pattern.contains("y"))
+                && pattern.contains("M")
+                && pattern.contains("d")
                 && pattern.contains("EEE");
     }
 

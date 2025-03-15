@@ -1,6 +1,7 @@
 package liqp.filters.date;
 
 import static java.time.temporal.ChronoField.YEAR;
+import static java.time.temporal.ChronoField.YEAR_OF_ERA;
 
 import java.text.DateFormatSymbols;
 import java.time.ZoneId;
@@ -119,7 +120,7 @@ public abstract class BasicDateParser {
         if (!patternToMatch.contains("GG")) {
             builder.appendValueReduced(YEAR, 2, 2, 2000);
         } else {
-            builder.appendValue(YEAR);
+            builder.appendValue(YEAR_OF_ERA);
         }
         if (partsAroundYear.length > 1 && !partsAroundYear[1].isEmpty()) {
             builder.appendPattern(partsAroundYear[1]);

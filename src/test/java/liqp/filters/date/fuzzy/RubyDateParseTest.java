@@ -16,12 +16,12 @@ public class RubyDateParseTest {
     @Test
     public void test__parse() {
         Object[][] testCases = {
-                //      # ctime(3), asctime(3)
+//                      # ctime(3), asctime(3)
 //                { "Sat Aug 28 02:55:50 1999", new Object[]{1999, 8, 28, 2, 55, 50, null, null, 6} },
 //                { "Sat Aug 28 02:55:50 02", new Object[]{2002, 8, 28, 2, 55, 50, null, null, 6} },
 //                { "Sat Aug 28 02:55:50 0002", new Object[]{2, 8, 28, 2, 55, 50, null, null, 6} },
-
-                // # date(1)
+//
+////                 # date(1)
 //                { "Sat Aug 28 02:29:34 JST 1999", new Object[]{1999, 8, 28, 2, 29, 34, "JST", 9*3600, 6} },
 //                { "Sat Aug 28 02:29:34 MET DST 1999", new Object[]{1999, 8, 28, 2, 29, 34, "MET DST", 2*3600, 6} },
 //                { "Sat Aug 28 02:29:34 AMT 1999", new Object[]{1999, 8, 28, 2, 29, 34, "AMT", null, 6} },

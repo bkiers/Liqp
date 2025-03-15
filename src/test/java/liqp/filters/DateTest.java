@@ -1,5 +1,10 @@
 package liqp.filters;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.function.Supplier;
 import liqp.Template;
 import liqp.TemplateContext;
 import liqp.TemplateParser;
@@ -242,8 +247,6 @@ public class DateTest {
         String[] tests = {
                 "now",
                 "today",
-                "1 March",
-                "MAR",
                 "MARCH",
                 "2024 MAR",
                 "2 mar",
@@ -252,6 +255,7 @@ public class DateTest {
                 "MARCH 2",
                 "MARCH 2nd",
                 "MARCH 3RD",
+                "MARCH 3rD",
                 "MARCH 4th",
                 "MARCH 5th",
                 "MARCH 10th",
@@ -284,6 +288,67 @@ public class DateTest {
             // returned is a sequence of digits.
             String rendered = TemplateParser.DEFAULT.parse("{% assign d = '" + test + "' | date: '%s' %}{{ d }}").render();
             assertTrue("Failed to parse: '" + test + "'", rendered.matches("\\d+"));
+        }
+    }
+
+    @Test
+    public void testSupportedDateStringsValues() {
+        Object[][] tests = {
+                { "1 March", "%d %m %Y", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3).withDayOfMonth(1), "dd MM y"},
+                { "MAR", "%b", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3), "MMM"},
+                { "MARCH", "%B", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3), "MMMM"},
+                { "2024 MAR", "%Y %b", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(2024, 3, 1),
+                        LocalTime.now()), "yyyy MMM"},
+                { "2 mar", "%e %b", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3).withDayOfMonth(2), "d MMM"},
+                { "2 MAR", "%e %B", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3).withDayOfMonth(2), "d MMMM"},
+                { "march 2nd", "%B %e", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3).withDayOfMonth(2), "MMMM d"},
+                { "MARCH 2", "%B %e", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3).withDayOfMonth(2), "MMMM d"},
+                { "MARCH 2nd", "%B %e", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3).withDayOfMonth(2), "MMMM d"},
+                { "MARCH 3RD", "%B %e", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3).withDayOfMonth(3), "MMMM d"},
+                { "MARCH 3rD", "%B %e", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3).withDayOfMonth(3), "MMMM d"},
+                { "MARCH 4th", "%B %e", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3).withDayOfMonth(4), "MMMM d"},
+                { "MARCH 5th", "%B %e", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3).withDayOfMonth(5), "MMMM d"},
+                { "MARCH 10th", "%B %e", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3).withDayOfMonth(10), "MMMM d"},
+                { "2010-10-31", "%Y-%m-%d", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(2010, 10, 31), LocalTime.now()), "yyyy-MM-dd"},
+                { "Aug 2000", "%b %Y", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(2000, 8, 1), LocalTime.now()), "MMM yyyy"},
+                { "Aug 31", "%b %d", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(8).withDayOfMonth(31), "MMM dd"},
+                { "Wed Nov 28 14:33:20 2001", "%a %b %d %H:%M:%S %Y", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(2001, 11, 28), LocalTime.parse("14:33:20")), "EEE MMM dd HH:mm:ss yyyy"},
+                { "Wed, 05 Oct 2011 22:26:12 -0400", "%a, %d %b %Y %H:%M:%S", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(2011, 10, 5), LocalTime.parse("22:26:12")), "EEE, dd MMM yyyy HH:mm:ss"},
+                { "Wed, 05 Oct 2011 02:26:12 GMT", "%a, %d %b %Y %H:%M:%S", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(2011, 10, 5), LocalTime.parse("02:26:12")), "EEE, dd MMM yyyy HH:mm:ss"},
+                { "Nov 29 14:33:20 2001", "%b %d %H:%M:%S %Y", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(2001, 11, 29), LocalTime.parse("14:33:20")), "MMM dd HH:mm:ss yyyy"},
+                { "05 Oct 2011 22:26:12 -0400", "%d %b %Y %H:%M:%S", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(2011, 10, 5), LocalTime.parse("22:26:12")), "dd MMM yyyy HH:mm:ss"},
+                { "06 Oct 2011 02:26:12 GMT", "%d %b %Y %H:%M:%S", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(2011, 10, 6), LocalTime.parse("02:26:12")), "dd MMM yyyy HH:mm:ss"},
+//                { "2011-10-05T22:26:12-04:00", "%Y-%m-%dT%H:%M:%S", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(2011, 10, 5), LocalTime.parse("22:26:12")), "yyyy-MM-dd'T'HH:mm:ss"},
+                { "0:00", "%H:%M", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withHour(0).withMinute(0), "HH:mm"},
+                { "1:00", "%H:%M", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withHour(1).withMinute(0), "HH:mm"},
+                { "01:00", "%H:%M", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withHour(1).withMinute(0), "HH:mm"},
+                { "12:00", "%H:%M", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withHour(12).withMinute(0), "HH:mm"},
+                { "16:30", "%H:%M", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withHour(16).withMinute(30), "HH:mm"},
+                { "3/2024", "%m/%Y", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(2024, 3, 1), LocalTime.now()), "MM/yyyy"},
+                { "01/03", "%m/%d", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(1).withDayOfMonth(3), "MM/dd"},
+                { "03/31", "%m/%d", (Supplier<LocalDateTime>)() -> LocalDateTime.now().withMonth(3).withDayOfMonth(31), "MM/dd"},
+                { "2001/03", "%Y/%m", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(2001, 3, 1), LocalTime.now()), "yyyy/MM"},
+                { "01/2003", "%m/%Y", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(2003, 1, 1), LocalTime.now()), "MM/yyyy"},
+                { "70-10-31", "%y-%m-%d", (Supplier<LocalDateTime>)() -> LocalDateTime.of(LocalDate.of(1970, 10, 31), LocalTime.now()), "yy-MM-dd"}
+        };
+        for (Object[] test : tests) {
+            String rendered;
+            try {
+                rendered = TemplateParser.DEFAULT.parse("{% assign d = '" + test[0] + "' | date: '" + test[1] + "' %}{{ d }}").render();
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to parse: '" + test[0] + "' with pattern '" + test[1] + "'", e);
+            }
+            LocalDateTime localDate = null;
+            String pattern = null;
+            try {
+                localDate = ((Supplier<LocalDateTime>) test[2]).get();
+                pattern = (String) test[3];
+                String expected = localDate.format(
+                        DateTimeFormatter.ofPattern(pattern));
+                assertEquals(""+test[0], expected, rendered);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to create java complementary: '" + localDate + "' with pattern '" + pattern + "'", e);
+            }
         }
     }
 }

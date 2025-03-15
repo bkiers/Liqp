@@ -9,6 +9,7 @@ import static liqp.filters.date.fuzzy.extractors.Extractors.monthNameExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.plainYearExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.regularTimeExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.shortWeekdaysExtractor;
+import static liqp.filters.date.fuzzy.extractors.Extractors.twoDigitYearExtractor;
 import static liqp.filters.date.fuzzy.extractors.Extractors.yearWithEraExtractor;
 
 import java.util.ArrayList;
@@ -91,20 +92,15 @@ public class PartRecognizer {
             }
             ctx.hasDate = false;
         }
-//
-//        if (notSet(ctx.hasYear)) {
-//            LookupResult result = lookup(parts, twoDigitYearExtractor.get(ctx.locale));
-//            if (result.found) {
-//                ctx.hasYear = true;
-//                return result.parts;
-//            }
-//        }
 
-        // remove weekday so it may be incorrect like in ruby (ignored)
-        // but this has to be done in both pattern and input
-        if ((isTrue(ctx.hasYear) && isTrue(ctx.hasMonth) && isTrue(ctx.hasDate)) && isTrue(ctx.weekDay)) {
-
+        if (notSet(ctx.hasYear)) {
+            LookupResult result = lookup(parts, twoDigitYearExtractor.get(ctx.locale));
+            if (result.found) {
+                ctx.hasYear = true;
+                return result.parts;
+            }
         }
+
         return markAsUnrecognized(parts);
     }
 

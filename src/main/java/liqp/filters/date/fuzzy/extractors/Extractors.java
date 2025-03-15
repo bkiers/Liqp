@@ -83,13 +83,13 @@ public enum Extractors {
             return partExtractor;
         }
     },
-//    twoDigitYearExtractor {
-//        private final PartExtractor partExtractor = new RegexPartExtractor("twoDigitYearExtractor", ".*\\b?(\\d{2})\\b?.*", "yy");
-//        @Override
-//        public PartExtractor get(Locale locale) {
-//            return partExtractor;
-//        }
-//    },
+    twoDigitYearExtractor {
+        private final PartExtractor partExtractor = new RegexPartExtractor("twoDigitYearExtractor", ".*\\b?(\\d{2})\\b?.*", "y");
+        @Override
+        public PartExtractor get(Locale locale) {
+            return partExtractor;
+        }
+    },
 //    fullMonthExtractor {
 //        private final Map<Locale, PartExtractor> extractors = new HashMap<>();
 //        @Override

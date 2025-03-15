@@ -29,4 +29,8 @@ class RegexPartExtractor extends PartExtractor {
         }
         return new PartExtractorResult(name);
     }
+
+    public String getName() {
+        return name;
+    }
 }

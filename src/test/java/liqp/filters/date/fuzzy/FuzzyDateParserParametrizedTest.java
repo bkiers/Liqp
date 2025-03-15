@@ -112,20 +112,18 @@ public class FuzzyDateParserParametrizedTest {
                 {null, "01/01/23 12:34 ", "MM/dd/yy HH:mm "},
                 {null, "11 31st   of  December  1996 ", "'11' dd   'of'  MMMM  yyyy "},
                 {null, "December.31st", "MMMM.dd"},
-                {null, " 11 December, 11 ", " dd MMMM, '11' "},
-                {null, " 11, December 11 ", " '11', MMMM dd "},
-                {null, " 11 December - 11 ", " dd MMMM - '11' "},
-                {null, " 11 - December 11 ", " '11' - MMMM dd "},
-                {null, " 11 , December - 11 ", " '11' , MMMM - dd "},
-                {null, " 11 - December , 11 ", " dd - MMMM , '11' "},
-                {null, "11 December, 11", "dd MMMM, '11'"},
-                {null, "11, December 11", "'11', MMMM dd"},
-                {null, "11 December - 11", "dd MMMM - '11'"},
-                {null, "11 - December 11", "'11' - MMMM dd"},
-                {null, "11 , December - 11", "'11' , MMMM - dd"},
-                {null, "11 - December , 11", "dd - MMMM , '11'"},
-
-                {null, "December - 11", "MMMM - dd"}
+                {null, " 11 December, 10 ", " dd MMMM, y "},
+                {null, " 11, December 10 ", " y, MMMM dd "},
+                {null, " 11 December - 10 ", " dd MMMM - y "},
+                {null, " 11 - December 10 ", " y - MMMM dd "},
+                {null, " 11 , December - 10 ", " y , MMMM - dd "},
+                {null, " 11 - December , 10 ", " dd - MMMM , y "},
+                {null, "11 December, 10", "dd MMMM, y"},
+                {null, "11, December 10", "y, MMMM dd"},
+                {null, "11 December - 10", "dd MMMM - y"},
+                {null, "11 - December 10", "y - MMMM dd"},
+                {null, "11 , December - 10", "y , MMMM - dd"},
+                {null, "11 - December , 10", "dd - MMMM , y"},
 
         });
     }

@@ -25,13 +25,14 @@ public class MonthDateExtractor extends PartExtractor {
         RIGHT
     }
 
-    private static final RegexPartExtractor leftDateExtractor = new MonthDatePartExtractor("MonthDayExtractor.left",
+    // special classes name for easy debugging only (yu see class name directly)
+    private static final RegexPartExtractor leftDateExtractor = new LeftDateExtractor(
             "(?:^|.*?\\D)(?<day>0?[1-9]|[12][0-9]|3[01])[^,\\d;]+?$");
-    private static final RegexPartExtractor leftDateSpacesOnlyExtractor = new MonthDatePartExtractor("MonthDayExtractor.left",
+    private static final RegexPartExtractor leftDateSpacesOnlyExtractor = new LeftDateSpacesOnlyExtractor(
             "(?:^|.*?\\D)(?<day>0?[1-9]|[12][0-9]|3[01])\\s+?$");
-    private static final RegexPartExtractor rightDateExtractor = new MonthDatePartExtractor("MonthDayExtractor.right",
+    private static final RegexPartExtractor rightDateExtractor = new RightDateExtractor(
             "^[^,\\d;]+?(?<day>0?[1-9]|[12][0-9]|3[01])(?:$|\\D.*?)");
-    private static final RegexPartExtractor rightDateSpacesOnlyExtractor = new MonthDatePartExtractor("MonthDayExtractor.right",
+    private static final RegexPartExtractor rightDateSpacesOnlyExtractor = new RightDateSpacesOnlyExtractor(
             "^\\s+?(?<day>0?[1-9]|[12][0-9]|3[01])(?:$|\\D.*?)");
 
     @Override
@@ -103,7 +104,11 @@ public class MonthDateExtractor extends PartExtractor {
             index++;
         }
 
-        return new LookupResult(this.name, parts, false);
+        if (extractor == null) {
+            return new LookupResult(this.name, parts, false);
+        } else {
+            return new LookupResult(extractor.getName(), parts, false);
+        }
     }
 
     private RegexPartExtractor getExtractorByModeAndDirection(Mode mode, Direction direction) {
@@ -145,6 +150,30 @@ public class MonthDateExtractor extends PartExtractor {
                 return result;
             }
             return new PartExtractorResult(name);
+        }
+    }
+
+    private static class LeftDateExtractor extends MonthDatePartExtractor {
+        public LeftDateExtractor(String regex) {
+            super("MonthDayExtractor.leftDateExtractor", regex);
+        }
+    }
+
+    private static class LeftDateSpacesOnlyExtractor extends MonthDatePartExtractor {
+        public LeftDateSpacesOnlyExtractor(String regex) {
+            super("MonthDayExtractor.leftDateSpacesOnlyExtractor", regex);
+        }
+    }
+
+    private static class RightDateExtractor extends MonthDatePartExtractor {
+        public RightDateExtractor(String regex) {
+            super("MonthDayExtractor.rightDateExtractor", regex);
+        }
+    }
+
+    private static class RightDateSpacesOnlyExtractor extends MonthDatePartExtractor {
+        public RightDateSpacesOnlyExtractor(String regex) {
+            super("MonthDayExtractor.rightDateSpacesOnlyExtractor", regex);
         }
     }
 }

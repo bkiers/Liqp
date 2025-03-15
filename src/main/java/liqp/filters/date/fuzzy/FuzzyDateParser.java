@@ -79,6 +79,11 @@ public class FuzzyDateParser extends BasicDateParser {
 
     GuessingResult guessPattern(String normalized, Locale locale, ZoneId defaultZone) {
         Stream<String> guessingStream = getGuessingStream(cachedPatterns, normalized, locale, defaultZone);
+        if (isDebug()) {
+            List<String> collected = guessingStream.collect(Collectors.toList());
+            System.out.println("Guessing patterns: " + collected);
+            guessingStream = collected.stream();
+        }
         return getGuessingResult(guessingStream, normalized, locale, defaultZone);
     }
 

@@ -14,6 +14,15 @@ tn = Time.now
 t = Time.new(2007,11,1,15,25,0, "+09:00")
 t_str = t.to_s
 
+pp "time: " + Time.parse(" 11 december, 10").strftime('%Y-%m-%d %H:%M:%S %z')
+pp "time: " + Time.parse(" 11 ,december 10").strftime('%Y-%m-%d %H:%M:%S %z')
+pp "time: " + Time.parse(" 11 ;december, 10").strftime('%Y-%m-%d %H:%M:%S %z')
+pp "time: " + Time.parse(" 11 ,december; 10").strftime('%Y-%m-%d %H:%M:%S %z')
+pp "time: " + Time.parse(" 11 =december, 10").strftime('%Y-%m-%d %H:%M:%S %z')
+pp "time: " + Time.parse(" 11 ,december= 10").strftime('%Y-%m-%d %H:%M:%S %z')
+pp "time: " + Time.parse(" 11 -december, 10").strftime('%Y-%m-%d %H:%M:%S %z')
+pp "time: " + Time.parse(" 11 ,december- 10").strftime('%Y-%m-%d %H:%M:%S %z')
+
 # abs filter ignores fact the time is numeric
 # assertTrue(render({"a" => Time.now}, "{{ a | append: 'k' }}").end_with?("k"))
 # assertEqual("0", render({"a" => Time.now}, "{{ a | abs }}"))

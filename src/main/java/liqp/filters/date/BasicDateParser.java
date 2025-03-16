@@ -135,7 +135,7 @@ public abstract class BasicDateParser {
     }
 
     private static boolean dayOfWeekIsRedundant(String pattern) {
-        return (pattern.contains("y"))
+        return (pattern.contains("y") || pattern.contains("u"))
                 && pattern.contains("M")
                 && pattern.contains("d")
                 && pattern.contains("EEE");

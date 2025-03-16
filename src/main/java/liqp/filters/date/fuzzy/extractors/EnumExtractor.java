@@ -14,8 +14,8 @@ abstract class EnumExtractor extends PartExtractorDelegate {
             locale = Locale.US;
         }
         String valuesPattern = arrayToRegexp.apply(getEnumValues(locale), locale);
-        super.delegate = new RegexPartExtractor(name,"(?:^|.*?[^\\w_])(" + valuesPattern + ")(?:$|[^\\w_].*?)",
-                formatterPattern);
+        super.delegates.add(new RegexPartExtractor(name,"(?:^|.*?[^\\w_])(" + valuesPattern + ")(?:$|[^\\w_].*?)",
+                formatterPattern));
     }
 
     abstract String[] getEnumValues(Locale locale);

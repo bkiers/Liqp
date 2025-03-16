@@ -19,13 +19,15 @@ class RegularTimeExtractor extends RegexPartExtractor {
                 + "(?<ampm>\\s*[AaPp][Mm](?![A-Za-z]))?"
                 + ")" // end of main group
                 + "(?:$|\\D.*?)", null);
+
+        // https://www.ibm.com/docs/en/cloud-pak-system-w4600/2.3.3?topic=SSDLT6_2.3.3/psapsys_restapi/time_zone_list.htm
     }
 
     @Override
     public PartExtractorResult extract(String source, List<Part> parts, int i) {
         Matcher m = pattern.matcher(source);
         if (m.matches()) {
-            PartExtractorResult r = new PartExtractorResult("RegularTimeExtractor");
+            PartExtractorResult r = new PartExtractorResult(name);
             r.found = true;
 
             String ampmPart = "";
@@ -72,7 +74,7 @@ class RegularTimeExtractor extends RegexPartExtractor {
             r.formatterPatterns = newList(resPattern);
             return r;
         }
-        return new PartExtractorResult("RegularTimeExtractor");
+        return new PartExtractorResult(name);
     }
 
     static String repeat(String key, int count) {

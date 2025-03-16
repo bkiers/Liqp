@@ -118,7 +118,11 @@ public abstract class BasicDateParser {
             builder.appendPattern(partsAroundYear[0]);
         }
         if (!patternToMatch.contains("GG")) {
-            builder.appendValueReduced(YEAR, 2, 2, 2000);
+            // The year within century (0-99).
+            // When a century is not otherwise specified (with a value for %C),
+            // values in the range 69-99 refer to years in the twentieth century (1969-1999);
+            // values in the range 00-68 refer to years in the twenty-first century (2000-2068).
+            builder.appendValueReduced(YEAR, 2, 2, 1969);
         } else {
             builder.appendValue(YEAR_OF_ERA);
         }

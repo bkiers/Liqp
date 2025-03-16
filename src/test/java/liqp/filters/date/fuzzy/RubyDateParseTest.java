@@ -16,17 +16,23 @@ public class RubyDateParseTest {
     @Test
     public void test__parse() {
         Object[][] testCases = {
+                { "Aug 28 02:55:50 68", new Object[]{2068, 8, 28, 2, 55, 50, null, null, 6} },
+                { "Aug 28 02:55:50 69", new Object[]{1969, 8, 28, 2, 55, 50, null, null, 6} },
+                { "Aug 28 02:55:50 -68", new Object[]{-68, 8, 28, 2, 55, 50, null, null, 6} },
+                { "Aug 28 02:55:50 -69", new Object[]{-69, 8, 28, 2, 55, 50, null, null, 6} },
+
 //                      # ctime(3), asctime(3)
-//                { "Sat Aug 28 02:55:50 1999", new Object[]{1999, 8, 28, 2, 55, 50, null, null, 6} },
-//                { "Sat Aug 28 02:55:50 02", new Object[]{2002, 8, 28, 2, 55, 50, null, null, 6} },
-//                { "Sat Aug 28 02:55:50 0002", new Object[]{2, 8, 28, 2, 55, 50, null, null, 6} },
-//
+                { "Sat Aug 28 02:55:50 1999", new Object[]{1999, 8, 28, 2, 55, 50, null, null, 6} },
+                { "Sat Aug 28 02:55:50 02", new Object[]{2002, 8, 28, 2, 55, 50, null, null, 6} },
+                { "Sat Aug 28 02:55:50 0002", new Object[]{2, 8, 28, 2, 55, 50, null, null, 6} },
+
 ////                 # date(1)
-//                { "Sat Aug 28 02:29:34 JST 1999", new Object[]{1999, 8, 28, 2, 29, 34, "JST", 9*3600, 6} },
-//                { "Sat Aug 28 02:29:34 MET DST 1999", new Object[]{1999, 8, 28, 2, 29, 34, "MET DST", 2*3600, 6} },
-//                { "Sat Aug 28 02:29:34 AMT 1999", new Object[]{1999, 8, 28, 2, 29, 34, "AMT", null, 6} },
-//                { "Sat Aug 28 02:29:34 PMT 1999", new Object[]{1999, 8, 28, 2, 29, 34, "PMT", null, 6} },
+                { "Sat Aug 28 02:29:34 JST 1999", new Object[]{1999, 8, 28, 2, 29, 34, "JST", 9*3600, 6} },
+                { "Sat Aug 28 02:29:34 MET DST 1999", new Object[]{1999, 8, 28, 2, 29, 34, "MET DST", 2*3600, 6} },
+                { "Sat Aug 28 02:29:34 AMT 1999", new Object[]{1999, 8, 28, 2, 29, 34, "AMT", null, 6} },
+                { "Sat Aug 28 02:29:34 PMT 1999", new Object[]{1999, 8, 28, 2, 29, 34, "PMT", null, 6} },
                 { "Sat Aug 28 02:29:34 PMT -1999", new Object[]{-1999, 8, 28, 2, 29, 34, "PMT", null, 6} },
+                { "Sat Aug 28 02:29:34 PMT -19", new Object[]{-19, 8, 28, 2, 29, 34, "PMT", null, 6} },
         };
 
         FuzzyDateParser parser = new FuzzyDateParser();

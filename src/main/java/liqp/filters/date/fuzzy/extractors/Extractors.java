@@ -56,8 +56,8 @@ public enum Extractors {
     },
     plainYearExtractor {
         private final PartExtractor partExtractor = new PartExtractorDelegate("plainYearExtractor",
-                new RegexPartExtractor("plainYearExtractor", ".*\\b?(-\\d{4})\\b?.*", "uuuu"),
-                new RegexPartExtractor("plainYearExtractor", ".*\\b?(\\d{4})\\b?.*", "yyyy")
+                new RegexPartExtractor("plainYearExtractorWithMinus", ".*\\b?(-\\d{4})\\b?.*", "uuuu"),
+                new RegexPartExtractor("plainYearExtractorWithoutMinus", ".*\\b?(\\d{4})\\b?.*", "yyyy")
         );
         @Override
         public PartExtractor get(Locale locale) {
@@ -87,7 +87,10 @@ public enum Extractors {
         }
     },
     twoDigitYearExtractor {
-        private final PartExtractor partExtractor = new RegexPartExtractor("twoDigitYearExtractor", ".*\\b?(\\d{2})\\b?.*", "y");
+        private final PartExtractor partExtractor = new PartExtractorDelegate("plainYearExtractor",
+                new RegexPartExtractor("twoDigitYearExtractorWithMinus", ".*\\b?(-\\d{2})\\b?.*", "u"),
+                new RegexPartExtractor("twoDigitYearExtractorWithoutMinus", ".*\\b?(\\d{2})\\b?.*", "y")
+        );
         @Override
         public PartExtractor get(Locale locale) {
             return partExtractor;

@@ -13,7 +13,9 @@ require 'date'
 tn = Time.now
 t = Time.new(2007,11,1,15,25,0, "+09:00")
 t_str = t.to_s
-
+pp "time: " + Time.parse("Aug 28 02:55:50 68").strftime('%Y-%m-%d %H:%M:%S')
+pp "time: " + Time.parse("Aug 28 02:55:50 69").strftime('%Y-%m-%d %H:%M:%S')
+pp "time: " + Time.parse("Sun, 06 Nov 94 08:49 GMT").strftime('%Y-%m-%d %H:%M:%S %z')
 pp "time: " + Time.parse(" 01/03 ").strftime('%Y-%m-%d %H:%M:%S %z')
 pp "time: " + Time.parse("3/2024").strftime('%Y-%m-%d %H:%M:%S %z')
 pp "time: " + Time.parse(" 11 december, 10").strftime('%Y-%m-%d %H:%M:%S %z')

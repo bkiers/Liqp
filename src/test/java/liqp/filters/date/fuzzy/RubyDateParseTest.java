@@ -33,6 +33,20 @@ public class RubyDateParseTest {
                 { "Sat Aug 28 02:29:34 PMT 1999", new Object[]{1999, 8, 28, 2, 29, 34, "PMT", null, 6} },
                 { "Sat Aug 28 02:29:34 PMT -1999", new Object[]{-1999, 8, 28, 2, 29, 34, "PMT", null, 6} },
                 { "Sat Aug 28 02:29:34 PMT -19", new Object[]{-19, 8, 28, 2, 29, 34, "PMT", null, 6} },
+
+                { "Sat Aug 28 02:29:34 JST 02", new Object[]{2002, 8, 28, 2, 29, 34, "JST", 9*3600, 6} },
+                { "Sat Aug 28 02:29:34 JST 0002", new Object[]{2, 8, 28, 2, 29, 34, "JST", 9*3600, 6} },
+                { "Sat Aug 28 02:29:34 AEST 0002", new Object[]{2, 8, 28, 2, 29, 34, "AEST", 10*3600, 6} },
+
+                { "Sat Aug 28 02:29:34 GMT+09 0002", new Object[]{2, 8, 28, 2, 29, 34, "GMT+09", 9*3600, 6} },
+                { "Sat Aug 28 02:29:34 GMT+0900 0002", new Object[]{2, 8, 28, 2, 29, 34, "GMT+0900", 9*3600, 6} },
+                { "Sat Aug 28 02:29:34 GMT+09:00 0002", new Object[]{2, 8, 28, 2, 29, 34, "GMT+09:00", 9*3600, 6} },
+                { "Sat Aug 28 02:29:34 GMT-09 0002", new Object[]{2, 8, 28, 2, 29, 34, "GMT-09", -9*3600, 6} },
+                { "Sat Aug 28 02:29:34 GMT-0900 0002", new Object[]{2, 8, 28, 2, 29, 34, "GMT-0900", -9*3600, 6} },
+                { "Sat Aug 28 02:29:34 GMT-09:00 0002", new Object[]{2, 8, 28, 2, 29, 34, "GMT-09:00", -9*3600, 6} },
+                { "Sat Aug 28 02:29:34 GMT-090102 0002", new Object[]{2, 8, 28, 2, 29, 34, "GMT-090102", -9*3600-60-2, 6} },
+                { "Sat Aug 28 02:29:34 GMT-09:01:02 0002", new Object[]{2, 8, 28, 2, 29, 34, "GMT-09:01:02", -9*3600-60-2, 6} }
+
         };
 
         FuzzyDateParser parser = new FuzzyDateParser();

@@ -188,7 +188,10 @@ mode IN_TAG;
 mode IN_TAG_ID;
   WS2 : WhitespaceChar+ -> channel(HIDDEN);
 
-  CommentInTagId : ( '#' ( {!linebreakOrTagEndAhead()}? . )* [ \t\r\n]* )+ -> channel(HIDDEN);
+  // When we encounter a comment in this "IN_TAG_ID" mode, there is no need to try to create more tokens
+  // since that will always result in an `InvalidEndTag` token. After all, a "#" comment consumes all
+  // characters until it "sees" an end-tag. Just pop out in that case.
+  CommentInTagId : ( '#' ( {!linebreakOrTagEndAhead()}? . )* [ \t\r\n]* )+ -> channel(HIDDEN), popMode;
 
   InvalidEndTag
      : ( '}}' SpaceOrTab* LineBreak? {stripSpacesAroundTags && stripSingleLine}?

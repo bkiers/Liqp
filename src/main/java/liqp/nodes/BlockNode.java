@@ -33,6 +33,13 @@ public class BlockNode implements LNode {
     public Object render(TemplateContext context) {
         ObjectAppender.Controller builder = context.newObjectAppender(children.size());
         for (LNode node : children) {
+
+            // Since tags can be "empty", `node` can be null, in which case we simply continue.
+            // For example, the tag `{% # inline comment %}` is considered "empty" since there is nothing inside.
+            if (node == null) {
+                continue;
+            }
+
             Object value = node.render(context);
             if (value == null) {
                 continue;

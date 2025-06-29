@@ -61,7 +61,7 @@
 
     <antlr4.version>4.13.0</antlr4.version>
     <jackson.databind.version>2.13.4.2</jackson.databind.version>
-    <jackson.version>2.13.2</jackson.version>
+    <jackson.version>2.15.0</jackson.version>
     <junit.version>4.13.1</junit.version>
 
     <main.class />

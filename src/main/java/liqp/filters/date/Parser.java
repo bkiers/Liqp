@@ -26,21 +26,6 @@ public class Parser extends BasicDateParser {
      */
     public static List<String> datePatterns = new ArrayList<>();
 
-    // Since Liquid supports dates like `March 1st`, this list will
-    // hold strings that will be removed from the input string.
-    private static final Map<String, String> toBeReplaced = new HashMap<String, String>() {{
-            this.put("1st", "1");
-            this.put("2nd", "2");
-            this.put("3rd", "3");
-            this.put("4th", "4");
-            this.put("5th", "5");
-            this.put("6th", "6");
-            this.put("7th", "7");
-            this.put("8th", "8");
-            this.put("9th", "9");
-            this.put("0th", "0");
-    }};
-
     static {
 
         datePatterns.add("EEE MMM d hh:mm:ss yyyy");
@@ -163,9 +148,7 @@ public class Parser extends BasicDateParser {
 
     public ZonedDateTime parse(String str, Locale locale, ZoneId defaultZone) {
         String normalized = str.toLowerCase();
-        for(Map.Entry<String, String> kv : toBeReplaced.entrySet()) {
-            normalized = normalized.replace(kv.getKey(), kv.getValue());
-        }
+        normalized = removeSequentialSuffixes(normalized);
         return parseUsingCachedPatterns(normalized, locale, defaultZone);
     }
 

@@ -1,13 +1,11 @@
 package liqp;
 
-import static liqp.filters.date.Parser.getZonedDateTimeFromTemporalAccessor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
-import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +16,7 @@ import java.util.Map;
 
 import liqp.RenderTransformer.ObjectAppender;
 import liqp.filters.date.CustomDateFormatRegistry;
+import liqp.filters.date.FullDateFromTemporalProducer;
 import liqp.nodes.AtomNode;
 
 /**
@@ -41,6 +40,8 @@ public abstract class LValue {
             return "";
         }
     };
+
+    private static final FullDateFromTemporalProducer fullDateFromTemporalProducer = new FullDateFromTemporalProducer();
 
     // sample: 2007-11-01 15:25:00 +0900
     public static DateTimeFormatter rubyDateTimeFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss XX");
@@ -214,7 +215,7 @@ public abstract class LValue {
     public static ZonedDateTime asRubyDate(Object value, TemplateContext context) {
         ZonedDateTime time = ZonedDateTime.now();
         if (value instanceof TemporalAccessor) {
-            time = getZonedDateTimeFromTemporalAccessor((TemporalAccessor) value, context.getParser().defaultTimeZone);
+            time = fullDateFromTemporalProducer.apply((TemporalAccessor) value, context.getParser().defaultTimeZone);
         } else if (CustomDateFormatRegistry.isCustomDateType(value)) {
             time = CustomDateFormatRegistry.getFromCustomType(value);
         }
@@ -495,7 +496,7 @@ public abstract class LValue {
     }
 
     public static boolean isBlank(final String string) {
-        if (string == null || string.length() == 0)
+        if (string == null || string.isEmpty())
             return true;
 
         int l = string.length();

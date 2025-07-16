@@ -6,6 +6,7 @@ import java.util.List;
 
 import liqp.RenderTransformer.ObjectAppender;
 import liqp.TemplateContext;
+import liqp.blocks.ExceptionalResult;
 
 import static liqp.LValue.*;
 
@@ -46,7 +47,11 @@ public class BlockNode implements LNode {
             }
 
             if (value == BREAK || value == CONTINUE) {
-                return value;
+                if ("".equals(builder.getResult().toString()))
+                {
+                    return value;
+                }
+                return new ExceptionalResult(value, builder.getResult());
             } else if (value instanceof List) {
 
                 List<?> list = (List<?>) value;

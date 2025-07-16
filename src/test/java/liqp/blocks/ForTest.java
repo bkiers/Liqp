@@ -117,6 +117,26 @@ public class ForTest {
     }
 
     /*
+     *   def test_for_with_break
+     *     assert_template_result('1234', '{% for i in (1..5) %}{% if i == 4 %}{{ i }}{% break %}{% else %}{{ i }}{% endif %}{% endfor %}')
+     *   end
+     */
+    @Test
+    public void testForWithBreak() {
+        assertThat(TemplateParser.DEFAULT.parse("{% for i in (1..5) %}{% if i == 4 %}{{ i }}{% break %}{% else %}{{ i }}{% endif %}{% endfor %}").render(), is("1234"));
+    }
+
+    /*
+     *   def test_for_with_continue
+     *     assert_template_result('12345', '{% for i in (1..5) %}{% if i == 4 %}{{ i }}{% continue %}{% else %}{{ i }}{% endif %}{% endfor %}')
+     *   end
+     */
+    @Test
+    public void testForWithContinue() {
+        assertThat(TemplateParser.DEFAULT.parse("{% for i in (1..5) %}{% if i == 4 %}{{ i }}{% continue %}{% else %}{{ i }}{% endif %}{% endfor %}").render(), is("12345"));
+    }
+
+    /*
      *
      *   def test_for_with_range
      *     assert_template_result(' 1  2  3 ', '{%for item in (1..3) %} {{item}} {%endfor%}')

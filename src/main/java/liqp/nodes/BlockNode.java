@@ -6,7 +6,7 @@ import java.util.List;
 
 import liqp.RenderTransformer.ObjectAppender;
 import liqp.TemplateContext;
-import liqp.blocks.ExceptionalResult;
+import liqp.blocks.LoopInterruptionResult;
 
 import static liqp.LValue.*;
 
@@ -51,7 +51,7 @@ public class BlockNode implements LNode {
                 {
                     return value;
                 }
-                return new ExceptionalResult(value, builder.getResult());
+                return new LoopInterruptionResult(value, builder.getResult());
             } else if (value instanceof List) {
 
                 List<?> list = (List<?>) value;

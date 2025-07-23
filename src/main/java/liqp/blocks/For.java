@@ -183,11 +183,13 @@ public class For extends Block {
             if(value == null) {
                 continue;
             }
-            if (value instanceof ExceptionalResult) {
-                ExceptionalResult exceptionalResult = (ExceptionalResult) value;
-                evalResult = exceptionalResult.getEvaluationResult();
-                value = exceptionalResult.getInterruption();
+            if (value instanceof LoopInterruptionResult) {
+                LoopInterruptionResult interruptionResult = (LoopInterruptionResult) value;
+                evalResult = interruptionResult.getEvaluationResult();
+                value = interruptionResult.getInterruption();
             }
+
+            // Append results of evaluation before handling break and continue statements
             if(super.isArray(evalResult)) {
 
                 Object[] arr = super.asArray(evalResult, context);

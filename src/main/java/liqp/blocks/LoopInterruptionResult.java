@@ -1,9 +1,9 @@
 package liqp.blocks;
 
-public class ExceptionalResult {
+public class LoopInterruptionResult {
   private final Object interruption;
   private final Object evaluationResult;
-  public ExceptionalResult(
+  public LoopInterruptionResult(
       Object interruption, Object evaluationResult
   ) {
     this.interruption = interruption;

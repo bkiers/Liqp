@@ -179,9 +179,26 @@ public class For extends Block {
         for (LNode node : children) {
 
             Object value = node.render(context);
-
+            Object evalResult = value;
             if(value == null) {
                 continue;
+            }
+            if (value instanceof LoopInterruptionResult) {
+                LoopInterruptionResult interruptionResult = (LoopInterruptionResult) value;
+                evalResult = interruptionResult.getEvaluationResult();
+                value = interruptionResult.getInterruption();
+            }
+
+            // Append results of evaluation before handling break and continue statements
+            if(super.isArray(evalResult)) {
+
+                Object[] arr = super.asArray(evalResult, context);
+
+                for (Object obj : arr) {
+                    builder.append(obj);
+                }
+            } else {
+                builder.append(super.asAppendableObject(evalResult, context));
             }
 
             if(value == CONTINUE) {
@@ -195,16 +212,7 @@ public class For extends Block {
                 break;
             }
 
-            if(super.isArray(value)) {
 
-                Object[] arr = super.asArray(value, context);
-
-                for (Object obj : arr) {
-                    builder.append(obj);
-                }
-            } else {
-                builder.append(super.asAppendableObject(value, context));
-            }
         }
         return isBreak;
     }

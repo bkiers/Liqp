@@ -3,7 +3,9 @@ package liqp.filters;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -58,7 +60,7 @@ public class Sort extends Filter {
 
         List<Comparable<Object>> list = asComparableList(context, array, property);
 
-        Collections.sort(list);
+        Collections.sort(list, new ObjectComparator());
 
         if (wasMap) {
             LinkedHashMap<Object, Object> map = new LinkedHashMap<>();
@@ -70,6 +72,30 @@ public class Sort extends Filter {
 
         return property == null ? list.toArray(new Comparable[list.size()]) : list.toArray(
             new SortableMap[list.size()]);
+    }
+
+    private static final class ObjectComparator implements Comparator<Comparable<Object>> {
+        private java.util.Map<Object, String> stringCache = null;
+
+        private String toString(Object obj) {
+            if (stringCache == null) {
+                stringCache = new IdentityHashMap<>();
+            }
+            return stringCache.computeIfAbsent(obj, String::valueOf);
+        }
+
+        @Override
+        public int compare(Comparable<Object> a, Comparable<Object> b) {
+            try {
+                return a.compareTo(b);
+            } catch (ClassCastException e) {
+                try {
+                    return -b.compareTo(a);
+                } catch (ClassCastException e2) {
+                    return toString(a).compareTo(toString(b));
+                }
+            }
+        }
     }
 
     private static final class ComparableMapEntry<K, V> implements java.util.Map.Entry<K, V>,
